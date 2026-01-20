@@ -24,6 +24,7 @@ jobs:
             texlive-fonts-recommended \
             texlive-pictures \
             texlive-latex-recommended \
+            texlive-lang-greek \
             latexmk
 
       - name: Build all PDFs
