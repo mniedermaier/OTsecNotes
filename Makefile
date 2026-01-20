@@ -23,16 +23,16 @@ NC = \033[0m
 .PHONY: all
 all: $(TOPICS)
 
-# Build a specific topic
+# Build a specific topic (uses per-document build dir for parallel safety)
 .PHONY: $(TOPICS)
 $(TOPICS): %: %/main.tex $(STYLE_FILE)
 	@echo "$(CYAN)[BUILD]$(NC) $@"
-	@mkdir -p $(BUILD_DIR)
-	@(cd $@ && TEXINPUTS="../$(TEMPLATE_DIR):$$TEXINPUTS" $(TEX) $(TEXFLAGS) -output-directory=../$(BUILD_DIR) main.tex > /dev/null 2>&1) || \
-		(echo "$(RED)[ERROR]$(NC) First pass failed for $@"; TEXINPUTS="$(TEMPLATE_DIR):$$TEXINPUTS" $(TEX) $(TEXFLAGS) -output-directory=$(BUILD_DIR) $@/main.tex; exit 1)
-	@(cd $@ && TEXINPUTS="../$(TEMPLATE_DIR):$$TEXINPUTS" $(TEX) $(TEXFLAGS) -output-directory=../$(BUILD_DIR) main.tex > /dev/null 2>&1) || \
+	@mkdir -p $(BUILD_DIR)/$@
+	@(cd $@ && TEXINPUTS="../$(TEMPLATE_DIR):$$TEXINPUTS" $(TEX) $(TEXFLAGS) -output-directory=../$(BUILD_DIR)/$@ main.tex > /dev/null 2>&1) || \
+		(echo "$(RED)[ERROR]$(NC) First pass failed for $@"; TEXINPUTS="$(TEMPLATE_DIR):$$TEXINPUTS" $(TEX) $(TEXFLAGS) -output-directory=$(BUILD_DIR)/$@ $@/main.tex; exit 1)
+	@(cd $@ && TEXINPUTS="../$(TEMPLATE_DIR):$$TEXINPUTS" $(TEX) $(TEXFLAGS) -output-directory=../$(BUILD_DIR)/$@ main.tex > /dev/null 2>&1) || \
 		(echo "$(RED)[ERROR]$(NC) Second pass failed for $@"; exit 1)
-	@mv $(BUILD_DIR)/main.pdf $@/$@.pdf
+	@mv $(BUILD_DIR)/$@/main.pdf $@/$@.pdf
 	@echo "$(GREEN)[DONE]$(NC) Generated $@/$@.pdf"
 
 # Build all documents in parallel
@@ -45,10 +45,10 @@ parallel:
 # Verbose build for a specific topic (usage: make verbose-01-purdue-model)
 verbose-%:
 	@echo "$(CYAN)[BUILD]$(NC) $* (verbose)"
-	@mkdir -p $(BUILD_DIR)
-	cd $* && TEXINPUTS="../$(TEMPLATE_DIR):$$TEXINPUTS" $(TEX) -output-directory=../$(BUILD_DIR) main.tex
-	cd $* && TEXINPUTS="../$(TEMPLATE_DIR):$$TEXINPUTS" $(TEX) -output-directory=../$(BUILD_DIR) main.tex
-	@mv $(BUILD_DIR)/main.pdf $*/$*.pdf
+	@mkdir -p $(BUILD_DIR)/$*
+	cd $* && TEXINPUTS="../$(TEMPLATE_DIR):$$TEXINPUTS" $(TEX) -output-directory=../$(BUILD_DIR)/$* main.tex
+	cd $* && TEXINPUTS="../$(TEMPLATE_DIR):$$TEXINPUTS" $(TEX) -output-directory=../$(BUILD_DIR)/$* main.tex
+	@mv $(BUILD_DIR)/$*/main.pdf $*/$*.pdf
 	@echo "$(GREEN)[DONE]$(NC) Generated $*/$*.pdf"
 
 # Clean auxiliary files
