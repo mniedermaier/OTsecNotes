@@ -27,10 +27,13 @@ all: $(TOPICS)
 .PHONY: $(TOPICS)
 $(TOPICS): %: %/main.tex $(STYLE_FILE)
 	@echo "$(CYAN)[BUILD]$(NC) $@"
+	@echo "  Working dir: $$(pwd)"
+	@echo "  Target dir exists: $$(test -d '$@' && echo 'yes' || echo 'no')"
+	@echo "  main.tex exists: $$(test -f '$@/main.tex' && echo 'yes' || echo 'no')"
 	@mkdir -p $(BUILD_DIR)
-	@cd $@ && TEXINPUTS="../$(TEMPLATE_DIR):$$TEXINPUTS" $(TEX) $(TEXFLAGS) -output-directory=../$(BUILD_DIR) main.tex > /dev/null 2>&1 || \
+	cd $@ && TEXINPUTS="../$(TEMPLATE_DIR):$$TEXINPUTS" $(TEX) $(TEXFLAGS) -output-directory=../$(BUILD_DIR) main.tex > /dev/null 2>&1 || \
 		(echo "$(RED)[ERROR]$(NC) First pass failed for $@"; cd $@ && TEXINPUTS="../$(TEMPLATE_DIR):$$TEXINPUTS" $(TEX) $(TEXFLAGS) -output-directory=../$(BUILD_DIR) main.tex; exit 1)
-	@cd $@ && TEXINPUTS="../$(TEMPLATE_DIR):$$TEXINPUTS" $(TEX) $(TEXFLAGS) -output-directory=../$(BUILD_DIR) main.tex > /dev/null 2>&1 || \
+	cd $@ && TEXINPUTS="../$(TEMPLATE_DIR):$$TEXINPUTS" $(TEX) $(TEXFLAGS) -output-directory=../$(BUILD_DIR) main.tex > /dev/null 2>&1 || \
 		(echo "$(RED)[ERROR]$(NC) Second pass failed for $@"; exit 1)
 	@mv $(BUILD_DIR)/main.pdf $@/$@.pdf
 	@echo "$(GREEN)[DONE]$(NC) Generated $@/$@.pdf"
