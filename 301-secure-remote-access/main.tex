@@ -1,0 +1,278 @@
+% ============================================================================
+%  Secure Remote Access - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+\hypersetup{
+    pdftitle={Secure Remote Access for OT},
+    pdfsubject={Implementing Safe Remote Connectivity to Industrial Systems},
+}
+
+\begin{document}
+
+% ----------------------------------------------------------------------------
+%  TITLE PAGE
+% ----------------------------------------------------------------------------
+
+\maketitlepage
+    {Secure Remote Access}
+    {Implementing Safe Remote Connectivity to Industrial Systems}
+    {OT Security Learning Series}
+    {Document 301 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+% ----------------------------------------------------------------------------
+%  TABLE OF CONTENTS
+% ----------------------------------------------------------------------------
+
+\tableofcontents
+\newpage
+
+% ----------------------------------------------------------------------------
+%  INTRODUCTION
+% ----------------------------------------------------------------------------
+
+\section{Introduction}
+
+Remote access to OT environments is increasingly necessary for operations, maintenance, and vendor support. However, improperly implemented remote access has been the entry point for numerous high-profile attacks on industrial systems.
+
+\begin{dangerbox}
+Remote access was the attack vector in the Ukraine power grid attacks (2015/2016). Attackers used hijacked VPN credentials to access SCADA systems and open circuit breakers remotely.
+\end{dangerbox}
+
+\subsection{Business Drivers}
+
+\begin{itemize}
+    \item \textbf{Centralized operations:} Monitor multiple sites from control center
+    \item \textbf{Vendor support:} Third-party maintenance and troubleshooting
+    \item \textbf{Expert access:} Specialists supporting remote facilities
+    \item \textbf{Emergency response:} After-hours incident support
+\end{itemize}
+
+\begin{warningbox}
+Every remote access connection is a potential attack path. The convenience must be balanced against the risk of unauthorized access to critical systems.
+\end{warningbox}
+
+% ----------------------------------------------------------------------------
+%  ARCHITECTURE
+% ----------------------------------------------------------------------------
+
+\section{Architecture Principles}
+
+\subsection{Key Requirements}
+
+\begin{successbox}
+\textbf{Secure remote access must provide:}
+\begin{enumerate}
+    \item \textbf{Strong authentication:} Multi-factor, not just passwords
+    \item \textbf{Encrypted transport:} Protect data in transit
+    \item \textbf{Access control:} Limit what users can reach
+    \item \textbf{Session monitoring:} Record and audit all activity
+    \item \textbf{Controlled entry point:} Single, monitored gateway
+\end{enumerate}
+\end{successbox}
+
+\subsection{DMZ-Based Architecture}
+
+Remote access should terminate in the Industrial DMZ, never directly into OT:
+
+\begin{center}
+\begin{tikzpicture}[scale=1.1, every node/.style={transform shape}]
+    % External
+    \node[rectangle, rounded corners, fill=gray!20, draw=gray, minimum width=2.5cm, minimum height=0.8cm] (ext) at (-4,0) {Remote User};
+
+    % DMZ
+    \node[rectangle, rounded corners, fill=zone35!30, draw=zone35, minimum width=3cm, minimum height=2cm] (dmz) at (0,0) {};
+    \node[font=\scriptsize, anchor=north] at (0,0.9) {DMZ};
+    \node[rectangle, rounded corners, fill=white, draw=zone35, minimum width=2cm, minimum height=0.5cm, font=\tiny] (jump) at (0,0.2) {Jump Server};
+    \node[rectangle, rounded corners, fill=white, draw=zone35, minimum width=2cm, minimum height=0.5cm, font=\tiny] (vpn) at (0,-0.5) {VPN Gateway};
+
+    % OT
+    \node[rectangle, rounded corners, fill=zone2!30, draw=zone2, minimum width=2.5cm, minimum height=0.8cm] (ot) at (4,0) {OT Systems};
+
+    % Arrows
+    \draw[->, thick] (ext) -- (vpn);
+    \draw[->, thick] (vpn) -- (jump);
+    \draw[->, thick] (jump) -- (ot);
+
+    % Firewalls
+    \draw[red, line width=1pt] (-1.8,-1.2) -- (-1.8,1.2);
+    \draw[red, line width=1pt] (1.8,-1.2) -- (1.8,1.2);
+    \node[font=\tiny, text=red] at (-1.8,-1.5) {FW};
+    \node[font=\tiny, text=red] at (1.8,-1.5) {FW};
+\end{tikzpicture}
+\end{center}
+
+% ----------------------------------------------------------------------------
+%  COMPONENTS
+% ----------------------------------------------------------------------------
+
+\section{Key Components}
+
+\subsection{Jump Servers (Bastion Hosts)}
+
+\begin{conceptbox}{Jump Server Functions}
+\begin{itemize}
+    \item \textbf{Single entry point:} All remote sessions pass through
+    \item \textbf{Session brokering:} Connects users to authorized systems
+    \item \textbf{No direct OT access:} Users cannot bypass the jump server
+    \item \textbf{Hardened system:} Minimal services, fully patched
+\end{itemize}
+\end{conceptbox}
+
+\subsection{VPN Technologies}
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3cm}p{10cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Type} & \textcolor{white}{\bfseries Considerations} \\
+\midrule
+IPsec & Strong encryption, complex configuration, site-to-site or client \\
+SSL/TLS VPN & Easier deployment, browser-based options, client-based \\
+WireGuard & Modern, lightweight, good performance \\
+\end{tabular}
+\end{center}
+
+\subsection{Multi-Factor Authentication (MFA)}
+
+\begin{itemize}
+    \item \textbf{Something you know:} Password, PIN
+    \item \textbf{Something you have:} Hardware token, mobile app, smart card
+    \item \textbf{Something you are:} Biometrics (less common in OT)
+\end{itemize}
+
+\begin{tipbox}
+MFA is essential for remote access. Password-only authentication is insufficient---stolen credentials were used in the Ukraine attacks.
+\end{tipbox}
+
+% ----------------------------------------------------------------------------
+%  ACCESS CONTROL
+% ----------------------------------------------------------------------------
+
+\section{Access Control}
+
+\subsection{Principle of Least Privilege}
+
+\begin{itemize}
+    \item \textbf{Role-based access:} Define roles with specific permissions
+    \item \textbf{System-level restrictions:} Limit which systems each role can access
+    \item \textbf{Time-based access:} Restrict access to business hours or maintenance windows
+    \item \textbf{Purpose-specific accounts:} Separate accounts for different functions
+\end{itemize}
+
+\subsection{Vendor Access Management}
+
+\begin{warningbox}
+\textbf{Third-party access requires additional controls:}
+\begin{itemize}
+    \item Dedicated vendor accounts (no shared credentials)
+    \item Access enabled only when needed, disabled by default
+    \item Explicit approval workflow for each session
+    \item All sessions monitored and recorded
+\end{itemize}
+\end{warningbox}
+
+% ----------------------------------------------------------------------------
+%  MONITORING
+% ----------------------------------------------------------------------------
+
+\section{Monitoring and Audit}
+
+\subsection{Session Recording}
+
+\begin{itemize}
+    \item \textbf{Video recording:} Capture screen activity for review
+    \item \textbf{Keystroke logging:} Record commands entered
+    \item \textbf{File transfer logging:} Track all files moved
+    \item \textbf{Retention:} Store recordings per compliance requirements
+\end{itemize}
+
+\subsection{Real-Time Monitoring}
+
+\begin{itemize}
+    \item \textbf{Active session visibility:} See who is connected now
+    \item \textbf{Anomaly detection:} Alert on unusual activity patterns
+    \item \textbf{Session termination:} Ability to kill suspicious sessions
+    \item \textbf{Geographic restrictions:} Block access from unexpected locations
+\end{itemize}
+
+\subsection{Audit Trail}
+
+\begin{itemize}
+    \item \textbf{Authentication logs:} All login attempts (success and failure)
+    \item \textbf{Authorization logs:} Access requests and approvals
+    \item \textbf{Activity logs:} Actions performed during sessions
+    \item \textbf{Log integrity:} Protect logs from tampering
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  COMMON MISTAKES
+% ----------------------------------------------------------------------------
+
+\section{Common Mistakes}
+
+\begin{dangerbox}
+\textbf{Remote access security failures:}
+\begin{itemize}
+    \item \textbf{Direct VPN to OT:} Bypassing DMZ and jump servers
+    \item \textbf{Shared credentials:} Multiple users with same account
+    \item \textbf{No MFA:} Password-only authentication
+    \item \textbf{Always-on access:} Vendor connections left enabled
+    \item \textbf{No monitoring:} Sessions not recorded or reviewed
+    \item \textbf{Forgotten access:} Former employees/vendors still enabled
+\end{itemize}
+\end{dangerbox}
+
+% ----------------------------------------------------------------------------
+%  IMPLEMENTATION CHECKLIST
+% ----------------------------------------------------------------------------
+
+\section{Implementation Checklist}
+
+\begin{successbox}
+\textbf{Secure remote access checklist:}
+\begin{enumerate}
+    \item[$\square$] Remote access terminates in DMZ, not directly in OT
+    \item[$\square$] Jump server required for all OT system access
+    \item[$\square$] Multi-factor authentication enforced
+    \item[$\square$] Role-based access control implemented
+    \item[$\square$] All sessions recorded and logged
+    \item[$\square$] Vendor access disabled by default, enabled per-request
+    \item[$\square$] Regular access reviews conducted
+    \item[$\square$] Incident response plan includes remote access scenarios
+\end{enumerate}
+\end{successbox}
+
+% ----------------------------------------------------------------------------
+%  FURTHER READING
+% ----------------------------------------------------------------------------
+
+\section{Further Reading}
+
+\subsection*{Standards and Guidelines}
+\begin{itemize}
+    \item \textbf{NIST SP 800-82 Rev. 3} -- Guide to OT Security (Chapter 5)\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+    \item \textbf{IEC 62443-3-3} -- System Security Requirements\\
+          \url{https://www.isa.org/standards-and-publications/isa-standards/isa-iec-62443-series-of-standards}
+\end{itemize}
+
+\subsection*{Resources}
+\begin{itemize}
+    \item \textbf{CISA} -- Remote Access Guidance\\
+          \url{https://www.cisa.gov/resources-tools/resources}
+    \item \textbf{SANS ICS} -- Securing Remote Access\\
+          \url{https://www.sans.org/blog/}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textcolor{mediumgray}{\rule{0.5\textwidth}{0.5pt}}\\[1em]
+\textcolor{mediumgray}{\small Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

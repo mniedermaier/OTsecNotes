@@ -1,0 +1,311 @@
+% ============================================================================
+%  TRITON/TRISIS - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+\hypersetup{
+    pdftitle={TRITON/TRISIS: Targeting Safety Systems},
+    pdfsubject={Analysis of the TRITON Attack on Safety Instrumented Systems},
+}
+
+\begin{document}
+
+% ----------------------------------------------------------------------------
+%  TITLE PAGE
+% ----------------------------------------------------------------------------
+
+\maketitlepage
+    {TRITON / TRISIS}
+    {The First Cyber Attack Targeting Safety Instrumented Systems}
+    {OT Security Learning Series}
+    {Document 412 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+% ----------------------------------------------------------------------------
+%  TABLE OF CONTENTS
+% ----------------------------------------------------------------------------
+
+\tableofcontents
+\newpage
+
+% ----------------------------------------------------------------------------
+%  INTRODUCTION
+% ----------------------------------------------------------------------------
+
+\section{Introduction}
+
+TRITON (also known as TRISIS or HatMan) is malware discovered in 2017 that specifically targeted Safety Instrumented Systems (SIS). This attack crossed a critical line---targeting systems designed to prevent catastrophic accidents and protect human life.
+
+\begin{dangerbox}
+TRITON is the first known malware designed to attack safety systems. By targeting the last line of defense against industrial disasters, the attackers demonstrated willingness to potentially cause loss of life.
+\end{dangerbox}
+
+\subsection{Key Facts}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Attribute} & \textcolor{white}{\bfseries Details} \\
+\midrule
+Discovery Date & December 2017 \\
+Target & Middle Eastern petrochemical facility \\
+Target Systems & Schneider Electric Triconex SIS controllers \\
+Attack Goal & Disable safety systems to enable physical damage \\
+Outcome & Attack failed; SIS triggered safe shutdown \\
+Attribution & Russian government research institute (CNIIHM) \\
+\end{tabular}
+\end{center}
+
+% ----------------------------------------------------------------------------
+%  SAFETY SYSTEMS BACKGROUND
+% ----------------------------------------------------------------------------
+
+\section{Understanding Safety Instrumented Systems}
+
+\subsection{What is a SIS?}
+
+\begin{definitionbox}{Safety Instrumented System (SIS)}
+A SIS is an autonomous control system designed to bring a process to a safe state when predetermined conditions are violated. It operates independently from the basic process control system (BPCS) and serves as the last automated line of defense against hazardous events.
+\end{definitionbox}
+
+\begin{conceptbox}{SIS Functions}
+\begin{itemize}
+    \item \textbf{Emergency Shutdown (ESD):} Stop processes when dangerous conditions detected
+    \item \textbf{Fire \& Gas Detection:} Trigger alarms and protective actions
+    \item \textbf{Burner Management:} Safe startup/shutdown of fired equipment
+    \item \textbf{High Integrity Pressure Protection (HIPPS):} Prevent overpressure
+\end{itemize}
+\end{conceptbox}
+
+\subsection{Defense in Depth Model}
+
+\begin{center}
+\begin{tikzpicture}[scale=0.9]
+    % Layers
+    \node[rectangle, rounded corners, minimum width=10cm, minimum height=0.8cm, fill=success!30, draw=success] at (0,3) {Process Design (inherently safer)};
+    \node[rectangle, rounded corners, minimum width=8.5cm, minimum height=0.8cm, fill=info!30, draw=info] at (0,2) {Basic Process Control System (BPCS)};
+    \node[rectangle, rounded corners, minimum width=7cm, minimum height=0.8cm, fill=warning!30, draw=warning] at (0,1) {Alarms \& Operator Response};
+    \node[rectangle, rounded corners, minimum width=5.5cm, minimum height=0.8cm, fill=danger!30, draw=danger, line width=1.5pt] at (0,0) {\textbf{Safety Instrumented System (SIS)}};
+    \node[rectangle, rounded corners, minimum width=4cm, minimum height=0.8cm, fill=secondary!30, draw=secondary] at (0,-1) {Physical Protection};
+
+    % Arrow and label
+    \draw[->, line width=1pt] (6,3) -- (6,-1);
+    \node[font=\scriptsize, align=center, anchor=west] at (6.2,1) {Layers of\\Protection};
+\end{tikzpicture}
+\end{center}
+
+\begin{warningbox}
+The SIS is the last automated barrier before physical protection devices (relief valves, rupture discs) and potential disaster. Compromising a SIS could allow dangerous conditions to escalate unchecked.
+\end{warningbox}
+
+% ----------------------------------------------------------------------------
+%  ATTACK ANALYSIS
+% ----------------------------------------------------------------------------
+
+\section{Attack Analysis}
+
+\subsection{Attack Timeline}
+
+\begin{itemize}
+    \item \textbf{2014 (estimated):} Initial compromise of corporate network
+    \item \textbf{2014--2017:} Lateral movement and reconnaissance
+    \item \textbf{Mid-2017:} Access to SIS engineering workstation gained
+    \item \textbf{August 2017:} First TRITON deployment attempt
+    \item \textbf{August 2017:} SIS detected invalid code, triggered shutdown
+    \item \textbf{December 2017:} Incident publicly disclosed by Dragos and FireEye
+\end{itemize}
+
+\subsection{Attack Chain}
+
+\begin{conceptbox}{TRITON Attack Sequence}
+\begin{enumerate}
+    \item \textbf{Initial Access:} Compromised corporate IT network (method unknown)
+    \item \textbf{Lateral Movement:} Pivoted through networks to reach OT
+    \item \textbf{Workstation Compromise:} Gained access to SIS engineering workstation
+    \item \textbf{Reconnaissance:} Studied Triconex controller architecture
+    \item \textbf{Payload Development:} Created custom framework for Triconex
+    \item \textbf{Deployment:} Uploaded malicious code to safety controllers
+    \item \textbf{Failure:} Code error triggered SIS safe shutdown
+\end{enumerate}
+\end{conceptbox}
+
+\subsection{Technical Details}
+
+\begin{conceptbox}{TRITON Malware Components}
+\begin{itemize}
+    \item \textbf{trilog.exe:} Main executable disguised as legitimate Triconex software
+    \item \textbf{library.zip:} Python libraries compiled for execution
+    \item \textbf{inject.bin:} Shellcode payload for Triconex controller
+    \item \textbf{imain.bin:} Main malicious logic for the controller
+\end{itemize}
+\end{conceptbox}
+
+The malware was designed to:
+\begin{enumerate}
+    \item Communicate with Triconex controllers using the TriStation protocol
+    \item Read and write controller memory
+    \item Upload and execute custom code on the safety controller
+    \item Potentially disable safety functions while hiding from operators
+\end{enumerate}
+
+\subsection{Why the Attack Failed}
+
+\begin{tipbox}
+The attack was discovered because the malicious code contained a bug that caused the safety controller to detect an invalid state and initiate a safe shutdown. This triggered an investigation that uncovered the intrusion.
+\end{tipbox}
+
+The SIS performed its designed function---when it detected something wrong, it failed safely. This highlights the importance of defense-in-depth and proper safety system design.
+
+% ----------------------------------------------------------------------------
+%  IMPLICATIONS
+% ----------------------------------------------------------------------------
+
+\section{Implications}
+
+\subsection{Crossing the Line}
+
+\begin{dangerbox}
+\textbf{TRITON represents a significant escalation in cyber attacks:}
+\begin{itemize}
+    \item First malware to target safety systems specifically
+    \item Demonstrates intent to cause physical harm or death
+    \item Shows advanced understanding of industrial safety architecture
+    \item Required significant investment and specialized expertise
+\end{itemize}
+\end{dangerbox}
+
+\subsection{Potential Consequences}
+
+Had the attack succeeded, potential outcomes could have included:
+
+\begin{itemize}
+    \item \textbf{Disabled safety functions:} Process could exceed safe limits
+    \item \textbf{Masked hazardous conditions:} Operators unaware of danger
+    \item \textbf{Explosions or fires:} Uncontrolled chemical reactions
+    \item \textbf{Toxic releases:} Environmental contamination
+    \item \textbf{Loss of life:} Worker and potentially community casualties
+\end{itemize}
+
+\subsection{Attribution}
+
+\begin{infobox}
+FireEye attributed TRITON to the Central Scientific Research Institute of Chemistry and Mechanics (CNIIHM), a Russian government research institution. This attribution is based on:
+\begin{itemize}
+    \item IP addresses traced to CNIIHM
+    \item Testing activity observed from Russian systems
+    \item Technical artifacts in the malware code
+\end{itemize}
+\end{infobox}
+
+% ----------------------------------------------------------------------------
+%  LESSONS LEARNED
+% ----------------------------------------------------------------------------
+
+\section{Lessons Learned}
+
+\subsection{Defense Recommendations}
+
+\begin{successbox}
+\textbf{Key security measures for safety systems:}
+\begin{enumerate}
+    \item \textbf{Isolate SIS networks:} Physical or strong logical separation from BPCS
+    \item \textbf{Restrict engineering access:} Limit who can program safety controllers
+    \item \textbf{Monitor SIS changes:} Detect unauthorized modifications to logic
+    \item \textbf{Use hardware key switches:} Physical controls for programming mode
+    \item \textbf{Implement change management:} Document and approve all SIS changes
+    \item \textbf{Regular integrity checks:} Verify SIS logic against approved baseline
+\end{enumerate}
+\end{successbox}
+
+\subsection{Network Architecture}
+
+\begin{warningbox}
+SIS engineering workstations should not be connected to general OT networks. Access to safety system programming should require physical presence and multiple authorization steps.
+\end{warningbox}
+
+Recommended architecture:
+\begin{itemize}
+    \item Separate network segment for SIS
+    \item Dedicated, hardened engineering workstations
+    \item No direct connectivity between SIS and business networks
+    \item Physical key switches to enable programming mode
+    \item Multi-person authorization for safety logic changes
+\end{itemize}
+
+\subsection{Industry Response}
+
+TRITON prompted significant industry action:
+
+\begin{itemize}
+    \item Schneider Electric released security advisories and patches
+    \item ICS-CERT issued alerts and recommended mitigations
+    \item Industry groups developed SIS-specific security guidelines
+    \item Increased focus on safety system cybersecurity in standards
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  DETECTION
+% ----------------------------------------------------------------------------
+
+\section{Detection and Response}
+
+\subsection{Indicators of Compromise}
+
+\begin{itemize}
+    \item Unauthorized TriStation protocol communications
+    \item Unexpected files on SIS engineering workstations
+    \item Safety controller in programming mode unexpectedly
+    \item Anomalous network traffic to/from safety systems
+    \item Unexpected safety system shutdowns
+\end{itemize}
+
+\subsection{Monitoring Recommendations}
+
+\begin{itemize}
+    \item \textbf{Network monitoring:} Detect unauthorized SIS communications
+    \item \textbf{File integrity:} Monitor engineering workstations for changes
+    \item \textbf{Access logging:} Track who accesses SIS programming tools
+    \item \textbf{Configuration baselines:} Compare SIS logic against known-good
+    \item \textbf{Physical controls:} Monitor key switch positions
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  FURTHER READING
+% ----------------------------------------------------------------------------
+
+\section{Further Reading}
+
+\subsection*{Technical Reports}
+\begin{itemize}
+    \item \textbf{Dragos} -- TRISIS Malware Analysis\\
+          \url{https://www.dragos.com/resource/trisis/}
+    \item \textbf{FireEye / Mandiant} -- TRITON Attribution Report\\
+          \url{https://www.mandiant.com/resources/reports}
+    \item \textbf{Schneider Electric} -- Security Notification\\
+          \url{https://www.se.com/ww/en/work/support/cybersecurity/security-notifications.jsp}
+\end{itemize}
+
+\subsection*{Government Resources}
+\begin{itemize}
+    \item \textbf{CISA} -- MAR-17-352-01 HatMan/TRITON\\
+          \url{https://www.cisa.gov/news-events/analysis-reports}
+    \item \textbf{NIST} -- Cybersecurity Framework\\
+          \url{https://www.nist.gov/cyberframework}
+\end{itemize}
+
+\subsection*{Standards}
+\begin{itemize}
+    \item \textbf{IEC 61511} -- Functional Safety: Safety Instrumented Systems for the Process Industry
+    \item \textbf{ISA/IEC 62443} -- Industrial Automation and Control Systems Security
+\end{itemize}
+
+\vfill
+\begin{center}
+\textcolor{mediumgray}{\rule{0.5\textwidth}{0.5pt}}\\[1em]
+\textcolor{mediumgray}{\small Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

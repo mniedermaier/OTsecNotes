@@ -1,0 +1,425 @@
+% ============================================================================
+%  Introduction to IEC 62443 - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+\hypersetup{
+    pdftitle={Introduction to IEC 62443},
+    pdfsubject={Industrial Cybersecurity Standards},
+}
+
+\begin{document}
+
+% ----------------------------------------------------------------------------
+%  TITLE PAGE
+% ----------------------------------------------------------------------------
+
+\maketitlepage
+    {Introduction to IEC 62443}
+    {The International Standard for Industrial Cybersecurity}
+    {OT Security Learning Series}
+    {Document 110 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+% ----------------------------------------------------------------------------
+%  TABLE OF CONTENTS
+% ----------------------------------------------------------------------------
+
+\tableofcontents
+\newpage
+
+% ----------------------------------------------------------------------------
+%  INTRODUCTION
+% ----------------------------------------------------------------------------
+
+\section{What is IEC 62443?}
+
+\textbf{IEC 62443} is the international standard series for cybersecurity in Industrial Automation and Control Systems (IACS). Developed by the International Electrotechnical Commission (IEC) in collaboration with ISA (International Society of Automation), it provides a comprehensive framework for securing industrial systems.
+
+\begin{infobox}
+IEC 62443 is often referred to as \textbf{ISA/IEC 62443} because it originated from the ISA99 committee's work. The standards are technically equivalent -- ISA-62443 and IEC 62443 can be used interchangeably.
+\end{infobox}
+
+\subsection{Why IEC 62443?}
+
+Traditional IT security standards (like ISO 27001) don't fully address the unique requirements of OT environments:
+
+\begin{itemize}
+    \item \textbf{Availability over Confidentiality:} In OT, system uptime is critical
+    \item \textbf{Safety Requirements:} Industrial systems can cause physical harm
+    \item \textbf{Legacy Systems:} 20+ year old equipment can't be easily patched
+    \item \textbf{Real-time Constraints:} Security can't introduce latency
+    \item \textbf{Different Lifecycles:} OT systems run for decades, not years
+\end{itemize}
+
+\begin{successbox}
+IEC 62443 provides a \textbf{risk-based approach} that balances security requirements with operational needs, covering the entire lifecycle from design to decommissioning.
+\end{successbox}
+
+% ----------------------------------------------------------------------------
+%  STRUCTURE
+% ----------------------------------------------------------------------------
+
+\section{Standard Structure}
+
+IEC 62443 is organized into four main series, each addressing different stakeholders and aspects of industrial cybersecurity.
+
+\subsection{The Four Series}
+
+\begin{center}
+\begin{tikzpicture}[
+    series/.style={
+        rectangle,
+        rounded corners=5pt,
+        minimum width=3.5cm,
+        minimum height=2cm,
+        text=white,
+        font=\small\bfseries,
+        align=center,
+        text width=3.2cm
+    }
+]
+
+\node[series, fill=primary] (s1) at (0,0) {62443-1-x\\[0.3em]\footnotesize General};
+\node[series, fill=secondary] (s2) at (4.5,0) {62443-2-x\\[0.3em]\footnotesize Policies \&\\Procedures};
+\node[series, fill=accent] (s3) at (9,0) {62443-3-x\\[0.3em]\footnotesize System};
+\node[series, fill=zone3] (s4) at (13.5,0) {62443-4-x\\[0.3em]\footnotesize Component};
+
+\node[font=\scriptsize, text=darkgray, align=center, text width=3.5cm] at (0,-1.8) {Concepts, models,\\terminology};
+\node[font=\scriptsize, text=darkgray, align=center, text width=3.5cm] at (4.5,-1.8) {Asset owners,\\service providers};
+\node[font=\scriptsize, text=darkgray, align=center, text width=3.5cm] at (9,-1.8) {System integrators,\\architects};
+\node[font=\scriptsize, text=darkgray, align=center, text width=3.5cm] at (13.5,-1.8) {Product vendors,\\developers};
+
+\end{tikzpicture}
+\end{center}
+
+\subsection{Key Documents}
+
+\begin{definitionbox}{Most Referenced Standards}
+\begin{description}[leftmargin=!,labelwidth=2.5cm]
+    \item[62443-1-1] Terminology, concepts, and models
+    \item[62443-2-1] Security program requirements for asset owners
+    \item[62443-2-4] Security program requirements for service providers
+    \item[62443-3-2] Security risk assessment and zone/conduit design
+    \item[62443-3-3] System security requirements and security levels
+    \item[62443-4-1] Secure product development lifecycle
+    \item[62443-4-2] Technical security requirements for components
+\end{description}
+\end{definitionbox}
+
+% ----------------------------------------------------------------------------
+%  SECURITY LEVELS
+% ----------------------------------------------------------------------------
+
+\section{Security Levels (SL)}
+
+One of the most important concepts in IEC 62443 is the \textbf{Security Level} (SL). Security levels define the degree of protection required against different threat actors.
+
+\subsection{The Four Security Levels}
+
+\begin{conceptbox}{\slone\ Security Level 1 -- Casual/Coincidental}
+\textbf{Threat Actor:} Unintentional errors, accidental exposure
+
+\textbf{Protection Against:}
+\begin{itemize}
+    \item Accidental or unintentional violations
+    \item Casual exploration by curious individuals
+    \item Basic automated tools and scripts
+\end{itemize}
+
+\textbf{Example:} Employee accidentally clicking a phishing link
+\end{conceptbox}
+
+\vspace{0.5em}
+
+\begin{conceptbox}{\sltwo\ Security Level 2 -- Intentional/Simple Means}
+\textbf{Threat Actor:} Low motivation, limited resources, general skills
+
+\textbf{Protection Against:}
+\begin{itemize}
+    \item Intentional attacks using simple techniques
+    \item Low-resource hackers and script kiddies
+    \item Common malware and known exploits
+\end{itemize}
+
+\textbf{Example:} Opportunistic attacker using publicly available tools
+\end{conceptbox}
+
+\vspace{0.5em}
+
+\begin{conceptbox}{\slthree\ Security Level 3 -- Intentional/Sophisticated Means}
+\textbf{Threat Actor:} Moderate motivation, sophisticated tools, IACS-specific skills
+
+\textbf{Protection Against:}
+\begin{itemize}
+    \item Sophisticated attacks with IACS knowledge
+    \item Organized crime groups
+    \item Targeted attacks on specific organizations
+\end{itemize}
+
+\textbf{Example:} Targeted ransomware attack on industrial facility
+\end{conceptbox}
+
+\vspace{0.5em}
+
+\begin{conceptbox}{\slfour\ Security Level 4 -- Intentional/State-Sponsored}
+\textbf{Threat Actor:} High motivation, extended resources, nation-state capabilities
+
+\textbf{Protection Against:}
+\begin{itemize}
+    \item Nation-state actors and APT groups
+    \item Extended campaigns with significant resources
+    \item Zero-day exploits and custom malware
+\end{itemize}
+
+\textbf{Example:} Stuxnet-style targeted attack on critical infrastructure
+\end{conceptbox}
+
+\subsection{Security Level Types}
+
+IEC 62443 defines three types of security levels:
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3cm} p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Type} & \textcolor{white}{\bfseries Description} \\
+\midrule
+\textbf{SL-T} (Target) & The desired security level based on risk assessment \\
+\textbf{SL-A} (Achieved) & The actual security level measured/tested \\
+\textbf{SL-C} (Capability) & The maximum level a component/system can achieve \\
+\end{tabular}
+\end{center}
+
+\begin{warningbox}
+The goal is to ensure: \textbf{SL-A $\geq$ SL-T}
+
+If your achieved security level is lower than your target, you have a security gap that must be addressed through compensating controls or system upgrades.
+\end{warningbox}
+
+% ----------------------------------------------------------------------------
+%  ZONES AND CONDUITS
+% ----------------------------------------------------------------------------
+
+\section{Zones and Conduits}
+
+IEC 62443 uses the concept of \textbf{zones} and \textbf{conduits} for network segmentation and risk management.
+
+\subsection{Zones}
+
+\begin{definitionbox}{Zone Definition}
+A \textbf{zone} is a logical or physical grouping of assets that share common security requirements based on:
+\begin{itemize}
+    \item Criticality and consequence of compromise
+    \item Required security level
+    \item Physical or logical location
+    \item Responsible organization
+\end{itemize}
+\end{definitionbox}
+
+Each zone has a single \textbf{target security level} (SL-T). Assets within a zone should have similar security requirements.
+
+\subsection{Conduits}
+
+\begin{definitionbox}{Conduit Definition}
+A \textbf{conduit} is a logical grouping of communication channels that share common security requirements and connect two or more zones.
+\end{definitionbox}
+
+Conduits must provide security controls appropriate to protect both connected zones. The conduit's security level should match or exceed the highest SL-T of the connected zones.
+
+\subsection{Zone and Conduit Diagram}
+
+\begin{center}
+\begin{tikzpicture}[
+    zone/.style={
+        rectangle,
+        rounded corners=8pt,
+        minimum width=3cm,
+        minimum height=2cm,
+        draw=#1,
+        line width=2pt,
+        fill=#1!10
+    },
+    conduit/.style={
+        ->,
+        line width=3pt,
+        color=accent
+    }
+]
+
+% Zones
+\node[zone=zone4] (enterprise) at (0,0) {\begin{tabular}{c}\textbf{Enterprise}\\SL-T: 2\end{tabular}};
+\node[zone=zone35] (dmz) at (5,0) {\begin{tabular}{c}\textbf{DMZ}\\SL-T: 3\end{tabular}};
+\node[zone=zone2] (control) at (10,0) {\begin{tabular}{c}\textbf{Control}\\SL-T: 3\end{tabular}};
+\node[zone=zone0] (safety) at (10,-3) {\begin{tabular}{c}\textbf{Safety}\\SL-T: 4\end{tabular}};
+
+% Conduits
+\draw[conduit] (enterprise) -- node[above, font=\scriptsize, text=darkgray] {C1} (dmz);
+\draw[conduit] (dmz) -- node[above, font=\scriptsize, text=darkgray] {C2} (control);
+\draw[conduit] (control) -- node[right, font=\scriptsize, text=darkgray] {C3} (safety);
+
+\end{tikzpicture}
+\end{center}
+
+% ----------------------------------------------------------------------------
+%  FOUNDATIONAL REQUIREMENTS
+% ----------------------------------------------------------------------------
+
+\section{Foundational Requirements (FR)}
+
+IEC 62443-3-3 defines seven \textbf{Foundational Requirements} (FRs) that form the basis of all security controls.
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{c p{4cm} p{7cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries FR} & \textcolor{white}{\bfseries Name} & \textcolor{white}{\bfseries Description} \\
+\midrule
+\textbf{FR 1} & Identification \& Authentication & Control who and what can access the system \\
+\textbf{FR 2} & Use Control & Control what authenticated users can do \\
+\textbf{FR 3} & System Integrity & Ensure the system operates correctly \\
+\textbf{FR 4} & Data Confidentiality & Protect sensitive data from disclosure \\
+\textbf{FR 5} & Restricted Data Flow & Segment networks and control data flow \\
+\textbf{FR 6} & Timely Response & Respond to security violations \\
+\textbf{FR 7} & Resource Availability & Ensure system availability against DoS \\
+\end{tabular}
+\end{center}
+
+Each FR contains multiple \textbf{System Requirements} (SRs) and \textbf{Requirement Enhancements} (REs) that specify detailed controls for each security level.
+
+\begin{tipbox}
+When implementing IEC 62443, start with the FRs and map them to your existing controls. This gap analysis helps prioritize security improvements.
+\end{tipbox}
+
+% ----------------------------------------------------------------------------
+%  ROLES AND RESPONSIBILITIES
+% ----------------------------------------------------------------------------
+
+\section{Roles and Responsibilities}
+
+IEC 62443 defines clear responsibilities for different stakeholders:
+
+\subsection{Asset Owner}
+
+\begin{itemize}
+    \item Defines security requirements (SL-T) based on risk assessment
+    \item Implements and maintains security program (62443-2-1)
+    \item Responsible for overall OT security governance
+    \item Verifies that SL-A meets SL-T
+\end{itemize}
+
+\subsection{System Integrator}
+
+\begin{itemize}
+    \item Designs systems to meet SL-T requirements
+    \item Implements zones, conduits, and security controls
+    \item Follows secure integration practices (62443-2-4)
+    \item Documents achieved security level (SL-A)
+\end{itemize}
+
+\subsection{Product Vendor}
+
+\begin{itemize}
+    \item Develops products following secure lifecycle (62443-4-1)
+    \item Documents product security capabilities (SL-C)
+    \item Provides security patches and updates
+    \item Certifies products against 62443-4-2
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  CERTIFICATION
+% ----------------------------------------------------------------------------
+
+\section{Certification}
+
+IEC 62443 certification is offered by several organizations including TUV, Exida, and ISASecure.
+
+\subsection{Certification Types}
+
+\begin{itemize}
+    \item \textbf{Component Certification} (62443-4-2): Individual products
+    \item \textbf{SDLC Certification} (62443-4-1): Development processes
+    \item \textbf{System Certification} (62443-3-3): Complete systems
+    \item \textbf{Capability Certification}: Organization processes
+\end{itemize}
+
+\begin{infobox}
+Certification provides independent verification of security claims but is not mandatory. Many organizations use IEC 62443 as a framework without formal certification.
+\end{infobox}
+
+% ----------------------------------------------------------------------------
+%  SUMMARY
+% ----------------------------------------------------------------------------
+
+\section{Summary}
+
+\begin{definitionbox}{Key Takeaways}
+\begin{description}[leftmargin=!,labelwidth=3cm]
+    \item[IEC 62443] Comprehensive standard for industrial cybersecurity
+    \item[Security Levels] SL 1-4 define protection against threat actors
+    \item[Zones/Conduits] Network segmentation methodology
+    \item[7 FRs] Foundational requirements covering all security aspects
+    \item[Stakeholders] Asset owners, integrators, and vendors have defined roles
+\end{description}
+\end{definitionbox}
+
+\begin{successbox}
+IEC 62443 provides a \textbf{common language} for discussing OT security requirements between asset owners, integrators, and vendors. Even partial adoption improves security posture.
+\end{successbox}
+
+% ----------------------------------------------------------------------------
+%  NEXT STEPS
+% ----------------------------------------------------------------------------
+
+\section{Next Steps}
+
+To start implementing IEC 62443 in your organization:
+
+\begin{enumerate}
+    \item \textbf{Inventory:} Document all IACS assets and their criticality
+    \item \textbf{Risk Assessment:} Determine SL-T for each zone (62443-3-2)
+    \item \textbf{Gap Analysis:} Compare current state (SL-A) to target (SL-T)
+    \item \textbf{Roadmap:} Prioritize improvements based on risk
+    \item \textbf{Procurement:} Require 62443-4-2 compliance for new products
+\end{enumerate}
+
+% ----------------------------------------------------------------------------
+%  FURTHER READING
+% ----------------------------------------------------------------------------
+
+\section{Further Reading}
+
+\subsection*{Standards}
+\begin{itemize}
+    \item \textbf{ISA/IEC 62443 Series} -- Complete Standards Collection\\
+          \url{https://www.isa.org/standards-and-publications/isa-standards/isa-iec-62443-series-of-standards}
+    \item \textbf{IEC 62443-2-1} -- Security Program Requirements for Asset Owners
+    \item \textbf{IEC 62443-3-3} -- System Security Requirements and Security Levels
+    \item \textbf{IEC 62443-4-2} -- Technical Security Requirements for IACS Components
+\end{itemize}
+
+\subsection*{Resources}
+\begin{itemize}
+    \item \textbf{NIST SP 800-82 Rev. 3} -- Guide to OT Security\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+    \item \textbf{CISA ICS-CERT} -- Industrial Control Systems Advisories\\
+          \url{https://www.cisa.gov/news-events/ics-advisories}
+    \item \textbf{ISASecure} -- IEC 62443 Certification Information\\
+          \url{https://isasecure.org/}
+\end{itemize}
+
+\subsection*{Books}
+\begin{itemize}
+    \item Knapp, E. \& Langill, J. -- \textit{Industrial Network Security} (Syngress)
+    \item Macaulay, T. \& Singer, B. -- \textit{Cybersecurity for Industrial Control Systems} (CRC Press)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textcolor{mediumgray}{\rule{0.5\textwidth}{0.5pt}}\\[1em]
+\textcolor{mediumgray}{\small Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

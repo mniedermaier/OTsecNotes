@@ -1,0 +1,304 @@
+% ============================================================================
+%  OT Risk Assessment - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+\hypersetup{
+    pdftitle={OT Risk Assessment},
+    pdfsubject={Assessing Cybersecurity Risk in Industrial Environments},
+}
+
+\begin{document}
+
+% ----------------------------------------------------------------------------
+%  TITLE PAGE
+% ----------------------------------------------------------------------------
+
+\maketitlepage
+    {OT Risk Assessment}
+    {Assessing Cybersecurity Risk in Industrial Environments}
+    {OT Security Learning Series}
+    {Document 700 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+% ----------------------------------------------------------------------------
+%  TABLE OF CONTENTS
+% ----------------------------------------------------------------------------
+
+\tableofcontents
+\newpage
+
+% ----------------------------------------------------------------------------
+%  INTRODUCTION
+% ----------------------------------------------------------------------------
+
+\section{Introduction}
+
+Risk assessment in OT environments must consider factors beyond traditional IT security---including physical safety, environmental impact, and operational continuity. The goal is to identify, analyze, and prioritize risks to enable informed security decisions.
+
+\begin{infobox}
+OT risk assessment bridges cybersecurity and process safety. It requires collaboration between security professionals, engineers, and operations staff to accurately evaluate threats and their potential consequences.
+\end{infobox}
+
+\subsection{OT vs IT Risk Considerations}
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{4.5cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Factor} & \textcolor{white}{\bfseries IT Focus} & \textcolor{white}{\bfseries OT Focus} \\
+\midrule
+Primary concern & Data confidentiality & Safety and availability \\
+Impact scope & Business operations & Physical world effects \\
+Threat actors & Cybercriminals, APTs & Nation-states, insiders \\
+Asset lifetime & 3--5 years & 15--25+ years \\
+Patching & Regular updates & Constrained by operations \\
+\end{tabular}
+\end{center}
+
+% ----------------------------------------------------------------------------
+%  RISK FORMULA
+% ----------------------------------------------------------------------------
+
+\section{Risk Fundamentals}
+
+\subsection{Risk Equation}
+
+\begin{conceptbox}{Risk Calculation}
+\begin{center}
+\textbf{Risk = Threat $\times$ Vulnerability $\times$ Consequence}
+\end{center}
+
+\begin{itemize}
+    \item \textbf{Threat:} Who might attack and how likely?
+    \item \textbf{Vulnerability:} What weaknesses can be exploited?
+    \item \textbf{Consequence:} What is the impact if successful?
+\end{itemize}
+\end{conceptbox}
+
+\subsection{Consequence Categories}
+
+OT risk assessment must consider multiple impact types:
+
+\begin{itemize}
+    \item \textbf{Safety:} Potential for injury or loss of life
+    \item \textbf{Environmental:} Spills, emissions, contamination
+    \item \textbf{Operational:} Production loss, equipment damage
+    \item \textbf{Financial:} Direct costs and business impact
+    \item \textbf{Reputational:} Customer and public trust
+    \item \textbf{Regulatory:} Fines, compliance violations
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  IEC 62443 APPROACH
+% ----------------------------------------------------------------------------
+
+\section{IEC 62443 Risk Assessment}
+
+\subsection{Zone and Conduit Model}
+
+IEC 62443-3-2 defines a systematic approach:
+
+\begin{enumerate}
+    \item \textbf{Identify system under consideration (SUC)}
+    \item \textbf{Perform initial risk assessment}
+    \item \textbf{Partition into zones and conduits}
+    \item \textbf{Assign target security levels (SL-T)}
+    \item \textbf{Document security requirements}
+\end{enumerate}
+
+\subsection{Security Levels}
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.5cm}p{3cm}p{8.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries SL} & \textcolor{white}{\bfseries Threat Level} & \textcolor{white}{\bfseries Description} \\
+\midrule
+\slone & Casual/Accidental & Protection against unintentional errors \\
+\sltwo & Intentional (simple) & Low skill, limited resources, general motivation \\
+\slthree & Intentional (sophisticated) & Moderate skill, moderate resources, specific target \\
+\slfour & Intentional (nation-state) & High skill, extensive resources, highly motivated \\
+\end{tabular}
+\end{center}
+
+\subsection{Risk Matrix}
+
+\begin{center}
+\begin{tikzpicture}[scale=0.8]
+    % Grid
+    \draw[step=1.5cm, gray, thin] (0,0) grid (6,6);
+
+    % Colors
+    \fill[success!40] (0,0) rectangle (1.5,1.5);
+    \fill[success!40] (0,1.5) rectangle (1.5,3);
+    \fill[success!40] (1.5,0) rectangle (3,1.5);
+    \fill[warning!40] (0,3) rectangle (1.5,4.5);
+    \fill[warning!40] (1.5,1.5) rectangle (3,3);
+    \fill[warning!40] (3,0) rectangle (4.5,1.5);
+    \fill[warning!40] (0,4.5) rectangle (1.5,6);
+    \fill[warning!40] (1.5,3) rectangle (3,4.5);
+    \fill[warning!40] (3,1.5) rectangle (4.5,3);
+    \fill[warning!40] (4.5,0) rectangle (6,1.5);
+    \fill[danger!40] (1.5,4.5) rectangle (3,6);
+    \fill[danger!40] (3,3) rectangle (4.5,4.5);
+    \fill[danger!40] (4.5,1.5) rectangle (6,3);
+    \fill[danger!40] (3,4.5) rectangle (4.5,6);
+    \fill[danger!40] (4.5,3) rectangle (6,4.5);
+    \fill[danger!60] (4.5,4.5) rectangle (6,6);
+
+    % Labels
+    \node[font=\scriptsize] at (0.75,0.75) {Low};
+    \node[font=\scriptsize] at (2.25,2.25) {Med};
+    \node[font=\scriptsize] at (3.75,3.75) {High};
+    \node[font=\scriptsize] at (5.25,5.25) {Critical};
+
+    % Axes
+    \node[font=\small, rotate=90] at (-0.7,3) {Likelihood};
+    \node[font=\small] at (3,-0.5) {Consequence};
+\end{tikzpicture}
+\end{center}
+
+% ----------------------------------------------------------------------------
+%  ASSESSMENT PROCESS
+% ----------------------------------------------------------------------------
+
+\section{Assessment Process}
+
+\subsection{Step 1: Scope Definition}
+
+\begin{itemize}
+    \item Define boundaries of assessment (facility, system, zone)
+    \item Identify stakeholders and their concerns
+    \item Gather existing documentation (diagrams, procedures)
+    \item Establish assessment criteria and risk tolerance
+\end{itemize}
+
+\subsection{Step 2: Asset Identification}
+
+\begin{itemize}
+    \item Inventory all assets in scope
+    \item Classify by criticality and function
+    \item Map communication flows and dependencies
+    \item Identify data flows crossing zone boundaries
+\end{itemize}
+
+\subsection{Step 3: Threat Assessment}
+
+\begin{itemize}
+    \item Identify relevant threat actors (nation-state, criminal, insider)
+    \item Consider threat capabilities and motivations
+    \item Review industry-specific threat intelligence
+    \item Assess likelihood of targeting your organization
+\end{itemize}
+
+\subsection{Step 4: Vulnerability Assessment}
+
+\begin{warningbox}
+\textbf{OT vulnerability assessment considerations:}
+\begin{itemize}
+    \item Avoid active scanning of production systems
+    \item Use passive methods and configuration review
+    \item Consider architectural weaknesses, not just CVEs
+    \item Assess compensating controls effectiveness
+\end{itemize}
+\end{warningbox}
+
+\subsection{Step 5: Risk Evaluation}
+
+\begin{itemize}
+    \item Calculate risk for each threat-vulnerability pair
+    \item Consider existing controls and their effectiveness
+    \item Prioritize risks based on consequence severity
+    \item Document assumptions and uncertainties
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  RISK TREATMENT
+% ----------------------------------------------------------------------------
+
+\section{Risk Treatment}
+
+\subsection{Treatment Options}
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.5cm}p{10.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Option} & \textcolor{white}{\bfseries Description} \\
+\midrule
+Mitigate & Implement controls to reduce likelihood or consequence \\
+Transfer & Insurance, contractual arrangements with vendors \\
+Accept & Document acceptance with management approval \\
+Avoid & Eliminate the risk source (remove system, change process) \\
+\end{tabular}
+\end{center}
+
+\subsection{Control Selection}
+
+Prioritize controls that:
+\begin{itemize}
+    \item Address highest risks first
+    \item Are compatible with operational requirements
+    \item Can be implemented without safety impact
+    \item Provide defense in depth
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  DOCUMENTATION
+% ----------------------------------------------------------------------------
+
+\section{Documentation}
+
+\subsection{Required Outputs}
+
+\begin{itemize}
+    \item \textbf{Asset inventory} with criticality ratings
+    \item \textbf{Zone and conduit diagram} with security levels
+    \item \textbf{Risk register} with ratings and treatment plans
+    \item \textbf{Security requirements} for each zone
+    \item \textbf{Residual risk statement} with management sign-off
+\end{itemize}
+
+\subsection{Review Cycle}
+
+\begin{itemize}
+    \item \textbf{Annual review:} Full reassessment recommended
+    \item \textbf{Trigger-based:} After incidents, major changes, new threats
+    \item \textbf{Continuous:} Update as new vulnerabilities discovered
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  FURTHER READING
+% ----------------------------------------------------------------------------
+
+\section{Further Reading}
+
+\subsection*{Standards}
+\begin{itemize}
+    \item \textbf{IEC 62443-3-2} -- Security Risk Assessment for System Design\\
+          \url{https://www.isa.org/standards-and-publications/isa-standards/isa-iec-62443-series-of-standards}
+    \item \textbf{NIST SP 800-82 Rev. 3} -- Guide to OT Security\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+    \item \textbf{ISO 27005} -- Information Security Risk Management\\
+          \url{https://www.iso.org/standard/80585.html}
+\end{itemize}
+
+\subsection*{Resources}
+\begin{itemize}
+    \item \textbf{NIST Cybersecurity Framework}\\
+          \url{https://www.nist.gov/cyberframework}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textcolor{mediumgray}{\rule{0.5\textwidth}{0.5pt}}\\[1em]
+\textcolor{mediumgray}{\small Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

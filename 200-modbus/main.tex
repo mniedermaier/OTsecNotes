@@ -1,0 +1,246 @@
+% ============================================================================
+%  Modbus Protocol - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+\hypersetup{
+    pdftitle={Modbus Protocol},
+    pdfsubject={Understanding Modbus and Its Security Implications},
+}
+
+\begin{document}
+
+% ----------------------------------------------------------------------------
+%  TITLE PAGE
+% ----------------------------------------------------------------------------
+
+\maketitlepage
+    {Modbus Protocol}
+    {Understanding the Most Common Industrial Protocol}
+    {OT Security Learning Series}
+    {Document 200 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+% ----------------------------------------------------------------------------
+%  TABLE OF CONTENTS
+% ----------------------------------------------------------------------------
+
+\tableofcontents
+\newpage
+
+% ----------------------------------------------------------------------------
+%  INTRODUCTION
+% ----------------------------------------------------------------------------
+
+\section{Introduction}
+
+Modbus is one of the oldest and most widely deployed industrial communication protocols. Developed by Modicon in 1979, it has become the de facto standard for connecting industrial electronic devices due to its simplicity and openness.
+
+\begin{infobox}
+Despite being over 45 years old, Modbus remains ubiquitous in industrial environments. Understanding its operation and security limitations is essential for OT security professionals.
+\end{infobox}
+
+\subsection{Why Modbus Matters}
+
+\begin{itemize}
+    \item \textbf{Ubiquity:} Found in virtually every industrial sector
+    \item \textbf{Simplicity:} Easy to implement and troubleshoot
+    \item \textbf{Legacy:} Many systems will run Modbus for decades to come
+    \item \textbf{Attack surface:} No built-in security makes it an easy target
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  PROTOCOL OVERVIEW
+% ----------------------------------------------------------------------------
+
+\section{Protocol Overview}
+
+\subsection{Modbus Variants}
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3cm}p{3cm}p{7cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Variant} & \textcolor{white}{\bfseries Medium} & \textcolor{white}{\bfseries Description} \\
+\midrule
+Modbus RTU & Serial (RS-232/485) & Binary encoding, compact, most common serial variant \\
+Modbus ASCII & Serial (RS-232/485) & ASCII encoding, human-readable, slower \\
+Modbus TCP & Ethernet (TCP/IP) & RTU over TCP, port 502, most common today \\
+Modbus UDP & Ethernet (UDP/IP) & Less common, no connection guarantee \\
+\end{tabular}
+\end{center}
+
+\subsection{Architecture}
+
+Modbus uses a master-slave (client-server) architecture:
+
+\begin{conceptbox}{Modbus Communication Model}
+\begin{itemize}
+    \item \textbf{Master/Client:} Initiates all communication (HMI, SCADA, PLC)
+    \item \textbf{Slave/Server:} Responds to requests (sensors, actuators, I/O modules)
+    \item \textbf{Unit ID:} Addresses slaves (1--247 for serial, 0--255 for TCP)
+    \item \textbf{Request-Response:} Master sends request, slave responds
+\end{itemize}
+\end{conceptbox}
+
+\subsection{Data Model}
+
+Modbus defines four primary data types:
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{2cm}p{2cm}p{5.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Type} & \textcolor{white}{\bfseries Access} & \textcolor{white}{\bfseries Size} & \textcolor{white}{\bfseries Typical Use} \\
+\midrule
+Coils & Read/Write & 1 bit & Digital outputs (relays, actuators) \\
+Discrete Inputs & Read Only & 1 bit & Digital inputs (switches, sensors) \\
+Holding Registers & Read/Write & 16 bits & Analog outputs, setpoints, config \\
+Input Registers & Read Only & 16 bits & Analog inputs (measurements) \\
+\end{tabular}
+\end{center}
+
+% ----------------------------------------------------------------------------
+%  FUNCTION CODES
+% ----------------------------------------------------------------------------
+
+\section{Function Codes}
+
+Modbus operations are defined by function codes:
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.5cm}p{4.5cm}p{7cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Code} & \textcolor{white}{\bfseries Function} & \textcolor{white}{\bfseries Description} \\
+\midrule
+0x01 & Read Coils & Read status of digital outputs \\
+0x02 & Read Discrete Inputs & Read status of digital inputs \\
+0x03 & Read Holding Registers & Read analog/config values \\
+0x04 & Read Input Registers & Read analog input values \\
+0x05 & Write Single Coil & Set one digital output \\
+0x06 & Write Single Register & Set one register value \\
+0x0F & Write Multiple Coils & Set multiple digital outputs \\
+0x10 & Write Multiple Registers & Set multiple register values \\
+\end{tabular}
+\end{center}
+
+\begin{warningbox}
+Function codes 0x05, 0x06, 0x0F, and 0x10 allow writing to devices. An attacker with network access can use these to manipulate physical processes without any authentication.
+\end{warningbox}
+
+% ----------------------------------------------------------------------------
+%  SECURITY CONCERNS
+% ----------------------------------------------------------------------------
+
+\section{Security Concerns}
+
+\subsection{Design Limitations}
+
+\begin{dangerbox}
+\textbf{Modbus has no built-in security features:}
+\begin{itemize}
+    \item No authentication -- any client can communicate with any server
+    \item No encryption -- all data transmitted in plaintext
+    \item No integrity checking -- packets can be modified in transit
+    \item No authorization -- no access control for function codes
+\end{itemize}
+\end{dangerbox}
+
+\subsection{Common Attack Vectors}
+
+\begin{enumerate}
+    \item \textbf{Reconnaissance:} Scanning for Modbus devices (port 502)
+    \item \textbf{Eavesdropping:} Capturing process data from network traffic
+    \item \textbf{Replay attacks:} Recording and replaying valid commands
+    \item \textbf{Command injection:} Sending unauthorized write commands
+    \item \textbf{Denial of service:} Flooding devices with requests
+    \item \textbf{Man-in-the-middle:} Intercepting and modifying communications
+\end{enumerate}
+
+\subsection{Attack Example}
+
+A simple Modbus TCP write command to set a coil:
+
+\begin{lstlisting}[language=bash]
+# Transaction ID: 0x0001
+# Protocol ID: 0x0000 (Modbus)
+# Length: 0x0006
+# Unit ID: 0x01
+# Function: 0x05 (Write Single Coil)
+# Address: 0x0000
+# Value: 0xFF00 (ON)
+
+00 01 00 00 00 06 01 05 00 00 FF 00
+\end{lstlisting}
+
+\begin{tipbox}
+This 12-byte packet is all that's needed to turn on a coil. No credentials, no handshake, no verification. If you can reach the device, you can control it.
+\end{tipbox}
+
+% ----------------------------------------------------------------------------
+%  SECURITY MITIGATIONS
+% ----------------------------------------------------------------------------
+
+\section{Security Mitigations}
+
+Since Modbus cannot be secured at the protocol level, defense must rely on compensating controls:
+
+\subsection{Network-Level Controls}
+
+\begin{itemize}
+    \item \textbf{Network segmentation:} Isolate Modbus devices in dedicated VLANs
+    \item \textbf{Firewalls:} Restrict access to port 502 to authorized systems only
+    \item \textbf{Deep packet inspection:} Use OT-aware firewalls to filter function codes
+    \item \textbf{Encryption tunnels:} Wrap Modbus in VPN or TLS tunnels
+\end{itemize}
+
+\subsection{Monitoring and Detection}
+
+\begin{itemize}
+    \item \textbf{Network monitoring:} Detect anomalous Modbus traffic patterns
+    \item \textbf{Baseline behavior:} Alert on unexpected function codes or addresses
+    \item \textbf{Rate limiting:} Detect flooding or scanning attempts
+    \item \textbf{Logging:} Record all Modbus transactions for forensics
+\end{itemize}
+
+\subsection{Modbus/TCP Security Extension}
+
+\begin{infobox}
+The Modbus organization released a security specification that adds TLS encryption and role-based access control. However, adoption remains limited due to legacy device constraints.
+\end{infobox}
+
+% ----------------------------------------------------------------------------
+%  FURTHER READING
+% ----------------------------------------------------------------------------
+
+\section{Further Reading}
+
+\subsection*{Specifications}
+\begin{itemize}
+    \item \textbf{Modbus Organization} -- Protocol Specifications\\
+          \url{https://modbus.org/specs.php}
+    \item \textbf{Modbus/TCP Security} -- Protocol Specification\\
+          \url{https://modbus.org/docs/MB-TCP-Security-v21_2018-07-24.pdf}
+\end{itemize}
+
+\subsection*{Security Resources}
+\begin{itemize}
+    \item \textbf{CISA} -- ICS-CERT Advisories\\
+          \url{https://www.cisa.gov/news-events/ics-advisories}
+    \item \textbf{NIST SP 800-82} -- Guide to OT Security\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textcolor{mediumgray}{\rule{0.5\textwidth}{0.5pt}}\\[1em]
+\textcolor{mediumgray}{\small Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

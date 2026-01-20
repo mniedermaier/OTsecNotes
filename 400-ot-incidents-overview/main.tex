@@ -1,0 +1,204 @@
+% ============================================================================
+%  OT Security Incidents Overview - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+\hypersetup{
+    pdftitle={OT Security Incidents Overview},
+    pdfsubject={Notable Attacks on Industrial Control Systems},
+}
+
+\begin{document}
+
+% ----------------------------------------------------------------------------
+%  TITLE PAGE
+% ----------------------------------------------------------------------------
+
+\maketitlepage
+    {OT Security Incidents}
+    {Overview of Notable Attacks on Industrial Control Systems}
+    {OT Security Learning Series}
+    {Document 400 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+% ----------------------------------------------------------------------------
+%  TABLE OF CONTENTS
+% ----------------------------------------------------------------------------
+
+\tableofcontents
+\newpage
+
+% ----------------------------------------------------------------------------
+%  INTRODUCTION
+% ----------------------------------------------------------------------------
+
+\section{Introduction}
+
+The history of attacks on Operational Technology (OT) and Industrial Control Systems (ICS) provides valuable lessons for security professionals. Understanding how past incidents occurred helps organizations identify vulnerabilities and implement effective defenses.
+
+\begin{infobox}
+This document provides an overview of significant OT/ICS security incidents. Detailed analyses of individual attacks are available in separate documents within the 410-series.
+\end{infobox}
+
+\subsection{Why Study Past Incidents?}
+
+\begin{itemize}
+    \item \textbf{Learn from mistakes:} Understanding attack vectors helps prevent similar incidents
+    \item \textbf{Identify patterns:} Many attacks share common techniques and entry points
+    \item \textbf{Justify investments:} Real-world examples demonstrate the need for OT security
+    \item \textbf{Improve detection:} Knowledge of attack behaviors aids in building detection capabilities
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  TIMELINE
+% ----------------------------------------------------------------------------
+
+\section{Timeline of Major Incidents}
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.5cm}p{4cm}p{7.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Year} & \textcolor{white}{\bfseries Incident} & \textcolor{white}{\bfseries Impact} \\
+\midrule
+2010 & Stuxnet & Destroyed Iranian uranium enrichment centrifuges \\
+2014 & German Steel Mill & Physical damage to blast furnace \\
+2015 & Ukraine Power Grid & 225,000 customers lost power \\
+2016 & Ukraine Power Grid (Industroyer) & Power outage in Kyiv \\
+2017 & TRITON/TRISIS & Targeted safety instrumented systems \\
+2017 & NotPetya & Global disruption, \$10B+ damages \\
+2019 & LockerGoga (Norsk Hydro) & Aluminum production halted \\
+2020 & SolarWinds & Supply chain compromise affecting OT vendors \\
+2021 & Colonial Pipeline & Fuel supply disruption, US East Coast \\
+2021 & Oldsmar Water & Attempted manipulation of water treatment \\
+2021 & JBS Foods & Meat processing shutdown \\
+2022 & Viasat/Ukraine & Satellite communications disrupted \\
+\end{tabular}
+\end{center}
+
+% ----------------------------------------------------------------------------
+%  ATTACK CATEGORIES
+% ----------------------------------------------------------------------------
+
+\section{Attack Categories}
+
+\subsection{Nation-State Attacks}
+
+\begin{conceptbox}{Characteristics of Nation-State Attacks}
+\begin{itemize}
+    \item Highly sophisticated and well-resourced
+    \item Often target critical infrastructure
+    \item May remain undetected for extended periods
+    \item Focus on espionage, sabotage, or pre-positioning
+\end{itemize}
+
+\textbf{Examples:} Stuxnet, Ukraine Power Grid attacks, TRITON
+\end{conceptbox}
+
+\subsection{Ransomware and Criminal Attacks}
+
+\begin{conceptbox}{Characteristics of Criminal Attacks}
+\begin{itemize}
+    \item Financially motivated
+    \item Often opportunistic rather than targeted
+    \item IT systems compromised, OT affected indirectly
+    \item Growing trend of targeting industrial sectors
+\end{itemize}
+
+\textbf{Examples:} Colonial Pipeline, JBS Foods, Norsk Hydro
+\end{conceptbox}
+
+\subsection{Insider Threats}
+
+\begin{conceptbox}{Characteristics of Insider Threats}
+\begin{itemize}
+    \item Authorized access misused
+    \item May be malicious or unintentional
+    \item Difficult to detect with perimeter security
+    \item Can cause significant damage due to system knowledge
+\end{itemize}
+
+\textbf{Examples:} Maroochy Shire sewage spill (2000)
+\end{conceptbox}
+
+% ----------------------------------------------------------------------------
+%  COMMON ATTACK VECTORS
+% ----------------------------------------------------------------------------
+
+\section{Common Attack Vectors}
+
+\begin{warningbox}
+Most OT security incidents do not begin with direct attacks on OT systems. Attackers typically compromise IT networks first, then pivot to OT environments.
+\end{warningbox}
+
+\subsection{Initial Access Methods}
+
+\begin{enumerate}
+    \item \textbf{Spear Phishing:} Targeted emails to employees with access to OT networks
+    \item \textbf{Remote Access:} Compromised VPNs, RDP, or vendor connections
+    \item \textbf{Supply Chain:} Compromised software updates or vendor tools
+    \item \textbf{Removable Media:} USB drives crossing air-gap boundaries
+    \item \textbf{Internet-Exposed Systems:} Misconfigured devices accessible from internet
+\end{enumerate}
+
+\subsection{Lateral Movement to OT}
+
+\begin{enumerate}
+    \item \textbf{Dual-Homed Systems:} Engineering workstations connected to both networks
+    \item \textbf{Historian Servers:} Data replication paths between IT and OT
+    \item \textbf{Shared Credentials:} Same passwords used across IT and OT systems
+    \item \textbf{Flat Networks:} Lack of segmentation allowing direct access
+\end{enumerate}
+
+% ----------------------------------------------------------------------------
+%  LESSONS LEARNED
+% ----------------------------------------------------------------------------
+
+\section{Key Lessons Learned}
+
+\begin{successbox}
+\textbf{Recurring themes across major incidents:}
+\begin{enumerate}
+    \item Network segmentation failures enabled lateral movement
+    \item Lack of visibility into OT network traffic
+    \item Insufficient monitoring and logging
+    \item Weak authentication and access controls
+    \item Delayed patching of known vulnerabilities
+    \item Inadequate incident response planning for OT
+\end{enumerate}
+\end{successbox}
+
+% ----------------------------------------------------------------------------
+%  FURTHER READING
+% ----------------------------------------------------------------------------
+
+\section{Further Reading}
+
+\subsection*{Reports and Analysis}
+\begin{itemize}
+    \item \textbf{CISA ICS Advisories}\\
+          \url{https://www.cisa.gov/news-events/ics-advisories}
+    \item \textbf{MITRE ATT\&CK for ICS}\\
+          \url{https://attack.mitre.org/techniques/ics/}
+    \item \textbf{Dragos Year in Review Reports}\\
+          \url{https://www.dragos.com/year-in-review/}
+\end{itemize}
+
+\subsection*{Standards}
+\begin{itemize}
+    \item \textbf{NIST Cybersecurity Framework}\\
+          \url{https://www.nist.gov/cyberframework}
+    \item \textbf{IEC 62443 Series}\\
+          \url{https://www.isa.org/standards-and-publications/isa-standards/isa-iec-62443-series-of-standards}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textcolor{mediumgray}{\rule{0.5\textwidth}{0.5pt}}\\[1em]
+\textcolor{mediumgray}{\small Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

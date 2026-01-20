@@ -1,0 +1,258 @@
+% ============================================================================
+%  OT Asset Discovery - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+\hypersetup{
+    pdftitle={OT Asset Discovery},
+    pdfsubject={Building and Maintaining an Industrial Asset Inventory},
+}
+
+\begin{document}
+
+% ----------------------------------------------------------------------------
+%  TITLE PAGE
+% ----------------------------------------------------------------------------
+
+\maketitlepage
+    {OT Asset Discovery}
+    {Building and Maintaining an Industrial Asset Inventory}
+    {OT Security Learning Series}
+    {Document 510 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+% ----------------------------------------------------------------------------
+%  TABLE OF CONTENTS
+% ----------------------------------------------------------------------------
+
+\tableofcontents
+\newpage
+
+% ----------------------------------------------------------------------------
+%  INTRODUCTION
+% ----------------------------------------------------------------------------
+
+\section{Introduction}
+
+Asset discovery and inventory management is the foundation of any OT security program. You cannot protect assets you don't know exist, and you cannot assess risk without understanding what systems are in your environment.
+
+\begin{infobox}
+Industry reports from SANS ICS and Dragos indicate that organizations commonly underestimate their OT asset count by 30--50\%. Unknown assets represent unmanaged risk and potential attack vectors.
+\end{infobox}
+
+\subsection{Why Asset Inventory Matters}
+
+\begin{itemize}
+    \item \textbf{Vulnerability management:} Know what needs patching
+    \item \textbf{Risk assessment:} Understand exposure and criticality
+    \item \textbf{Incident response:} Identify affected systems quickly
+    \item \textbf{Compliance:} Required by IEC 62443, NERC CIP, etc.
+    \item \textbf{Change management:} Baseline for detecting unauthorized changes
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  DISCOVERY METHODS
+% ----------------------------------------------------------------------------
+
+\section{Discovery Methods}
+
+\subsection{Passive Discovery}
+
+\begin{successbox}
+\textbf{Passive methods are preferred for OT environments:}
+\begin{itemize}
+    \item Network traffic analysis (SPAN/TAP)
+    \item Protocol fingerprinting from observed communications
+    \item DHCP and DNS log analysis
+    \item Switch CAM table queries (low risk)
+\end{itemize}
+\end{successbox}
+
+\subsection{Active Discovery}
+
+\begin{warningbox}
+\textbf{Active scanning risks in OT:}
+\begin{itemize}
+    \item May crash legacy PLCs and controllers
+    \item Can trigger safety system responses
+    \item May disrupt real-time communications
+    \item Should only be performed during maintenance windows
+\end{itemize}
+\end{warningbox}
+
+If active discovery is necessary:
+\begin{itemize}
+    \item Use OT-aware scanning tools with rate limiting
+    \item Test in lab environment first
+    \item Schedule during planned downtime
+    \item Have rollback procedures ready
+\end{itemize}
+
+\subsection{Manual Methods}
+
+\begin{itemize}
+    \item \textbf{Physical walkdowns:} Visually inspect and document equipment
+    \item \textbf{Documentation review:} Network diagrams, as-built drawings
+    \item \textbf{Vendor records:} Maintenance contracts, support agreements
+    \item \textbf{Interviews:} Operations and maintenance staff knowledge
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  ASSET ATTRIBUTES
+% ----------------------------------------------------------------------------
+
+\section{Asset Attributes}
+
+\subsection{Essential Information}
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Attribute} & \textcolor{white}{\bfseries Description} \\
+\midrule
+Device Name/ID & Unique identifier for the asset \\
+IP/MAC Address & Network identifiers \\
+Device Type & PLC, HMI, Switch, Server, etc. \\
+Vendor/Model & Manufacturer and model number \\
+Firmware/OS Version & Software version for vulnerability matching \\
+Location & Physical and logical (Purdue level, zone) \\
+Function & Role in the process (criticality) \\
+Owner & Responsible person or department \\
+\end{tabular}
+\end{center}
+
+\subsection{Security-Relevant Attributes}
+
+\begin{itemize}
+    \item \textbf{Network connectivity:} What can it communicate with?
+    \item \textbf{Protocols used:} Modbus, OPC, Ethernet/IP, etc.
+    \item \textbf{Authentication:} Does it support/require authentication?
+    \item \textbf{Patch status:} Last update, available patches
+    \item \textbf{End-of-life status:} Vendor support availability
+    \item \textbf{Backup status:} Configuration backup available?
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  INVENTORY MANAGEMENT
+% ----------------------------------------------------------------------------
+
+\section{Inventory Management}
+
+\subsection{Initial Baseline}
+
+\begin{enumerate}
+    \item Deploy passive monitoring on key network segments
+    \item Conduct physical walkdowns of critical areas
+    \item Review existing documentation and diagrams
+    \item Merge and deduplicate discovered assets
+    \item Validate with operations and engineering staff
+\end{enumerate}
+
+\subsection{Ongoing Maintenance}
+
+\begin{conceptbox}{Keeping Inventory Current}
+\begin{itemize}
+    \item \textbf{Continuous monitoring:} Detect new devices automatically
+    \item \textbf{Change management integration:} Update on approved changes
+    \item \textbf{Periodic reviews:} Quarterly validation with stakeholders
+    \item \textbf{Reconciliation:} Compare discovered vs documented assets
+\end{itemize}
+\end{conceptbox}
+
+\subsection{Common Challenges}
+
+\begin{itemize}
+    \item \textbf{Shadow OT:} Unauthorized devices connected by staff
+    \item \textbf{Transient devices:} Vendor laptops, temporary equipment
+    \item \textbf{Legacy systems:} Undocumented, forgotten equipment
+    \item \textbf{Serial devices:} Not visible on IP networks
+    \item \textbf{Air-gapped systems:} Require manual discovery
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  CRITICALITY ASSESSMENT
+% ----------------------------------------------------------------------------
+
+\section{Criticality Assessment}
+
+\subsection{Classification Criteria}
+
+Assess each asset's criticality based on:
+
+\begin{itemize}
+    \item \textbf{Safety impact:} Could failure cause injury?
+    \item \textbf{Process impact:} Effect on production if unavailable
+    \item \textbf{Recovery time:} How long to restore or replace?
+    \item \textbf{Data sensitivity:} Confidential process information?
+    \item \textbf{Connectivity:} Exposure to other networks
+\end{itemize}
+
+\subsection{Criticality Levels}
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.5cm}p{10.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Level} & \textcolor{white}{\bfseries Description} \\
+\midrule
+\riskcritical & Safety systems, emergency shutdown, life safety \\
+\riskhigh & Core process control, production-critical systems \\
+\riskmedium & Supporting systems, historians, non-critical HMIs \\
+\risklow & Monitoring only, easily replaceable \\
+\end{tabular}
+\end{center}
+
+% ----------------------------------------------------------------------------
+%  INTEGRATION
+% ----------------------------------------------------------------------------
+
+\section{Integration}
+
+\subsection{Connected Systems}
+
+Asset inventory should integrate with:
+
+\begin{itemize}
+    \item \textbf{Vulnerability management:} Match assets to CVEs
+    \item \textbf{SIEM/SOC:} Provide context for security alerts
+    \item \textbf{CMDB:} Enterprise configuration management
+    \item \textbf{Backup systems:} Ensure critical configs are backed up
+    \item \textbf{Incident response:} Rapid asset lookup during incidents
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  FURTHER READING
+% ----------------------------------------------------------------------------
+
+\section{Further Reading}
+
+\subsection*{Standards}
+\begin{itemize}
+    \item \textbf{IEC 62443-2-1} -- Security Management System Requirements\\
+          \url{https://www.isa.org/standards-and-publications/isa-standards/isa-iec-62443-series-of-standards}
+    \item \textbf{NIST SP 800-82 Rev. 3} -- Guide to OT Security\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+\end{itemize}
+
+\subsection*{Resources}
+\begin{itemize}
+    \item \textbf{CISA} -- Asset Identification Resources\\
+          \url{https://www.cisa.gov/resources-tools/resources}
+    \item \textbf{SANS ICS} -- State of ICS/OT Cybersecurity Survey\\
+          \url{https://www.sans.org/white-papers/}
+    \item \textbf{Dragos} -- Year in Review Reports\\
+          \url{https://www.dragos.com/year-in-review/}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textcolor{mediumgray}{\rule{0.5\textwidth}{0.5pt}}\\[1em]
+\textcolor{mediumgray}{\small Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

@@ -1,0 +1,396 @@
+% ============================================================================
+%  Application Whitelisting & System Lockdown - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+\hypersetup{
+    pdftitle={Application Whitelisting and System Lockdown},
+    pdfsubject={OT Security Solutions},
+}
+
+\begin{document}
+
+% ----------------------------------------------------------------------------
+%  TITLE PAGE
+% ----------------------------------------------------------------------------
+
+\maketitlepage
+    {Application Whitelisting \& System Lockdown}
+    {Protecting OT Endpoints Through Allowlisting and Lockdown}
+    {OT Security Learning Series}
+    {Document 810 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+% ----------------------------------------------------------------------------
+%  TABLE OF CONTENTS
+% ----------------------------------------------------------------------------
+
+\tableofcontents
+\newpage
+
+% ----------------------------------------------------------------------------
+%  INTRODUCTION
+% ----------------------------------------------------------------------------
+
+\section{Introduction}
+
+In Operational Technology environments, endpoints such as HMIs, engineering workstations, and SCADA servers are critical assets that directly interact with industrial processes. Unlike traditional IT environments where regular patching and antivirus updates are standard practice, OT systems often run for years without updates due to availability requirements and vendor certification constraints.
+
+\begin{infobox}
+\textbf{Application Whitelisting} (also called allowlisting) is a security approach that permits only pre-approved applications to execute, blocking all others by default. Combined with \textbf{System Lockdown}, it provides a robust defense-in-depth strategy for OT endpoints.
+\end{infobox}
+
+\subsection{Why Traditional Antivirus Falls Short in OT}
+
+\begin{itemize}
+    \item Requires frequent signature updates (network connectivity, maintenance windows)
+    \item Cannot detect zero-day threats or targeted attacks
+    \item May flag legitimate industrial software as suspicious
+    \item Resource-intensive scanning can impact real-time performance
+    \item Reactive approach: detects known threats after they exist
+\end{itemize}
+
+\begin{successbox}
+Application whitelisting takes a \textbf{proactive} approach: instead of trying to identify malicious software, it only allows known-good applications to run. This is particularly effective in OT environments where the software inventory is relatively static.
+\end{successbox}
+
+% ----------------------------------------------------------------------------
+%  CONCEPTS
+% ----------------------------------------------------------------------------
+
+\section{Core Concepts}
+
+\subsection{Application Whitelisting}
+
+Application whitelisting works by maintaining a list of approved executables, scripts, and libraries that are permitted to run on a system. Any attempt to execute unlisted software is blocked.
+
+\begin{definitionbox}{Whitelisting Methods}
+\begin{description}[leftmargin=!,labelwidth=3cm]
+    \item[Hash-based] Cryptographic hash (SHA-256) of each approved file
+    \item[Path-based] Allow execution from specific directories only
+    \item[Certificate-based] Trust applications signed by specific publishers
+    \item[Publisher-based] Allow all software from trusted vendors
+\end{description}
+\end{definitionbox}
+
+\subsubsection{Hash-Based Whitelisting}
+
+\begin{itemize}
+    \item Most secure method -- exact file matching
+    \item Requires updating hashes after every legitimate software change
+    \item Best for static OT environments with infrequent changes
+\end{itemize}
+
+\subsubsection{Certificate-Based Whitelisting}
+
+\begin{itemize}
+    \item Trusts all executables signed by approved certificates
+    \item Easier maintenance -- new versions automatically trusted
+    \item Risk: compromised signing certificates could allow malware
+\end{itemize}
+
+\subsection{System Lockdown}
+
+System lockdown goes beyond application whitelisting to restrict system configuration and prevent unauthorized changes.
+
+\begin{conceptbox}{System Lockdown Components}
+\begin{itemize}
+    \item \textbf{Write Protection:} Prevent modifications to system files and directories
+    \item \textbf{Registry Protection:} Lock critical registry keys (Windows)
+    \item \textbf{Device Control:} Block unauthorized USB devices and removable media
+    \item \textbf{Network Lockdown:} Restrict network connections to approved endpoints
+    \item \textbf{User Restrictions:} Limit user privileges and disable unnecessary accounts
+\end{itemize}
+\end{conceptbox}
+
+% ----------------------------------------------------------------------------
+%  OT SPECIFIC CONSIDERATIONS
+% ----------------------------------------------------------------------------
+
+\section{OT-Specific Considerations}
+
+\subsection{Challenges in OT Environments}
+
+\begin{warningbox}
+Implementing application whitelisting in OT requires careful planning. Incorrect configuration can block critical process control software and cause operational disruptions.
+\end{warningbox}
+
+\begin{itemize}
+    \item \textbf{Legacy Systems:} Older Windows versions (XP, 7) may have limited whitelisting support
+    \item \textbf{Vendor Software:} Industrial applications may use unusual execution patterns
+    \item \textbf{Change Management:} Software updates require whitelist maintenance
+    \item \textbf{Real-Time Requirements:} Whitelisting overhead must not impact process timing
+    \item \textbf{Availability:} Cannot risk blocking legitimate control system software
+\end{itemize}
+
+\subsection{OT Endpoint Categories}
+
+Different endpoint types require tailored approaches:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\textbf{Endpoint Type} & \textbf{Change Frequency} & \textbf{Recommended Approach} \\
+\midrule
+HMI Stations & Low & Hash-based, full lockdown \\
+Engineering Workstations & Medium & Certificate-based, partial lockdown \\
+SCADA Servers & Low & Hash-based, full lockdown \\
+Historian Servers & Low-Medium & Certificate-based, write protection \\
+Jump Servers (DMZ) & Medium & Certificate-based, strict device control \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Purdue Model Integration}
+
+\begin{tipbox}
+Apply stricter lockdown policies at lower Purdue levels where systems are more critical and changes are less frequent.
+\end{tipbox}
+
+\begin{itemize}
+    \item \zonezero\ \zoneone\ -- Maximum lockdown, hash-based whitelisting
+    \item \zonetwo\ -- Full lockdown with controlled exceptions for engineering tools
+    \item \zonethree\ -- Certificate-based whitelisting, device control
+    \item \zonedmz\ -- Strict whitelisting on jump servers and data transfer systems
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  IMPLEMENTATION
+% ----------------------------------------------------------------------------
+
+\section{Implementation Guide}
+
+\subsection{Phase 1: Discovery and Baselining}
+
+Before enabling enforcement, inventory all legitimate software:
+
+\begin{enumerate}
+    \item \textbf{Audit Mode:} Run whitelisting solution in monitor-only mode
+    \item \textbf{Baseline Creation:} Capture all running executables and DLLs
+    \item \textbf{Vendor Coordination:} Identify all vendor-required software components
+    \item \textbf{Documentation:} Record software inventory with business justification
+\end{enumerate}
+
+\begin{infobox}
+Run the discovery phase for at least 2-4 weeks to capture all operational scenarios, including startup sequences, scheduled tasks, and maintenance activities.
+\end{infobox}
+
+\subsection{Phase 2: Policy Development}
+
+\begin{enumerate}
+    \item \textbf{Define Trust Sources:}
+    \begin{itemize}
+        \item Operating system components
+        \item Industrial software vendors (Siemens, Rockwell, ABB, etc.)
+        \item Approved security tools
+        \item Internal utilities (signed with corporate certificate)
+    \end{itemize}
+    \item \textbf{Create Execution Rules:}
+    \begin{itemize}
+        \item Allow by hash for critical control software
+        \item Allow by certificate for vendor applications
+        \item Allow by path for specific directories (with caution)
+    \end{itemize}
+    \item \textbf{Define Exceptions Process:} Document how to request new software approval
+\end{enumerate}
+
+\subsection{Phase 3: Staged Rollout}
+
+\begin{dangerbox}
+Never enable enforcement on all systems simultaneously. A phased approach prevents widespread disruption if policies are incomplete.
+\end{dangerbox}
+
+\begin{enumerate}
+    \item Start with non-critical systems (test environments, non-production)
+    \item Monitor for false positives and policy violations
+    \item Refine policies based on findings
+    \item Gradually expand to production systems
+    \item Maintain audit logging for troubleshooting
+\end{enumerate}
+
+\subsection{Phase 4: Maintenance}
+
+Ongoing activities to keep whitelisting effective:
+
+\begin{itemize}
+    \item \textbf{Change Management Integration:} Update whitelist before software deployments
+    \item \textbf{Regular Reviews:} Audit whitelist entries for obsolete software
+    \item \textbf{Incident Response:} Investigate all blocked execution attempts
+    \item \textbf{Vendor Coordination:} Obtain hashes/certificates before updates
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  SOLUTIONS
+% ----------------------------------------------------------------------------
+
+\section{Commercial Solutions}
+
+Several vendors offer application whitelisting solutions suitable for OT:
+
+\begin{conceptbox}{OT-Focused Solutions}
+\begin{description}[leftmargin=!,labelwidth=4cm]
+    \item[Carbon Black App Control] Enterprise solution with OT support
+    \item[McAfee Application Control] Wide OS support including legacy Windows
+    \item[Symantec Critical System Protection] Designed for fixed-function devices
+    \item[Honeywell Secure Connection] ICS-specific whitelisting
+    \item[Claroty Edge] OT-native endpoint protection
+\end{description}
+\end{conceptbox}
+
+\subsection{Windows Built-in Options}
+
+\begin{conceptbox}{Microsoft Technologies}
+\begin{description}[leftmargin=!,labelwidth=4cm]
+    \item[AppLocker] Available in Enterprise editions (Win 7+)
+    \item[WDAC] Windows Defender Application Control (Win 10+)
+    \item[SRP] Software Restriction Policies (legacy, all editions)
+\end{description}
+\end{conceptbox}
+
+\begin{warningbox}
+Built-in Windows solutions may lack centralized management and OT-specific features. Evaluate carefully for production OT use.
+\end{warningbox}
+
+% ----------------------------------------------------------------------------
+%  BEST PRACTICES
+% ----------------------------------------------------------------------------
+
+\section{Best Practices}
+
+\subsection{Do's}
+
+\begin{itemize}
+    \item[\iconCheckSquare] Start in audit/monitor mode before enforcement
+    \item[\iconCheckSquare] Involve OT operators and vendors in policy development
+    \item[\iconCheckSquare] Document all approved software and business justification
+    \item[\iconCheckSquare] Integrate with change management processes
+    \item[\iconCheckSquare] Maintain offline backup of whitelist configuration
+    \item[\iconCheckSquare] Test policies in non-production environments first
+    \item[\iconCheckSquare] Plan for emergency bypass procedures
+\end{itemize}
+
+\subsection{Don'ts}
+
+\begin{itemize}
+    \item[\iconSquare] Don't enable enforcement without thorough baselining
+    \item[\iconSquare] Don't rely solely on path-based rules (easily bypassed)
+    \item[\iconSquare] Don't forget about scripts (PowerShell, VBScript, batch files)
+    \item[\iconSquare] Don't ignore DLLs and libraries (DLL hijacking attacks)
+    \item[\iconSquare] Don't deploy during critical production periods
+    \item[\iconSquare] Don't assume vendor software is static (background updaters)
+\end{itemize}
+
+\subsection{Emergency Procedures}
+
+\begin{dangerbox}
+Always have a documented procedure to disable whitelisting in emergencies. Process safety must take priority over security controls.
+\end{dangerbox}
+
+Prepare for scenarios where whitelisting must be bypassed:
+\begin{itemize}
+    \item Local administrator override capability
+    \item Emergency boot media with whitelisting disabled
+    \item Out-of-band management access
+    \item Documented escalation procedures
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  IEC 62443 ALIGNMENT
+% ----------------------------------------------------------------------------
+
+\section{IEC 62443 Alignment}
+
+Application whitelisting supports multiple IEC 62443 requirements:
+
+\begin{center}
+\begin{tabular}{lp{8cm}}
+\toprule
+\textbf{Requirement} & \textbf{How Whitelisting Helps} \\
+\midrule
+SR 3.4 & Software and information integrity -- prevents unauthorized code execution \\
+SR 7.6 & Network and security configuration settings -- system lockdown protects configurations \\
+SR 2.1 & Authorization enforcement -- restricts what software users can run \\
+CR 7.2 & Resource availability -- prevents resource exhaustion from malware \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Security Levels}
+
+\begin{itemize}
+    \item \slone\ -- Basic: Antivirus may be sufficient
+    \item \sltwo\ -- Standard: Application whitelisting recommended
+    \item \slthree\ -- Enhanced: Whitelisting with full system lockdown required
+    \item \slfour\ -- Critical: Hardware-enforced integrity, strict whitelisting
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  SUMMARY
+% ----------------------------------------------------------------------------
+
+\section{Summary}
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item Application whitelisting is more effective than antivirus for static OT environments
+    \item Combine with system lockdown for comprehensive endpoint protection
+    \item Thorough baselining and phased rollout are critical for success
+    \item Maintain emergency bypass procedures for operational safety
+    \item Integrate with change management to keep whitelist current
+    \item Stricter policies for lower Purdue levels, more flexibility higher up
+\end{itemize}
+\end{definitionbox}
+
+\begin{tipbox}
+Application whitelisting transforms endpoint security from a reactive "find the bad" approach to a proactive "allow only good" model -- perfectly suited for the predictable, stable nature of OT systems.
+\end{tipbox}
+
+% ----------------------------------------------------------------------------
+%  REFERENCES
+% ----------------------------------------------------------------------------
+
+\section{Further Reading}
+
+\subsection*{Standards and Guidelines}
+\begin{itemize}
+    \item \textbf{NIST SP 800-167} -- Guide to Application Whitelisting\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-167/final}
+    \item \textbf{NIST SP 800-82 Rev. 3} -- Guide to OT Security\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+    \item \textbf{IEC 62443-3-3} -- System Security Requirements and Security Levels\\
+          \url{https://www.isa.org/standards-and-publications/isa-standards/isa-iec-62443-series-of-standards}
+\end{itemize}
+
+\subsection*{Government Resources}
+\begin{itemize}
+    \item \textbf{ASD Essential Eight} -- Application Control Guidance\\
+          \url{https://www.cyber.gov.au/resources-business-and-government/essential-cyber-security/essential-eight}
+    \item \textbf{CISA} -- ICS Defense-in-Depth Strategies\\
+          \url{https://www.cisa.gov/resources-tools/resources/recommended-practice-improving-industrial-control-system-cybersecurity-defense-depth-strategies}
+    \item \textbf{NSA/CISA} -- Top 10 Cybersecurity Misconfigurations\\
+          \url{https://www.cisa.gov/news-events/cybersecurity-advisories/aa23-278a}
+\end{itemize}
+
+\subsection*{Technical Documentation}
+\begin{itemize}
+    \item \textbf{Windows Defender Application Control (WDAC)}\\
+          \url{https://learn.microsoft.com/en-us/windows/security/application-security/application-control/windows-defender-application-control/}
+    \item \textbf{AppLocker Documentation}\\
+          \url{https://learn.microsoft.com/en-us/windows/security/application-security/application-control/windows-defender-application-control/applocker/applocker-overview}
+\end{itemize}
+
+\subsection*{Books}
+\begin{itemize}
+    \item Knapp, E. \& Langill, J. -- \textit{Industrial Network Security} (Syngress)
+    \item Macaulay, T. \& Singer, B. -- \textit{Cybersecurity for Industrial Control Systems} (CRC Press)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textcolor{mediumgray}{\rule{0.5\textwidth}{0.5pt}}\\[1em]
+\textcolor{mediumgray}{\small Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

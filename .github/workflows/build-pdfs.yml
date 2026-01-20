@@ -1,0 +1,162 @@
+name: Build PDFs
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install LaTeX
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            texlive-latex-extra \
+            texlive-fonts-extra \
+            texlive-fonts-recommended \
+            texlive-pictures \
+            texlive-latex-recommended \
+            latexmk
+
+      - name: Build all PDFs
+        run: make parallel
+
+      - name: Collect PDFs
+        run: |
+          mkdir -p pdf-output
+          find . -maxdepth 2 -name "*.pdf" -exec cp {} pdf-output/ \;
+          ls -la pdf-output/
+
+      - name: Upload PDFs as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pdf-documents
+          path: pdf-output/
+          retention-days: 30
+
+  # Deploy to GitHub Pages (only on push to main)
+  deploy:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download PDFs artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: pdf-documents
+          path: public/
+
+      - name: Generate index page
+        run: |
+          cat > public/index.html << 'HTMLEOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>OT Security Learning Notes</title>
+            <style>
+              body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; background: #f5f5f5; }
+              h1 { color: #0f172a; }
+              .category { margin: 1.5rem 0; padding: 1rem; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+              .category h2 { color: #0ea5e9; margin-top: 0; font-size: 1.1rem; }
+              a { color: #1e3a5f; text-decoration: none; }
+              a:hover { color: #0ea5e9; }
+              ul { list-style: none; padding: 0; }
+              li { padding: 0.5rem 0; border-bottom: 1px solid #eee; }
+              li:last-child { border-bottom: none; }
+              .doc-num { color: #6b7280; font-family: monospace; margin-right: 0.5rem; }
+            </style>
+          </head>
+          <body>
+            <h1>OT Security Learning Notes</h1>
+            <p>Educational documents covering Operational Technology (OT) and Industrial Control System (ICS) security.</p>
+          HTMLEOF
+
+          # Define categories
+          declare -A CATEGORIES
+          CATEGORIES["001-099"]="Fundamentals"
+          CATEGORIES["100-199"]="Standards & Compliance"
+          CATEGORIES["200-299"]="Protocols & Technologies"
+          CATEGORIES["300-399"]="Architecture & Design"
+          CATEGORIES["400-499"]="Threats & Attacks"
+          CATEGORIES["500-599"]="Detection & Monitoring"
+          CATEGORIES["600-699"]="Incident Response"
+          CATEGORIES["700-799"]="Assessments"
+          CATEGORIES["800-899"]="Solutions & Tools"
+
+          # Process each category
+          for range in "001-099" "100-199" "200-299" "300-399" "400-499" "500-599" "600-699" "700-799" "800-899"; do
+            start=${range%-*}
+            end=${range#*-}
+            category_name="${CATEGORIES[$range]}"
+
+            # Find PDFs in this range
+            pdfs=$(ls public/*.pdf 2>/dev/null | xargs -I {} basename {} .pdf | grep -E "^[0-9]{3}-" | while read name; do
+              num=${name%%-*}
+              if [ "$num" -ge "$start" ] && [ "$num" -le "$end" ]; then
+                echo "$name"
+              fi
+            done | sort)
+
+            if [ -n "$pdfs" ]; then
+              echo "    <div class=\"category\">" >> public/index.html
+              echo "      <h2>$category_name ($range)</h2>" >> public/index.html
+              echo "      <ul>" >> public/index.html
+
+              echo "$pdfs" | while read pdf_name; do
+                doc_num=${pdf_name%%-*}
+                # Extract title from PDF name (replace dashes with spaces, title case)
+                title=$(echo "${pdf_name#*-}" | sed 's/-/ /g' | sed 's/\b\(.\)/\u\1/g')
+                echo "        <li><span class=\"doc-num\">$doc_num</span> <a href=\"${pdf_name}.pdf\">$title</a></li>" >> public/index.html
+              done
+
+              echo "      </ul>" >> public/index.html
+              echo "    </div>" >> public/index.html
+            fi
+          done
+
+          # Add footer
+          cat >> public/index.html << 'HTMLEOF'
+
+            <hr>
+            <p style="color: #6b7280; font-size: 0.875rem;">Auto-generated from repository. Last updated: TIMESTAMP</p>
+          </body>
+          </html>
+          HTMLEOF
+
+          # Replace timestamp
+          sed -i "s/TIMESTAMP/$(date -u +'%Y-%m-%d %H:%M UTC')/" public/index.html
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload to Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public/
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

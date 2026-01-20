@@ -1,0 +1,489 @@
+% ============================================================================
+%  OT Security Standards Overview - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+\hypersetup{
+    pdftitle={OT Security Standards Overview},
+    pdfsubject={Global Industrial Cybersecurity Standards},
+}
+
+\begin{document}
+
+% ----------------------------------------------------------------------------
+%  TITLE PAGE
+% ----------------------------------------------------------------------------
+
+\maketitlepage
+    {OT Security Standards Overview}
+    {A Global Perspective on Industrial Cybersecurity Regulations}
+    {OT Security Learning Series}
+    {Document 100 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+% ----------------------------------------------------------------------------
+%  TABLE OF CONTENTS
+% ----------------------------------------------------------------------------
+
+\tableofcontents
+\newpage
+
+% ----------------------------------------------------------------------------
+%  INTRODUCTION
+% ----------------------------------------------------------------------------
+
+\section{Introduction}
+
+The increasing convergence of IT and OT systems, combined with the rise of cyber threats targeting critical infrastructure, has led to the development of numerous cybersecurity standards and regulations worldwide. Understanding these standards is essential for organizations operating in multiple regions or sectors.
+
+\begin{infobox}
+This document provides an overview of the major OT security standards and regulations across different regions. Standards vary in their scope, requirements, and enforcement mechanisms.
+\end{infobox}
+
+\subsection{Types of Standards}
+
+\begin{itemize}
+    \item \textbf{International Standards:} Developed by international bodies (ISO, IEC, ISA) for global adoption
+    \item \textbf{Regional Regulations:} Legal requirements within specific regions (EU, North America)
+    \item \textbf{National Standards:} Country-specific guidelines and frameworks
+    \item \textbf{Sector-Specific:} Standards for particular industries (energy, water, manufacturing)
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  WORLD MAP
+% ----------------------------------------------------------------------------
+
+\section{Global Standards Overview}
+
+\begin{center}
+\begin{tikzpicture}[
+    scale=0.9,
+    regionbox/.style={
+        rectangle,
+        rounded corners=4pt,
+        minimum width=3.2cm,
+        minimum height=1.8cm,
+        align=center,
+        font=\scriptsize,
+        inner sep=5pt
+    }
+]
+    % Center circle - International Standards
+    \fill[primary] (0,0) circle (2cm);
+    \node[text=white, font=\bfseries, align=center] at (0,0.4) {International};
+    \node[text=white, font=\scriptsize, align=center] at (0,-0.4) {IEC 62443\\ISO 27001\\ISA-95};
+
+    % Connecting lines
+    \foreach \angle in {90, 162, 234, 306, 18} {
+        \draw[accent, line width=2pt, opacity=0.6] (\angle:2cm) -- (\angle:3.2cm);
+    }
+
+    % North America - top
+    \node[regionbox, fill=info!15, draw=info, line width=1pt] at (90:4.2cm) {
+        \textbf{\textcolor{info}{North America}}\\[2pt]
+        NIST 800-82\\
+        NERC CIP
+    };
+
+    % Europe - top left
+    \node[regionbox, fill=success!15, draw=success, line width=1pt] at (162:4.2cm) {
+        \textbf{\textcolor{success}{Europe}}\\[2pt]
+        NIS2 Directive\\
+        ENISA / BSI
+    };
+
+    % Asia - bottom left
+    \node[regionbox, fill=warning!15, draw=warning, line width=1pt] at (234:4.2cm) {
+        \textbf{\textcolor{warning}{Asia}}\\[2pt]
+        GB/T (China)\\
+        METI (Japan)
+    };
+
+    % Australia & NZ - bottom right
+    \node[regionbox, fill=secondary!15, draw=secondary, line width=1pt] at (306:4.2cm) {
+        \textbf{\textcolor{secondary}{Australia \& NZ}}\\[2pt]
+        SOCI Act\\
+        AESCSF
+    };
+
+    % Middle East - top right
+    \node[regionbox, fill=danger!10, draw=danger!70, line width=1pt] at (18:4.2cm) {
+        \textbf{\textcolor{danger!70}{Middle East}}\\[2pt]
+        NESA (UAE)\\
+        NCA (Saudi)
+    };
+
+\end{tikzpicture}
+\end{center}
+
+\vspace{0.5cm}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\small
+\begin{tabular}{lp{5cm}l}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Region} & \textcolor{white}{\bfseries Key Standards} & \textcolor{white}{\bfseries Mandatory} \\
+\midrule
+International & IEC 62443, ISO/IEC 27001, ISA-95 & No \\
+North America & NIST SP 800-82, NERC CIP, TSA Directives & Partial \\
+Europe & NIS2, CRA, BSI IT-Grundschutz, ENISA & Yes \\
+Asia-Pacific & GB/T 30976 (CN), METI (JP), TR64 (SG) & Partial \\
+Australia \& NZ & SOCI Act, AESCSF, Essential Eight & Yes \\
+Middle East & NESA (UAE), NCA (Saudi Arabia) & Yes \\
+\end{tabular}
+\end{center}
+
+\begin{successbox}
+\textbf{IEC 62443} is referenced by regulations worldwide and serves as the common foundation for OT security compliance across all regions.
+\end{successbox}
+
+% ----------------------------------------------------------------------------
+%  INTERNATIONAL STANDARDS
+% ----------------------------------------------------------------------------
+
+\section{International Standards}
+
+\subsection{IEC 62443}
+
+\begin{conceptbox}{IEC 62443 -- Industrial Automation and Control Systems Security}
+\begin{description}[leftmargin=!,labelwidth=2.5cm]
+    \item[Scope] Comprehensive framework for IACS security
+    \item[Publisher] International Electrotechnical Commission (IEC)
+    \item[Adoption] Worldwide, referenced by many national regulations
+    \item[Key Parts] 62443-2-1 (Policies), 62443-3-3 (System Requirements), 62443-4-2 (Components)
+\end{description}
+\end{conceptbox}
+
+\begin{successbox}
+IEC 62443 is the most widely recognized international standard for OT security. It provides a common framework and language for asset owners, integrators, and vendors.
+\end{successbox}
+
+\subsection{ISO/IEC 27001}
+
+\begin{conceptbox}{ISO/IEC 27001 -- Information Security Management}
+\begin{description}[leftmargin=!,labelwidth=2.5cm]
+    \item[Scope] Information security management systems (ISMS)
+    \item[Publisher] ISO/IEC Joint Technical Committee
+    \item[Adoption] Worldwide, certifiable standard
+    \item[OT Relevance] General framework, often combined with IEC 62443 for OT
+\end{description}
+\end{conceptbox}
+
+\subsection{ISA-95 / IEC 62264}
+
+\begin{conceptbox}{ISA-95 -- Enterprise-Control System Integration}
+\begin{description}[leftmargin=!,labelwidth=2.5cm]
+    \item[Scope] Integration between enterprise and control systems
+    \item[Publisher] International Society of Automation (ISA)
+    \item[Adoption] Worldwide, manufacturing focus
+    \item[OT Relevance] Defines functional hierarchy, basis for Purdue Model
+\end{description}
+\end{conceptbox}
+
+% ----------------------------------------------------------------------------
+%  NORTH AMERICA
+% ----------------------------------------------------------------------------
+
+\section{North America}
+
+\subsection{United States}
+
+\subsubsection{NIST SP 800-82}
+
+\begin{conceptbox}{NIST SP 800-82 -- Guide to OT Security}
+\begin{description}[leftmargin=!,labelwidth=2.5cm]
+    \item[Scope] Guidance for securing industrial control systems
+    \item[Publisher] National Institute of Standards and Technology
+    \item[Status] Recommended practice (voluntary for most sectors)
+    \item[Current Version] Revision 3 (2023)
+\end{description}
+\end{conceptbox}
+
+\subsubsection{NERC CIP}
+
+\begin{conceptbox}{NERC CIP -- Critical Infrastructure Protection}
+\begin{description}[leftmargin=!,labelwidth=2.5cm]
+    \item[Scope] Bulk electric system cybersecurity
+    \item[Publisher] North American Electric Reliability Corporation
+    \item[Status] \textbf{Mandatory} for bulk power system owners/operators
+    \item[Enforcement] Significant financial penalties for non-compliance
+\end{description}
+\end{conceptbox}
+
+\begin{warningbox}
+NERC CIP violations can result in penalties up to \$1 million per violation per day. Compliance is mandatory for registered entities operating bulk electric system assets.
+\end{warningbox}
+
+\subsubsection{Other U.S. Frameworks}
+
+\begin{itemize}
+    \item \textbf{NIST Cybersecurity Framework (CSF)} -- Risk-based framework applicable to all sectors
+    \item \textbf{CISA Guidelines} -- Sector-specific guidance for critical infrastructure
+    \item \textbf{TSA Security Directives} -- Pipeline and rail cybersecurity requirements
+    \item \textbf{CFATS} -- Chemical facility anti-terrorism standards
+\end{itemize}
+
+\subsection{Canada}
+
+\begin{itemize}
+    \item \textbf{CSA Z246.1} -- Security Management for Petroleum and Natural Gas
+    \item \textbf{NERC CIP} -- Applicable to interconnected power systems
+    \item \textbf{CCCS Guidelines} -- Canadian Centre for Cyber Security guidance
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  EUROPE
+% ----------------------------------------------------------------------------
+
+\section{Europe}
+
+\subsection{European Union}
+
+\subsubsection{NIS2 Directive}
+
+\begin{conceptbox}{NIS2 Directive -- Network and Information Security}
+\begin{description}[leftmargin=!,labelwidth=2.5cm]
+    \item[Scope] Essential and important entities across EU
+    \item[Publisher] European Parliament and Council
+    \item[Status] \textbf{Mandatory} (Member states must transpose by Oct 2024)
+    \item[Sectors] Energy, transport, health, water, digital infrastructure, manufacturing
+\end{description}
+\end{conceptbox}
+
+\begin{dangerbox}
+NIS2 significantly expands the scope of the original NIS Directive. More organizations are now subject to mandatory cybersecurity requirements, including many manufacturing companies.
+\end{dangerbox}
+
+\subsubsection{Cyber Resilience Act (CRA)}
+
+\begin{itemize}
+    \item Mandatory cybersecurity requirements for products with digital elements
+    \item Affects manufacturers, importers, and distributors
+    \item Applies to both hardware and software, including OT components
+\end{itemize}
+
+\subsubsection{ENISA Guidelines}
+
+The European Union Agency for Cybersecurity (ENISA) publishes sector-specific guidelines:
+\begin{itemize}
+    \item Good Practices for Security of Smart Manufacturing
+    \item Railway Cybersecurity Guidelines
+    \item Smart Grid Security Recommendations
+\end{itemize}
+
+\subsection{Germany}
+
+\begin{conceptbox}{BSI IT-Grundschutz}
+\begin{description}[leftmargin=!,labelwidth=2.5cm]
+    \item[Scope] Comprehensive IT/OT security methodology
+    \item[Publisher] German Federal Office for Information Security (BSI)
+    \item[Status] Mandatory for federal agencies, recommended for KRITIS
+    \item[OT Module] IND -- Industrial Control Systems
+\end{description}
+\end{conceptbox}
+
+\begin{itemize}
+    \item \textbf{IT-Sicherheitsgesetz 2.0} -- Legal requirements for critical infrastructure
+    \item \textbf{KRITIS Verordnung} -- Defines critical infrastructure thresholds
+\end{itemize}
+
+\subsection{United Kingdom}
+
+\begin{itemize}
+    \item \textbf{NIS Regulations} -- UK implementation (post-Brexit maintained)
+    \item \textbf{Cyber Assessment Framework (CAF)} -- NCSC guidance for OT
+    \item \textbf{OG86} -- Offshore oil and gas cybersecurity guidance
+\end{itemize}
+
+\subsection{France}
+
+\begin{itemize}
+    \item \textbf{LPM} -- Military Programming Law for critical infrastructure
+    \item \textbf{ANSSI Guidelines} -- National cybersecurity agency recommendations
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  ASIA-PACIFIC
+% ----------------------------------------------------------------------------
+
+\section{Asia-Pacific}
+
+\subsection{China}
+
+\begin{conceptbox}{Chinese Cybersecurity Standards}
+\begin{description}[leftmargin=!,labelwidth=2.5cm]
+    \item[GB/T 22239] -- Information Security Technology Baseline
+    \item[GB/T 30976] -- Industrial Control System Security
+    \item[Cybersecurity Law] -- Mandatory requirements for critical information infrastructure
+\end{description}
+\end{conceptbox}
+
+\begin{warningbox}
+China has mandatory data localization and security review requirements for critical infrastructure operators. Foreign companies operating in China must comply with local regulations.
+\end{warningbox}
+
+\subsection{Japan}
+
+\begin{itemize}
+    \item \textbf{METI Guidelines} -- Cyber-Physical Security Framework
+    \item \textbf{NISC Guidelines} -- Critical infrastructure protection
+    \item \textbf{JPCERT/CC} -- Incident response and security guidance
+\end{itemize}
+
+\subsection{South Korea}
+
+\begin{itemize}
+    \item \textbf{KISA Guidelines} -- Korea Internet and Security Agency
+    \item \textbf{K-ISMS} -- Korean Information Security Management System
+\end{itemize}
+
+\subsection{Singapore}
+
+\begin{itemize}
+    \item \textbf{Cybersecurity Act} -- Critical information infrastructure requirements
+    \item \textbf{CSA Guidelines} -- Cyber Security Agency of Singapore
+    \item \textbf{TR64} -- Technical reference for ICS security
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  OCEANIA
+% ----------------------------------------------------------------------------
+
+\section{Australia \& New Zealand}
+
+\subsection{Australia}
+
+\begin{conceptbox}{Australian Energy Sector Cyber Security Framework (AESCSF)}
+\begin{description}[leftmargin=!,labelwidth=2.5cm]
+    \item[Scope] Energy sector cybersecurity maturity
+    \item[Publisher] Australian Energy Market Operator (AEMO)
+    \item[Status] Voluntary self-assessment framework
+    \item[Alignment] Maps to NIST CSF and IEC 62443
+\end{description}
+\end{conceptbox}
+
+\begin{itemize}
+    \item \textbf{SOCI Act} -- Security of Critical Infrastructure Act (mandatory)
+    \item \textbf{Essential Eight} -- ASD security baseline controls
+    \item \textbf{ISM} -- Information Security Manual
+\end{itemize}
+
+\subsection{New Zealand}
+
+\begin{itemize}
+    \item \textbf{NZISM} -- NZ Information Security Manual
+    \item \textbf{NCSC Guidelines} -- Critical infrastructure guidance
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  SECTOR-SPECIFIC
+% ----------------------------------------------------------------------------
+
+\section{Sector-Specific Standards}
+
+Certain industries have developed specialized standards:
+
+\begin{center}
+\begin{tabular}{llp{6cm}}
+\toprule
+\textbf{Sector} & \textbf{Standard} & \textbf{Description} \\
+\midrule
+Power Grid & NERC CIP & North American bulk electric system \\
+Oil \& Gas & API 1164 & Pipeline SCADA security \\
+Oil \& Gas & IEC 62443 & Commonly adopted in O\&G \\
+Water & AWWA Guidance & American Water Works Association \\
+Nuclear & NRC 10 CFR 73.54 & US Nuclear cybersecurity rule \\
+Nuclear & IEC 62645 & Nuclear I\&C security \\
+Maritime & IMO MSC.428 & Maritime cyber risk management \\
+Rail & EN 50129 & Railway safety-related systems \\
+Automotive & ISO/SAE 21434 & Road vehicle cybersecurity \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% ----------------------------------------------------------------------------
+%  COMPARISON
+% ----------------------------------------------------------------------------
+
+\section{Standards Comparison}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{lcccc}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Standard} & \textcolor{white}{\bfseries Mandatory} & \textcolor{white}{\bfseries Certifiable} & \textcolor{white}{\bfseries OT Focus} & \textcolor{white}{\bfseries Region} \\
+\midrule
+IEC 62443 & No & Yes & Yes & International \\
+ISO 27001 & No & Yes & No & International \\
+NIST 800-82 & No & No & Yes & USA \\
+NERC CIP & Yes & No & Yes & North America \\
+NIS2 & Yes & No & Partial & EU \\
+GB/T 30976 & Yes & No & Yes & China \\
+AESCSF & No & No & Yes & Australia \\
+\end{tabular}
+\end{center}
+
+\begin{tipbox}
+When operating across multiple regions, use IEC 62443 as a baseline framework and map it to regional requirements. This approach provides a common foundation while ensuring local compliance.
+\end{tipbox}
+
+% ----------------------------------------------------------------------------
+%  SUMMARY
+% ----------------------------------------------------------------------------
+
+\section{Summary}
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{IEC 62443} is the leading international OT security standard
+    \item \textbf{Regulations are expanding} -- NIS2, SOCI Act, and others bring mandatory requirements
+    \item \textbf{Sector matters} -- Critical infrastructure faces stricter requirements
+    \item \textbf{Regional compliance} -- Multinational organizations must address local regulations
+    \item \textbf{Convergence trend} -- Many regional standards reference or align with IEC 62443
+\end{itemize}
+\end{definitionbox}
+
+% ----------------------------------------------------------------------------
+%  FURTHER READING
+% ----------------------------------------------------------------------------
+
+\section{Further Reading}
+
+\subsection*{Standards Organizations}
+\begin{itemize}
+    \item \textbf{IEC} -- International Electrotechnical Commission\\
+          \url{https://www.iec.ch/}
+    \item \textbf{ISA} -- International Society of Automation\\
+          \url{https://www.isa.org/}
+    \item \textbf{NIST} -- National Institute of Standards and Technology\\
+          \url{https://www.nist.gov/cyberframework}
+\end{itemize}
+
+\subsection*{Regulatory Bodies}
+\begin{itemize}
+    \item \textbf{ENISA} -- European Union Agency for Cybersecurity\\
+          \url{https://www.enisa.europa.eu/}
+    \item \textbf{CISA} -- Cybersecurity and Infrastructure Security Agency\\
+          \url{https://www.cisa.gov/}
+    \item \textbf{BSI} -- German Federal Office for Information Security\\
+          \url{https://www.bsi.bund.de/}
+    \item \textbf{NERC} -- North American Electric Reliability Corporation\\
+          \url{https://www.nerc.com/}
+\end{itemize}
+
+\subsection*{Books}
+\begin{itemize}
+    \item Knapp, E. \& Langill, J. -- \textit{Industrial Network Security} (Syngress)
+    \item Macaulay, T. \& Singer, B. -- \textit{Cybersecurity for Industrial Control Systems} (CRC Press)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textcolor{mediumgray}{\rule{0.5\textwidth}{0.5pt}}\\[1em]
+\textcolor{mediumgray}{\small Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

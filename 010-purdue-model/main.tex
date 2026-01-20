@@ -1,0 +1,356 @@
+% ============================================================================
+%  The Purdue Model - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+\hypersetup{
+    pdftitle={The Purdue Model},
+    pdfsubject={Industrial Network Architecture},
+}
+
+\begin{document}
+
+% ----------------------------------------------------------------------------
+%  TITLE PAGE
+% ----------------------------------------------------------------------------
+
+\maketitlepage
+    {The Purdue Model}
+    {Understanding Industrial Network Architecture and Segmentation}
+    {OT Security Learning Series}
+    {Document 010 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+% ----------------------------------------------------------------------------
+%  TABLE OF CONTENTS
+% ----------------------------------------------------------------------------
+
+\tableofcontents
+\newpage
+
+% ----------------------------------------------------------------------------
+%  INTRODUCTION
+% ----------------------------------------------------------------------------
+
+\section{Introduction}
+
+The \textbf{Purdue Enterprise Reference Architecture} (PERA), commonly known as the \textbf{Purdue Model}, is a reference model for industrial control system (ICS) network segmentation. Originally developed in the 1990s at Purdue University, it has become the de facto standard for designing secure OT network architectures.
+
+\begin{infobox}
+The Purdue Model provides a hierarchical framework that separates industrial networks into distinct levels, each with specific functions and security requirements. This separation is fundamental to implementing defense-in-depth strategies in OT environments.
+\end{infobox}
+
+\subsection{Why the Purdue Model Matters}
+
+In modern industrial environments, the convergence of IT and OT systems creates significant security challenges:
+
+\begin{itemize}
+    \item Legacy OT systems were designed for reliability, not security
+    \item Flat networks allow lateral movement during attacks
+    \item IT-based threats can now reach physical processes
+    \item Regulatory frameworks (IEC 62443, NIST) reference this model
+\end{itemize}
+
+\begin{successbox}
+The Purdue Model helps organizations understand \textbf{where} security controls should be placed and \textbf{what} traffic should flow between different parts of the industrial network.
+\end{successbox}
+
+% ----------------------------------------------------------------------------
+%  THE LEVELS
+% ----------------------------------------------------------------------------
+
+\section{The Purdue Model Levels}
+
+The model defines six primary levels (0-5), plus a demilitarized zone (DMZ) between the OT and IT networks.
+
+\subsection{Level 0 -- Physical Process}
+
+\begin{conceptbox}{\zonezero\ Physical Process}
+\textbf{Function:} The actual physical equipment and processes
+
+\textbf{Components:}
+\begin{itemize}
+    \item Sensors (temperature, pressure, flow, level)
+    \item Actuators (valves, motors, pumps)
+    \item Physical machinery and production equipment
+\end{itemize}
+
+\textbf{Security Considerations:}
+\begin{itemize}
+    \item No network connectivity at this level
+    \item Physical security is paramount
+    \item Tampering detection mechanisms
+\end{itemize}
+\end{conceptbox}
+
+\subsection{Level 1 -- Basic Control}
+
+\begin{conceptbox}{\zoneone\ Basic Control}
+\textbf{Function:} Direct control of the physical process
+
+\textbf{Components:}
+\begin{itemize}
+    \item Programmable Logic Controllers (PLCs)
+    \item Remote Terminal Units (RTUs)
+    \item Intelligent Electronic Devices (IEDs)
+    \item Variable Frequency Drives (VFDs)
+\end{itemize}
+
+\textbf{Protocols:} Modbus, PROFINET, EtherNet/IP, DNP3
+
+\textbf{Security Considerations:}
+\begin{itemize}
+    \item Often lacks authentication mechanisms
+    \item Firmware updates require careful planning
+    \item Network isolation is critical
+\end{itemize}
+\end{conceptbox}
+
+\subsection{Level 2 -- Area Supervisory Control}
+
+\begin{conceptbox}{\zonetwo\ Area Supervisory Control}
+\textbf{Function:} Supervising and controlling the physical process
+
+\textbf{Components:}
+\begin{itemize}
+    \item Human-Machine Interfaces (HMIs)
+    \item SCADA systems
+    \item Engineering Workstations
+    \item Local operator consoles
+\end{itemize}
+
+\textbf{Security Considerations:}
+\begin{itemize}
+    \item User authentication required
+    \item Application whitelisting recommended
+    \item USB and removable media controls
+\end{itemize}
+\end{conceptbox}
+
+\subsection{Level 3 -- Site Operations}
+
+\begin{conceptbox}{\zonethree\ Site Operations}
+\textbf{Function:} Site-wide monitoring, optimization, and data collection
+
+\textbf{Components:}
+\begin{itemize}
+    \item Data Historians
+    \item OPC servers
+    \item Batch management systems
+    \item Manufacturing Execution Systems (MES)
+    \item Asset management systems
+\end{itemize}
+
+\textbf{Security Considerations:}
+\begin{itemize}
+    \item Database security and access controls
+    \item Secure remote access configuration
+    \item Integration point with business systems
+\end{itemize}
+\end{conceptbox}
+
+\subsection{Level 3.5 -- Industrial DMZ}
+
+\begin{conceptbox}{\zonedmz\ Industrial Demilitarized Zone}
+\textbf{Function:} Buffer zone between OT and IT networks
+
+\textbf{Components:}
+\begin{itemize}
+    \item Data diodes (unidirectional gateways)
+    \item Jump servers / Bastion hosts
+    \item Patch management servers
+    \item Antivirus update servers
+    \item Remote access gateways
+\end{itemize}
+
+\textbf{Security Considerations:}
+\begin{itemize}
+    \item No direct connectivity between IT and OT
+    \item All traffic must be proxied through DMZ
+    \item Strict firewall rules on both sides
+\end{itemize}
+\end{conceptbox}
+
+\begin{warningbox}
+The DMZ is \textbf{critical} for protecting OT networks. Never allow direct connections from Level 4/5 to Levels 0-3. All data exchange should pass through DMZ services.
+\end{warningbox}
+
+\subsection{Levels 4 \& 5 -- Enterprise}
+
+\begin{conceptbox}{\zonefour\ Enterprise Network}
+\textbf{Function:} Business operations and enterprise IT
+
+\textbf{Level 4 -- Site Business:}
+\begin{itemize}
+    \item Site email and intranet
+    \item ERP system interfaces
+    \item Business reporting
+\end{itemize}
+
+\textbf{Level 5 -- Enterprise Network:}
+\begin{itemize}
+    \item Corporate network
+    \item Cloud services
+    \item Internet connectivity
+    \item External business partners
+\end{itemize}
+\end{conceptbox}
+
+% ----------------------------------------------------------------------------
+%  VISUAL DIAGRAM
+% ----------------------------------------------------------------------------
+
+\section{Purdue Model Diagram}
+
+\begin{center}
+\begin{tikzpicture}[
+    scale=0.85,
+    every node/.style={transform shape},
+    level/.style={
+        rectangle,
+        rounded corners=3pt,
+        minimum width=9cm,
+        minimum height=0.9cm,
+        text=white,
+        font=\small\bfseries,
+        align=center
+    },
+    label/.style={
+        font=\scriptsize,
+        text=darkgray
+    }
+]
+
+% Levels
+\node[level, fill=zone4] (l5) at (0,0) {Level 5: Enterprise Network};
+\node[level, fill=zone4!80] (l4) at (0,-1.2) {Level 4: Site Business Planning};
+
+\node[level, fill=zone35, minimum height=0.7cm] (dmz) at (0,-2.4) {DMZ (Level 3.5)};
+
+\node[level, fill=zone3] (l3) at (0,-3.6) {Level 3: Site Operations};
+\node[level, fill=zone2] (l2) at (0,-4.8) {Level 2: Area Supervisory Control};
+\node[level, fill=zone1] (l1) at (0,-6) {Level 1: Basic Control};
+\node[level, fill=zone0] (l0) at (0,-7.2) {Level 0: Physical Process};
+
+% Labels on right
+\node[label, anchor=west] at (5,0) {Corporate IT, Internet};
+\node[label, anchor=west] at (5,-1.2) {ERP, Email, Business Apps};
+\node[label, anchor=west] at (5,-2.4) {Data Diodes, Jump Servers};
+\node[label, anchor=west] at (5,-3.6) {Historians, MES, OPC};
+\node[label, anchor=west] at (5,-4.8) {HMI, SCADA, Eng. Workstations};
+\node[label, anchor=west] at (5,-6) {PLCs, RTUs, Controllers};
+\node[label, anchor=west] at (5,-7.2) {Sensors, Actuators, Motors};
+
+% Zone labels on left
+\node[font=\scriptsize\bfseries, text=zone4, anchor=east] at (-5,-0.6) {IT ZONE};
+\node[font=\scriptsize\bfseries, text=zone35, anchor=east] at (-5,-2.4) {BUFFER};
+\node[font=\scriptsize\bfseries, text=zone1, anchor=east] at (-5,-5.4) {OT ZONE};
+
+% Firewall indicators
+\draw[red, line width=1.5pt, dashed] (-4.5,-1.75) -- (4.5,-1.75);
+\draw[red, line width=1.5pt, dashed] (-4.5,-3.05) -- (4.5,-3.05);
+\node[font=\tiny, text=red] at (4,-1.75) {Firewall};
+\node[font=\tiny, text=red] at (4,-3.05) {Firewall};
+
+\end{tikzpicture}
+\end{center}
+
+% ----------------------------------------------------------------------------
+%  IMPLEMENTATION
+% ----------------------------------------------------------------------------
+
+\section{Implementing the Purdue Model}
+
+\subsection{Key Principles}
+
+\begin{enumerate}
+    \item \textbf{Network Segmentation:} Each level should be on separate network segments/VLANs
+    \item \textbf{Traffic Control:} Firewalls between levels with strict rule sets
+    \item \textbf{Data Flow:} Information flows up; commands flow down
+    \item \textbf{No Bypass:} Never skip levels (e.g., no direct Level 5 to Level 1 connection)
+\end{enumerate}
+
+\subsection{Common Mistakes to Avoid}
+
+\begin{dangerbox}
+\textbf{Flat Networks:} Many legacy OT environments have flat networks where all devices can communicate directly. This allows attackers to move laterally from compromised IT systems directly to PLCs.
+\end{dangerbox}
+
+\begin{warningbox}
+\textbf{Direct Remote Access:} Allowing VPN connections directly into Level 2 or below bypasses the DMZ protection and creates significant risk.
+\end{warningbox}
+
+\subsection{Firewall Rules Example}
+
+Basic firewall policy between DMZ and Level 3:
+
+\begin{itemize}
+    \item \textbf{Allow:} Historian replication (specific ports, specific hosts)
+    \item \textbf{Allow:} Patch downloads from DMZ server to Level 3
+    \item \textbf{Deny:} All inbound connections from IT to OT
+    \item \textbf{Deny:} Direct database queries from IT
+    \item \textbf{Log:} All denied traffic for analysis
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  SUMMARY
+% ----------------------------------------------------------------------------
+
+\section{Summary}
+
+\begin{definitionbox}{Key Takeaways}
+\begin{description}[leftmargin=!,labelwidth=2.5cm]
+    \item[Level 0] Physical process -- sensors and actuators
+    \item[Level 1] Basic control -- PLCs, RTUs
+    \item[Level 2] Supervisory -- HMI, SCADA
+    \item[Level 3] Operations -- Historians, MES
+    \item[DMZ] Buffer zone -- data diodes, jump servers
+    \item[Level 4-5] Enterprise -- IT and business systems
+\end{description}
+\end{definitionbox}
+
+\begin{tipbox}
+When assessing an OT environment, start by mapping the existing network to the Purdue Model. This helps identify gaps in segmentation and areas where security controls are missing.
+\end{tipbox}
+
+% ----------------------------------------------------------------------------
+%  REFERENCES
+% ----------------------------------------------------------------------------
+
+\section{Further Reading}
+
+\subsection*{Standards and Guidelines}
+\begin{itemize}
+    \item \textbf{NIST SP 800-82 Rev. 3} -- Guide to OT Security\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+    \item \textbf{IEC 62443 Series} -- Industrial Automation and Control Systems Security\\
+          \url{https://www.isa.org/standards-and-publications/isa-standards/isa-iec-62443-series-of-standards}
+    \item \textbf{ISA-95 / IEC 62264} -- Enterprise-Control System Integration\\
+          \url{https://www.isa.org/isa95}
+\end{itemize}
+
+\subsection*{Resources}
+\begin{itemize}
+    \item \textbf{CISA} -- ICS Security Recommended Practices\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+    \item \textbf{SANS ICS} -- Industrial Control Systems Security Resources\\
+          \url{https://www.sans.org/industrial-control-systems-security/}
+    \item \textbf{Purdue Enterprise Reference Architecture} -- Original Williams Paper (1992)\\
+          Reference: Williams, T.J. "The Purdue Enterprise Reference Architecture"
+\end{itemize}
+
+\subsection*{Books}
+\begin{itemize}
+    \item Knapp, E. \& Langill, J. -- \textit{Industrial Network Security} (Syngress)
+    \item Macaulay, T. \& Singer, B. -- \textit{Cybersecurity for Industrial Control Systems} (CRC Press)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textcolor{mediumgray}{\rule{0.5\textwidth}{0.5pt}}\\[1em]
+\textcolor{mediumgray}{\small Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

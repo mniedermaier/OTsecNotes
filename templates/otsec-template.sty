@@ -1,0 +1,480 @@
+% ============================================================================
+%  OT Security Document Template - Shared Style File
+%  Include this in your documents with: \usepackage{otsec-template}
+% ============================================================================
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{otsec-template}[2026/01/20 OT Security Document Template]
+
+% ============================================================================
+%  PACKAGES
+% ============================================================================
+
+% Page geometry
+\RequirePackage[top=2.5cm, bottom=3.5cm, left=2.5cm, right=2.5cm]{geometry}
+
+% Modern fonts
+\RequirePackage[T1]{fontenc}
+\RequirePackage{inter}
+\renewcommand{\familydefault}{\sfdefault}
+
+% Colors
+\RequirePackage[dvipsnames,svgnames,x11names]{xcolor}
+
+% Graphics and figures
+\RequirePackage{graphicx}
+\RequirePackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, calc, shadows.blur, fit, backgrounds}
+
+% Tables
+\RequirePackage{booktabs}
+\RequirePackage{tabularx}
+\RequirePackage{colortbl}
+\RequirePackage{multirow}
+
+% Lists
+\RequirePackage{enumitem}
+
+% Code listings
+\RequirePackage{listings}
+\RequirePackage{fancyvrb}
+
+% Boxes and frames
+\RequirePackage[most]{tcolorbox}
+
+% Headers and footers
+\RequirePackage{fancyhdr}
+
+% Hyperlinks
+\RequirePackage{xurl}
+\RequirePackage{hyperref}
+
+% Icons (FontAwesome)
+\RequirePackage{fontawesome5}
+
+% Math (for some symbols)
+\RequirePackage{amsmath}
+\RequirePackage{amssymb}
+
+% Better paragraph spacing
+\RequirePackage{parskip}
+
+% Section styling
+\RequirePackage{titlesec}
+
+% ============================================================================
+%  ICON DEFINITIONS
+% ============================================================================
+
+\newcommand{\iconShield}{\text{\faIcon{shield-alt}}}
+\newcommand{\iconBuilding}{\text{\faIcon{building}}}
+\newcommand{\iconCalendar}{\text{\faIcon{calendar-alt}}}
+\newcommand{\iconInfo}{\faIcon{info-circle}}
+\newcommand{\iconWarning}{\faIcon{exclamation-triangle}}
+\newcommand{\iconDanger}{\faIcon{skull-crossbones}}
+\newcommand{\iconSuccess}{\faIcon{check-circle}}
+\newcommand{\iconTip}{\faIcon{lightbulb}}
+\newcommand{\iconBook}{\faIcon{book}}
+\newcommand{\iconNetwork}{\faIcon{network-wired}}
+\newcommand{\iconArrow}{\faIcon{angle-right}}
+\newcommand{\iconSquare}{\faIcon{square}}
+\newcommand{\iconCheckSquare}{\faIcon{check-square}}
+\newcommand{\iconLongArrow}{\faIcon{long-arrow-alt-right}}
+\newcommand{\iconLock}{\faIcon{lock}}
+
+% ============================================================================
+%  COLOR DEFINITIONS
+% ============================================================================
+
+% Primary palette - Deep industrial blue theme
+\definecolor{primary}{HTML}{0F172A}
+\definecolor{secondary}{HTML}{1E3A5F}
+\definecolor{accent}{HTML}{0EA5E9}
+\definecolor{accentlight}{HTML}{38BDF8}
+\definecolor{highlight}{HTML}{F59E0B}
+
+% Functional colors
+\definecolor{success}{HTML}{10B981}
+\definecolor{warning}{HTML}{F59E0B}
+\definecolor{danger}{HTML}{EF4444}
+\definecolor{info}{HTML}{3B82F6}
+
+% Neutral colors
+\definecolor{darkgray}{HTML}{1F2937}
+\definecolor{mediumgray}{HTML}{6B7280}
+\definecolor{lightgray}{HTML}{F3F4F6}
+\definecolor{bordergray}{HTML}{E5E7EB}
+
+% Code colors
+\definecolor{codebg}{HTML}{1E1E2E}
+\definecolor{codetext}{HTML}{CDD6F4}
+\definecolor{codekeyword}{HTML}{CBA6F7}
+\definecolor{codestring}{HTML}{A6E3A1}
+\definecolor{codecomment}{HTML}{6C7086}
+
+% Zone colors for Purdue Model
+\definecolor{zone0}{HTML}{7C3AED}
+\definecolor{zone1}{HTML}{2563EB}
+\definecolor{zone2}{HTML}{0891B2}
+\definecolor{zone3}{HTML}{059669}
+\definecolor{zone35}{HTML}{D97706}
+\definecolor{zone4}{HTML}{DC2626}
+
+% ============================================================================
+%  HYPERREF SETUP
+% ============================================================================
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=secondary,
+    filecolor=secondary,
+    urlcolor=accent,
+    citecolor=secondary,
+}
+
+% ============================================================================
+%  PAGE STYLE & HEADERS/FOOTERS
+% ============================================================================
+
+\pagestyle{fancy}
+\fancyhf{}
+
+% Header
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead[L]{%
+    \begin{tikzpicture}[remember picture, overlay]
+        \fill[primary] (current page.north west) rectangle ([yshift=-1.2cm]current page.north east);
+        \node[anchor=west, text=white, font=\small\bfseries] at ([xshift=2.5cm, yshift=-0.6cm]current page.north west) {\leftmark};
+        \node[anchor=east, text=accentlight, font=\small] at ([xshift=-2.5cm, yshift=-0.6cm]current page.north east) {\iconShield\hspace{0.3em}OT SECURITY NOTES};
+    \end{tikzpicture}
+}
+
+% Footer
+\fancyfoot[C]{%
+    \begin{tikzpicture}[remember picture, overlay]
+        \fill[lightgray] (current page.south west) rectangle ([yshift=1cm]current page.south east);
+        \draw[accent, line width=2pt] ([yshift=1cm]current page.south west) -- ([yshift=1cm]current page.south east);
+        \node[anchor=west, text=mediumgray, font=\footnotesize] at ([xshift=2.5cm, yshift=0.5cm]current page.south west) {Learning Resource};
+        \node[anchor=center, text=darkgray, font=\small\bfseries] at ([yshift=0.5cm]current page.south) {\thepage};
+        \node[anchor=east, text=mediumgray, font=\footnotesize] at ([xshift=-2.5cm, yshift=0.5cm]current page.south east) {\today};
+    \end{tikzpicture}
+}
+
+\setlength{\headheight}{2cm}
+\setlength{\footskip}{1.5cm}
+
+% ============================================================================
+%  TITLE PAGE COMMAND
+% ============================================================================
+
+\newcommand{\maketitlepage}[5]{%
+    \thispagestyle{empty}
+    \begin{tikzpicture}[remember picture, overlay]
+        % Background
+        \fill[primary] (current page.north west) rectangle (current page.south east);
+
+        % Shield with gear - industrial security symbol (top right)
+        \begin{scope}[shift={(current page.north east)}, xshift=-4.2cm, yshift=-2.2cm, scale=1, accent!40]
+            % Shield outline
+            \draw[line width=2.5pt]
+                (0,0) -- (2,0) -- (2,-2)
+                .. controls (2,-3.2) and (1,-4) .. (1,-4.4)
+                .. controls (1,-4) and (0,-3.2) .. (0,-2) -- cycle;
+            % Inner shield line
+            \draw[line width=1pt, opacity=0.5]
+                (0.18,-0.18) -- (1.82,-0.18) -- (1.82,-1.9)
+                .. controls (1.82,-2.95) and (1,-3.6) .. (1,-3.95)
+                .. controls (1,-3.6) and (0.18,-2.95) .. (0.18,-1.9) -- cycle;
+            % Gear in center
+            \begin{scope}[shift={(1,-1.8)}]
+                % Gear teeth
+                \foreach \angle in {0, 45, 90, 135, 180, 225, 270, 315} {
+                    \fill[rotate=\angle] (-0.1,0.45) rectangle (0.1,0.7);
+                }
+                % Outer circle
+                \fill (0,0) circle (0.5);
+                % Inner hole
+                \fill[primary] (0,0) circle (0.2);
+            \end{scope}
+        \end{scope}
+
+        % Large decorative shield shape (background)
+        \begin{scope}[shift={([xshift=5cm, yshift=-8cm]current page.north west)}, opacity=0.06, accent]
+            \fill[accent] (0,0) -- (3,1.5) -- (6,0) -- (6,-4)
+                .. controls (6,-7) and (3,-9) .. (3,-10)
+                .. controls (3,-9) and (0,-7) .. (0,-4) -- cycle;
+        \end{scope}
+
+        % Accent line
+        \fill[accent] ([yshift=-8cm]current page.north west) rectangle ([yshift=-8.15cm, xshift=8cm]current page.north west);
+
+        % Title
+        \node[anchor=north west, text=white, font=\fontsize{32}{38}\selectfont\bfseries, text width=12cm, align=flush left]
+            at ([xshift=2.5cm, yshift=-8.5cm]current page.north west) {\raggedright #1};
+
+        % Subtitle
+        \node[anchor=west, text=accentlight, font=\Large, text width=12cm]
+            at ([xshift=2.5cm, yshift=-14.5cm]current page.north west) {#2};
+
+        % Separator line
+        \draw[white!30, line width=0.5pt] ([xshift=2.5cm, yshift=-15.8cm]current page.north west) -- ([xshift=12cm, yshift=-15.8cm]current page.north west);
+
+        % Author/Organization
+        \node[anchor=west, text=white!80, font=\large]
+            at ([xshift=2.5cm, yshift=-17cm]current page.north west) {#3};
+
+        % Version/Date
+        \node[anchor=west, text=white!60, font=\normalsize]
+            at ([xshift=2.5cm, yshift=-18cm]current page.north west) {#4};
+
+        % Contributors
+        \node[anchor=west, text=white!50, font=\small]
+            at ([xshift=2.5cm, yshift=-19.3cm]current page.north west) {Contributors: #5};
+
+        % Bottom accent bar
+        \fill[accent] ([yshift=0.5cm]current page.south west) rectangle ([yshift=0.6cm]current page.south east);
+
+        % Badge
+        \node[fill=info, text=white, font=\small\bfseries, inner sep=8pt, rounded corners=3pt]
+            at ([xshift=-3cm, yshift=2cm]current page.south east) {LEARNING RESOURCE};
+
+    \end{tikzpicture}
+    \newpage
+}
+
+% ============================================================================
+%  SECTION STYLING
+% ============================================================================
+
+\titleformat{\section}
+    {\normalfont\Large\bfseries\color{primary}}
+    {\colorbox{accent}{\parbox{1.2cm}{\centering\textcolor{white}{\thesection}}}}
+    {1em}
+    {}
+    [\vspace{-0.5em}\textcolor{accent}{\rule{\linewidth}{1pt}}]
+
+\titleformat{\subsection}
+    {\normalfont\large\bfseries\color{secondary}}
+    {\textcolor{accent}{\thesubsection}}
+    {0.8em}
+    {}
+
+\titleformat{\subsubsection}
+    {\normalfont\normalsize\bfseries\color{darkgray}}
+    {\textcolor{mediumgray}{\thesubsubsection}}
+    {0.6em}
+    {}
+
+% ============================================================================
+%  CUSTOM BOXES
+% ============================================================================
+
+% Info Box
+\newtcolorbox{infobox}[1][]{
+    enhanced,
+    breakable,
+    colback=info!5,
+    colframe=info,
+    coltitle=white,
+    fonttitle=\bfseries,
+    title={\iconInfo\hspace{0.5em}Information},
+    boxrule=0pt,
+    leftrule=4pt,
+    arc=0pt,
+    outer arc=0pt,
+    shadow={2pt}{-2pt}{0pt}{black!20},
+    #1
+}
+
+% Warning Box
+\newtcolorbox{warningbox}[1][]{
+    enhanced,
+    breakable,
+    colback=warning!5,
+    colframe=warning,
+    coltitle=white,
+    fonttitle=\bfseries,
+    title={\iconWarning\hspace{0.5em}Warning},
+    boxrule=0pt,
+    leftrule=4pt,
+    arc=0pt,
+    outer arc=0pt,
+    shadow={2pt}{-2pt}{0pt}{black!20},
+    #1
+}
+
+% Danger Box
+\newtcolorbox{dangerbox}[1][]{
+    enhanced,
+    breakable,
+    colback=danger!5,
+    colframe=danger,
+    coltitle=white,
+    fonttitle=\bfseries,
+    title={\iconDanger\hspace{0.5em}Critical},
+    boxrule=0pt,
+    leftrule=4pt,
+    arc=0pt,
+    outer arc=0pt,
+    shadow={2pt}{-2pt}{0pt}{black!20},
+    #1
+}
+
+% Success Box
+\newtcolorbox{successbox}[1][]{
+    enhanced,
+    breakable,
+    colback=success!5,
+    colframe=success,
+    coltitle=white,
+    fonttitle=\bfseries,
+    title={\iconSuccess\hspace{0.5em}Key Point},
+    boxrule=0pt,
+    leftrule=4pt,
+    arc=0pt,
+    outer arc=0pt,
+    shadow={2pt}{-2pt}{0pt}{black!20},
+    #1
+}
+
+% Tip Box
+\newtcolorbox{tipbox}[1][]{
+    enhanced,
+    breakable,
+    colback=accent!5,
+    colframe=accent,
+    coltitle=white,
+    fonttitle=\bfseries,
+    title={\iconTip\hspace{0.5em}Tip},
+    boxrule=0pt,
+    leftrule=4pt,
+    arc=0pt,
+    outer arc=0pt,
+    shadow={2pt}{-2pt}{0pt}{black!20},
+    #1
+}
+
+% Definition Box
+\newtcolorbox{definitionbox}[2][]{
+    enhanced,
+    breakable,
+    colback=primary!3,
+    colframe=primary,
+    coltitle=white,
+    fonttitle=\bfseries,
+    title={\iconBook\hspace{0.5em}#2},
+    boxrule=0pt,
+    leftrule=4pt,
+    arc=3pt,
+    outer arc=3pt,
+    shadow={2pt}{-2pt}{0pt}{black!15},
+    #1
+}
+
+% Concept Box (for explaining key concepts)
+\newtcolorbox{conceptbox}[2][]{
+    enhanced,
+    colback=secondary!5,
+    colframe=secondary,
+    coltitle=white,
+    fonttitle=\bfseries,
+    title={#2},
+    boxrule=1pt,
+    arc=5pt,
+    outer arc=5pt,
+    shadow={2pt}{-2pt}{0pt}{black!20},
+    #1
+}
+
+% Quote Box
+\newtcolorbox{quotebox}[1][]{
+    enhanced,
+    breakable,
+    colback=lightgray,
+    colframe=mediumgray,
+    coltitle=darkgray,
+    fonttitle=\bfseries\itshape,
+    boxrule=0pt,
+    leftrule=4pt,
+    arc=0pt,
+    outer arc=0pt,
+    #1
+}
+
+% ============================================================================
+%  CODE LISTINGS
+% ============================================================================
+
+\lstdefinestyle{modernstyle}{
+    backgroundcolor=\color{codebg},
+    basicstyle=\ttfamily\small\color{codetext},
+    keywordstyle=\color{codekeyword}\bfseries,
+    stringstyle=\color{codestring},
+    commentstyle=\color{codecomment}\itshape,
+    numberstyle=\tiny\color{codecomment},
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=10pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    frame=none,
+    xleftmargin=1.5em,
+    framexleftmargin=1.5em,
+    aboveskip=1em,
+    belowskip=1em,
+}
+
+\lstset{style=modernstyle}
+
+\newcommand{\code}[1]{\colorbox{lightgray}{\texttt{\small\color{darkgray}#1}}}
+
+% ============================================================================
+%  LIST STYLING
+% ============================================================================
+
+\setlist[itemize]{
+    leftmargin=*,
+    label=\textcolor{accent}{\iconArrow},
+    itemsep=0.3em,
+}
+
+\setlist[enumerate]{
+    leftmargin=*,
+    itemsep=0.3em,
+}
+
+% ============================================================================
+%  RISK LEVEL INDICATORS
+% ============================================================================
+
+\newcommand{\riskcritical}{\tikz\node[fill=danger, text=white, font=\scriptsize\bfseries, inner sep=3pt, rounded corners=2pt]{CRITICAL};}
+\newcommand{\riskhigh}{\tikz\node[fill=highlight, text=white, font=\scriptsize\bfseries, inner sep=3pt, rounded corners=2pt]{HIGH};}
+\newcommand{\riskmedium}{\tikz\node[fill=warning, text=darkgray, font=\scriptsize\bfseries, inner sep=3pt, rounded corners=2pt]{MEDIUM};}
+\newcommand{\risklow}{\tikz\node[fill=success, text=white, font=\scriptsize\bfseries, inner sep=3pt, rounded corners=2pt]{LOW};}
+
+% ============================================================================
+%  SECURITY LEVEL INDICATORS (for IEC 62443)
+% ============================================================================
+
+\newcommand{\slone}{\tikz\node[fill=success, text=white, font=\scriptsize\bfseries, inner sep=3pt, rounded corners=2pt]{SL 1};}
+\newcommand{\sltwo}{\tikz\node[fill=info, text=white, font=\scriptsize\bfseries, inner sep=3pt, rounded corners=2pt]{SL 2};}
+\newcommand{\slthree}{\tikz\node[fill=warning, text=darkgray, font=\scriptsize\bfseries, inner sep=3pt, rounded corners=2pt]{SL 3};}
+\newcommand{\slfour}{\tikz\node[fill=danger, text=white, font=\scriptsize\bfseries, inner sep=3pt, rounded corners=2pt]{SL 4};}
+
+% ============================================================================
+%  ZONE LEVEL INDICATORS (for Purdue Model)
+% ============================================================================
+
+\newcommand{\zonezero}{\tikz\node[fill=zone0, text=white, font=\scriptsize\bfseries, inner sep=3pt, rounded corners=2pt]{Level 0};}
+\newcommand{\zoneone}{\tikz\node[fill=zone1, text=white, font=\scriptsize\bfseries, inner sep=3pt, rounded corners=2pt]{Level 1};}
+\newcommand{\zonetwo}{\tikz\node[fill=zone2, text=white, font=\scriptsize\bfseries, inner sep=3pt, rounded corners=2pt]{Level 2};}
+\newcommand{\zonethree}{\tikz\node[fill=zone3, text=white, font=\scriptsize\bfseries, inner sep=3pt, rounded corners=2pt]{Level 3};}
+\newcommand{\zonedmz}{\tikz\node[fill=zone35, text=white, font=\scriptsize\bfseries, inner sep=3pt, rounded corners=2pt]{DMZ};}
+\newcommand{\zonefour}{\tikz\node[fill=zone4, text=white, font=\scriptsize\bfseries, inner sep=3pt, rounded corners=2pt]{Level 4/5};}
+
+\endinput

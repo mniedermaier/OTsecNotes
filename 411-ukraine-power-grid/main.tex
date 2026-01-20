@@ -1,0 +1,293 @@
+% ============================================================================
+%  Ukraine Power Grid Attacks - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+\hypersetup{
+    pdftitle={Ukraine Power Grid Attacks},
+    pdfsubject={Analysis of the 2015 and 2016 Cyber Attacks},
+}
+
+\begin{document}
+
+% ----------------------------------------------------------------------------
+%  TITLE PAGE
+% ----------------------------------------------------------------------------
+
+\maketitlepage
+    {Ukraine Power Grid Attacks}
+    {Analysis of the 2015 and 2016 Cyber Attacks on Ukrainian Power Distribution}
+    {OT Security Learning Series}
+    {Document 411 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+% ----------------------------------------------------------------------------
+%  TABLE OF CONTENTS
+% ----------------------------------------------------------------------------
+
+\tableofcontents
+\newpage
+
+% ----------------------------------------------------------------------------
+%  INTRODUCTION
+% ----------------------------------------------------------------------------
+
+\section{Introduction}
+
+The cyber attacks on Ukraine's power grid in December 2015 and December 2016 represent landmark events in the history of OT security. These attacks demonstrated that adversaries could successfully compromise power distribution systems and cause widespread outages affecting civilian populations.
+
+\begin{dangerbox}
+The 2015 Ukraine attack was the first publicly confirmed cyber attack to cause a power outage. It proved that nation-state actors could and would target civilian critical infrastructure.
+\end{dangerbox}
+
+% ----------------------------------------------------------------------------
+%  2015 ATTACK
+% ----------------------------------------------------------------------------
+
+\section{The 2015 Attack}
+
+\subsection{Overview}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Attribute} & \textcolor{white}{\bfseries Details} \\
+\midrule
+Date & December 23, 2015 \\
+Target & Three Ukrainian power distribution companies \\
+Duration & 1--6 hours of outages \\
+Impact & Approximately 225,000 customers without power \\
+Malware & BlackEnergy 3, KillDisk \\
+Attribution & Sandworm (Russian state-sponsored group) \\
+\end{tabular}
+\end{center}
+
+\subsection{Attack Chain}
+
+\begin{conceptbox}{2015 Attack Sequence}
+\begin{enumerate}
+    \item \textbf{Initial Access:} Spear-phishing emails with malicious Word documents
+    \item \textbf{Persistence:} BlackEnergy malware established backdoor access
+    \item \textbf{Reconnaissance:} Months of network mapping and credential harvesting
+    \item \textbf{Lateral Movement:} Pivoted from IT networks to OT systems
+    \item \textbf{Execution:} Remote access to SCADA systems via hijacked VPNs
+    \item \textbf{Impact:} Operators watched as attackers opened breakers remotely
+    \item \textbf{Destruction:} KillDisk wiped systems, UPS firmware corrupted
+\end{enumerate}
+\end{conceptbox}
+
+\subsection{Attack Execution Details}
+
+\begin{warningbox}
+Attackers used legitimate remote access tools (VPNs, remote desktop) to control SCADA systems. They opened circuit breakers while operators watched helplessly, unable to regain control.
+\end{warningbox}
+
+The attackers demonstrated sophisticated operational planning:
+
+\begin{itemize}
+    \item \textbf{Coordinated timing:} Attacked three utilities simultaneously
+    \item \textbf{Denial of service:} Flooded utility call centers with fake calls
+    \item \textbf{Persistence denial:} Corrupted serial-to-Ethernet converters
+    \item \textbf{Recovery hindrance:} Deployed KillDisk to wipe workstations
+    \item \textbf{UPS sabotage:} Modified UPS firmware to fail during recovery
+\end{itemize}
+
+\subsection{Recovery}
+
+Power was restored within 1--6 hours through \textbf{manual operations}:
+
+\begin{itemize}
+    \item Operators physically traveled to substations
+    \item Breakers closed manually at each location
+    \item Ukrainian grid design allowed for manual override capability
+    \item Full IT system recovery took months
+\end{itemize}
+
+\begin{tipbox}
+The ability to manually operate equipment was critical to rapid recovery. Modern fully-automated systems without manual override capabilities may be more vulnerable to prolonged outages.
+\end{tipbox}
+
+% ----------------------------------------------------------------------------
+%  2016 ATTACK
+% ----------------------------------------------------------------------------
+
+\section{The 2016 Attack (Industroyer/CrashOverride)}
+
+\subsection{Overview}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Attribute} & \textcolor{white}{\bfseries Details} \\
+\midrule
+Date & December 17, 2016 \\
+Target & Ukrenergo transmission substation (Kyiv) \\
+Duration & Approximately 1 hour outage \\
+Impact & Portion of Kyiv without power \\
+Malware & Industroyer / CrashOverride \\
+Attribution & Sandworm (Russian state-sponsored group) \\
+\end{tabular}
+\end{center}
+
+\subsection{Industroyer Malware}
+
+\begin{dangerbox}
+Industroyer was the first known malware specifically designed to attack power grid equipment. It included modules for four different industrial protocols, making it adaptable to various power system configurations.
+\end{dangerbox}
+
+\begin{conceptbox}{Industroyer Protocol Modules}
+\begin{itemize}
+    \item \textbf{IEC 60870-5-101:} Serial communication protocol for telecontrol
+    \item \textbf{IEC 60870-5-104:} TCP/IP version of 101 protocol
+    \item \textbf{IEC 61850:} Substation automation standard
+    \item \textbf{OPC DA:} Industrial data access protocol
+\end{itemize}
+\end{conceptbox}
+
+\subsection{Attack Capabilities}
+
+Industroyer demonstrated advanced capabilities:
+
+\begin{itemize}
+    \item \textbf{Protocol-native attacks:} Spoke directly to substation equipment
+    \item \textbf{No operator interaction needed:} Fully automated attack sequence
+    \item \textbf{Modular design:} Easily adaptable to different targets
+    \item \textbf{Data wiping:} Included destructive component
+    \item \textbf{Potential for greater damage:} May have been a proof-of-concept
+\end{itemize}
+
+\subsection{Comparison: 2015 vs 2016}
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{5cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Aspect} & \textcolor{white}{\bfseries 2015 Attack} & \textcolor{white}{\bfseries 2016 Attack} \\
+\midrule
+Attack Method & Remote desktop hijacking & Protocol-native malware \\
+Human Involvement & Attackers manually operated SCADA & Automated malware execution \\
+Sophistication & Used existing tools & Custom ICS malware \\
+Scalability & Labor-intensive & Highly scalable \\
+Target Level & Distribution (lower voltage) & Transmission (higher voltage) \\
+\end{tabular}
+\end{center}
+
+% ----------------------------------------------------------------------------
+%  TECHNICAL ANALYSIS
+% ----------------------------------------------------------------------------
+
+\section{Technical Analysis}
+
+\subsection{Initial Compromise}
+
+Both attacks began with spear-phishing:
+
+\begin{enumerate}
+    \item Targeted emails sent to utility employees
+    \item Malicious Microsoft Word documents with macros
+    \item BlackEnergy malware downloaded and installed
+    \item Backdoor access established for long-term persistence
+\end{enumerate}
+
+\subsection{Network Architecture Exploitation}
+
+\begin{warningbox}
+The attackers exploited common weaknesses in IT/OT network architecture:
+\begin{itemize}
+    \item VPN connections between corporate and operational networks
+    \item Shared credentials between IT and OT systems
+    \item Insufficient network segmentation
+    \item Lack of multi-factor authentication
+\end{itemize}
+\end{warningbox}
+
+\subsection{MITRE ATT\&CK for ICS Mapping}
+
+Key techniques used (mapped to MITRE ATT\&CK for ICS):
+
+\begin{itemize}
+    \item \textbf{T0865:} Spearphishing Attachment (Initial Access)
+    \item \textbf{T0859:} Valid Accounts (Persistence, Lateral Movement)
+    \item \textbf{T0886:} Remote Services (Lateral Movement)
+    \item \textbf{T0855:} Unauthorized Command Message (Execution)
+    \item \textbf{T0831:} Manipulation of Control (Impact)
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  LESSONS LEARNED
+% ----------------------------------------------------------------------------
+
+\section{Lessons Learned}
+
+\subsection{Key Takeaways}
+
+\begin{successbox}
+\textbf{Critical lessons from the Ukraine attacks:}
+\begin{enumerate}
+    \item \textbf{Spear-phishing remains effective:} Initial access through email
+    \item \textbf{IT/OT convergence creates risk:} VPNs bridged networks
+    \item \textbf{Credential theft enables pivoting:} Shared passwords exploited
+    \item \textbf{Manual operations saved the day:} Ability to operate without SCADA
+    \item \textbf{Attackers are patient:} Months of reconnaissance before attack
+    \item \textbf{Coordinated attacks multiply impact:} Multiple targets hit simultaneously
+\end{enumerate}
+\end{successbox}
+
+\subsection{Defense Recommendations}
+
+\begin{itemize}
+    \item \textbf{Implement MFA:} Especially for remote access and VPNs
+    \item \textbf{Segment networks:} Proper DMZ between IT and OT
+    \item \textbf{Monitor OT traffic:} Detect anomalous commands and connections
+    \item \textbf{Maintain manual capabilities:} Ensure equipment can be operated manually
+    \item \textbf{Email security:} Advanced threat protection and user training
+    \item \textbf{Incident response:} OT-specific plans and regular exercises
+\end{itemize}
+
+\subsection{Industry Impact}
+
+The Ukraine attacks prompted significant changes:
+
+\begin{itemize}
+    \item Increased investment in grid cybersecurity worldwide
+    \item Development of ICS-specific threat intelligence sharing
+    \item Enhanced regulatory focus on critical infrastructure protection
+    \item Greater collaboration between utilities and government agencies
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  FURTHER READING
+% ----------------------------------------------------------------------------
+
+\section{Further Reading}
+
+\subsection*{Technical Reports}
+\begin{itemize}
+    \item \textbf{SANS ICS} -- Analysis of the Cyber Attack on the Ukrainian Power Grid\\
+          \url{https://www.sans.org/reading-room/whitepapers/ICS/}
+    \item \textbf{Dragos} -- CRASHOVERRIDE: Analysis of the Threat to Electric Grid Operations\\
+          \url{https://www.dragos.com/resource/crashoverride/}
+    \item \textbf{ESET} -- Industroyer: Biggest threat to industrial control systems since Stuxnet\\
+          \url{https://www.eset.com/int/industroyer/}
+\end{itemize}
+
+\subsection*{Government Resources}
+\begin{itemize}
+    \item \textbf{CISA} -- ICS Alert: Cyber-Attack Against Ukrainian Critical Infrastructure\\
+          \url{https://www.cisa.gov/news-events/ics-alerts}
+    \item \textbf{US-CERT} -- Alert TA17-163A: CrashOverride Malware\\
+          \url{https://www.cisa.gov/news-events/alerts}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textcolor{mediumgray}{\rule{0.5\textwidth}{0.5pt}}\\[1em]
+\textcolor{mediumgray}{\small Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

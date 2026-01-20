@@ -1,0 +1,280 @@
+% ============================================================================
+%  OPC UA - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+\hypersetup{
+    pdftitle={OPC UA},
+    pdfsubject={Understanding OPC Unified Architecture},
+}
+
+\begin{document}
+
+% ----------------------------------------------------------------------------
+%  TITLE PAGE
+% ----------------------------------------------------------------------------
+
+\maketitlepage
+    {OPC UA}
+    {Understanding OPC Unified Architecture}
+    {OT Security Learning Series}
+    {Document 201 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+% ----------------------------------------------------------------------------
+%  TABLE OF CONTENTS
+% ----------------------------------------------------------------------------
+
+\tableofcontents
+\newpage
+
+% ----------------------------------------------------------------------------
+%  INTRODUCTION
+% ----------------------------------------------------------------------------
+
+\section{Introduction}
+
+OPC Unified Architecture (OPC UA) is a platform-independent, service-oriented architecture for industrial communication. Developed by the OPC Foundation, it was designed to replace legacy OPC Classic and address its limitations, including security.
+
+\begin{infobox}
+OPC UA is increasingly adopted as the standard for Industry 4.0 and IIoT applications. Unlike most legacy protocols, it includes built-in security features---but proper configuration is essential.
+\end{infobox}
+
+\subsection{OPC Classic vs OPC UA}
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{4.5cm}p{4.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Aspect} & \textcolor{white}{\bfseries OPC Classic} & \textcolor{white}{\bfseries OPC UA} \\
+\midrule
+Platform & Windows only (COM/DCOM) & Platform independent \\
+Transport & DCOM (dynamic ports) & TCP, HTTPS, WebSockets \\
+Security & Windows security only & Built-in encryption \& auth \\
+Firewall & Difficult (DCOM) & Simple (single port) \\
+Data Model & Separate specs (DA, HDA, A\&E) & Unified information model \\
+Released & 1996 & 2008 \\
+\end{tabular}
+\end{center}
+
+% ----------------------------------------------------------------------------
+%  ARCHITECTURE
+% ----------------------------------------------------------------------------
+
+\section{Architecture Overview}
+
+\subsection{Communication Stack}
+
+OPC UA defines a layered communication architecture:
+
+\begin{conceptbox}{OPC UA Stack Layers}
+\begin{itemize}
+    \item \textbf{Application Layer:} Client/server application logic
+    \item \textbf{Service Layer:} OPC UA services (Read, Write, Subscribe, etc.)
+    \item \textbf{Security Layer:} Authentication, encryption, signing
+    \item \textbf{Transport Layer:} TCP binary, HTTPS, WebSockets
+\end{itemize}
+\end{conceptbox}
+
+\subsection{Information Model}
+
+OPC UA uses a rich, object-oriented information model:
+
+\begin{itemize}
+    \item \textbf{Nodes:} Basic building blocks (Objects, Variables, Methods)
+    \item \textbf{References:} Relationships between nodes
+    \item \textbf{Address Space:} Hierarchical namespace of all nodes
+    \item \textbf{Companion Specs:} Industry-specific data models (e.g., for robotics, PLCs)
+\end{itemize}
+
+\subsection{Communication Patterns}
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{9.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Pattern} & \textcolor{white}{\bfseries Description} \\
+\midrule
+Client-Server & Traditional request-response model \\
+Publish-Subscribe & Event-driven data distribution (OPC UA PubSub) \\
+\end{tabular}
+\end{center}
+
+% ----------------------------------------------------------------------------
+%  SECURITY FEATURES
+% ----------------------------------------------------------------------------
+
+\section{Security Features}
+
+\subsection{Security Model}
+
+\begin{successbox}
+\textbf{OPC UA includes comprehensive security features:}
+\begin{itemize}
+    \item Authentication (user and application identity)
+    \item Authorization (role-based access control)
+    \item Confidentiality (encryption)
+    \item Integrity (message signing)
+    \item Auditability (event logging)
+\end{itemize}
+\end{successbox}
+
+\subsection{Security Modes}
+
+OPC UA defines three security modes:
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3cm}p{2.5cm}p{2.5cm}p{4.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Mode} & \textcolor{white}{\bfseries Encryption} & \textcolor{white}{\bfseries Signing} & \textcolor{white}{\bfseries Use Case} \\
+\midrule
+None & No & No & Testing only (never in production) \\
+Sign & No & Yes & Integrity without confidentiality \\
+SignAndEncrypt & Yes & Yes & Full security (recommended) \\
+\end{tabular}
+\end{center}
+
+\begin{dangerbox}
+Security Mode ``None'' disables all security. Unfortunately, many deployments use this mode for convenience, negating OPC UA's security advantages.
+\end{dangerbox}
+
+\subsection{Authentication Methods}
+
+\begin{itemize}
+    \item \textbf{Anonymous:} No authentication (not recommended)
+    \item \textbf{Username/Password:} Basic credential authentication
+    \item \textbf{X.509 Certificates:} Strong application and user authentication
+    \item \textbf{Kerberos:} Enterprise SSO integration
+\end{itemize}
+
+\subsection{Certificate Management}
+
+OPC UA relies heavily on X.509 certificates:
+
+\begin{conceptbox}{Certificate Trust Model}
+\begin{itemize}
+    \item Each application has its own certificate
+    \item Clients and servers must trust each other's certificates
+    \item Trust can be explicit (trusted list) or CA-based
+    \item Certificate validation includes expiry, revocation, hostname
+\end{itemize}
+\end{conceptbox}
+
+% ----------------------------------------------------------------------------
+%  SECURITY CONCERNS
+% ----------------------------------------------------------------------------
+
+\section{Security Concerns}
+
+\subsection{Common Misconfigurations}
+
+\begin{warningbox}
+\textbf{Security features don't help if not properly configured:}
+\begin{itemize}
+    \item Security Mode set to ``None''
+    \item Anonymous authentication enabled
+    \item Self-signed certificates without proper trust management
+    \item Default or weak credentials
+    \item Missing certificate revocation checks
+\end{itemize}
+\end{warningbox}
+
+\subsection{Known Vulnerabilities}
+
+OPC UA implementations have had security vulnerabilities:
+
+\begin{itemize}
+    \item \textbf{Stack implementations:} Buffer overflows, DoS vulnerabilities
+    \item \textbf{Certificate handling:} Improper validation, path traversal
+    \item \textbf{Authentication bypass:} Implementation-specific flaws
+\end{itemize}
+
+\begin{tipbox}
+The OPC UA specification is complex. Implementation vulnerabilities are common. Keep OPC UA software updated and monitor security advisories.
+\end{tipbox}
+
+\subsection{Attack Scenarios}
+
+\begin{enumerate}
+    \item \textbf{Discovery abuse:} Enumerate servers and endpoints
+    \item \textbf{Downgrade attacks:} Force use of weaker security modes
+    \item \textbf{Certificate theft:} Steal private keys to impersonate applications
+    \item \textbf{DoS attacks:} Exhaust server resources with malformed requests
+    \item \textbf{Information disclosure:} Access sensitive process data
+\end{enumerate}
+
+% ----------------------------------------------------------------------------
+%  BEST PRACTICES
+% ----------------------------------------------------------------------------
+
+\section{Security Best Practices}
+
+\subsection{Configuration Hardening}
+
+\begin{itemize}
+    \item \textbf{Always use SignAndEncrypt} security mode
+    \item \textbf{Disable anonymous access} -- require authentication
+    \item \textbf{Use strong security policies} (Basic256Sha256 or better)
+    \item \textbf{Implement proper certificate management} with PKI
+    \item \textbf{Enable audit logging} for security events
+    \item \textbf{Apply least privilege} through role-based access
+\end{itemize}
+
+\subsection{Network Security}
+
+\begin{itemize}
+    \item \textbf{Segment OPC UA traffic} in dedicated network zones
+    \item \textbf{Use firewalls} to restrict access to OPC UA ports (4840)
+    \item \textbf{Monitor traffic} for anomalous patterns
+    \item \textbf{Consider additional encryption} (VPN) for cross-zone traffic
+\end{itemize}
+
+\subsection{Operational Security}
+
+\begin{itemize}
+    \item \textbf{Keep software updated} -- patch known vulnerabilities
+    \item \textbf{Inventory all OPC UA endpoints} in your environment
+    \item \textbf{Review security configurations} regularly
+    \item \textbf{Test security settings} before deployment
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  FURTHER READING
+% ----------------------------------------------------------------------------
+
+\section{Further Reading}
+
+\subsection*{Specifications}
+\begin{itemize}
+    \item \textbf{OPC Foundation} -- OPC UA Specifications\\
+          \url{https://opcfoundation.org/developer-tools/specifications-unified-architecture}
+    \item \textbf{OPC UA Security Analysis} -- BSI (German Federal Office)\\
+          \url{https://www.bsi.bund.de/EN/}
+\end{itemize}
+
+\subsection*{Standards}
+\begin{itemize}
+    \item \textbf{IEC 62541} -- OPC Unified Architecture (international standard)
+    \item \textbf{IEC 62443} -- Industrial Automation Security\\
+          \url{https://www.isa.org/standards-and-publications/isa-standards/isa-iec-62443-series-of-standards}
+\end{itemize}
+
+\subsection*{Resources}
+\begin{itemize}
+    \item \textbf{CISA} -- ICS Advisories\\
+          \url{https://www.cisa.gov/news-events/ics-advisories}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textcolor{mediumgray}{\rule{0.5\textwidth}{0.5pt}}\\[1em]
+\textcolor{mediumgray}{\small Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

@@ -1,0 +1,397 @@
+% ============================================================================
+%  IT vs OT - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+\hypersetup{
+    pdftitle={IT vs OT - Understanding the Differences},
+    pdfsubject={OT Security Fundamentals},
+}
+
+\begin{document}
+
+% ----------------------------------------------------------------------------
+%  TITLE PAGE
+% ----------------------------------------------------------------------------
+
+\maketitlepage
+    {IT vs OT}
+    {Understanding the Fundamental Differences}
+    {OT Security Learning Series}
+    {Document 001 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+% ----------------------------------------------------------------------------
+%  TABLE OF CONTENTS
+% ----------------------------------------------------------------------------
+
+\tableofcontents
+\newpage
+
+% ----------------------------------------------------------------------------
+%  INTRODUCTION
+% ----------------------------------------------------------------------------
+
+\section{Introduction}
+
+The worlds of Information Technology (IT) and Operational Technology (OT) have traditionally been separate domains with distinct priorities, technologies, and cultures. However, increasing digitalization and connectivity are driving convergence between these two worlds, creating new challenges for security professionals.
+
+\begin{infobox}
+Understanding the fundamental differences between IT and OT is essential for anyone working in industrial cybersecurity. Applying IT security practices directly to OT environments without adaptation can lead to operational disruptions or safety incidents.
+\end{infobox}
+
+% ----------------------------------------------------------------------------
+%  DEFINITIONS
+% ----------------------------------------------------------------------------
+
+\section{Definitions}
+
+\subsection{Information Technology (IT)}
+
+\begin{definitionbox}{Information Technology (IT)}
+IT encompasses the hardware, software, and networks used to process, store, and transmit \textbf{data and information}. IT systems support business operations, communication, and data management.
+
+\textbf{Examples:}
+\begin{itemize}
+    \item Servers, workstations, laptops
+    \item Enterprise applications (ERP, CRM, email)
+    \item Databases and data centers
+    \item Corporate networks and internet connectivity
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Operational Technology (OT)}
+
+\begin{definitionbox}{Operational Technology (OT)}
+OT encompasses the hardware, software, and networks used to monitor and control \textbf{physical processes, devices, and infrastructure}. OT systems directly interact with the physical world.
+
+\textbf{Examples:}
+\begin{itemize}
+    \item Programmable Logic Controllers (PLCs)
+    \item SCADA systems and HMIs
+    \item Distributed Control Systems (DCS)
+    \item Industrial robots and machinery
+    \item Building automation systems
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Industrial Control Systems (ICS)}
+
+\begin{definitionbox}{Industrial Control Systems (ICS)}
+ICS is a subset of OT that specifically refers to the control systems used in industrial environments. The term encompasses SCADA, DCS, PLCs, and other control system components.
+\end{definitionbox}
+
+% ----------------------------------------------------------------------------
+%  KEY DIFFERENCES
+% ----------------------------------------------------------------------------
+
+\section{Key Differences}
+
+\subsection{Priority: CIA vs AIC}
+
+The most fundamental difference between IT and OT lies in the prioritization of security objectives.
+
+\begin{center}
+\begin{tikzpicture}[scale=0.9]
+    % IT - CIA (Confidentiality top priority)
+    \begin{scope}[shift={(-4,0)}]
+        \node[font=\bfseries] at (0,3.5) {IT Priority};
+        % Triangle pointing up
+        \fill[info!25, draw=info, line width=1.5pt] (-2,0) -- (2,0) -- (0,2.8) -- cycle;
+        % Labels at corners
+        \node[font=\bfseries, text=info] at (0,2) {C};
+        \node[font=\small] at (-1.3,0.4) {I};
+        \node[font=\small] at (1.3,0.4) {A};
+        % Legend below
+        \node[font=\scriptsize, text=darkgray, align=center] at (0,-0.7) {
+            \textbf{C}onfidentiality (top)\\
+            \textbf{I}ntegrity~~\textbf{A}vailability
+        };
+    \end{scope}
+
+    % OT - AIC (Availability top priority)
+    \begin{scope}[shift={(4,0)}]
+        \node[font=\bfseries] at (0,3.5) {OT Priority};
+        % Triangle pointing up
+        \fill[warning!25, draw=warning, line width=1.5pt] (-2,0) -- (2,0) -- (0,2.8) -- cycle;
+        % Labels at corners
+        \node[font=\bfseries, text=warning!80!black] at (0,2) {A};
+        \node[font=\small] at (-1.3,0.4) {I};
+        \node[font=\small] at (1.3,0.4) {C};
+        % Legend below
+        \node[font=\scriptsize, text=darkgray, align=center] at (0,-0.7) {
+            \textbf{A}vailability (top)\\
+            \textbf{I}ntegrity~~\textbf{C}onfidentiality
+        };
+    \end{scope}
+\end{tikzpicture}
+\end{center}
+
+\begin{conceptbox}{Why Availability is King in OT}
+\begin{itemize}
+    \item \textbf{Safety:} System downtime can endanger human lives
+    \item \textbf{Physical consequences:} Processes cannot simply be "restarted"
+    \item \textbf{Financial impact:} Production downtime costs can be enormous
+    \item \textbf{Environmental:} Failures can cause environmental damage
+\end{itemize}
+\end{conceptbox}
+
+\subsection{Comparison Table}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\small
+\begin{tabular}{p{3.5cm}p{5cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Aspect} & \textcolor{white}{\bfseries IT} & \textcolor{white}{\bfseries OT} \\
+\midrule
+\textbf{Primary Goal} & Process data & Control physical processes \\
+\textbf{Top Priority} & Confidentiality & Availability / Safety \\
+\textbf{Downtime Tolerance} & Minutes to hours acceptable & Seconds can be critical \\
+\textbf{System Lifecycle} & 3--5 years & 15--25+ years \\
+\textbf{Patching} & Regular, often automated & Rare, requires planning \\
+\textbf{Change Management} & Agile, frequent updates & Rigid, infrequent changes \\
+\textbf{Environment} & Climate-controlled offices & Harsh industrial conditions \\
+\textbf{Protocols} & TCP/IP, HTTP, SQL & Modbus, DNP3, OPC, Profinet \\
+\textbf{Real-time Requirements} & Generally not critical & Often millisecond precision \\
+\textbf{Security Testing} & Penetration testing common & Can cause physical damage \\
+\textbf{Vendor Dependency} & Multiple vendors, standards & Proprietary, vendor lock-in \\
+\textbf{Staff Background} & Computer science, IT & Engineering, process control \\
+\end{tabular}
+\end{center}
+
+\subsection{System Lifecycles}
+
+\begin{warningbox}
+OT systems often run for 15--25 years or longer. It is common to find Windows XP, Windows 7, or even older systems still operating critical infrastructure because the control system vendor only supports those platforms.
+\end{warningbox}
+
+\begin{center}
+\begin{tikzpicture}[scale=0.9]
+    % IT lifecycle (top)
+    \node[font=\small, anchor=east] at (-0.3,1.6) {IT};
+    \fill[info!50, draw=info, line width=0.5pt] (0,1.3) rectangle (3,2);
+    \fill[info!50, draw=info, line width=0.5pt] (3.3,1.3) rectangle (6.3,2);
+    \fill[info!50, draw=info, line width=0.5pt] (6.6,1.3) rectangle (9.6,2);
+    \node[font=\scriptsize] at (1.5,1.65) {IT System 1};
+    \node[font=\scriptsize] at (4.8,1.65) {IT System 2};
+    \node[font=\scriptsize] at (8.1,1.65) {IT System 3};
+
+    % OT lifecycle (middle)
+    \node[font=\small, anchor=east] at (-0.3,0.5) {OT};
+    \fill[warning!50, draw=warning, line width=0.5pt] (0,0.2) rectangle (10,0.9);
+    \node[font=\scriptsize] at (5,0.55) {OT System (same system, 20+ years)};
+
+    % Timeline (bottom)
+    \draw[->, line width=1pt] (0,-0.5) -- (11,-0.5) node[right] {Years};
+    \foreach \x/\year in {0/0, 2.5/5, 5/10, 7.5/15, 10/20} {
+        \draw[line width=0.5pt] (\x,-0.4) -- (\x,-0.6);
+        \node[font=\tiny] at (\x,-0.9) {\year};
+    }
+\end{tikzpicture}
+\end{center}
+
+\subsection{Communication Protocols}
+
+\begin{conceptbox}{Protocol Differences}
+\textbf{IT Protocols:}
+\begin{itemize}
+    \item TCP/IP, HTTP/HTTPS, TLS
+    \item Built-in security features (encryption, authentication)
+    \item Well-documented, standardized
+\end{itemize}
+
+\textbf{OT Protocols:}
+\begin{itemize}
+    \item Modbus (1979), DNP3, BACnet, Profinet, EtherNet/IP
+    \item Often no built-in security (designed for isolated networks)
+    \item Proprietary variations common
+\end{itemize}
+\end{conceptbox}
+
+\begin{dangerbox}
+Many OT protocols were designed decades ago when networks were physically isolated. They lack authentication, encryption, and integrity checking. A single packet can command a PLC to perform dangerous actions.
+\end{dangerbox}
+
+% ----------------------------------------------------------------------------
+%  CONVERGENCE
+% ----------------------------------------------------------------------------
+
+\section{IT/OT Convergence}
+
+\subsection{What is Convergence?}
+
+IT/OT convergence refers to the increasing integration of IT and OT systems, driven by:
+
+\begin{itemize}
+    \item \textbf{Industry 4.0 / IIoT:} Connected sensors, cloud analytics, digital twins
+    \item \textbf{Business requirements:} Real-time data for decision making
+    \item \textbf{Remote operations:} Centralized monitoring and control
+    \item \textbf{Cost reduction:} Shared infrastructure and standard technologies
+\end{itemize}
+
+\subsection{Convergence Challenges}
+
+\begin{center}
+\begin{tikzpicture}[
+    challenge/.style={
+        rectangle,
+        rounded corners=3pt,
+        minimum width=4.5cm,
+        minimum height=1cm,
+        align=center,
+        font=\small,
+        inner sep=5pt
+    }
+]
+    % Challenges
+    \node[challenge, fill=danger!15, draw=danger] at (0,2) {Different priorities\\and cultures};
+    \node[challenge, fill=warning!15, draw=warning] at (5.5,2) {Legacy systems\\without security};
+    \node[challenge, fill=info!15, draw=info] at (0,0) {Expanded\\attack surface};
+    \node[challenge, fill=secondary!15, draw=secondary] at (5.5,0) {Skill gaps in\\both domains};
+\end{tikzpicture}
+\end{center}
+
+\begin{warningbox}
+Convergence increases the attack surface. Attackers can now potentially reach OT systems through IT networks, email phishing, or compromised vendor connections.
+\end{warningbox}
+
+\subsection{The Air Gap Myth}
+
+\begin{tipbox}
+The belief that OT networks are "air-gapped" (physically isolated) is often false. Studies show most OT environments have some connection to IT networks or the internet, whether intended or not.
+\end{tipbox}
+
+Common connectivity paths:
+\begin{itemize}
+    \item Historian servers replicating to business networks
+    \item Remote access for vendors and operators
+    \item USB drives and laptops moving between networks
+    \item Dual-homed engineering workstations
+    \item Cloud-based monitoring and analytics
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  SECURITY IMPLICATIONS
+% ----------------------------------------------------------------------------
+
+\section{Security Implications}
+
+\subsection{Why OT Security is Different}
+
+\begin{enumerate}
+    \item \textbf{Safety first:} Security controls must not compromise safety systems
+    \item \textbf{No downtime for patching:} Systems run 24/7/365
+    \item \textbf{Testing limitations:} Cannot test on production systems
+    \item \textbf{Vendor dependencies:} Changes may void warranties or certifications
+    \item \textbf{Long lifecycles:} Must secure systems for decades
+    \item \textbf{Physical consequences:} Cyber attacks can cause real-world harm
+\end{enumerate}
+
+\subsection{Common Mistakes}
+
+\begin{dangerbox}
+\textbf{Applying IT practices directly to OT can be dangerous:}
+\begin{itemize}
+    \item Automatic updates may crash control systems
+    \item Antivirus scans can cause CPU spikes and missed deadlines
+    \item Active vulnerability scanning may disrupt PLCs
+    \item Network segmentation can break process dependencies
+\end{itemize}
+\end{dangerbox}
+
+\subsection{Real-World Incidents}
+
+Notable incidents demonstrating IT/OT security failures:
+
+\begin{itemize}
+    \item \textbf{Stuxnet (2010):} Malware crossed IT/OT boundary to destroy centrifuges
+    \item \textbf{Ukraine Power Grid (2015):} IT compromise led to OT manipulation
+    \item \textbf{TRITON/TRISIS (2017):} Targeted safety instrumented systems
+    \item \textbf{Colonial Pipeline (2021):} IT ransomware caused OT shutdown
+    \item \textbf{Oldsmar Water (2021):} Remote access exploit to manipulate chemicals
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  BRIDGING THE GAP
+% ----------------------------------------------------------------------------
+
+\section{Bridging the Gap}
+
+\subsection{Organizational Approaches}
+
+\begin{successbox}
+Successful IT/OT security requires collaboration, not competition. Neither team can secure converged environments alone.
+\end{successbox}
+
+\begin{itemize}
+    \item \textbf{Joint governance:} Combined IT/OT security committees
+    \item \textbf{Cross-training:} IT staff learn process safety; OT staff learn cybersecurity
+    \item \textbf{Shared responsibility:} Clear RACI for converged systems
+    \item \textbf{Unified policies:} Adapted for both environments
+\end{itemize}
+
+\subsection{Technical Approaches}
+
+\begin{itemize}
+    \item \textbf{Network segmentation:} Purdue Model, DMZ between IT and OT
+    \item \textbf{Secure remote access:} Jump servers, MFA, session recording
+    \item \textbf{OT-specific tools:} Passive monitoring, OT-aware firewalls
+    \item \textbf{Asset inventory:} Know what's connected before securing it
+    \item \textbf{Compensating controls:} When patching isn't possible
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  SUMMARY
+% ----------------------------------------------------------------------------
+
+\section{Summary}
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{IT manages data}; \textbf{OT controls physical processes}
+    \item OT prioritizes \textbf{availability and safety} over confidentiality
+    \item OT systems have \textbf{much longer lifecycles} (15--25+ years)
+    \item IT/OT \textbf{convergence is increasing}, expanding the attack surface
+    \item \textbf{Direct application of IT security} to OT can cause harm
+    \item Successful security requires \textbf{collaboration} between IT and OT teams
+\end{itemize}
+\end{definitionbox}
+
+% ----------------------------------------------------------------------------
+%  FURTHER READING
+% ----------------------------------------------------------------------------
+
+\section{Further Reading}
+
+\subsection*{Standards and Guidelines}
+\begin{itemize}
+    \item \textbf{NIST SP 800-82 Rev. 3} -- Guide to OT Security\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+    \item \textbf{IEC 62443} -- Industrial Automation Security\\
+          \url{https://www.isa.org/standards-and-publications/isa-standards/isa-iec-62443-series-of-standards}
+\end{itemize}
+
+\subsection*{Resources}
+\begin{itemize}
+    \item \textbf{CISA} -- ICS Security Resources\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+    \item \textbf{SANS ICS} -- Industrial Control Systems Security\\
+          \url{https://www.sans.org/industrial-control-systems-security/}
+\end{itemize}
+
+\subsection*{Books}
+\begin{itemize}
+    \item Knapp, E. \& Langill, J. -- \textit{Industrial Network Security} (Syngress)
+    \item Macaulay, T. \& Singer, B. -- \textit{Cybersecurity for Industrial Control Systems} (CRC Press)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textcolor{mediumgray}{\rule{0.5\textwidth}{0.5pt}}\\[1em]
+\textcolor{mediumgray}{\small Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

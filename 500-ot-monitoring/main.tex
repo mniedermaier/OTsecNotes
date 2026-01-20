@@ -1,0 +1,240 @@
+% ============================================================================
+%  OT Network Monitoring - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+\hypersetup{
+    pdftitle={OT Network Monitoring},
+    pdfsubject={Visibility and Detection in Industrial Networks},
+}
+
+\begin{document}
+
+% ----------------------------------------------------------------------------
+%  TITLE PAGE
+% ----------------------------------------------------------------------------
+
+\maketitlepage
+    {OT Network Monitoring}
+    {Visibility and Detection in Industrial Networks}
+    {OT Security Learning Series}
+    {Document 500 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+% ----------------------------------------------------------------------------
+%  TABLE OF CONTENTS
+% ----------------------------------------------------------------------------
+
+\tableofcontents
+\newpage
+
+% ----------------------------------------------------------------------------
+%  INTRODUCTION
+% ----------------------------------------------------------------------------
+
+\section{Introduction}
+
+Network monitoring in OT environments provides visibility into industrial communications, enabling detection of anomalies, threats, and operational issues. Unlike IT monitoring, OT monitoring must account for specialized protocols, safety constraints, and the critical nature of industrial processes.
+
+\begin{infobox}
+You cannot protect what you cannot see. OT network monitoring is foundational to any industrial security program---it enables asset discovery, threat detection, and incident response.
+\end{infobox}
+
+\subsection{Key Differences from IT Monitoring}
+
+\begin{itemize}
+    \item \textbf{Passive only:} Active scanning can disrupt OT devices
+    \item \textbf{Protocol awareness:} Must understand Modbus, DNP3, OPC, etc.
+    \item \textbf{Process context:} Security events need operational context
+    \item \textbf{Availability focus:} Monitoring must not impact operations
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  MONITORING APPROACHES
+% ----------------------------------------------------------------------------
+
+\section{Monitoring Approaches}
+
+\subsection{Passive Network Monitoring}
+
+\begin{successbox}
+\textbf{Passive monitoring is the preferred approach for OT:}
+\begin{itemize}
+    \item Listens to network traffic without injecting packets
+    \item No risk of disrupting sensitive control systems
+    \item Uses SPAN ports, TAPs, or packet brokers
+    \item Can decode industrial protocols for deep inspection
+\end{itemize}
+\end{successbox}
+
+\subsection{Active vs Passive Comparison}
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3cm}p{5cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Aspect} & \textcolor{white}{\bfseries Passive} & \textcolor{white}{\bfseries Active} \\
+\midrule
+Impact on OT & None & Can crash devices \\
+Discovery & Traffic-based & Query-based \\
+Coverage & Only active communications & All addressable devices \\
+Protocol support & Deep inspection & Limited \\
+Recommended & Yes & Only with caution \\
+\end{tabular}
+\end{center}
+
+\begin{dangerbox}
+Active scanning (Nmap, vulnerability scanners) can crash PLCs and other OT devices. Never perform active scanning in OT without explicit approval, testing, and during maintenance windows.
+\end{dangerbox}
+
+% ----------------------------------------------------------------------------
+%  DATA COLLECTION
+% ----------------------------------------------------------------------------
+
+\section{Data Collection Methods}
+
+\subsection{Network TAPs}
+
+\begin{itemize}
+    \item \textbf{Hardware devices} that copy traffic without interruption
+    \item \textbf{Fail-safe:} Network continues if TAP loses power
+    \item \textbf{Full duplex:} Captures both directions of traffic
+    \item \textbf{Recommended} for critical OT network segments
+\end{itemize}
+
+\subsection{SPAN/Mirror Ports}
+
+\begin{itemize}
+    \item \textbf{Switch feature} that copies traffic to monitoring port
+    \item \textbf{Lower cost} than dedicated TAPs
+    \item \textbf{Limitations:} May drop packets under load
+    \item \textbf{Suitable} for less critical segments
+\end{itemize}
+
+\subsection{Strategic Placement}
+
+Monitor at key network boundaries:
+
+\begin{itemize}
+    \item \textbf{IT/OT boundary:} DMZ firewalls, data diodes
+    \item \textbf{Zone boundaries:} Between Purdue levels
+    \item \textbf{Critical assets:} Historians, engineering workstations
+    \item \textbf{Remote access:} VPN and jump server traffic
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  DETECTION CAPABILITIES
+% ----------------------------------------------------------------------------
+
+\section{Detection Capabilities}
+
+\subsection{Asset Discovery}
+
+Passive monitoring reveals:
+
+\begin{itemize}
+    \item IP and MAC addresses of communicating devices
+    \item Device types and vendors (from protocol fingerprinting)
+    \item Communication patterns and relationships
+    \item New or unauthorized devices on the network
+\end{itemize}
+
+\subsection{Threat Detection}
+
+\begin{conceptbox}{Detectable Threats}
+\begin{itemize}
+    \item \textbf{Reconnaissance:} Port scans, protocol enumeration
+    \item \textbf{Unauthorized access:} New connections, failed authentication
+    \item \textbf{Malicious commands:} Dangerous write operations to PLCs
+    \item \textbf{Lateral movement:} Unusual communication patterns
+    \item \textbf{Data exfiltration:} Large transfers, unusual destinations
+    \item \textbf{Malware C2:} Known bad IPs, DNS anomalies
+\end{itemize}
+\end{conceptbox}
+
+\subsection{Operational Anomalies}
+
+\begin{itemize}
+    \item \textbf{Protocol violations:} Malformed packets, invalid commands
+    \item \textbf{Timing anomalies:} Unusual polling intervals
+    \item \textbf{Configuration changes:} PLC logic modifications
+    \item \textbf{Network issues:} Retransmissions, packet loss
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  IMPLEMENTATION
+% ----------------------------------------------------------------------------
+
+\section{Implementation Considerations}
+
+\subsection{Protocol Support}
+
+Ensure monitoring solution supports your protocols:
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{9.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Category} & \textcolor{white}{\bfseries Protocols} \\
+\midrule
+Process Control & Modbus, DNP3, IEC 60870-5-104, IEC 61850 \\
+Industrial Ethernet & EtherNet/IP, PROFINET, Modbus TCP \\
+Building Automation & BACnet, LonWorks \\
+Enterprise Integration & OPC UA, OPC DA \\
+\end{tabular}
+\end{center}
+
+\subsection{Integration Points}
+
+\begin{itemize}
+    \item \textbf{SIEM integration:} Forward alerts to security operations
+    \item \textbf{Asset management:} Sync discovered assets to inventory
+    \item \textbf{Ticketing systems:} Create incidents for investigation
+    \item \textbf{Historian data:} Correlate network events with process data
+\end{itemize}
+
+\subsection{Challenges}
+
+\begin{warningbox}
+\textbf{Common OT monitoring challenges:}
+\begin{itemize}
+    \item Encrypted traffic (OPC UA, TLS) limits visibility
+    \item High-volume networks require significant storage
+    \item Proprietary protocols may lack decoder support
+    \item Alert tuning needed to reduce false positives
+\end{itemize}
+\end{warningbox}
+
+% ----------------------------------------------------------------------------
+%  FURTHER READING
+% ----------------------------------------------------------------------------
+
+\section{Further Reading}
+
+\subsection*{Standards}
+\begin{itemize}
+    \item \textbf{NIST SP 800-82 Rev. 3} -- Guide to OT Security\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+    \item \textbf{IEC 62443-3-3} -- System Security Requirements\\
+          \url{https://www.isa.org/standards-and-publications/isa-standards/isa-iec-62443-series-of-standards}
+\end{itemize}
+
+\subsection*{Resources}
+\begin{itemize}
+    \item \textbf{CISA} -- ICS Network Monitoring\\
+          \url{https://www.cisa.gov/resources-tools/resources}
+    \item \textbf{MITRE ATT\&CK for ICS}\\
+          \url{https://attack.mitre.org/techniques/ics/}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textcolor{mediumgray}{\rule{0.5\textwidth}{0.5pt}}\\[1em]
+\textcolor{mediumgray}{\small Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

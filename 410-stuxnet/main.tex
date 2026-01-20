@@ -1,0 +1,273 @@
+% ============================================================================
+%  Stuxnet - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+\hypersetup{
+    pdftitle={Stuxnet: The First Cyber Weapon},
+    pdfsubject={Analysis of the Stuxnet Attack},
+}
+
+\begin{document}
+
+% ----------------------------------------------------------------------------
+%  TITLE PAGE
+% ----------------------------------------------------------------------------
+
+\maketitlepage
+    {Stuxnet}
+    {The First Cyber Weapon Targeting Industrial Control Systems}
+    {OT Security Learning Series}
+    {Document 410 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+% ----------------------------------------------------------------------------
+%  TABLE OF CONTENTS
+% ----------------------------------------------------------------------------
+
+\tableofcontents
+\newpage
+
+% ----------------------------------------------------------------------------
+%  INTRODUCTION
+% ----------------------------------------------------------------------------
+
+\section{Introduction}
+
+Stuxnet, discovered in 2010, is widely considered the first true cyber weapon---malware specifically designed to cause physical damage to industrial equipment. It targeted Iran's nuclear enrichment facility at Natanz, destroying centrifuges while hiding its activities from operators.
+
+\begin{dangerbox}
+Stuxnet demonstrated that cyber attacks can cause physical destruction of industrial equipment. It fundamentally changed the threat landscape for critical infrastructure worldwide.
+\end{dangerbox}
+
+\subsection{Key Facts}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Attribute} & \textcolor{white}{\bfseries Details} \\
+\midrule
+Discovery Date & June 2010 \\
+Target & Natanz uranium enrichment facility, Iran \\
+Target Systems & Siemens S7-300 PLCs controlling centrifuges \\
+Attack Method & USB propagation, network spreading, PLC manipulation \\
+Physical Impact & Approximately 1,000 centrifuges destroyed \\
+Attribution & Widely attributed to US and Israel (unconfirmed) \\
+Zero-Days Used & 4 Windows zero-day vulnerabilities \\
+\end{tabular}
+\end{center}
+
+% ----------------------------------------------------------------------------
+%  ATTACK OVERVIEW
+% ----------------------------------------------------------------------------
+
+\section{Attack Overview}
+
+\subsection{Propagation Methods}
+
+Stuxnet used multiple methods to spread and reach its target:
+
+\begin{enumerate}
+    \item \textbf{USB Drives:} Primary initial infection vector---exploited Windows autorun and LNK file vulnerabilities
+    \item \textbf{Network Shares:} Spread via Windows network shares using multiple vulnerabilities
+    \item \textbf{Print Spooler:} Exploited Windows Print Spooler vulnerability (MS10-061)
+    \item \textbf{Siemens WinCC/Step 7:} Spread through shared project files
+\end{enumerate}
+
+\begin{warningbox}
+Stuxnet crossed the ``air gap'' through infected USB drives carried by contractors and employees. Physical isolation alone is not sufficient protection.
+\end{warningbox}
+
+\subsection{Target Identification}
+
+Stuxnet was highly selective in its targeting:
+
+\begin{itemize}
+    \item Searched for Siemens Step 7 software installations
+    \item Identified specific PLC configurations (S7-315 and S7-417)
+    \item Verified presence of specific frequency converter drives (Vacon and Fararo Paya)
+    \item Checked for drive frequencies between 807--1210 Hz (centrifuge operating range)
+    \item Only activated payload when all conditions matched
+\end{itemize}
+
+\begin{tipbox}
+The extreme specificity of Stuxnet's targeting criteria indicates detailed intelligence about the Natanz facility's configuration was available to the attackers.
+\end{tipbox}
+
+% ----------------------------------------------------------------------------
+%  TECHNICAL ANALYSIS
+% ----------------------------------------------------------------------------
+
+\section{Technical Analysis}
+
+\subsection{Zero-Day Vulnerabilities}
+
+Stuxnet exploited four previously unknown Windows vulnerabilities:
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.5cm}p{4cm}p{6.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries CVE} & \textcolor{white}{\bfseries Component} & \textcolor{white}{\bfseries Description} \\
+\midrule
+CVE-2010-2568 & Windows Shell & LNK file vulnerability for USB propagation \\
+CVE-2010-2729 & Print Spooler & Remote code execution via shared printers \\
+CVE-2010-2772 & Windows Server Service & Network propagation vulnerability \\
+CVE-2010-3338 & Task Scheduler & Privilege escalation \\
+\end{tabular}
+\end{center}
+
+\subsection{PLC Payload}
+
+The core payload targeted Siemens S7-300 PLCs:
+
+\begin{conceptbox}{PLC Attack Mechanism}
+\begin{enumerate}
+    \item \textbf{Infection:} Malicious code injected into Step 7 project files
+    \item \textbf{Rootkit:} PLC rootkit hid modifications from engineering software
+    \item \textbf{Recording:} Captured 21 days of normal centrifuge operation data
+    \item \textbf{Replay:} Played back normal data to operators while attacking
+    \item \textbf{Manipulation:} Varied centrifuge speeds to cause mechanical stress
+    \item \textbf{Destruction:} Centrifuges destroyed through metal fatigue
+\end{enumerate}
+\end{conceptbox}
+
+\subsection{Man-in-the-Middle on PLCs}
+
+\begin{dangerbox}
+Stuxnet implemented a man-in-the-middle attack between the HMI/SCADA system and the PLCs. Operators saw normal readings while centrifuges were being destroyed. This ``lying to the operator'' technique has been replicated in subsequent attacks.
+\end{dangerbox}
+
+% ----------------------------------------------------------------------------
+%  ATTACK TIMELINE
+% ----------------------------------------------------------------------------
+
+\section{Attack Timeline}
+
+\begin{center}
+\begin{tikzpicture}[scale=0.9]
+    % Timeline
+    \draw[->, line width=1pt] (0,0) -- (13,0);
+
+    % Years
+    \foreach \x/\year in {1/2007, 4/2008, 7/2009, 10/2010, 13/2011} {
+        \draw[line width=0.5pt] (\x,-0.15) -- (\x,0.15);
+        \node[font=\small] at (\x,-0.5) {\year};
+    }
+
+    % Events
+    \node[fill=warning!30, rounded corners, font=\scriptsize, align=center, anchor=south] at (1,0.3) {Development\\begins};
+    \node[fill=danger!30, rounded corners, font=\scriptsize, align=center, anchor=south] at (4,0.3) {First infections\\detected};
+    \node[fill=danger!30, rounded corners, font=\scriptsize, align=center, anchor=south] at (7,0.3) {Major variant\\deployed};
+    \node[fill=info!30, rounded corners, font=\scriptsize, align=center, anchor=south] at (10,0.3) {Publicly\\discovered};
+    \node[fill=success!30, rounded corners, font=\scriptsize, align=center, anchor=south] at (12,0.3) {Analysis\\complete};
+\end{tikzpicture}
+\end{center}
+
+\begin{itemize}
+    \item \textbf{2005--2007:} Development phase (estimated)
+    \item \textbf{June 2009:} First known variant deployed
+    \item \textbf{March 2010:} More aggressive variant released
+    \item \textbf{June 2010:} Discovered by VirusBlokAda (Belarus)
+    \item \textbf{July 2010:} Siemens acknowledges targeting of their systems
+    \item \textbf{September 2010:} Full analysis published by Symantec
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  IMPACT AND CONSEQUENCES
+% ----------------------------------------------------------------------------
+
+\section{Impact and Consequences}
+
+\subsection{Immediate Impact}
+
+\begin{itemize}
+    \item Approximately 1,000 IR-1 centrifuges destroyed at Natanz
+    \item Iranian nuclear program delayed by an estimated 1--2 years
+    \item Stuxnet spread beyond intended target to systems worldwide
+    \item Over 100,000 systems infected globally (most not affected by payload)
+\end{itemize}
+
+\subsection{Long-Term Consequences}
+
+\begin{warningbox}
+\textbf{Stuxnet's legacy extends far beyond its immediate impact:}
+\begin{itemize}
+    \item Demonstrated feasibility of cyber-physical attacks
+    \item Lowered the barrier for future ICS attacks
+    \item Code and techniques studied and reused by other actors
+    \item Sparked global investment in OT security
+    \item Led to development of ICS-specific security standards
+\end{itemize}
+\end{warningbox}
+
+% ----------------------------------------------------------------------------
+%  LESSONS LEARNED
+% ----------------------------------------------------------------------------
+
+\section{Lessons Learned}
+
+\subsection{Defense Recommendations}
+
+\begin{successbox}
+\textbf{Key takeaways for OT security:}
+\begin{enumerate}
+    \item \textbf{Air gaps are not absolute:} USB drives and contractor laptops can bridge isolated networks
+    \item \textbf{Monitor PLC integrity:} Detect unauthorized changes to PLC logic
+    \item \textbf{Verify operator displays:} Cross-check HMI data with independent measurements
+    \item \textbf{Control removable media:} Implement strict USB and media policies
+    \item \textbf{Segment networks:} Limit lateral movement within OT environments
+    \item \textbf{Update systems:} Apply security patches where safely possible
+\end{enumerate}
+\end{successbox}
+
+\subsection{Detection Indicators}
+
+Stuxnet could have been detected through:
+
+\begin{itemize}
+    \item Monitoring for unauthorized Step 7 project file modifications
+    \item Detecting anomalous PLC communication patterns
+    \item Identifying unexpected DLL injections in SCADA software
+    \item Monitoring centrifuge performance deviations
+    \item Network traffic analysis for C2 communications
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  FURTHER READING
+% ----------------------------------------------------------------------------
+
+\section{Further Reading}
+
+\subsection*{Technical Reports}
+\begin{itemize}
+    \item \textbf{Symantec} -- W32.Stuxnet Dossier\\
+          \url{https://www.symantec.com/content/en/us/enterprise/media/security_response/whitepapers/w32_stuxnet_dossier.pdf}
+    \item \textbf{Langner Communications} -- To Kill a Centrifuge\\
+          \url{https://www.langner.com/to-kill-a-centrifuge/}
+    \item \textbf{ICS-CERT} -- Advisory ICSA-10-272-01\\
+          \url{https://www.cisa.gov/news-events/ics-advisories}
+\end{itemize}
+
+\subsection*{Books}
+\begin{itemize}
+    \item Zetter, K. -- \textit{Countdown to Zero Day} (Crown, 2014)
+    \item Langner, R. -- \textit{Robust Control System Networks} (Momentum Press, 2011)
+\end{itemize}
+
+\subsection*{Documentary}
+\begin{itemize}
+    \item \textit{Zero Days} (2016) -- Documentary by Alex Gibney
+\end{itemize}
+
+\vfill
+\begin{center}
+\textcolor{mediumgray}{\rule{0.5\textwidth}{0.5pt}}\\[1em]
+\textcolor{mediumgray}{\small Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

@@ -1,0 +1,248 @@
+% ============================================================================
+%  OT Incident Response - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+\hypersetup{
+    pdftitle={OT Incident Response},
+    pdfsubject={Responding to Security Incidents in Industrial Environments},
+}
+
+\begin{document}
+
+% ----------------------------------------------------------------------------
+%  TITLE PAGE
+% ----------------------------------------------------------------------------
+
+\maketitlepage
+    {OT Incident Response}
+    {Responding to Security Incidents in Industrial Environments}
+    {OT Security Learning Series}
+    {Document 600 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+% ----------------------------------------------------------------------------
+%  TABLE OF CONTENTS
+% ----------------------------------------------------------------------------
+
+\tableofcontents
+\newpage
+
+% ----------------------------------------------------------------------------
+%  INTRODUCTION
+% ----------------------------------------------------------------------------
+
+\section{Introduction}
+
+Incident response in OT environments requires different approaches than traditional IT incident response. The presence of physical processes, safety systems, and operational constraints means that standard IR playbooks may be inappropriate or even dangerous.
+
+\begin{dangerbox}
+Standard IT incident response actions (isolate, reimage, restore from backup) can cause serious harm in OT environments. Disconnecting a PLC or rebooting a control system can stop production or create safety hazards.
+\end{dangerbox}
+
+\subsection{Key Differences from IT IR}
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{4.5cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Aspect} & \textcolor{white}{\bfseries IT Response} & \textcolor{white}{\bfseries OT Response} \\
+\midrule
+Primary goal & Protect data & Maintain safe operations \\
+Isolation & Disconnect immediately & May not be possible \\
+System restart & Common remediation & Can disrupt process \\
+Forensics & Image drives & May lack storage access \\
+Timing & Business hours focus & 24/7 operations \\
+Expertise & IT security team & Requires process knowledge \\
+\end{tabular}
+\end{center}
+
+% ----------------------------------------------------------------------------
+%  IR PHASES
+% ----------------------------------------------------------------------------
+
+\section{Incident Response Phases}
+
+\subsection{Preparation}
+
+\begin{successbox}
+\textbf{OT-specific preparation requirements:}
+\begin{itemize}
+    \item Cross-trained team (IT security + OT engineering)
+    \item OT-specific playbooks reviewed by operations
+    \item Network diagrams and asset inventory available
+    \item Backup configurations for critical devices
+    \item Relationships with OT vendors established
+    \item Safe shutdown procedures documented
+\end{itemize}
+\end{successbox}
+
+\subsection{Detection and Analysis}
+
+Sources of OT incident detection:
+
+\begin{itemize}
+    \item \textbf{OT network monitoring:} Anomalous traffic, unauthorized commands
+    \item \textbf{Process anomalies:} Unexpected behavior reported by operators
+    \item \textbf{IT security alerts:} Threats moving toward OT networks
+    \item \textbf{Vendor notifications:} Vulnerability or compromise advisories
+\end{itemize}
+
+\subsection{Containment}
+
+\begin{warningbox}
+\textbf{Containment in OT requires extreme caution:}
+\begin{itemize}
+    \item Consult operations before any network changes
+    \item Understand process dependencies before isolation
+    \item Consider safety implications of any action
+    \item Document everything---changes may need reversal
+\end{itemize}
+\end{warningbox}
+
+Containment options (least to most disruptive):
+
+\begin{enumerate}
+    \item \textbf{Monitor only:} Observe while gathering intelligence
+    \item \textbf{Block at firewall:} Stop specific traffic without isolation
+    \item \textbf{Segment:} Isolate affected zone, maintain internal operations
+    \item \textbf{Controlled shutdown:} Safe process stop if necessary
+    \item \textbf{Emergency stop:} Only for imminent safety threat
+\end{enumerate}
+
+\subsection{Eradication and Recovery}
+
+\begin{itemize}
+    \item \textbf{Restore from known-good:} Use verified configuration backups
+    \item \textbf{Vendor involvement:} May need vendor support for restoration
+    \item \textbf{Staged recovery:} Bring systems back incrementally
+    \item \textbf{Verification:} Confirm process operates correctly
+    \item \textbf{Enhanced monitoring:} Watch for reinfection
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  OT-SPECIFIC CONSIDERATIONS
+% ----------------------------------------------------------------------------
+
+\section{OT-Specific Considerations}
+
+\subsection{Safety First}
+
+\begin{dangerbox}
+\textbf{Safety always takes precedence over security:}
+\begin{itemize}
+    \item Never disable safety instrumented systems
+    \item Ensure safe state before any remediation
+    \item Involve process safety personnel in decisions
+    \item Document safety implications of all actions
+\end{itemize}
+\end{dangerbox}
+
+\subsection{Operational Constraints}
+
+Consider before taking action:
+
+\begin{itemize}
+    \item \textbf{Process state:} Can the process be safely interrupted?
+    \item \textbf{Production schedule:} Critical batches or orders in progress?
+    \item \textbf{Maintenance windows:} When can changes be made?
+    \item \textbf{Staffing:} Are qualified operators available?
+    \item \textbf{Dependencies:} What else will be affected?
+\end{itemize}
+
+\subsection{Evidence Collection}
+
+OT forensics challenges:
+
+\begin{itemize}
+    \item \textbf{Limited logging:} PLCs may not log security events
+    \item \textbf{Volatile memory:} Evidence lost on restart
+    \item \textbf{No disk imaging:} Embedded systems lack standard storage
+    \item \textbf{Network captures:} Primary source of forensic data
+    \item \textbf{Historian data:} Process values may indicate compromise
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  TEAM STRUCTURE
+% ----------------------------------------------------------------------------
+
+\section{Team Structure}
+
+\subsection{Required Expertise}
+
+\begin{conceptbox}{OT Incident Response Team}
+\begin{itemize}
+    \item \textbf{IT Security:} Malware analysis, network forensics
+    \item \textbf{OT Engineering:} Process knowledge, control systems
+    \item \textbf{Operations:} Current process state, safe shutdown
+    \item \textbf{Safety:} Risk assessment, safety system expertise
+    \item \textbf{Management:} Decision authority, communications
+    \item \textbf{Vendors:} System-specific expertise (as needed)
+\end{itemize}
+\end{conceptbox}
+
+\subsection{Communication}
+
+\begin{itemize}
+    \item \textbf{Out-of-band:} Don't rely on potentially compromised networks
+    \item \textbf{Stakeholder updates:} Operations, management, regulators
+    \item \textbf{Vendor coordination:} May need under NDA
+    \item \textbf{Information sharing:} ISAC, CISA (as appropriate)
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  POST-INCIDENT
+% ----------------------------------------------------------------------------
+
+\section{Post-Incident Activities}
+
+\subsection{Lessons Learned}
+
+\begin{itemize}
+    \item \textbf{What happened:} Root cause and attack timeline
+    \item \textbf{What worked:} Effective detection and response actions
+    \item \textbf{What failed:} Gaps in monitoring, procedures, or tools
+    \item \textbf{Improvements:} Specific actions to prevent recurrence
+\end{itemize}
+
+\subsection{Documentation}
+
+\begin{itemize}
+    \item Complete incident timeline with evidence
+    \item Actions taken and their outcomes
+    \item Recommendations for security improvements
+    \item Updates to IR procedures based on lessons learned
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  FURTHER READING
+% ----------------------------------------------------------------------------
+
+\section{Further Reading}
+
+\subsection*{Standards and Guidelines}
+\begin{itemize}
+    \item \textbf{NIST SP 800-82 Rev. 3} -- Guide to OT Security (Incident Response)\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+    \item \textbf{IEC 62443-2-1} -- Security Management System\\
+          \url{https://www.isa.org/standards-and-publications/isa-standards/isa-iec-62443-series-of-standards}
+\end{itemize}
+
+\subsection*{Resources}
+\begin{itemize}
+    \item \textbf{CISA} -- ICS Incident Response\\
+          \url{https://www.cisa.gov/resources-tools/resources}
+    \item \textbf{SANS ICS} -- Incident Response Resources\\
+          \url{https://www.sans.org/blog/}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textcolor{mediumgray}{\rule{0.5\textwidth}{0.5pt}}\\[1em]
+\textcolor{mediumgray}{\small Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

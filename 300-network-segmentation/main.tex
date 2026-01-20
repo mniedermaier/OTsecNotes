@@ -1,0 +1,277 @@
+% ============================================================================
+%  OT Network Segmentation - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+\hypersetup{
+    pdftitle={OT Network Segmentation},
+    pdfsubject={Implementing Defense in Depth for Industrial Networks},
+}
+
+\begin{document}
+
+% ----------------------------------------------------------------------------
+%  TITLE PAGE
+% ----------------------------------------------------------------------------
+
+\maketitlepage
+    {OT Network Segmentation}
+    {Implementing Defense in Depth for Industrial Networks}
+    {OT Security Learning Series}
+    {Document 300 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+% ----------------------------------------------------------------------------
+%  TABLE OF CONTENTS
+% ----------------------------------------------------------------------------
+
+\tableofcontents
+\newpage
+
+% ----------------------------------------------------------------------------
+%  INTRODUCTION
+% ----------------------------------------------------------------------------
+
+\section{Introduction}
+
+Network segmentation is the practice of dividing a network into smaller, isolated segments to limit the spread of attacks and control traffic flow. In OT environments, proper segmentation is one of the most effective security controls available.
+
+\begin{infobox}
+Network segmentation is consistently identified as a critical missing control in post-incident analyses. Flat networks allow attackers to move laterally from initial compromise directly to critical control systems.
+\end{infobox}
+
+\subsection{Why Segmentation Matters}
+
+\begin{itemize}
+    \item \textbf{Limits blast radius:} Compromises contained to single segment
+    \item \textbf{Controls data flow:} Only authorized traffic between zones
+    \item \textbf{Enables monitoring:} Choke points for traffic inspection
+    \item \textbf{Supports compliance:} Required by IEC 62443, NIST, NERC CIP
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  SEGMENTATION MODELS
+% ----------------------------------------------------------------------------
+
+\section{Segmentation Models}
+
+\subsection{Purdue Model Application}
+
+The Purdue Model provides the conceptual framework; segmentation is the implementation:
+
+\begin{center}
+\begin{tikzpicture}[scale=0.8, every node/.style={transform shape}]
+    % Zones
+    \node[rectangle, rounded corners, minimum width=8cm, minimum height=1cm, fill=zone4!30, draw=zone4] at (0,3) {Enterprise Zone (Levels 4-5)};
+    \node[rectangle, rounded corners, minimum width=8cm, minimum height=0.8cm, fill=zone35!30, draw=zone35, line width=1.5pt] at (0,1.8) {Industrial DMZ (Level 3.5)};
+    \node[rectangle, rounded corners, minimum width=8cm, minimum height=1cm, fill=zone3!30, draw=zone3] at (0,0.6) {Operations Zone (Level 3)};
+    \node[rectangle, rounded corners, minimum width=8cm, minimum height=1cm, fill=zone2!30, draw=zone2] at (0,-0.6) {Control Zone (Levels 1-2)};
+    \node[rectangle, rounded corners, minimum width=8cm, minimum height=0.8cm, fill=zone0!30, draw=zone0] at (0,-1.8) {Field Zone (Level 0)};
+
+    % Firewalls
+    \draw[red, line width=1pt, dashed] (-4.5,2.4) -- (4.5,2.4);
+    \draw[red, line width=1pt, dashed] (-4.5,1.2) -- (4.5,1.2);
+    \node[font=\tiny, text=red] at (5,2.4) {FW};
+    \node[font=\tiny, text=red] at (5,1.2) {FW};
+\end{tikzpicture}
+\end{center}
+
+\subsection{Zone and Conduit Model (IEC 62443)}
+
+\begin{conceptbox}{Zones and Conduits}
+\begin{itemize}
+    \item \textbf{Zone:} Grouping of assets with common security requirements
+    \item \textbf{Conduit:} Controlled communication path between zones
+    \item \textbf{Security Level:} Target security capability for each zone (SL 1-4)
+\end{itemize}
+\end{conceptbox}
+
+% ----------------------------------------------------------------------------
+%  IMPLEMENTATION
+% ----------------------------------------------------------------------------
+
+\section{Implementation Approaches}
+
+\subsection{Physical Segmentation}
+
+\begin{itemize}
+    \item \textbf{Separate physical networks:} Different cables, switches, infrastructure
+    \item \textbf{Air gaps:} Complete physical isolation (increasingly rare)
+    \item \textbf{Data diodes:} Hardware-enforced unidirectional communication
+\end{itemize}
+
+\begin{tipbox}
+Physical segmentation provides the strongest isolation but is costly and inflexible. Use for the most critical systems where risk justifies the expense.
+\end{tipbox}
+
+\subsection{Logical Segmentation}
+
+\begin{itemize}
+    \item \textbf{VLANs:} Layer 2 separation on shared infrastructure
+    \item \textbf{Firewalls:} Layer 3/4 traffic filtering between segments
+    \item \textbf{ACLs:} Router-based access control lists
+    \item \textbf{Software-defined networking:} Centralized policy enforcement
+\end{itemize}
+
+\subsection{Comparison}
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3cm}p{3cm}p{3cm}p{3.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Method} & \textcolor{white}{\bfseries Security} & \textcolor{white}{\bfseries Cost} & \textcolor{white}{\bfseries Flexibility} \\
+\midrule
+Air Gap & Highest & High & Very Low \\
+Data Diode & Very High & High & Low \\
+Physical Separation & High & Medium-High & Low \\
+Firewalls + VLANs & Medium-High & Medium & High \\
+VLANs Only & Low-Medium & Low & High \\
+\end{tabular}
+\end{center}
+
+% ----------------------------------------------------------------------------
+%  DMZ DESIGN
+% ----------------------------------------------------------------------------
+
+\section{Industrial DMZ Design}
+
+\subsection{Purpose}
+
+The Industrial DMZ (Level 3.5) serves as a buffer zone:
+
+\begin{itemize}
+    \item \textbf{No direct IT-OT connections:} All traffic proxied through DMZ
+    \item \textbf{Services hosted in DMZ:} Jump servers, historians, patch servers
+    \item \textbf{Dual-firewall architecture:} Separate firewalls on each side
+\end{itemize}
+
+\begin{dangerbox}
+Never allow direct connections from enterprise networks (Level 4-5) to control systems (Level 0-2). All communication must pass through the DMZ.
+\end{dangerbox}
+
+\subsection{Common DMZ Services}
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Service} & \textcolor{white}{\bfseries Purpose} \\
+\midrule
+Jump Server / Bastion Host & Controlled remote access point \\
+Historian Mirror & Replicated process data for business use \\
+Patch Repository & Staging area for OT software updates \\
+AV Update Server & Antivirus signatures for OT systems \\
+Remote Access Gateway & VPN termination and access control \\
+\end{tabular}
+\end{center}
+
+% ----------------------------------------------------------------------------
+%  FIREWALL RULES
+% ----------------------------------------------------------------------------
+
+\section{Firewall Rule Design}
+
+\subsection{Principles}
+
+\begin{successbox}
+\textbf{Firewall rule design principles:}
+\begin{enumerate}
+    \item \textbf{Default deny:} Block all traffic not explicitly permitted
+    \item \textbf{Least privilege:} Allow only required protocols and ports
+    \item \textbf{Source/destination specific:} No ``any'' rules
+    \item \textbf{Direction matters:} OT initiates outbound; block inbound
+    \item \textbf{Log denied traffic:} For detection and troubleshooting
+\end{enumerate}
+\end{successbox}
+
+\subsection{Example Rule Set}
+
+DMZ to OT Zone (Level 3) rules:
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{2.5cm}p{2.5cm}p{1.5cm}p{1.5cm}p{2cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Action} & \textcolor{white}{\bfseries Source} & \textcolor{white}{\bfseries Dest} & \textcolor{white}{\bfseries Port} & \textcolor{white}{\bfseries Proto} & \textcolor{white}{\bfseries Purpose} \\
+\midrule
+Allow & Historian-DMZ & Historian-OT & 1433 & TCP & DB replication \\
+Allow & Jump-Server & Eng-WS & 3389 & TCP & Remote access \\
+Allow & Patch-Server & OT-Servers & 445 & TCP & Updates \\
+Deny & Any & Any & Any & Any & Default deny \\
+\end{tabular}
+\end{center}
+
+% ----------------------------------------------------------------------------
+%  COMMON MISTAKES
+% ----------------------------------------------------------------------------
+
+\section{Common Mistakes}
+
+\begin{warningbox}
+\textbf{Segmentation pitfalls to avoid:}
+\begin{itemize}
+    \item \textbf{VLANs without firewalls:} VLANs alone don't filter traffic
+    \item \textbf{Overly permissive rules:} ``Allow any'' defeats the purpose
+    \item \textbf{Dual-homed systems:} Workstations bridging zones
+    \item \textbf{Forgotten connections:} Vendor modems, cellular gateways
+    \item \textbf{No monitoring:} Segmentation without visibility
+    \item \textbf{Static rules:} Never reviewed or updated
+\end{itemize}
+\end{warningbox}
+
+% ----------------------------------------------------------------------------
+%  VALIDATION
+% ----------------------------------------------------------------------------
+
+\section{Validation and Maintenance}
+
+\subsection{Testing Segmentation}
+
+\begin{itemize}
+    \item \textbf{Network scanning:} Verify only expected hosts reachable
+    \item \textbf{Rule review:} Audit firewall rules regularly
+    \item \textbf{Traffic analysis:} Confirm actual flows match policy
+    \item \textbf{Penetration testing:} Validate segmentation effectiveness
+\end{itemize}
+
+\subsection{Ongoing Maintenance}
+
+\begin{itemize}
+    \item \textbf{Change management:} Document and approve all rule changes
+    \item \textbf{Regular audits:} Quarterly review of firewall rules
+    \item \textbf{Asset inventory:} Keep zone assignments current
+    \item \textbf{Incident integration:} Update rules based on lessons learned
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  FURTHER READING
+% ----------------------------------------------------------------------------
+
+\section{Further Reading}
+
+\subsection*{Standards}
+\begin{itemize}
+    \item \textbf{IEC 62443-3-2} -- Security Risk Assessment and Zone/Conduit Design\\
+          \url{https://www.isa.org/standards-and-publications/isa-standards/isa-iec-62443-series-of-standards}
+    \item \textbf{NIST SP 800-82 Rev. 3} -- Guide to OT Security\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+\end{itemize}
+
+\subsection*{Resources}
+\begin{itemize}
+    \item \textbf{CISA} -- Network Segmentation Fact Sheet\\
+          \url{https://www.cisa.gov/resources-tools/resources}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textcolor{mediumgray}{\rule{0.5\textwidth}{0.5pt}}\\[1em]
+\textcolor{mediumgray}{\small Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}
