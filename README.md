@@ -32,11 +32,10 @@ All documents share a consistent, modern design through a custom LaTeX template 
 | | Feature |
 |:---:|:---|
 | :shield: | **Vendor-Neutral** — Focus on concepts and standards, not specific products |
-| :book: | **17+ Documents** — Covering fundamentals to advanced topics |
-| :art: | **Professional Design** — Consistent styling with custom LaTeX template |
-| :gear: | **Auto-Build** — GitHub Actions automatically generates PDFs |
+| :book: | **Documents** — Covering fundamentals to advanced topics |
 | :scroll: | **Standards-Based** — References IEC 62443, NIST 800-82, and more |
 | :warning: | **Real Case Studies** — Analysis of Stuxnet, TRITON, Ukraine attacks |
+| :balance_scale: | **Open License** — CC BY-SA 4.0 |
 
 ---
 

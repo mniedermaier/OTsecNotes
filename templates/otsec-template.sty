@@ -154,7 +154,7 @@
     \begin{tikzpicture}[remember picture, overlay]
         \fill[lightgray] (current page.south west) rectangle ([yshift=1cm]current page.south east);
         \draw[accent, line width=2pt] ([yshift=1cm]current page.south west) -- ([yshift=1cm]current page.south east);
-        \node[anchor=west, text=mediumgray, font=\footnotesize] at ([xshift=2.5cm, yshift=0.5cm]current page.south west) {Learning Resource};
+        \node[anchor=west, text=mediumgray, font=\footnotesize] at ([xshift=2.5cm, yshift=0.5cm]current page.south west) {\faIcon{creative-commons}\hspace{0.2em}\faIcon{creative-commons-by}\hspace{0.2em}\faIcon{creative-commons-sa}\hspace{0.4em}CC BY-SA 4.0};
         \node[anchor=center, text=darkgray, font=\small\bfseries] at ([yshift=0.5cm]current page.south) {\thepage};
         \node[anchor=east, text=mediumgray, font=\footnotesize] at ([xshift=-2.5cm, yshift=0.5cm]current page.south east) {\today};
     \end{tikzpicture}
@@ -241,6 +241,10 @@
         % Badge
         \node[fill=info, text=white, font=\small\bfseries, inner sep=8pt, rounded corners=3pt]
             at ([xshift=-3cm, yshift=2cm]current page.south east) {LEARNING RESOURCE};
+
+        % License
+        \node[anchor=west, text=white!50, font=\scriptsize]
+            at ([xshift=2.5cm, yshift=1.5cm]current page.south west) {\faIcon{creative-commons}\hspace{0.2em}\faIcon{creative-commons-by}\hspace{0.2em}\faIcon{creative-commons-sa}\hspace{0.4em}Licensed under CC BY-SA 4.0};
 
     \end{tikzpicture}
     \newpage
