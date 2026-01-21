@@ -1,0 +1,370 @@
+% ============================================================================
+%  840-secure-media-handling - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+% Define colors for TikZ (matching template colors)
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {Secure Removable Media Handling}
+    {Controlling USB drives, optical media, and portable storage in OT environments}
+    {OT Security Learning Series}
+    {Document 840 \quad|\quad January 2026}
+    {AI Assistant}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+Removable media -- USB drives, CD-ROMs, and other portable storage -- represent one of the most significant attack vectors for OT environments. Stuxnet spread via USB drives, and many ransomware incidents trace back to infected portable media crossing the air gap.
+\end{infobox}
+
+Despite the risks, removable media remains necessary in OT environments for:
+\begin{itemize}
+    \item Vendor software and firmware updates
+    \item PLC program transfers
+    \item Diagnostic tool delivery
+    \item Data export for analysis
+    \item Emergency recovery procedures
+\end{itemize}
+
+This document covers secure handling procedures for all types of removable media in industrial environments.
+
+% ============================================================================
+\section{Media Types and Risks}
+% ============================================================================
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Media Type} & \textbf{Common Use} & \textbf{Risk Level} \\
+\hline
+USB Flash Drives & General file transfer & \riskhigh \\
+External HDDs/SSDs & Large data transfer, backups & \riskhigh \\
+SD/MicroSD Cards & Embedded systems, cameras & \riskmedium \\
+CD/DVD-ROM & Software distribution & \riskmedium \\
+Floppy Disks & Legacy systems & \riskmedium \\
+Memory Cards (CF, etc.) & PLCs, industrial cameras & \riskmedium \\
+\hline
+\end{tabular}
+\caption{Removable Media Types in OT Environments}
+\end{table}
+
+\begin{dangerbox}
+\textbf{USB Weaponization:} Attackers can weaponize USB devices beyond just storing malware:
+\begin{itemize}
+    \item \textbf{BadUSB} -- Firmware-level attacks that make drives appear as keyboards
+    \item \textbf{USB Killers} -- Devices that physically destroy ports via electrical surge
+    \item \textbf{Rubber Ducky} -- Keystroke injection devices disguised as flash drives
+    \item \textbf{Data exfiltration} -- Covert channels via modified firmware
+\end{itemize}
+\end{dangerbox}
+
+% ============================================================================
+\section{Scanning Kiosk Architecture}
+% ============================================================================
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    zone/.style={rectangle, draw, thick, minimum height=2.5cm, minimum width=3cm, rounded corners=5pt},
+    kiosk/.style={rectangle, draw, thick, fill=otwarning!30, minimum height=1.5cm, minimum width=2.5cm, rounded corners=3pt, font=\small\bfseries},
+    arrow/.style={->, very thick, >=stealth}
+]
+
+% Zones
+\node[zone, fill=otdanger!10] (untrusted) at (-4,0) {};
+\node[font=\scriptsize\bfseries, otdanger] at (-4,1.6) {Untrusted Media};
+\node[font=\tiny, text width=2.5cm, align=center] at (-4,0) {Vendor USB\\Personal drives\\Unknown media};
+
+\node[zone, fill=otwarning!10] (dmz) at (0,0) {};
+\node[font=\scriptsize\bfseries, otwarning] at (0,1.6) {Scanning Station};
+
+\node[zone, fill=otsuccess!10] (ot) at (4,0) {};
+\node[font=\scriptsize\bfseries, otsuccess] at (4,1.6) {OT Environment};
+\node[font=\tiny, text width=2.5cm, align=center] at (4,0) {PLCs\\HMIs\\Engineering\\Workstations};
+
+% Kiosk in DMZ
+\node[kiosk] (kiosk) at (0,0) {Scan Kiosk};
+
+% Arrows
+\draw[arrow, otdanger] (-2.3,0) -- (-1.5,0);
+\draw[arrow, otsuccess] (1.5,0) -- (2.3,0);
+
+% Labels
+\node[font=\tiny, otwarning] at (0,-0.6) {\faIcon{shield-alt} Multi-AV};
+\node[font=\tiny, otwarning] at (0,-0.95) {\faIcon{file-alt} File Check};
+
+\end{tikzpicture}
+\caption{Media Scanning Kiosk Architecture}
+\end{figure}
+
+\subsection{Kiosk Requirements}
+
+\begin{definitionbox}{Scanning Kiosk Specifications}
+\begin{itemize}
+    \item \textbf{Isolation} -- No network connection to OT or corporate networks
+    \item \textbf{Multiple AV engines} -- At least 2-3 different vendors
+    \item \textbf{Regular updates} -- Signature updates via secure, one-way channel
+    \item \textbf{File type filtering} -- Block executables, scripts by default
+    \item \textbf{Logging} -- Record all scans, results, and user actions
+    \item \textbf{Regular reimaging} -- Weekly or after any detection
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Physical Placement}
+
+\begin{itemize}
+    \item Located at controlled entry points to OT areas
+    \item Visible to security cameras
+    \item Secure storage for clean media nearby
+    \item Clear signage with procedures
+\end{itemize}
+
+% ============================================================================
+\section{Media Handling Procedures}
+% ============================================================================
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    procstep/.style={rectangle, draw, thick, fill=otaccent!20, minimum height=1cm, minimum width=2cm, rounded corners=3pt, font=\tiny\bfseries, align=center},
+    arrow/.style={->, thick, >=stealth}
+]
+
+\node[procstep] (receive) at (0,0) {1. Receive\\Media};
+\node[procstep] (register) at (2.5,0) {2. Register\\in Log};
+\node[procstep] (scan) at (5,0) {3. Scan at\\Kiosk};
+\node[procstep] (transfer) at (7.5,0) {4. Transfer\\to Clean};
+\node[procstep] (use) at (10,0) {5. Use in\\OT};
+
+\draw[arrow, otprimary] (receive) -- (register);
+\draw[arrow, otprimary] (register) -- (scan);
+\draw[arrow, otprimary] (scan) -- (transfer);
+\draw[arrow, otprimary] (transfer) -- (use);
+
+\end{tikzpicture}
+\caption{Media Handling Process Flow}
+\end{figure}
+
+\subsection{Step-by-Step Procedure}
+
+\begin{enumerate}
+    \item \textbf{Receive and register} -- Log media source, owner, purpose, date
+    \item \textbf{Visual inspection} -- Check for physical tampering or damage
+    \item \textbf{Scan at kiosk} -- Full scan with multiple AV engines
+    \item \textbf{Review results} -- Verify clean scan, check file types
+    \item \textbf{Transfer to clean media} -- Copy approved files to company-owned media
+    \item \textbf{Secure original} -- Store or return original media
+    \item \textbf{Deploy to OT} -- Use clean media in target system
+    \item \textbf{Post-use handling} -- Wipe or secure-store media after use
+\end{enumerate}
+
+\begin{warningbox}
+\textbf{Never} insert untrusted media directly into OT systems. Even ``quick checks'' bypass security controls and have caused major incidents.
+\end{warningbox}
+
+% ============================================================================
+\section{USB Port Controls}
+% ============================================================================
+
+\subsection{Disabling USB Ports}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Method} & \textbf{Effectiveness} & \textbf{Notes} \\
+\hline
+BIOS/UEFI disable & High & Requires physical access to re-enable \\
+Group Policy (Windows) & Medium & Can be bypassed with admin rights \\
+Endpoint protection & Medium-High & Allows granular control \\
+Physical port blockers & High & Visible deterrent, tamper-evident \\
+Epoxy/hot glue & Very High & Permanent, not recommended \\
+\hline
+\end{tabular}
+\caption{USB Port Control Methods}
+\end{table}
+
+\subsection{Selective USB Access}
+
+For systems requiring occasional USB access:
+\begin{itemize}
+    \item \textbf{Device whitelisting} -- Only allow specific, registered devices
+    \item \textbf{Read-only mode} -- Allow reading but block writing
+    \item \textbf{Time-limited access} -- Enable ports only during maintenance windows
+    \item \textbf{Supervised access} -- Require two-person authorization
+\end{itemize}
+
+% ============================================================================
+\section{Company-Issued Media Program}
+% ============================================================================
+
+\begin{successbox}
+\textbf{Best Practice:} Maintain a pool of company-owned, managed removable media. Personal devices should never enter OT environments.
+\end{successbox}
+
+\subsection{Media Inventory Management}
+
+\begin{itemize}
+    \item Unique identifiers (serial numbers, asset tags)
+    \item Check-out/check-in tracking system
+    \item Assigned custodians for each device
+    \item Regular audits of media location and condition
+    \item Secure storage when not in use
+\end{itemize}
+
+\subsection{Media Lifecycle}
+
+\begin{enumerate}
+    \item \textbf{Procurement} -- Purchase from trusted sources, verify authenticity
+    \item \textbf{Initialization} -- Format, scan, assign ID, register in inventory
+    \item \textbf{Active use} -- Track assignments, scan before/after each use
+    \item \textbf{Retirement} -- Secure wipe (multiple passes) or physical destruction
+\end{enumerate}
+
+\subsection{Hardware-Encrypted Drives}
+
+For sensitive data transfers:
+\begin{itemize}
+    \item Hardware encryption with PIN/password
+    \item Auto-wipe after failed access attempts
+    \item FIPS 140-2 certified devices for regulated environments
+    \item No software installation required on host
+\end{itemize}
+
+% ============================================================================
+\section{Vendor and Contractor Media}
+% ============================================================================
+
+\begin{dangerbox}
+Vendor USB drives are a common attack vector. Require all vendors to submit files through your controlled transfer process rather than bringing their own media.
+\end{dangerbox}
+
+\subsection{Vendor Media Policy}
+
+\begin{itemize}
+    \item \textbf{Advance notification} -- Vendors must declare file transfer needs before arrival
+    \item \textbf{Pre-transfer option} -- Encourage vendors to send files electronically in advance
+    \item \textbf{No direct insertion} -- Vendor media never connects directly to OT systems
+    \item \textbf{Company media provided} -- Transfer scanned files to company-owned media
+    \item \textbf{Supervision required} -- Escort vendors during all media handling
+\end{itemize}
+
+\subsection{Contractual Requirements}
+
+Include in vendor agreements:
+\begin{itemize}
+    \item Compliance with site media handling policies
+    \item Liability for malware introduced via vendor media
+    \item Right to scan and inspect all media
+    \item Prohibition on unauthorized media use
+\end{itemize}
+
+% ============================================================================
+\section{Legacy Media Considerations}
+% ============================================================================
+
+\subsection{Floppy Disks}
+
+Still used in some legacy OT systems:
+\begin{itemize}
+    \item Maintain dedicated, isolated floppy drive for scanning
+    \item Stock supply of new, sealed diskettes
+    \item Consider USB floppy emulators with logging capability
+\end{itemize}
+
+\subsection{Optical Media (CD/DVD)}
+
+\begin{itemize}
+    \item Write-once media (CD-R, DVD-R) preferred for software distribution
+    \item Verify disc authenticity (holograms, vendor packaging)
+    \item Scan contents before use even from ``trusted'' vendors
+    \item Disable autorun/autoplay on all systems
+\end{itemize}
+
+% ============================================================================
+\section{Logging and Auditing}
+% ============================================================================
+
+All media handling activities should be logged:
+
+\begin{itemize}
+    \item Date, time, and user identity
+    \item Media type, serial number, and source
+    \item Files transferred (names, sizes, hashes)
+    \item Scan results from all engines
+    \item Destination system and purpose
+    \item Any anomalies or policy exceptions
+\end{itemize}
+
+\begin{successbox}
+\textbf{Forensic Value:} Media handling logs are critical for incident investigation. They help trace infection sources and identify compromised systems.
+\end{successbox}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Media is an attack vector} -- USB drives enabled Stuxnet and many other attacks
+    \item \textbf{Scan everything} -- Use dedicated kiosks with multiple AV engines
+    \item \textbf{Disable USB ports} -- Block by default, enable selectively
+    \item \textbf{Company media only} -- No personal or vendor devices in OT
+    \item \textbf{Control vendors} -- Require advance notice, scan all vendor files
+    \item \textbf{Log all transfers} -- Audit trails support incident response
+    \item \textbf{Include legacy media} -- Floppies and CDs still exist in OT
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Standards and Guidelines}
+
+\begin{itemize}
+    \item \textbf{NIST SP 800-82 Rev. 3} -- Guide to OT Security (Section 6.2.5 Media Protection)\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+    \item \textbf{IEC 62443-2-1} -- Security program requirements\\
+          \url{https://webstore.iec.ch/publication/7030}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{CISA -- Using Caution with USB Drives}\\
+          \url{https://www.cisa.gov/news-events/news/using-caution-usb-drives}
+    \item \textbf{SANS -- Securing Removable Media}\\
+          \url{https://www.sans.org/white-papers/}
+\end{itemize}
+
+\subsection*{Books}
+
+\begin{itemize}
+    \item Knapp, E. \& Langill, J. -- \textit{Industrial Network Security} (Syngress)
+    \item Macaulay, T. \& Singer, B. -- \textit{Cybersecurity for Industrial Control Systems} (CRC Press)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

@@ -1,0 +1,418 @@
+% ============================================================================
+%  841-it-ot-file-transfer - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+% Define colors for TikZ (matching template colors)
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {Secure IT/OT File Transfer}
+    {DMZ-based architectures for network file exchange between IT and OT}
+    {OT Security Learning Series}
+    {Document 841 \quad|\quad January 2026}
+    {AI Assistant}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+Network-based file transfer between IT and OT networks requires careful architectural design. A properly implemented DMZ-based file transfer system provides secure, auditable exchange while maintaining network segmentation and preventing direct connectivity between zones.
+\end{infobox}
+
+Common file transfer requirements include:
+\begin{itemize}
+    \item Software patches and updates from IT to OT
+    \item Production data export from OT to IT (historians, reports)
+    \item Configuration files and documentation
+    \item Vendor files received via email or download
+    \item Backup data replication
+\end{itemize}
+
+This document covers secure network-based file transfer architectures and procedures for IT/OT environments.
+
+% ============================================================================
+\section{Architecture Overview}
+% ============================================================================
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    zone/.style={rectangle, draw, thick, minimum height=3cm, minimum width=2.5cm, rounded corners=5pt},
+    server/.style={rectangle, draw, thick, fill=otaccent!20, minimum height=0.7cm, minimum width=1.8cm, rounded corners=2pt, font=\tiny\bfseries, align=center},
+    firewall/.style={rectangle, draw, thick, fill=otdanger!30, minimum height=2.5cm, minimum width=0.4cm},
+    arrow/.style={->, thick, >=stealth}
+]
+
+% Zones
+\node[zone, fill=otinfo!10] (it) at (0,0) {};
+\node[font=\scriptsize\bfseries, otinfo] at (0,1.8) {IT Network};
+\node[font=\tiny, text width=2cm, align=center] at (0,0.5) {Corporate\\systems};
+\node[font=\tiny, text width=2cm, align=center] at (0,-0.5) {User\\workstations};
+
+\node[zone, fill=otwarning!10, minimum width=4.5cm] (dmz) at (5,0) {};
+\node[font=\scriptsize\bfseries, otwarning] at (5,1.8) {File Transfer DMZ};
+
+\node[zone, fill=otsuccess!10] (ot) at (10,0) {};
+\node[font=\scriptsize\bfseries, otsuccess] at (10,1.8) {OT Network};
+\node[font=\tiny, text width=2cm, align=center] at (10,0.5) {SCADA\\PLCs};
+\node[font=\tiny, text width=2cm, align=center] at (10,-0.5) {Engineering\\stations};
+
+% Firewalls
+\node[firewall] (fw1) at (2,0) {};
+\node[font=\tiny, rotate=90, white] at (2,0) {FW};
+\node[firewall] (fw2) at (8,0) {};
+\node[font=\tiny, rotate=90, white] at (8,0) {FW};
+
+% Servers in DMZ (spread apart)
+\node[server] (upload) at (3.8,0.8) {Upload\\Server};
+\node[server, fill=otdanger!20] (scan) at (5,-0.3) {Scan\\Engine};
+\node[server] (download) at (6.2,0.8) {Download\\Server};
+
+% Arrows - IT pushes to DMZ, OT pulls from DMZ
+\draw[arrow, otinfo] (1.3,0.5) -- (2.8,0.5);
+\node[font=\tiny] at (2,0.9) {Push};
+
+\draw[arrow, otwarning] (upload) -- (scan);
+\draw[arrow, otwarning] (scan) -- (download);
+
+\draw[arrow, otsuccess] (7.2,0.5) -- (8.7,0.5);
+\node[font=\tiny] at (8,0.9) {Pull};
+
+\end{tikzpicture}
+\caption{DMZ-Based File Transfer Architecture}
+\end{figure}
+
+\subsection{Key Design Principles}
+
+\begin{definitionbox}{Secure File Transfer Principles}
+\begin{itemize}
+    \item \textbf{No direct connectivity} -- IT and OT never communicate directly
+    \item \textbf{Defense in depth} -- Multiple security layers (firewalls, scanning, access control)
+    \item \textbf{Pull model for OT} -- OT retrieves files; nothing pushed into OT
+    \item \textbf{Scan everything} -- Multi-engine AV and content inspection
+    \item \textbf{Audit trail} -- Complete logging of all transfers
+    \item \textbf{Least privilege} -- Minimal permissions at each stage
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{DMZ Components}
+% ============================================================================
+
+\subsection{Upload Server (IT-Facing)}
+
+Receives files from IT network:
+\begin{itemize}
+    \item Web portal for manual uploads
+    \item SFTP/SCP for automated transfers
+    \item User authentication (AD integration optional)
+    \item File size and type restrictions
+    \item Quarantine storage pending scan
+\end{itemize}
+
+\subsection{Scanning Engine}
+
+Processes all incoming files:
+\begin{itemize}
+    \item Multiple AV engines (minimum 2-3 vendors)
+    \item Content Disarm and Reconstruction (CDR)
+    \item File type validation (magic numbers, structure)
+    \item Signature updates via one-way channel
+    \item Sandboxing for suspicious files (optional)
+\end{itemize}
+
+\subsection{Download Server (OT-Facing)}
+
+Provides clean files to OT:
+\begin{itemize}
+    \item Separate server from upload (defense in depth)
+    \item Pull-only access from OT network
+    \item File integrity verification (hashes)
+    \item Automatic expiration of unclaimed files
+    \item Notification system for available files
+\end{itemize}
+
+% ============================================================================
+\section{Transfer Protocols}
+% ============================================================================
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{Protocol} & \textbf{Direction} & \textbf{Use Case} & \textbf{Security} \\
+\hline
+SFTP & IT$\rightarrow$DMZ & Automated uploads & Encrypted, key auth \\
+HTTPS & IT$\rightarrow$DMZ & Web portal uploads & TLS, cert validation \\
+SCP & DMZ$\rightarrow$OT & Pull from OT & Encrypted, key auth \\
+SMB/CIFS & Internal & Windows shares & Requires Kerberos \\
+\hline
+\end{tabular}
+\caption{Recommended Transfer Protocols}
+\end{table}
+
+\begin{warningbox}
+\textbf{Avoid These Protocols:}
+\begin{itemize}
+    \item FTP (unencrypted credentials and data)
+    \item Telnet (unencrypted)
+    \item HTTP (unencrypted)
+    \item NFS without Kerberos (weak authentication)
+\end{itemize}
+\end{warningbox}
+
+% ============================================================================
+\section{Firewall Rules}
+% ============================================================================
+
+\subsection{IT to DMZ Firewall}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{Source} & \textbf{Dest} & \textbf{Port} & \textbf{Purpose} \\
+\hline
+IT Users & Upload Server & 443/tcp & HTTPS portal \\
+IT Systems & Upload Server & 22/tcp & SFTP uploads \\
+\hline
+\end{tabular}
+\caption{IT$\rightarrow$DMZ Firewall Rules}
+\end{table}
+
+\subsection{DMZ to OT Firewall}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{Source} & \textbf{Dest} & \textbf{Port} & \textbf{Purpose} \\
+\hline
+OT Systems & Download Server & 22/tcp & SFTP pull \\
+OT Systems & Download Server & 443/tcp & HTTPS download \\
+\hline
+\end{tabular}
+\caption{DMZ$\rightarrow$OT Firewall Rules (OT Initiates)}
+\end{table}
+
+\begin{successbox}
+\textbf{Key Point:} OT systems initiate connections to the DMZ. The DMZ never initiates connections into OT. This prevents attackers who compromise the DMZ from directly accessing OT systems.
+\end{successbox}
+
+% ============================================================================
+\section{Content Disarm and Reconstruction}
+% ============================================================================
+
+\begin{definitionbox}{CDR Technology}
+CDR sanitizes files by deconstructing them, removing potentially malicious active content, and rebuilding clean versions. This neutralizes threats that bypass signature-based detection.
+\end{definitionbox}
+
+\subsection{CDR Capabilities}
+
+\begin{itemize}
+    \item \textbf{Office documents} -- Remove macros, embedded objects, OLE
+    \item \textbf{PDFs} -- Strip JavaScript, forms, embedded files
+    \item \textbf{Images} -- Flatten layers, remove metadata, steganography
+    \item \textbf{Archives} -- Extract, scan contents, repackage
+    \item \textbf{Conversion} -- Convert to safe formats (e.g., PDF/A)
+\end{itemize}
+
+\subsection{File Type Policies}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{File Type} & \textbf{Action} & \textbf{Notes} \\
+\hline
+.exe, .msi, .bat & Block or quarantine & Require approval workflow \\
+.pdf, .docx & CDR processing & Strip active content \\
+.csv, .xml, .txt & Allow after scan & Low risk \\
+.zip, .7z & Extract and scan & Recursive scanning \\
+.bin, .hex (firmware) & Manual review & High-risk, requires approval \\
+\hline
+\end{tabular}
+\caption{File Type Processing Policies}
+\end{table}
+
+% ============================================================================
+\section{Workflow and Approval}
+% ============================================================================
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    procstep/.style={rectangle, draw, thick, fill=otaccent!20, minimum height=0.9cm, minimum width=1.8cm, rounded corners=3pt, font=\tiny\bfseries, align=center},
+    decision/.style={diamond, draw, thick, fill=otwarning!20, minimum height=0.8cm, minimum width=0.8cm, font=\tiny\bfseries, align=center, aspect=2},
+    arrow/.style={->, thick, >=stealth}
+]
+
+\node[procstep] (upload) at (0,0) {Upload};
+\node[procstep] (scan) at (2.2,0) {Scan};
+\node[decision] (clean) at (4.2,0) {Clean?};
+\node[procstep] (approve) at (6.4,0) {Approve};
+\node[procstep] (avail) at (8.6,0) {Available};
+\node[procstep] (pull) at (10.8,0) {OT Pull};
+
+\node[procstep, fill=otdanger!20] (quarantine) at (4.2,-1.5) {Quarantine};
+
+\draw[arrow, otprimary] (upload) -- (scan);
+\draw[arrow, otprimary] (scan) -- (clean);
+\draw[arrow, otsuccess] (clean) -- node[above, font=\tiny] {Yes} (approve);
+\draw[arrow, otprimary] (approve) -- (avail);
+\draw[arrow, otprimary] (avail) -- (pull);
+\draw[arrow, otdanger] (clean) -- node[right, font=\tiny] {No} (quarantine);
+
+\end{tikzpicture}
+\caption{File Transfer Workflow}
+\end{figure}
+
+\subsection{Standard Workflow}
+
+\begin{enumerate}
+    \item User uploads file via portal or SFTP
+    \item File quarantined, scan initiated
+    \item Multi-AV scan and CDR processing
+    \item Clean files queued for approval (if required)
+    \item Approver reviews and approves
+    \item File moved to download area
+    \item OT user notified, retrieves file
+    \item Unclaimed files expire after defined period
+\end{enumerate}
+
+\subsection{Approval Requirements}
+
+\begin{itemize}
+    \item \textbf{Automatic approval} -- Low-risk file types (text, CSV, sanitized docs)
+    \item \textbf{Single approval} -- Standard files (patches, configs)
+    \item \textbf{Dual approval} -- High-risk files (executables, firmware)
+    \item \textbf{Emergency bypass} -- Documented exception with senior approval
+\end{itemize}
+
+% ============================================================================
+\section{Data Diode Integration}
+% ============================================================================
+
+For high-security environments, data diodes provide hardware-enforced one-way transfer:
+
+\begin{itemize}
+    \item \textbf{Inbound diode} -- IT$\rightarrow$OT for patches and updates
+    \item \textbf{Outbound diode} -- OT$\rightarrow$IT for historian data, logs
+    \item Eliminates any possibility of reverse channel
+    \item Requires protocol proxies for TCP-based applications
+\end{itemize}
+
+\begin{warningbox}
+Data diodes require careful protocol handling. TCP acknowledgments cannot traverse the diode, so proxy applications must handle protocol conversion.
+\end{warningbox}
+
+% ============================================================================
+\section{Logging and Monitoring}
+% ============================================================================
+
+All file transfers must be logged with:
+
+\begin{itemize}
+    \item Timestamp and unique transfer ID
+    \item Source user/system identity
+    \item File metadata (name, size, hash before/after)
+    \item Scan results from all engines
+    \item Approval workflow (who, when)
+    \item Destination (who retrieved, when)
+    \item Any alerts or anomalies
+\end{itemize}
+
+\begin{successbox}
+\textbf{SIEM Integration:} Forward file transfer logs to your security monitoring platform. Alert on failed scans, unusual file types, high volumes, or after-hours transfers.
+\end{successbox}
+
+% ============================================================================
+\section{Operational Procedures}
+% ============================================================================
+
+\subsection{Patch Tuesday Process}
+
+\begin{enumerate}
+    \item IT downloads patches from vendor
+    \item Upload to file transfer system
+    \item Scan and CDR processing
+    \item OT team reviews and approves
+    \item Files staged for maintenance window
+    \item OT retrieves and tests in lab
+    \item Deploy to production during outage
+\end{enumerate}
+
+\subsection{Emergency File Transfer}
+
+\begin{itemize}
+    \item Pre-approved emergency contacts authorized to bypass
+    \item Documented justification required
+    \item Post-incident review mandatory
+    \item Scan still performed (blocking only bypassed)
+\end{itemize}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Use a DMZ} -- Never allow direct IT/OT file transfer
+    \item \textbf{Pull model} -- OT retrieves files; nothing pushed to OT
+    \item \textbf{Scan everything} -- Multiple AV engines plus CDR
+    \item \textbf{Strict firewall rules} -- Minimal ports, OT initiates only
+    \item \textbf{Approval workflows} -- Human review for sensitive files
+    \item \textbf{Complete audit trail} -- Log all transfers for forensics
+    \item \textbf{Consider data diodes} -- Hardware-enforced for high security
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Standards and Guidelines}
+
+\begin{itemize}
+    \item \textbf{IEC 62443-3-3} -- System security requirements for IACS\\
+          \url{https://webstore.iec.ch/publication/7033}
+    \item \textbf{NIST SP 800-82 Rev. 3} -- Guide to OT Security\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{CISA -- Securing Industrial Control Systems}\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+    \item \textbf{SANS ICS -- Network Security Monitoring}\\
+          \url{https://www.sans.org/cyber-security-courses/industrial-control-system-network-security-monitoring/}
+\end{itemize}
+
+\subsection*{Books}
+
+\begin{itemize}
+    \item Knapp, E. \& Langill, J. -- \textit{Industrial Network Security} (Syngress)
+    \item Macaulay, T. \& Singer, B. -- \textit{Cybersecurity for Industrial Control Systems} (CRC Press)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

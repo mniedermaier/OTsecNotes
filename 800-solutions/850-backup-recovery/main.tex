@@ -1,0 +1,381 @@
+% ============================================================================
+%  850-backup-recovery - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+% Define colors for TikZ (matching template colors)
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {OT Backup and Recovery}
+    {Strategies for protecting and restoring industrial control systems}
+    {OT Security Learning Series}
+    {Document 850 \quad|\quad January 2026}
+    {AI Assistant}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+Backup and recovery capabilities are essential for OT resilience. Unlike IT systems where data is the primary asset, OT environments must protect and restore \textbf{control logic}, \textbf{configurations}, and \textbf{operational state} -- often for systems that cannot tolerate extended downtime.
+\end{infobox}
+
+Effective OT backup strategies address:
+\begin{itemize}
+    \item PLC and controller program backups
+    \item HMI/SCADA configuration preservation
+    \item Network device configurations
+    \item Historian and operational data
+    \item System images for rapid restoration
+\end{itemize}
+
+Without proper backups, ransomware attacks or system failures can result in weeks of downtime while engineers recreate control logic from scratch.
+
+% ============================================================================
+\section{OT vs IT Backup Challenges}
+% ============================================================================
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Aspect} & \textbf{IT Backup} & \textbf{OT Backup} \\
+\hline
+Primary asset & Data files & Control logic, configs \\
+Backup frequency & Daily/hourly & After changes \\
+Restore window & Hours acceptable & Minutes critical \\
+Agents & Standard backup agents & Often not possible \\
+Network access & Always connected & Air-gapped common \\
+Change rate & Frequent & Rare but critical \\
+Validation & File integrity & Functional testing \\
+\hline
+\end{tabular}
+\caption{IT vs OT Backup Considerations}
+\end{table}
+
+\begin{warningbox}
+\textbf{OT-Specific Challenge:} Many industrial devices cannot run backup agents, don't support standard protocols, and may require proprietary tools for program extraction. Generic IT backup solutions often fail in OT environments.
+\end{warningbox}
+
+% ============================================================================
+\section{What to Back Up}
+% ============================================================================
+
+\subsection{Control System Components}
+
+\begin{definitionbox}{Critical OT Assets for Backup}
+\begin{itemize}
+    \item \textbf{PLC/RTU Programs} -- Ladder logic, function blocks, structured text
+    \item \textbf{HMI Projects} -- Graphics, scripts, tag databases, alarm configs
+    \item \textbf{SCADA Configurations} -- Communication settings, historian configs
+    \item \textbf{DCS Configurations} -- Controller configs, I/O assignments, tuning parameters
+    \item \textbf{Safety System Logic} -- SIS programs (with strict change control)
+    \item \textbf{Network Devices} -- Switch/firewall/router configurations
+    \item \textbf{Engineering Workstations} -- Project files, licensing, tools
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Operational Data}
+
+\begin{itemize}
+    \item Historian databases (process data, trends)
+    \item Alarm and event logs
+    \item Batch records and production data
+    \item Audit trails and access logs
+\end{itemize}
+
+\subsection{Supporting Documentation}
+
+\begin{itemize}
+    \item Network diagrams and IP assignments
+    \item I/O lists and wiring documentation
+    \item Setpoint and tuning parameter records
+    \item Recovery procedures
+\end{itemize}
+
+% ============================================================================
+\section{Backup Strategies}
+% ============================================================================
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, minimum height=1.2cm, minimum width=3cm, rounded corners=3pt, font=\small\bfseries},
+    arrow/.style={->, thick, >=stealth}
+]
+
+% Backup types
+\node[box, fill=otaccent!20] (full) at (0,2) {Full Backup};
+\node[box, fill=otsuccess!20] (incr) at (4,2) {Incremental};
+\node[box, fill=otwarning!20] (diff) at (8,2) {Differential};
+
+% Descriptions
+\node[font=\tiny, text width=2.8cm, align=center] at (0,0.6) {Complete copy\\of all data\\Longest time\\Self-contained};
+\node[font=\tiny, text width=2.8cm, align=center] at (4,0.6) {Changes since\\last backup\\Fastest backup\\Complex restore};
+\node[font=\tiny, text width=2.8cm, align=center] at (8,0.6) {Changes since\\last full backup\\Medium speed\\Simpler restore};
+
+% OT recommendation
+\node[font=\scriptsize\bfseries, otsuccess] at (4,-0.8) {OT Recommendation: Full backups after every change};
+
+\end{tikzpicture}
+\caption{Backup Strategy Types}
+\end{figure}
+
+\subsection{Change-Triggered Backups}
+
+In OT environments where changes are infrequent but critical:
+
+\begin{successbox}
+\textbf{Best Practice:} Perform a full backup immediately before and after any change to control logic. This creates a known-good state to restore and documents what changed.
+\end{successbox}
+
+\subsection{Scheduled Backups}
+
+Even without changes, periodic backups catch:
+\begin{itemize}
+    \item Unauthorized modifications
+    \item Runtime parameter drift
+    \item Configuration corruption
+    \item Comparison baselines for integrity monitoring
+\end{itemize}
+
+% ============================================================================
+\section{Backup Methods}
+% ============================================================================
+
+\subsection{Native Vendor Tools}
+
+Most control system vendors provide backup utilities:
+\begin{itemize}
+    \item Upload/download functions in programming software
+    \item Project archive features
+    \item Export to portable formats
+\end{itemize}
+
+\begin{warningbox}
+\textbf{Limitation:} Vendor tools often require manual operation and don't integrate with enterprise backup systems. Automation may require scripting or third-party solutions.
+\end{warningbox}
+
+\subsection{Online vs Offline Backups}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Method} & \textbf{Advantages} & \textbf{Disadvantages} \\
+\hline
+Online (running) & No downtime & May miss runtime state \\
+Offline (stopped) & Complete capture & Requires outage \\
+Memory card copy & Direct, complete & Physical access needed \\
+Network upload & Remote capable & Protocol limitations \\
+\hline
+\end{tabular}
+\caption{Online vs Offline Backup Methods}
+\end{table}
+
+\subsection{Image-Based Backups}
+
+For Windows-based OT systems (HMIs, historians, engineering workstations):
+\begin{itemize}
+    \item Full disk images capture OS, applications, and data
+    \item Bare-metal restore capability
+    \item Must validate application functionality after restore
+    \item Consider licensing implications
+\end{itemize}
+
+% ============================================================================
+\section{Backup Storage and Protection}
+% ============================================================================
+
+\begin{dangerbox}
+\textbf{Critical Rule:} Backups must be stored separately from production systems. If ransomware encrypts your OT network, it should not reach your backups.
+\end{dangerbox}
+
+\subsection{Storage Locations}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    loc/.style={rectangle, draw, thick, minimum height=1cm, minimum width=2.5cm, rounded corners=3pt, font=\tiny\bfseries, align=center},
+    arrow/.style={->, thick, >=stealth}
+]
+
+\node[loc, fill=otdanger!20] (ot) at (0,0) {OT Network};
+\node[loc, fill=otwarning!20] (dmz) at (3.5,0) {DMZ Backup\\Server};
+\node[loc, fill=otsuccess!20] (offline) at (7,0) {Offline/\\Air-gapped};
+\node[loc, fill=otinfo!20] (offsite) at (10.5,0) {Offsite\\Storage};
+
+\draw[arrow, otprimary] (ot) -- (dmz);
+\draw[arrow, otprimary] (dmz) -- (offline);
+\draw[arrow, otprimary] (offline) -- (offsite);
+
+\node[font=\tiny, otprimary] at (1.75,0.8) {Automated};
+\node[font=\tiny, otprimary] at (5.25,0.8) {Manual};
+\node[font=\tiny, otprimary] at (8.75,0.8) {Periodic};
+
+\end{tikzpicture}
+\caption{Backup Storage Tiers}
+\end{figure}
+
+\subsection{The 3-2-1 Rule for OT}
+
+\begin{definitionbox}{3-2-1 Backup Rule}
+\begin{itemize}
+    \item \textbf{3} copies of critical data
+    \item \textbf{2} different storage media/types
+    \item \textbf{1} copy offsite or air-gapped
+\end{itemize}
+For OT, add: at least one copy that is \textbf{offline} and immune to network-based attacks.
+\end{definitionbox}
+
+\subsection{Backup Security}
+
+\begin{itemize}
+    \item \textbf{Encryption} -- Protect backups at rest and in transit
+    \item \textbf{Access control} -- Limit who can read/write/delete backups
+    \item \textbf{Integrity verification} -- Hash validation, checksums
+    \item \textbf{Immutable storage} -- Write-once media or immutable cloud storage
+    \item \textbf{Version retention} -- Keep multiple generations
+\end{itemize}
+
+% ============================================================================
+\section{Recovery Planning}
+% ============================================================================
+
+\subsection{Recovery Time Objectives}
+
+Define acceptable downtime for each system:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{System Type} & \textbf{Typical RTO} & \textbf{Recovery Priority} \\
+\hline
+Safety systems & Minutes & \riskcritical \\
+Critical PLCs & 1-4 hours & \riskhigh \\
+HMI/SCADA & 4-8 hours & \riskhigh \\
+Historians & 24 hours & \riskmedium \\
+Engineering stations & Days & \risklow \\
+\hline
+\end{tabular}
+\caption{Recovery Time Objectives by System Type}
+\end{table}
+
+\subsection{Recovery Procedures}
+
+Document step-by-step procedures for each system type:
+\begin{enumerate}
+    \item Prerequisites (tools, access, credentials)
+    \item Locate and verify backup integrity
+    \item Restoration steps
+    \item Validation and testing
+    \item Return to production checklist
+\end{enumerate}
+
+\begin{successbox}
+\textbf{Critical:} Recovery procedures must be usable by operators under stress during an incident. Keep them simple, tested, and accessible (printed copies in control rooms).
+\end{successbox}
+
+% ============================================================================
+\section{Testing and Validation}
+% ============================================================================
+
+\begin{warningbox}
+\textbf{Untested backups are not backups.} Many organizations discover their backups are corrupt, incomplete, or unusable only when they need them most.
+\end{warningbox}
+
+\subsection{Backup Validation}
+
+\begin{itemize}
+    \item Verify backup completed successfully (no errors)
+    \item Check file integrity (hashes match)
+    \item Confirm backup is readable and not corrupted
+    \item Validate backup contains expected content
+\end{itemize}
+
+\subsection{Recovery Testing}
+
+\begin{itemize}
+    \item \textbf{Tabletop exercises} -- Walk through procedures
+    \item \textbf{Lab restoration} -- Test in non-production environment
+    \item \textbf{Partial recovery} -- Restore individual components
+    \item \textbf{Full recovery drill} -- Complete system restoration (during maintenance)
+\end{itemize}
+
+\subsection{Testing Frequency}
+
+\begin{itemize}
+    \item Backup verification: Every backup
+    \item Procedure review: Quarterly
+    \item Lab recovery test: Semi-annually
+    \item Full recovery drill: Annually
+\end{itemize}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{OT backups differ from IT} -- Focus on control logic and configurations, not just data
+    \item \textbf{Back up everything} -- PLCs, HMIs, network devices, documentation
+    \item \textbf{Change-triggered backups} -- Full backup before and after every change
+    \item \textbf{Isolate backup storage} -- Keep backups separate from production networks
+    \item \textbf{Follow 3-2-1 rule} -- Three copies, two media types, one offline/offsite
+    \item \textbf{Document recovery procedures} -- Simple, tested, accessible
+    \item \textbf{Test regularly} -- Untested backups provide false confidence
+    \item \textbf{Define RTOs} -- Know acceptable downtime for each system
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Standards and Guidelines}
+
+\begin{itemize}
+    \item \textbf{IEC 62443-2-1} -- Security program requirements (backup and recovery)\\
+          \url{https://webstore.iec.ch/publication/7030}
+    \item \textbf{NIST SP 800-82 Rev. 3} -- Guide to OT Security (Section 6.2.9 Contingency Planning)\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+    \item \textbf{NIST SP 800-184} -- Guide for Cybersecurity Event Recovery\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-184/final}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{CISA -- ICS Recommended Practices}\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+    \item \textbf{SANS ICS -- Incident Response and Recovery}\\
+          \url{https://www.sans.org/blog/industrial-control-system-security/}
+\end{itemize}
+
+\subsection*{Books}
+
+\begin{itemize}
+    \item Knapp, E. \& Langill, J. -- \textit{Industrial Network Security} (Syngress)
+    \item Stouffer, K. et al. -- \textit{Guide to Industrial Control Systems Security} (NIST)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}
