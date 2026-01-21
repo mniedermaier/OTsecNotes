@@ -1,13 +1,6 @@
 <div align="center">
 
-```
-   ____  _______   _____           _   _       _
-  / __ \|__   __| / ____|         | \ | |     | |
- | |  | |  | |   | (___   ___  ___|  \| | ___ | |_ ___  ___
- | |  | |  | |    \___ \ / _ \/ __| . ` |/ _ \| __/ _ \/ __|
- | |__| |  | |    ____) |  __/ (__| |\  | (_) | ||  __/\__ \
-  \____/   |_|   |_____/ \___|\___|_| \_|\___/ \__\___||___/
-```
+# :shield: OT Security Notes
 
 ### Operational Technology Security Learning Series
 
@@ -15,6 +8,8 @@
 [![LaTeX](https://img.shields.io/badge/Made%20with-LaTeX-1f425f.svg)](https://www.latex-project.org/)
 [![License: CC BY-SA 4.0](https://img.shields.io/badge/License-CC%20BY--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-sa/4.0/)
 [![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://mniedermaier.github.io/OTsecNotes/)
+
+**Comprehensive learning documents for ICS/SCADA security professionals**
 
 </div>
 
