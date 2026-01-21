@@ -1,0 +1,346 @@
+% ============================================================================
+%  040-safety-systems - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usetikzlibrary{decorations.pathreplacing}
+
+% Define colors for TikZ (matching template colors)
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {Safety Instrumented Systems}
+    {Understanding SIS, SIL levels, and safety system security}
+    {OT Security Learning Series}
+    {Document 040 \quad|\quad January 2026}
+    {AI Assistant}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+Safety Instrumented Systems (SIS) are the last line of defense against catastrophic events in industrial processes. Unlike control systems that optimize production, safety systems exist solely to prevent harm to people, equipment, and the environment.
+\end{infobox}
+
+Safety systems operate independently from basic process control systems (BPCS) and are designed to bring a process to a safe state when dangerous conditions are detected. Understanding these systems is critical for OT security professionals because:
+
+\begin{itemize}
+    \item Compromised safety systems can lead to \textbf{loss of life}
+    \item They are explicitly targeted by sophisticated attackers (e.g., TRITON malware)
+    \item Security measures must not compromise safety functionality
+\end{itemize}
+
+% ============================================================================
+\section{Safety vs Control Systems}
+% ============================================================================
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, minimum height=1cm, minimum width=2.8cm, rounded corners=3pt, font=\small\bfseries},
+    arrow/.style={->, thick, >=stealth},
+    desc/.style={font=\tiny, text width=2.6cm, align=left}
+]
+
+% Left column - BPCS
+\node[box, fill=otaccent!20] (bpcs) at (-4,4) {BPCS};
+\node[font=\scriptsize] at (-4.5,3.2) {Basic Process Control};
+\node[desc] at (-4.5,1.8) {
+    \textbullet\ Optimizes production\\[2pt]
+    \textbullet\ Continuous operation\\[2pt]
+    \textbullet\ Efficiency focused\\[2pt]
+    \textbullet\ Frequent changes
+};
+
+% Right column - SIS
+\node[box, fill=otdanger!20] (sis) at (4,4) {SIS};
+\node[font=\scriptsize] at (4.5,3.2) {Safety Instrumented System};
+\node[desc] at (4.5,1.8) {
+    \textbullet\ Prevents hazards\\[2pt]
+    \textbullet\ Activates on demand\\[2pt]
+    \textbullet\ Safety focused\\[2pt]
+    \textbullet\ Rarely modified
+};
+
+% Center - Separation line
+\draw[very thick, dashed, otwarning] (0,4.8) -- (0,0.2);
+\node[font=\scriptsize\bfseries, otwarning, fill=white, inner sep=2pt] at (0,2.5) {SEPARATION};
+
+% Bottom - Process
+\node[box, fill=otsuccess!20, minimum width=5cm, minimum height=1.2cm] (process) at (0,-0.8) {Industrial Process};
+
+% Arrows - from inner edge of boxes, not through text
+\draw[arrow, otaccent, line width=1.5pt] (-2.6,4) -- (-2.6,0.5) -- (-1.5,0.5) -- (-1.5,-0.2);
+\draw[arrow, otdanger, line width=1.5pt] (2.6,4) -- (2.6,0.5) -- (1.5,0.5) -- (1.5,-0.2);
+
+\end{tikzpicture}
+\caption{BPCS vs SIS: Separate Systems with Different Objectives}
+\end{figure}
+
+\begin{definitionbox}{Key Principle: Independence}
+Safety systems must be \textbf{independent} from control systems. A failure in the BPCS should not affect the SIS, and vice versa. This separation extends to:
+\begin{itemize}
+    \item Hardware (separate controllers, I/O, power supplies)
+    \item Software (different logic solvers, no shared code)
+    \item Networks (physically or logically separated)
+    \item Personnel (different teams for engineering and maintenance)
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{SIS Components}
+% ============================================================================
+
+A Safety Instrumented System consists of three main elements that form a Safety Instrumented Function (SIF):
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    block/.style={rectangle, draw, thick, minimum height=1.5cm, minimum width=2.5cm, rounded corners=5pt, font=\small\bfseries},
+    arrow/.style={->, very thick, >=stealth}
+]
+
+% Components
+\node[block, fill=otinfo!20] (sensor) at (0,0) {Sensors};
+\node[block, fill=otaccent!20] (logic) at (4,0) {Logic Solver};
+\node[block, fill=otsuccess!20] (final) at (8,0) {Final Elements};
+
+% Labels below
+\node[font=\tiny, text width=2.5cm, align=center] at (0,-1.3) {Detect hazardous\\conditions};
+\node[font=\tiny, text width=2.5cm, align=center] at (4,-1.3) {Process inputs\\and decide};
+\node[font=\tiny, text width=2.5cm, align=center] at (8,-1.3) {Take action to\\achieve safe state};
+
+% Examples
+\node[font=\tiny\itshape, otprimary!70] at (0,-2.2) {Pressure, temp,};
+\node[font=\tiny\itshape, otprimary!70] at (0,-2.6) {level, flow sensors};
+\node[font=\tiny\itshape, otprimary!70] at (4,-2.2) {Safety PLC,};
+\node[font=\tiny\itshape, otprimary!70] at (4,-2.6) {relay systems};
+\node[font=\tiny\itshape, otprimary!70] at (8,-2.2) {Valves, breakers,};
+\node[font=\tiny\itshape, otprimary!70] at (8,-2.6) {motors, alarms};
+
+% Arrows
+\draw[arrow, otprimary] (sensor) -- (logic);
+\draw[arrow, otprimary] (logic) -- (final);
+
+% SIF bracket
+\draw[thick, otdanger, decorate, decoration={brace, amplitude=10pt, mirror}] (-1.2,-3.2) -- (9.2,-3.2);
+\node[font=\small\bfseries, otdanger] at (4,-4) {Safety Instrumented Function (SIF)};
+
+\end{tikzpicture}
+\caption{Components of a Safety Instrumented Function}
+\end{figure}
+
+\subsection{Sensors}
+
+Safety sensors detect process variables that indicate hazardous conditions:
+\begin{itemize}
+    \item High pressure, temperature, or level transmitters
+    \item Gas detectors (toxic, combustible)
+    \item Flame detectors, smoke detectors
+    \item Emergency stop buttons (E-stops)
+\end{itemize}
+
+\subsection{Logic Solver}
+
+The logic solver evaluates sensor inputs and determines when to activate final elements:
+\begin{itemize}
+    \item \textbf{Safety PLCs} -- Purpose-built controllers certified for safety applications
+    \item \textbf{Relay systems} -- Traditional hardwired logic (still used in simple applications)
+    \item \textbf{Safety controllers} -- Integrated systems from safety vendors
+\end{itemize}
+
+\subsection{Final Elements}
+
+Final elements take physical action to achieve a safe state:
+\begin{itemize}
+    \item Emergency shutdown valves (ESV)
+    \item Motor trip relays
+    \item Circuit breakers
+    \item Audible/visual alarms
+\end{itemize}
+
+% ============================================================================
+\section{Safety Integrity Levels (SIL)}
+% ============================================================================
+
+\begin{dangerbox}
+Safety Integrity Levels (SIL) define the required reliability of safety functions. Higher SIL levels require more rigorous design, testing, and maintenance to achieve lower probability of failure.
+\end{dangerbox}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|l|l|}
+\hline
+\textbf{SIL} & \textbf{PFD Range} & \textbf{Risk Reduction} & \textbf{Typical Application} \\
+\hline
+1 & $10^{-1}$ to $10^{-2}$ & 10 to 100 & Low-risk processes \\
+2 & $10^{-2}$ to $10^{-3}$ & 100 to 1,000 & Standard chemical plants \\
+3 & $10^{-3}$ to $10^{-4}$ & 1,000 to 10,000 & High-hazard processes \\
+4 & $10^{-4}$ to $10^{-5}$ & 10,000 to 100,000 & Nuclear (rarely used) \\
+\hline
+\end{tabular}
+\caption{Safety Integrity Levels (PFD = Probability of Failure on Demand)}
+\end{table}
+
+\subsection{Achieving Higher SIL}
+
+Higher SIL levels are achieved through:
+\begin{itemize}
+    \item \textbf{Redundancy} -- Multiple sensors, logic solvers, or final elements (1oo2, 2oo3 voting)
+    \item \textbf{Diversity} -- Different technologies or manufacturers
+    \item \textbf{Diagnostics} -- Self-testing and fault detection
+    \item \textbf{Proof testing} -- Regular functional testing
+    \item \textbf{Certified components} -- Hardware/software certified to target SIL
+\end{itemize}
+
+% ============================================================================
+\section{Relevant Standards}
+% ============================================================================
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Standard} & \textbf{Scope} \\
+\hline
+IEC 61511 & Process industry functional safety \\
+IEC 61508 & General functional safety (basis for sector standards) \\
+IEC 62443 & Industrial cybersecurity (includes SIS considerations) \\
+ISA 84 & US adoption of IEC 61511 \\
+NFPA 85 & Boiler and combustion systems \\
+API 556 & Fired heaters in refineries \\
+\hline
+\end{tabular}
+\caption{Key Safety System Standards}
+\end{table}
+
+% ============================================================================
+\section{Security Threats to Safety Systems}
+% ============================================================================
+
+\begin{warningbox}
+\textbf{TRITON/TRISIS (2017):} The first known malware specifically designed to attack safety instrumented systems. It targeted Schneider Electric Triconex safety controllers at a petrochemical facility, attempting to disable safety functions that could have enabled a catastrophic release.
+\end{warningbox}
+
+\subsection{Attack Scenarios}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    attack/.style={rectangle, draw, thick, fill=otdanger!15, minimum height=0.8cm, minimum width=5.5cm, rounded corners=3pt, font=\small}
+]
+
+\node[attack] (a1) at (0,2.5) {\faIcon{eye-slash} Disable safety function silently};
+\node[attack] (a2) at (0,1.5) {\faIcon{random} Modify setpoints/thresholds};
+\node[attack] (a3) at (0,0.5) {\faIcon{clock} Delay safety response};
+\node[attack] (a4) at (0,-0.5) {\faIcon{bell-slash} Suppress alarms};
+\node[attack] (a5) at (0,-1.5) {\faIcon{bomb} Trigger spurious trips (DoS)};
+
+\end{tikzpicture}
+\caption{Potential Attack Scenarios Against Safety Systems}
+\end{figure}
+
+\subsection{Why SIS is Targeted}
+
+\begin{itemize}
+    \item \textbf{Catastrophic impact} -- Disabling safety enables physical destruction
+    \item \textbf{Trusted status} -- Safety systems are often less monitored
+    \item \textbf{Rare changes} -- Infrequent updates make anomalies harder to detect
+    \item \textbf{Specialized knowledge} -- Fewer defenders understand safety systems
+\end{itemize}
+
+% ============================================================================
+\section{Security Best Practices}
+% ============================================================================
+
+\begin{successbox}
+\textbf{Defense in Depth for SIS:}
+\begin{itemize}
+    \item Maintain physical and logical separation from BPCS
+    \item Implement strict access control (physical and logical)
+    \item Monitor for unauthorized changes and anomalies
+    \item Include SIS in security assessments and incident response plans
+    \item Ensure security measures don't compromise safety functionality
+\end{itemize}
+\end{successbox}
+
+\subsection{Network Segmentation}
+
+\begin{itemize}
+    \item SIS should be on a \textbf{separate network} from BPCS
+    \item Use firewalls with strict allowlists between zones
+    \item Consider \textbf{data diodes} for one-way data flow out of SIS
+    \item Disable unnecessary communication protocols
+\end{itemize}
+
+\subsection{Access Control}
+
+\begin{itemize}
+    \item Restrict physical access to SIS cabinets and engineering stations
+    \item Use key switches or hardware write-protect for logic changes
+    \item Implement role-based access with strong authentication
+    \item Log all access attempts and configuration changes
+\end{itemize}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{SIS protects lives} -- Safety systems prevent catastrophic events
+    \item \textbf{Independence is critical} -- SIS must be separate from BPCS
+    \item \textbf{SIL defines reliability} -- Higher SIL = more rigorous requirements
+    \item \textbf{TRITON proved the threat} -- Nation-state actors target safety systems
+    \item \textbf{Security supports safety} -- Protection measures must not compromise safety
+    \item \textbf{Defense in depth} -- Layers of network, access, and change controls
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Standards and Guidelines}
+
+\begin{itemize}
+    \item \textbf{IEC 61511} -- Functional safety for process industries\\
+          \url{https://webstore.iec.ch/publication/5526}
+    \item \textbf{IEC 62443-4-2} -- Technical security requirements for IACS components\\
+          \url{https://webstore.iec.ch/publication/34421}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{CISA -- TRITON Malware Analysis}\\
+          \url{https://www.cisa.gov/news-events/cybersecurity-advisories/aa22-083a}
+    \item \textbf{Dragos -- TRISIS Analysis}\\
+          \url{https://www.dragos.com/resource/trisis/}
+\end{itemize}
+
+\subsection*{Books}
+
+\begin{itemize}
+    \item Gruhn, P. \& Cheddie, H. -- \textit{Safety Instrumented Systems: Design, Analysis, and Justification} (ISA)
+    \item Smith, D. \& Simpson, K. -- \textit{Safety Critical Systems Handbook} (Elsevier)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

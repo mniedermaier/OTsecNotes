@@ -471,7 +471,7 @@ jobs:
                 <div class="search-box">
                   <input type="text" id="search" placeholder="🔍 Search documents..." autocomplete="off">
                 </div>
-                <button class="toggle-btn" id="toggle-all" onclick="toggleAll()">Collapse All</button>
+                <button class="toggle-btn" id="toggle-all" onclick="toggleAll()">Expand All</button>
               </div>
               <div class="categories" id="categories">
           HTMLEOF
@@ -513,7 +513,7 @@ jobs:
             done | sort)
 
             if [ -n "$pdfs" ]; then
-              echo "            <div class=\"category\" data-category=\"$category_name\">" >> public/index.html
+              echo "            <div class=\"category collapsed\" data-category=\"$category_name\">" >> public/index.html
               echo "              <div class=\"category-header\" onclick=\"this.parentElement.classList.toggle('collapsed')\">" >> public/index.html
               echo "                <span class=\"category-icon\">$category_icon</span>" >> public/index.html
               echo "                <span class=\"category-title\">$category_name</span>" >> public/index.html

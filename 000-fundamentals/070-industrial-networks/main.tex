@@ -1,0 +1,360 @@
+% ============================================================================
+%  070-industrial-networks - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+% Define colors for TikZ (matching template colors)
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {Industrial Network Fundamentals}
+    {Understanding OT network technologies, topologies, and fieldbus systems}
+    {OT Security Learning Series}
+    {Document 070 \quad|\quad January 2026}
+    {AI Assistant}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+Industrial networks connect field devices, controllers, and supervisory systems in OT environments. Unlike IT networks optimized for data throughput, industrial networks prioritize \textbf{determinism}, \textbf{reliability}, and \textbf{real-time performance} for process control.
+\end{infobox}
+
+Understanding industrial networking is essential for OT security because:
+\begin{itemize}
+    \item Network architecture affects segmentation strategies
+    \item Legacy protocols lack security features
+    \item Physical layer differences impact monitoring capabilities
+    \item Redundancy mechanisms must be preserved during security implementations
+\end{itemize}
+
+% ============================================================================
+\section{Network Topologies}
+% ============================================================================
+
+Industrial networks use various topologies based on reliability, cost, and application requirements.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    device/.style={circle, draw, thick, fill=otaccent!20, minimum size=0.8cm, font=\tiny},
+    switch/.style={rectangle, draw, thick, fill=otwarning!20, minimum size=0.6cm, font=\tiny},
+    label/.style={font=\scriptsize\bfseries, otprimary}
+]
+
+% Star Topology
+\node[label] at (-4,2.5) {Star};
+\node[switch] (star-sw) at (-4,1) {SW};
+\node[device] (s1) at (-5.5,1.8) {D};
+\node[device] (s2) at (-4,2.2) {D};
+\node[device] (s3) at (-2.5,1.8) {D};
+\node[device] (s4) at (-5.2,0) {D};
+\node[device] (s5) at (-2.8,0) {D};
+\draw[thick, otprimary!60] (star-sw) -- (s1);
+\draw[thick, otprimary!60] (star-sw) -- (s2);
+\draw[thick, otprimary!60] (star-sw) -- (s3);
+\draw[thick, otprimary!60] (star-sw) -- (s4);
+\draw[thick, otprimary!60] (star-sw) -- (s5);
+
+% Ring Topology
+\node[label] at (0,2.5) {Ring};
+\node[device] (r1) at (0,1.8) {D};
+\node[device] (r2) at (1,1) {D};
+\node[device] (r3) at (0.6,0) {D};
+\node[device] (r4) at (-0.6,0) {D};
+\node[device] (r5) at (-1,1) {D};
+\draw[thick, otprimary!60] (r1) -- (r2) -- (r3) -- (r4) -- (r5) -- (r1);
+
+% Bus Topology
+\node[label] at (4,2.5) {Bus/Line};
+\draw[very thick, otwarning] (2.5,1) -- (5.5,1);
+\node[device] (b1) at (2.8,1.8) {D};
+\node[device] (b2) at (3.6,1.8) {D};
+\node[device] (b3) at (4.4,1.8) {D};
+\node[device] (b4) at (5.2,1.8) {D};
+\draw[thick, otprimary!60] (b1) -- (2.8,1);
+\draw[thick, otprimary!60] (b2) -- (3.6,1);
+\draw[thick, otprimary!60] (b3) -- (4.4,1);
+\draw[thick, otprimary!60] (b4) -- (5.2,1);
+
+% Labels
+\node[font=\tiny, text width=2cm, align=center] at (-4,-1) {Central switch\\Single point of failure};
+\node[font=\tiny, text width=2cm, align=center] at (0,-1) {Redundant path\\Self-healing};
+\node[font=\tiny, text width=2cm, align=center] at (4,-1) {Simple, low cost\\Legacy fieldbus};
+
+\end{tikzpicture}
+\caption{Common Industrial Network Topologies}
+\end{figure}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|l|}
+\hline
+\textbf{Topology} & \textbf{Redundancy} & \textbf{Cost} & \textbf{Common Use} \\
+\hline
+Star & None (single switch) & Medium & Ethernet networks \\
+Ring & High (dual path) & Higher & Critical systems \\
+Bus/Line & None & Low & Legacy fieldbus \\
+Mesh & Very high & Highest & Wireless, critical \\
+\hline
+\end{tabular}
+\caption{Topology Comparison}
+\end{table}
+
+% ============================================================================
+\section{Serial Communications}
+% ============================================================================
+
+Many legacy industrial systems use serial communications for device connectivity.
+
+\subsection{RS-232}
+
+\begin{itemize}
+    \item Point-to-point communication only
+    \item Short distance (typically $<$ 15 meters)
+    \item Common for HMI-to-PLC connections, programming ports
+    \item Speeds up to 115.2 kbps
+\end{itemize}
+
+\subsection{RS-485}
+
+\begin{itemize}
+    \item Multi-drop bus supporting up to 32 devices
+    \item Longer distances (up to 1200 meters)
+    \item Half-duplex or full-duplex operation
+    \item Basis for Modbus RTU and many fieldbus protocols
+    \item Speeds up to 10 Mbps (distance dependent)
+\end{itemize}
+
+\begin{warningbox}
+\textbf{Security Note:} Serial protocols typically have \textbf{no authentication or encryption}. Physical access to the bus allows reading and injecting traffic. Serial-to-Ethernet converters can expose these insecure protocols to IP networks.
+\end{warningbox}
+
+% ============================================================================
+\section{Fieldbus Technologies}
+% ============================================================================
+
+Fieldbus networks connect sensors, actuators, and controllers at the field level.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    block/.style={rectangle, draw, thick, minimum height=0.8cm, minimum width=2.8cm, rounded corners=3pt, font=\footnotesize},
+    arrow/.style={->, thick, >=stealth}
+]
+
+% Timeline
+\draw[very thick, otprimary!40] (0,0) -- (10,0);
+\node[font=\tiny] at (0,-0.4) {1980s};
+\node[font=\tiny] at (5,-0.4) {2000s};
+\node[font=\tiny] at (10,-0.4) {Today};
+
+% Fieldbus era
+\node[block, fill=otwarning!20] at (1.5,1.2) {Modbus RTU};
+\node[block, fill=otwarning!20] at (1.5,2.2) {PROFIBUS};
+\node[block, fill=otwarning!20] at (4,1.7) {DeviceNet};
+\node[font=\scriptsize\bfseries, otwarning] at (2.5,3) {Serial Fieldbus};
+
+% Industrial Ethernet
+\node[block, fill=otsuccess!20] at (6.5,1.2) {Modbus TCP};
+\node[block, fill=otsuccess!20] at (6.5,2.2) {PROFINET};
+\node[block, fill=otsuccess!20] at (9,1.2) {EtherNet/IP};
+\node[block, fill=otsuccess!20] at (9,2.2) {OPC UA};
+\node[font=\scriptsize\bfseries, otsuccess] at (7.5,3) {Industrial Ethernet};
+
+\end{tikzpicture}
+\caption{Evolution from Serial Fieldbus to Industrial Ethernet}
+\end{figure}
+
+\subsection{Legacy Fieldbus}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Protocol} & \textbf{Physical Layer} & \textbf{Typical Use} \\
+\hline
+Modbus RTU & RS-485 & Universal, simple I/O \\
+PROFIBUS DP & RS-485 & Siemens environments \\
+DeviceNet & CAN bus & Rockwell/Allen-Bradley \\
+Foundation Fieldbus & H1 (31.25 kbps) & Process instrumentation \\
+HART & 4-20mA analog + digital & Smart instruments \\
+\hline
+\end{tabular}
+\caption{Common Serial Fieldbus Protocols}
+\end{table}
+
+% ============================================================================
+\section{Industrial Ethernet}
+% ============================================================================
+
+Industrial Ethernet adapts standard Ethernet for factory and process automation with enhanced reliability and real-time capabilities.
+
+\subsection{Key Differences from IT Ethernet}
+
+\begin{itemize}
+    \item \textbf{Deterministic timing} -- Guaranteed message delivery within defined time
+    \item \textbf{Ruggedized hardware} -- Extended temperature, vibration, EMI resistance
+    \item \textbf{Ring redundancy} -- Sub-50ms failover (MRP, HSR, PRP)
+    \item \textbf{Application layer protocols} -- Industrial-specific (not just TCP/IP)
+\end{itemize}
+
+\subsection{Common Industrial Ethernet Protocols}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Protocol} & \textbf{Vendor/Org} & \textbf{Real-Time Method} \\
+\hline
+EtherNet/IP & ODVA (Rockwell) & Standard TCP/IP + CIP \\
+PROFINET & Siemens/PI & IRT (Isochronous Real-Time) \\
+Modbus TCP & Modbus.org & Standard TCP/IP \\
+EtherCAT & Beckhoff/ETG & Processing on the fly \\
+OPC UA & OPC Foundation & Pub/Sub, TSN \\
+\hline
+\end{tabular}
+\caption{Industrial Ethernet Protocols}
+\end{table}
+
+% ============================================================================
+\section{Network Redundancy}
+% ============================================================================
+
+Industrial networks implement redundancy to ensure availability of critical control functions.
+
+\begin{definitionbox}{Common Redundancy Protocols}
+\begin{itemize}
+    \item \textbf{MRP} (Media Redundancy Protocol) -- Ring topology, $<$200ms recovery
+    \item \textbf{RSTP} (Rapid Spanning Tree) -- Standard Ethernet, $<$2s recovery
+    \item \textbf{HSR} (High-availability Seamless Redundancy) -- Zero recovery time
+    \item \textbf{PRP} (Parallel Redundancy Protocol) -- Dual parallel networks
+\end{itemize}
+\end{definitionbox}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    switch/.style={rectangle, draw, thick, fill=otaccent!20, minimum height=0.8cm, minimum width=1.2cm, font=\tiny\bfseries},
+    device/.style={rectangle, draw, thick, fill=otsuccess!20, minimum height=0.6cm, minimum width=1cm, font=\tiny}
+]
+
+% MRP Ring
+\node[switch] (sw1) at (0,2) {SW1};
+\node[switch] (sw2) at (2,2) {SW2};
+\node[switch] (sw3) at (2,0) {SW3};
+\node[switch] (sw4) at (0,0) {SW4};
+
+\draw[very thick, otsuccess] (sw1) -- (sw2) -- (sw3) -- (sw4) -- (sw1);
+\draw[thick, dashed, otdanger] (sw1) -- (sw3);
+\node[font=\tiny, otdanger] at (1,1) {Blocked};
+
+% Devices
+\node[device] (d1) at (-1.2,2) {PLC};
+\node[device] (d2) at (3.2,2) {HMI};
+\node[device] (d3) at (3.2,0) {I/O};
+\draw[thick, otprimary!60] (d1) -- (sw1);
+\draw[thick, otprimary!60] (d2) -- (sw2);
+\draw[thick, otprimary!60] (d3) -- (sw3);
+
+\node[font=\scriptsize\bfseries, otprimary] at (1,-1) {MRP Ring with Blocked Port};
+
+\end{tikzpicture}
+\caption{Media Redundancy Protocol (MRP) Ring Topology}
+\end{figure}
+
+% ============================================================================
+\section{Security Considerations}
+% ============================================================================
+
+\begin{dangerbox}
+Industrial networks often lack basic security controls. Many protocols were designed decades ago without security considerations and cannot be easily updated due to availability requirements.
+\end{dangerbox}
+
+\subsection{Common Vulnerabilities}
+
+\begin{itemize}
+    \item \textbf{No authentication} -- Most fieldbus protocols accept any command
+    \item \textbf{No encryption} -- Traffic readable by anyone on the network
+    \item \textbf{Flat networks} -- No segmentation between zones
+    \item \textbf{Legacy devices} -- Cannot be patched or upgraded
+    \item \textbf{Broadcast traffic} -- Easy reconnaissance via passive sniffing
+\end{itemize}
+
+\subsection{Security Best Practices}
+
+\begin{successbox}
+\textbf{Network Security Measures:}
+\begin{itemize}
+    \item Segment networks by function and criticality (zones and conduits)
+    \item Deploy industrial firewalls at zone boundaries
+    \item Use managed switches with port security, VLANs
+    \item Implement network monitoring and anomaly detection
+    \item Disable unused ports and services
+    \item Consider encrypted tunnels for sensitive traffic
+\end{itemize}
+\end{successbox}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Topology matters} -- Star, ring, and bus have different reliability profiles
+    \item \textbf{Serial still exists} -- RS-485 and fieldbus remain common in brownfield sites
+    \item \textbf{Industrial Ethernet differs} -- Determinism and redundancy, not just TCP/IP
+    \item \textbf{Redundancy is critical} -- MRP, HSR, PRP ensure availability
+    \item \textbf{Legacy = insecure} -- Most industrial protocols lack authentication/encryption
+    \item \textbf{Segment and monitor} -- Compensating controls for protocol weaknesses
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Standards and Guidelines}
+
+\begin{itemize}
+    \item \textbf{IEC 62439} -- Industrial communication networks -- High availability\\
+          \url{https://webstore.iec.ch/publication/6990}
+    \item \textbf{IEC 62443-3-2} -- Security risk assessment for system design\\
+          \url{https://webstore.iec.ch/publication/30727}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{ODVA} -- EtherNet/IP specifications\\
+          \url{https://www.odva.org/}
+    \item \textbf{PROFIBUS/PROFINET International}\\
+          \url{https://www.profibus.com/}
+\end{itemize}
+
+\subsection*{Books}
+
+\begin{itemize}
+    \item Zurawski, R. -- \textit{Industrial Communication Technology Handbook} (CRC Press)
+    \item Galloway, B. \& Hancke, G. -- \textit{Introduction to Industrial Control Networks} (IEEE)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}
