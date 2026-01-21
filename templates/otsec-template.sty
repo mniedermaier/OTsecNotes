@@ -39,6 +39,10 @@
 \RequirePackage{listings}
 \RequirePackage{fancyvrb}
 
+% Float control - prevent figures from interrupting code listings
+\RequirePackage{placeins}
+\RequirePackage{etoolbox}
+
 % Boxes and frames
 \RequirePackage[most]{tcolorbox}
 
@@ -438,6 +442,9 @@
 }
 
 \lstset{style=modernstyle}
+
+% Automatically insert FloatBarrier before code listings to prevent figures from interrupting code
+\BeforeBeginEnvironment{lstlisting}{\FloatBarrier}
 
 \newcommand{\code}[1]{\colorbox{lightgray}{\texttt{\small\color{darkgray}#1}}}
 

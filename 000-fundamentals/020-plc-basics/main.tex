@@ -1,0 +1,478 @@
+% ============================================================================
+%  020-plc-basics - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+% Define colors for TikZ (matching template colors)
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {PLC Fundamentals}
+    {Understanding Programmable Logic Controllers in Industrial Environments}
+    {OT Security Learning Series}
+    {Document 020 \quad|\quad January 2026}
+    {OT Security Community}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+A \textbf{Programmable Logic Controller (PLC)} is a ruggedized industrial computer designed to control manufacturing processes, machinery, and other automation equipment. PLCs are the backbone of industrial automation and a critical component in OT security.
+\end{infobox}
+
+PLCs replaced hard-wired relay-based control systems in the late 1960s, offering flexibility, reliability, and programmability. Today, they are found in virtually every industrial sector, from manufacturing and energy to water treatment and transportation.
+
+Understanding PLC architecture, operation, and vulnerabilities is essential for OT security professionals. This document covers the fundamentals of PLC technology from a security perspective.
+
+% ============================================================================
+\section{PLC Architecture}
+% ============================================================================
+
+A PLC consists of several key components working together to monitor inputs, execute control logic, and drive outputs.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    block/.style={rectangle, thick, minimum height=1.1cm, minimum width=2.5cm, rounded corners=3pt, font=\small\bfseries},
+    arrow/.style={->, thick, >=stealth, otprimary},
+    label/.style={font=\scriptsize\itshape, otprimary!70}
+]
+
+% Main PLC Housing
+\draw[very thick, rounded corners=10pt, fill=otprimary!5] (-6,-4) rectangle (6,3.2);
+\node[font=\large\bfseries, otprimary] at (0,2.7) {PLC Architecture};
+
+% Top row modules
+\node[block, draw=otwarning, fill=otwarning!15] (psu) at (-3.5,1.5) {Power Supply};
+\node[block, draw=otsuccess, fill=otsuccess!15] (cpu) at (0,1.5) {CPU};
+\node[block, draw=otaccent, fill=otaccent!15] (comm) at (3.5,1.5) {Comm Module};
+
+% Labels for top row
+\node[label] at (-3.5,0.65) {24V DC / 120V AC};
+\node[label] at (0,0.65) {Logic Processing};
+\node[label] at (3.5,0.65) {Ethernet/Serial};
+
+% Backplane Bus
+\draw[very thick, otprimary!40, line cap=round] (-5.2,0) -- (5.2,0);
+\node[label, fill=otprimary!5, inner sep=2pt] at (0,0) {Backplane / Bus};
+
+% Bottom row modules
+\node[block, draw=otinfo, fill=otinfo!15] (input) at (-3,-2) {Input Module};
+\node[block, draw=otprimary!70, fill=otprimary!10] (mem) at (0,-2) {Memory};
+\node[block, draw=otdanger, fill=otdanger!15] (output) at (3,-2) {Output Module};
+
+% Labels for bottom row
+\node[label] at (-3,-2.85) {Digital \& Analog};
+\node[label] at (0,-2.85) {Program + Data};
+\node[label] at (3,-2.85) {Digital \& Analog};
+
+% Vertical connections to backplane
+\draw[thick, otprimary!60] (psu.south) -- (-3.5,0);
+\draw[thick, otprimary!60] (cpu.south) -- (0,0);
+\draw[thick, otprimary!60] (comm.south) -- (3.5,0);
+\draw[thick, otprimary!60] (input.north) -- (-3,0);
+\draw[thick, otprimary!60] (mem.north) -- (0,0);
+\draw[thick, otprimary!60] (output.north) -- (3,0);
+
+% External connections
+\draw[arrow, otinfo] (-7,-2) -- (input.west) node[midway, above, font=\tiny] {Sensors};
+\draw[arrow, otdanger] (output.east) -- (7,-2) node[midway, above, font=\tiny] {Actuators};
+\draw[arrow, <->, otaccent] (comm.east) -- (7,1.5) node[midway, above, font=\tiny] {Network};
+
+\end{tikzpicture}
+\caption{PLC Hardware Architecture}
+\end{figure}
+
+\subsection{Central Processing Unit (CPU)}
+
+The CPU is the brain of the PLC, responsible for:
+\begin{itemize}
+    \item Executing the control program (ladder logic, function blocks, etc.)
+    \item Managing memory and data storage
+    \item Handling communication with other devices
+    \item Performing diagnostic functions
+\end{itemize}
+
+\subsection{Memory Types}
+
+PLCs use several types of memory:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Type} & \textbf{Purpose} & \textbf{Persistence} \\
+\hline
+RAM & Runtime data, I/O status & Volatile \\
+ROM/EPROM & Firmware, operating system & Non-volatile \\
+Flash & User program storage & Non-volatile \\
+Battery-backed RAM & Retentive data & Semi-persistent \\
+\hline
+\end{tabular}
+\caption{PLC Memory Types}
+\end{table}
+
+\subsection{Input/Output Modules}
+
+\begin{definitionbox}{I/O Modules}
+I/O modules are the interface between the PLC and the physical world. They convert electrical signals from sensors into data the CPU can process, and convert CPU commands into signals that control actuators.
+\end{definitionbox}
+
+\textbf{Digital I/O:}
+\begin{itemize}
+    \item Discrete on/off signals (24V DC, 120V AC)
+    \item Examples: pushbuttons, limit switches, indicator lights, solenoids
+\end{itemize}
+
+\textbf{Analog I/O:}
+\begin{itemize}
+    \item Continuous signals (4-20mA, 0-10V)
+    \item Examples: temperature sensors, pressure transmitters, variable speed drives
+\end{itemize}
+
+% ============================================================================
+\section{PLC Scan Cycle}
+% ============================================================================
+
+The PLC operates in a continuous loop called the \textbf{scan cycle}. Understanding this cycle is crucial for both programming and security analysis.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    stage/.style={rectangle, draw=otaccent, fill=otaccent!15, thick, minimum height=1.5cm, minimum width=3.5cm, rounded corners=5pt, font=\small\bfseries, align=center},
+    arrow/.style={->, very thick, >=stealth, otprimary}
+]
+
+% Stages in a circle
+\node[stage, fill=otinfo!20, draw=otinfo] (read) at (0,3) {1. Read Inputs\\{\footnotesize Scan input modules}};
+\node[stage, fill=otsuccess!20, draw=otsuccess] (exec) at (4,0) {2. Execute Program\\{\footnotesize Process logic}};
+\node[stage, fill=otwarning!20, draw=otwarning] (write) at (0,-3) {3. Write Outputs\\{\footnotesize Update outputs}};
+\node[stage, fill=otdanger!20, draw=otdanger] (diag) at (-4,0) {4. Diagnostics\\{\footnotesize Comms \& housekeeping}};
+
+% Arrows
+\draw[arrow] (read.east) to[bend left=20] (exec.north);
+\draw[arrow] (exec.south) to[bend left=20] (write.east);
+\draw[arrow] (write.west) to[bend left=20] (diag.south);
+\draw[arrow] (diag.north) to[bend left=20] (read.west);
+
+% Center label
+\node[font=\large\bfseries, otprimary] at (0,0) {Scan Cycle};
+\node[font=\footnotesize, otprimary!70] at (0,-0.5) {Typical: 1-100ms};
+
+\end{tikzpicture}
+\caption{PLC Scan Cycle}
+\end{figure}
+
+\begin{warningbox}
+\textbf{Security Implication:} The scan cycle time affects how quickly a PLC can respond to malicious commands or anomalies. Attackers can time their actions between scan cycles to avoid detection.
+\end{warningbox}
+
+\subsection{Scan Time Considerations}
+
+\begin{itemize}
+    \item \textbf{Fast processes} require short scan times (< 10ms)
+    \item \textbf{Complex programs} increase scan time
+    \item \textbf{Watchdog timers} reset the PLC if scan time exceeds limits
+    \item \textbf{Interrupts} can preempt the normal scan for time-critical tasks
+\end{itemize}
+
+% ============================================================================
+\section{Programming Languages}
+% ============================================================================
+
+The IEC 61131-3 standard defines five programming languages for PLCs:
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    lang/.style={rectangle, draw=otprimary, fill=otprimary!10, thick, minimum height=1cm, minimum width=2.5cm, rounded corners=3pt, font=\small\bfseries},
+    desc/.style={font=\tiny, align=center, text width=2.5cm}
+]
+
+% Languages
+\node[lang, fill=otsuccess!20] (ld) at (0,0) {Ladder Diagram};
+\node[lang, fill=otinfo!20] (fbd) at (3.5,0) {Function Block};
+\node[lang, fill=otwarning!20] (st) at (7,0) {Structured Text};
+\node[lang, fill=otdanger!20] (il) at (10.5,0) {Instruction List};
+\node[lang, fill=otaccent!20] (sfc) at (5.25,-2) {Sequential Function Chart};
+
+% Descriptions
+\node[desc] at (0,-0.8) {Graphical\\Relay-based};
+\node[desc] at (3.5,-0.8) {Graphical\\Block diagrams};
+\node[desc] at (7,-0.8) {Textual\\Pascal-like};
+\node[desc] at (10.5,-0.8) {Textual\\Assembly-like};
+\node[desc] at (5.25,-2.8) {Graphical, State-machine};
+
+% Categories - box around Ladder Diagram and Function Block
+\draw[thick, otsuccess, rounded corners] (-1.5,0.8) rectangle (5.2,-1.4);
+\node[font=\tiny\bfseries, otsuccess] at (1.85,1.0) {Most Common};
+
+\end{tikzpicture}
+\caption{IEC 61131-3 Programming Languages}
+\end{figure}
+
+\subsection{Ladder Diagram (LD)}
+
+Ladder logic is the most widely used PLC programming language, especially in North America. It resembles electrical relay schematics.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    contact/.style={font=\footnotesize},
+    coil/.style={font=\footnotesize}
+]
+
+% Power rails
+\draw[very thick, otprimary] (0,2) -- (0,-1);
+\draw[very thick, otprimary] (8,2) -- (8,-1);
+\node[font=\tiny, otprimary] at (0,2.3) {L1};
+\node[font=\tiny, otprimary] at (8,2.3) {L2};
+
+% Rung 1
+\draw[thick] (0,1.5) -- (1,1.5);
+% NO Contact
+\draw[thick] (1,1.2) -- (1,1.8);
+\draw[thick] (1.5,1.2) -- (1.5,1.8);
+\draw[thick] (1.5,1.5) -- (3,1.5);
+\node[contact, above] at (1.25,1.8) {START};
+% NC Contact
+\draw[thick] (3,1.2) -- (3,1.8);
+\draw[thick] (3.5,1.2) -- (3.5,1.8);
+\draw[thick] (3,1.8) -- (3.5,1.2);
+\draw[thick] (3.5,1.5) -- (5.5,1.5);
+\node[contact, above] at (3.25,1.8) {STOP};
+% Coil
+\draw[thick] (5.5,1.5) circle (0.3);
+\draw[thick] (5.8,1.5) -- (8,1.5);
+\node[coil, above] at (5.5,1.9) {MOTOR};
+
+% Rung 2 - Seal-in
+\draw[thick] (0,0) -- (1,0);
+\draw[thick] (1,-0.3) -- (1,0.3);
+\draw[thick] (1.5,-0.3) -- (1.5,0.3);
+\draw[thick] (1.5,0) -- (3,0);
+\node[contact, above] at (1.25,0.3) {MOTOR};
+% Connect to rung 1
+\draw[thick] (3,0) -- (3,1.5);
+
+% Labels
+\node[font=\tiny\itshape, otprimary!70] at (4,-0.8) {Basic Motor Start/Stop Circuit};
+
+\end{tikzpicture}
+\caption{Ladder Logic Example}
+\end{figure}
+
+\subsection{Structured Text (ST)}
+
+Structured Text is a high-level textual language similar to Pascal or C:
+
+\begin{lstlisting}[language=Pascal, caption=Structured Text Example]
+IF Start_Button AND NOT Stop_Button THEN
+    Motor := TRUE;
+    Run_Time := Run_Time + Scan_Time;
+ELSIF Stop_Button OR Emergency_Stop THEN
+    Motor := FALSE;
+END_IF;
+\end{lstlisting}
+
+% ============================================================================
+\section{Communication Protocols}
+% ============================================================================
+
+Modern PLCs support various communication protocols for integration with other systems:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Protocol} & \textbf{Use Case} & \textbf{Security Level} \\
+\hline
+Modbus TCP/RTU & Legacy systems, simple I/O & \risklow None built-in \\
+EtherNet/IP & Rockwell/Allen-Bradley & \riskmedium Optional CIP Security \\
+PROFINET & Siemens environments & \riskmedium TLS available \\
+OPC UA & Modern integration & \riskhigh Built-in security \\
+\hline
+\end{tabular}
+\caption{Common PLC Communication Protocols}
+\end{table}
+
+\begin{dangerbox}
+\textbf{Critical Security Gap:} Many legacy protocols like Modbus have \textbf{no authentication or encryption}. Anyone with network access can read/write PLC registers and potentially cause physical damage.
+\end{dangerbox}
+
+% ============================================================================
+\section{PLC Security Considerations}
+% ============================================================================
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    threat/.style={rectangle, draw=otdanger, fill=otdanger!10, thick, minimum height=0.8cm, minimum width=3cm, rounded corners=3pt, font=\small},
+    control/.style={rectangle, draw=otsuccess, fill=otsuccess!10, thick, minimum height=0.8cm, minimum width=3cm, rounded corners=3pt, font=\small},
+    arrow/.style={->, thick, >=stealth}
+]
+
+% PLC in center
+\node[rectangle, draw=otprimary, fill=otprimary!20, very thick, minimum height=2cm, minimum width=2.5cm, rounded corners=5pt, font=\bfseries] (plc) at (0,0) {PLC};
+
+% Threats
+\node[threat] (t1) at (-5,2) {Unauthorized Access};
+\node[threat] (t2) at (-5,0.5) {Malicious Code};
+\node[threat] (t3) at (-5,-1) {DoS Attacks};
+\node[threat] (t4) at (-5,-2.5) {Man-in-the-Middle};
+
+% Controls
+\node[control] (c1) at (5,2) {Network Segmentation};
+\node[control] (c2) at (5,0.5) {Access Control};
+\node[control] (c3) at (5,-1) {Firmware Updates};
+\node[control] (c4) at (5,-2.5) {Monitoring/IDS};
+
+% Arrows
+\draw[arrow, otdanger] (t1) -- (plc);
+\draw[arrow, otdanger] (t2) -- (plc);
+\draw[arrow, otdanger] (t3) -- (plc);
+\draw[arrow, otdanger] (t4) -- (plc);
+
+\draw[arrow, otsuccess] (c1) -- (plc);
+\draw[arrow, otsuccess] (c2) -- (plc);
+\draw[arrow, otsuccess] (c3) -- (plc);
+\draw[arrow, otsuccess] (c4) -- (plc);
+
+% Labels
+\node[font=\small\bfseries, otdanger] at (-5,3) {Threats};
+\node[font=\small\bfseries, otsuccess] at (5,3) {Controls};
+
+\end{tikzpicture}
+\caption{PLC Security: Threats and Controls}
+\end{figure}
+
+\subsection{Common Vulnerabilities}
+
+\begin{itemize}
+    \item \textbf{Default credentials} -- Many PLCs ship with known default passwords
+    \item \textbf{Insecure protocols} -- Modbus, older EtherNet/IP lack authentication
+    \item \textbf{No encryption} -- Program uploads/downloads often unencrypted
+    \item \textbf{Limited logging} -- Most PLCs have minimal audit capabilities
+    \item \textbf{Firmware vulnerabilities} -- Buffer overflows, hardcoded keys
+    \item \textbf{Physical access} -- USB ports, serial connections often unprotected
+\end{itemize}
+
+\subsection{Security Best Practices}
+
+\begin{successbox}
+\textbf{Key Security Controls for PLCs:}
+\begin{enumerate}
+    \item Change default passwords immediately
+    \item Segment PLC networks from IT/business networks
+    \item Disable unnecessary services and ports
+    \item Implement network monitoring and anomaly detection
+    \item Maintain firmware update procedures
+    \item Use encrypted protocols where available (OPC UA, CIP Security)
+    \item Restrict physical access to PLC hardware
+    \item Back up PLC programs regularly and verify integrity
+\end{enumerate}
+\end{successbox}
+
+% ============================================================================
+\section{Major PLC Vendors}
+% ============================================================================
+
+Understanding vendor-specific implementations helps with security assessments:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Vendor} & \textbf{Product Lines} & \textbf{Common Industries} \\
+\hline
+Siemens & S7-300/400/1200/1500 & Manufacturing, Energy \\
+Rockwell/Allen-Bradley & ControlLogix, CompactLogix & Automotive, Food \& Beverage \\
+Schneider Electric & Modicon M340/M580 & Water, Building Automation \\
+Mitsubishi & MELSEC iQ-R/F & Electronics, Automotive \\
+ABB & AC500 & Process Industries \\
+Omron & NX/NJ Series & Packaging, Assembly \\
+\hline
+\end{tabular}
+\caption{Major PLC Vendors and Applications}
+\end{table}
+
+% ============================================================================
+\section{PLC vs. Other Controllers}
+% ============================================================================
+
+\begin{conceptbox}{Controller Types Comparison}
+\begin{itemize}
+    \item \textbf{PLC} -- Discrete/hybrid control, fast I/O, rugged, ladder logic
+    \item \textbf{DCS} -- Process control, continuous processes, integrated HMI
+    \item \textbf{RTU} -- Remote sites, telemetry, low power, wide-area comms
+    \item \textbf{PAC} -- Combines PLC + PC capabilities, complex applications
+    \item \textbf{Safety PLC} -- SIL-rated, redundant, for safety instrumented systems
+\end{itemize}
+\end{conceptbox}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item PLCs are specialized industrial computers that control physical processes
+    \item They operate in a continuous scan cycle: read inputs, execute logic, write outputs
+    \item IEC 61131-3 defines five programming languages; ladder logic is most common
+    \item Many PLCs use insecure legacy protocols without authentication
+    \item Security controls include network segmentation, access control, and monitoring
+    \item Understanding PLC architecture is essential for OT security assessments
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Standards and Guidelines}
+
+\begin{itemize}
+    \item \textbf{IEC 61131-3} -- Programmable controllers - Programming languages\\
+          \url{https://www.iec.ch/}
+    \item \textbf{IEC 62443} -- Industrial communication networks - Security\\
+          \url{https://www.isa.org/standards-and-publications/isa-standards/isa-iec-62443-series-of-standards}
+    \item \textbf{NIST SP 800-82} -- Guide to ICS Security\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{CISA ICS Advisories} -- Vendor-specific PLC vulnerabilities\\
+          \url{https://www.cisa.gov/news-events/cybersecurity-advisories}
+    \item \textbf{PLCopen} -- PLC programming standards organization\\
+          \url{https://www.plcopen.org/}
+\end{itemize}
+
+\subsection*{Books}
+
+\begin{itemize}
+    \item Bolton -- \textit{Programmable Logic Controllers} (Newnes)
+    \item Petruzella -- \textit{Programmable Logic Controllers} (McGraw-Hill)
+    \item Knapp \& Langill -- \textit{Industrial Network Security} (Syngress)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}
