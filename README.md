@@ -1,29 +1,94 @@
-# OT Security Learning Notes
+<div align="center">
 
-A collection of learning documents covering Operational Technology (OT) and Industrial Control System (ICS) security topics.
+```
+   ____  _______   _____           _   _       _
+  / __ \|__   __| / ____|         | \ | |     | |
+ | |  | |  | |   | (___   ___  ___|  \| | ___ | |_ ___  ___
+ | |  | |  | |    \___ \ / _ \/ __| . ` |/ _ \| __/ _ \/ __|
+ | |__| |  | |    ____) |  __/ (__| |\  | (_) | ||  __/\__ \
+  \____/   |_|   |_____/ \___|\___|_| \_|\___/ \__\___||___/
+```
+
+### Operational Technology Security Learning Series
+
+[![Build PDFs](https://github.com/mniedermaier/OTsecNotes/actions/workflows/build-pdfs.yml/badge.svg)](https://github.com/mniedermaier/OTsecNotes/actions/workflows/build-pdfs.yml)
+[![LaTeX](https://img.shields.io/badge/Made%20with-LaTeX-1f425f.svg)](https://www.latex-project.org/)
+[![License: CC BY-SA 4.0](https://img.shields.io/badge/License-CC%20BY--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-sa/4.0/)
+[![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://mniedermaier.github.io/OTsecNotes/)
+
+</div>
+
+---
+
+## About This Project
+
+This repository contains a comprehensive collection of professionally formatted learning documents focused on **Operational Technology (OT)** and **Industrial Control System (ICS)** security. The documents are designed to provide clear, vendor-neutral educational content for security professionals, engineers, and students working with critical infrastructure.
+
+Each document covers a specific topic in depth, ranging from foundational concepts like the Purdue Model to advanced subjects such as incident response procedures and security assessments. The series draws from established standards including **IEC 62443**, **NIST SP 800-82**, and real-world case studies of significant OT security incidents.
+
+All documents share a consistent, modern design through a custom LaTeX template featuring color-coded information boxes, security level indicators, and professional typography. The build system automatically detects new documents and generates PDFs through GitHub Actions, making contributions straightforward.
+
+> **Quick Access:** Browse all documents at [mniedermaier.github.io/OTsecNotes](https://mniedermaier.github.io/OTsecNotes/)
+
+---
+
+## Highlights
+
+| | Feature |
+|:---:|:---|
+| :shield: | **Vendor-Neutral** — Focus on concepts and standards, not specific products |
+| :book: | **17+ Documents** — Covering fundamentals to advanced topics |
+| :art: | **Professional Design** — Consistent styling with custom LaTeX template |
+| :gear: | **Auto-Build** — GitHub Actions automatically generates PDFs |
+| :scroll: | **Standards-Based** — References IEC 62443, NIST 800-82, and more |
+| :warning: | **Real Case Studies** — Analysis of Stuxnet, TRITON, Ukraine attacks |
+
+---
 
 ## Document Categories
 
 Documents are organized by category using a three-digit numbering scheme:
 
 | Range | Category | Description |
-|-------|----------|-------------|
-| **001-099** | Fundamentals | Core concepts, models, and OT basics |
-| **100-199** | Standards & Compliance | IEC 62443, NIST 800-82, NERC CIP, etc. |
-| **200-299** | Protocols & Technologies | Modbus, DNP3, OPC UA, EtherNet/IP, etc. |
-| **300-399** | Architecture & Design | Network segmentation, DMZ design, secure remote access |
-| **400-499** | Threats & Attacks | Attack vectors, case studies, threat landscape |
-| **500-599** | Detection & Monitoring | OT IDS, network monitoring, anomaly detection |
-| **600-699** | Incident Response | IR procedures, forensics, recovery |
-| **700-799** | Assessments | Penetration testing, risk assessment, audits |
-| **800-899** | Solutions & Tools | Firewalls, data diodes, practical implementations |
+|:------|:---------|:------------|
+| **001-099** | :bulb: Fundamentals | Core concepts, models, and OT basics |
+| **100-199** | :scroll: Standards & Compliance | IEC 62443, NIST 800-82, NERC CIP, etc. |
+| **200-299** | :electric_plug: Protocols & Technologies | Modbus, DNP3, OPC UA, EtherNet/IP, etc. |
+| **300-399** | :bricks: Architecture & Design | Network segmentation, DMZ design, secure remote access |
+| **400-499** | :skull: Threats & Attacks | Attack vectors, case studies, threat landscape |
+| **500-599** | :mag: Detection & Monitoring | OT IDS, network monitoring, anomaly detection |
+| **600-699** | :fire_extinguisher: Incident Response | IR procedures, forensics, recovery |
+| **700-799** | :clipboard: Assessments | Penetration testing, risk assessment, audits |
+| **800-899** | :hammer_and_wrench: Solutions & Tools | Firewalls, data diodes, practical implementations |
+
+---
+
+## Quick Start
+
+```bash
+# Clone the repository
+git clone https://github.com/mniedermaier/OTsecNotes.git
+cd OTsecNotes
+
+# Build all documents
+make all
+
+# Or build in parallel for faster compilation
+make parallel
+
+# Create a new document
+make new NAME=250-new-protocol
+```
+
+---
 
 ## Current Documents
 
-Documents are auto-detected from the repository. Run `make list` to see all available documents.
+<details>
+<summary><strong>Click to expand document list</strong> (17 documents)</summary>
 
 | Document | Title | Category |
-|----------|-------|----------|
+|:---------|:------|:---------|
 | 001-it-vs-ot | IT vs OT | Fundamentals |
 | 010-purdue-model | The Purdue Model | Fundamentals |
 | 100-standards-overview | OT Security Standards Overview | Standards & Compliance |
@@ -42,6 +107,10 @@ Documents are auto-detected from the repository. Run `make list` to see all avai
 | 700-ot-risk-assessment | OT Risk Assessment | Assessments |
 | 810-application-whitelisting | Application Whitelisting & System Lockdown | Solutions & Tools |
 
+</details>
+
+---
+
 ## Project Structure
 
 ```
@@ -57,6 +126,8 @@ OTsecNotes/
 ├── Makefile                  # Build system (auto-detects documents)
 └── README.md
 ```
+
+---
 
 ## Building Documents
 
@@ -104,6 +175,8 @@ make new NAME=XXX-topic-name
 
 New documents are automatically detected on the next build - no need to edit the Makefile.
 
+---
+
 ## Template Features
 
 The shared template (`templates/otsec-template.sty`) provides:
@@ -127,12 +200,16 @@ The shared template (`templates/otsec-template.sty`) provides:
     {Contributor 1, Contributor 2}
 ```
 
+---
+
 ## Contributing
 
 1. Create a new document using `make new NAME=XXX-topic-name`
 2. Choose the appropriate category number range
 3. Add your content to `XXX-topic-name/main.tex`
 4. Build and verify with `make XXX-topic-name`
+
+---
 
 ## CI/CD
 
@@ -148,10 +225,22 @@ PDFs are automatically built on every push to `main` using GitHub Actions. New d
 1. Go to repository Settings → Pages
 2. Set Source to "GitHub Actions"
 
+---
+
 ## License
 
-This project is for educational purposes.
+This work is licensed under a [Creative Commons Attribution-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-sa/4.0/).
+
+---
 
 ## Disclaimer
 
-This content was created with the assistance of AI. While every effort has been made to ensure accuracy, this material is provided on a best-effort basis without any guarantees for correctness or completeness. Always verify critical information against official sources and current standards documents before applying it in production environments.
+> :robot: This content was created with the assistance of AI. While every effort has been made to ensure accuracy, this material is provided on a best-effort basis without any guarantees for correctness or completeness. Always verify critical information against official sources and current standards documents before applying it in production environments.
+
+---
+
+<div align="center">
+
+**[Browse Documents](https://mniedermaier.github.io/OTsecNotes/)** · **[Report Issue](https://github.com/mniedermaier/OTsecNotes/issues)** · **[Request Document](https://github.com/mniedermaier/OTsecNotes/issues/new?template=new-document-request.yml)**
+
+</div>
