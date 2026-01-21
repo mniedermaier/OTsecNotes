@@ -19,9 +19,7 @@
 
 This repository contains a comprehensive collection of professionally formatted learning documents focused on **Operational Technology (OT)** and **Industrial Control System (ICS)** security. The documents are designed to provide clear, vendor-neutral educational content for security professionals, engineers, and students working with critical infrastructure.
 
-Each document covers a specific topic in depth, ranging from foundational concepts like the Purdue Model to advanced subjects such as incident response procedures and security assessments. The series draws from established standards including **IEC 62443**, **NIST SP 800-82**, and real-world case studies of significant OT security incidents.
-
-All documents share a consistent, modern design through a custom LaTeX template featuring color-coded information boxes, security level indicators, and professional typography. The build system automatically detects new documents and generates PDFs through GitHub Actions, making contributions straightforward.
+Each document covers a specific topic in depth, ranging from foundational concepts like the Purdue Model to advanced subjects such as incident response procedures and security assessments. The series draws from established standards including **IEC 62443**, **NIST SP 800-82**, and real-world case studies of significant OT security incidents. All documents are kept concise and focused — **under 10 pages each** — making them quick to read while still providing essential knowledge.
 
 > **Quick Access:** Browse all documents at [mniedermaier.github.io/OTsecNotes](https://mniedermaier.github.io/OTsecNotes/)
 
