@@ -282,6 +282,15 @@ jobs:
                 padding: 1.25rem 1.5rem;
                 background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.5) 100%);
                 border-bottom: 1px solid var(--border);
+                cursor: pointer;
+                user-select: none;
+                transition: background 0.2s ease;
+              }
+              .category-header:hover {
+                background: linear-gradient(135deg, rgba(40, 51, 69, 0.6) 0%, rgba(25, 33, 52, 0.6) 100%);
+              }
+              .category.collapsed .category-header {
+                border-bottom: none;
               }
               .category-icon {
                 font-size: 1.75rem;
@@ -295,8 +304,16 @@ jobs:
                 border: 1px solid rgba(255,255,255,0.1);
               }
               .category-title { font-size: 1.2rem; font-weight: 600; color: var(--text); }
-              .category-range {
+              .category-toggle {
                 margin-left: auto;
+                font-size: 1.2rem;
+                color: var(--text-muted);
+                transition: transform 0.3s ease;
+              }
+              .category.collapsed .category-toggle {
+                transform: rotate(-90deg);
+              }
+              .category-range {
                 font-size: 0.8rem;
                 color: var(--text-muted);
                 font-family: monospace;
@@ -305,7 +322,17 @@ jobs:
                 border-radius: 8px;
                 border: 1px solid var(--border);
               }
-              .doc-list { list-style: none; }
+              .doc-list {
+                list-style: none;
+                max-height: 2000px;
+                overflow: hidden;
+                transition: max-height 0.4s ease, opacity 0.3s ease;
+                opacity: 1;
+              }
+              .category.collapsed .doc-list {
+                max-height: 0;
+                opacity: 0;
+              }
               .doc-item {
                 display: flex;
                 align-items: center;
@@ -432,10 +459,11 @@ jobs:
 
             if [ -n "$pdfs" ]; then
               echo "            <div class=\"category\" data-category=\"$category_name\">" >> public/index.html
-              echo "              <div class=\"category-header\">" >> public/index.html
+              echo "              <div class=\"category-header\" onclick=\"this.parentElement.classList.toggle('collapsed')\">" >> public/index.html
               echo "                <span class=\"category-icon\">$category_icon</span>" >> public/index.html
               echo "                <span class=\"category-title\">$category_name</span>" >> public/index.html
               echo "                <span class=\"category-range\">$range</span>" >> public/index.html
+              echo "                <span class=\"category-toggle\">▼</span>" >> public/index.html
               echo "              </div>" >> public/index.html
               echo "              <ul class=\"doc-list\">" >> public/index.html
 
