@@ -1,6 +1,9 @@
 # Build directory (used by Makefile)
 build/
 
+# Local preview directory
+preview/
+
 # Generated PDFs (built via CI/CD, available on GitHub Pages)
 [0-9][0-9][0-9]-*/[0-9][0-9][0-9]-*/*.pdf
 
