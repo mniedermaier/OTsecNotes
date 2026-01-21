@@ -263,7 +263,15 @@ jobs:
                 margin: 0 auto;
                 padding: 2rem 1.5rem 4rem;
               }
-              .search-box { margin-bottom: 2.5rem; }
+              .controls {
+                display: flex;
+                gap: 1rem;
+                margin-bottom: 2.5rem;
+                align-items: center;
+              }
+              .search-box {
+                flex: 1;
+              }
               .search-box input {
                 width: 100%;
                 padding: 1.1rem 1.5rem;
@@ -284,6 +292,26 @@ jobs:
                 background: rgba(30, 41, 59, 0.9);
               }
               .search-box input::placeholder { color: var(--text-muted); }
+              .toggle-btn {
+                padding: 1.1rem 1.5rem;
+                font-size: 0.95rem;
+                font-weight: 600;
+                border: 1px solid var(--border);
+                border-radius: 16px;
+                background: rgba(30, 41, 59, 0.7);
+                color: var(--text);
+                cursor: pointer;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+                backdrop-filter: blur(20px);
+                white-space: nowrap;
+              }
+              .toggle-btn:hover {
+                border-color: var(--accent);
+                background: rgba(14, 165, 233, 0.2);
+                transform: translateY(-2px);
+                box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+              }
               .categories { display: grid; gap: 1.75rem; }
               .category {
                 background: var(--card-bg);
@@ -439,8 +467,11 @@ jobs:
               </div>
             </header>
             <main class="container">
-              <div class="search-box">
-                <input type="text" id="search" placeholder="🔍 Search documents..." autocomplete="off">
+              <div class="controls">
+                <div class="search-box">
+                  <input type="text" id="search" placeholder="🔍 Search documents..." autocomplete="off">
+                </div>
+                <button class="toggle-btn" id="toggle-all" onclick="toggleAll()">Collapse All</button>
               </div>
               <div class="categories" id="categories">
           HTMLEOF
@@ -525,6 +556,23 @@ jobs:
               <p style="margin-top: 0.5rem;">🤖 Created with AI assistance · Licensed under CC BY-SA 4.0</p>
             </footer>
             <script>
+              // Toggle all categories expand/collapse
+              function toggleAll() {
+                const categories = document.querySelectorAll('.category');
+                const btn = document.getElementById('toggle-all');
+                const allCollapsed = Array.from(categories).every(c => c.classList.contains('collapsed'));
+
+                categories.forEach(cat => {
+                  if (allCollapsed) {
+                    cat.classList.remove('collapsed');
+                  } else {
+                    cat.classList.add('collapsed');
+                  }
+                });
+
+                btn.textContent = allCollapsed ? 'Collapse All' : 'Expand All';
+              }
+
               const canvas = document.getElementById('particles-canvas');
               const ctx = canvas.getContext('2d');
               let particles = [];
