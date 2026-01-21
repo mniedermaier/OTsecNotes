@@ -1,0 +1,357 @@
+% ============================================================================
+%  030-hmi-scada-basics - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+% Define colors for TikZ (matching template colors)
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {HMI and SCADA Fundamentals}
+    {Understanding operator interfaces and supervisory control systems}
+    {OT Security Learning Series}
+    {Document 030 \quad|\quad January 2026}
+    {AI Assistant}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+Human-Machine Interfaces (HMIs) and Supervisory Control and Data Acquisition (SCADA) systems form the critical bridge between human operators and industrial processes. Understanding these systems is essential for securing operational technology environments.
+\end{infobox}
+
+HMIs and SCADA systems serve as the ``eyes and hands'' of operators in industrial environments. While PLCs and RTUs execute control logic at the field level, HMIs and SCADA provide the visualization, monitoring, and high-level control capabilities that enable operators to oversee complex processes.
+
+\textbf{Key distinctions:}
+\begin{itemize}
+    \item \textbf{HMI} -- Local operator interface for a specific process or machine
+    \item \textbf{SCADA} -- Distributed system for monitoring and controlling geographically dispersed assets
+\end{itemize}
+
+% ============================================================================
+\section{Human-Machine Interface (HMI)}
+% ============================================================================
+
+An HMI is a device or software application that presents process data to operators and accepts control inputs. HMIs range from simple panel displays to sophisticated touchscreen workstations.
+
+\subsection{HMI Components}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    block/.style={rectangle, draw, thick, minimum height=1cm, minimum width=2.8cm, rounded corners=3pt, font=\small},
+    arrow/.style={->, thick, >=stealth}
+]
+
+% HMI Software layers
+\node[block, fill=otaccent!20] (display) at (0,3) {Display Layer};
+\node[block, fill=otinfo!20] (logic) at (0,1.5) {Application Logic};
+\node[block, fill=otsuccess!20] (comm) at (0,0) {Communication Driver};
+
+% Operator
+\node[font=\Large] (operator) at (-4,3) {\faIcon{user}};
+\node[font=\scriptsize, below=0.1cm of operator] {Operator};
+
+% Field devices
+\node[block, fill=otwarning!20, minimum width=2cm] (plc) at (5.5,0) {PLC/RTU};
+
+% Connections
+\draw[<->, thick, >=stealth, otprimary] (operator) -- (display);
+\draw[arrow, otprimary] (display) -- (logic);
+\draw[arrow, otprimary] (logic) -- (comm);
+\draw[<->, thick, >=stealth, otprimary] (comm) -- (plc);
+
+% Labels
+\node[font=\tiny\itshape, otprimary!70, above=-0.1cm of operator] {View \& Input};
+\node[font=\tiny\itshape, otprimary!70, right=0.1cm of display] {Graphics, trends, alarms};
+\node[font=\tiny\itshape, otprimary!70, right=0.1cm of logic] {Scripts, calculations};
+\node[font=\tiny\itshape, otprimary!70, above=0.1cm of plc] {Field Devices};
+
+\end{tikzpicture}
+\caption{HMI Software Architecture}
+\end{figure}
+
+\subsection{HMI Functions}
+
+\begin{itemize}
+    \item \textbf{Process Visualization} -- Graphical representation of equipment, flows, and status
+    \item \textbf{Alarm Management} -- Display and acknowledgment of abnormal conditions
+    \item \textbf{Trend Display} -- Historical and real-time data charts
+    \item \textbf{Control Interface} -- Buttons, setpoint entry, mode selection
+    \item \textbf{Data Logging} -- Recording process values for analysis
+\end{itemize}
+
+\subsection{HMI Types}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Type} & \textbf{Description} & \textbf{Use Case} \\
+\hline
+Panel HMI & Dedicated hardware with touchscreen & Machine-level control \\
+PC-based HMI & Software on Windows/Linux PC & Complex processes \\
+Web HMI & Browser-based interface & Remote monitoring \\
+Mobile HMI & Tablet/smartphone apps & Field operations \\
+\hline
+\end{tabular}
+\caption{Common HMI Types}
+\end{table}
+
+% ============================================================================
+\section{SCADA Systems}
+% ============================================================================
+
+SCADA systems extend beyond local HMIs to provide centralized monitoring and control of distributed infrastructure. They are essential for utilities, pipelines, and other geographically dispersed operations.
+
+\subsection{SCADA Architecture}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    block/.style={rectangle, draw, thick, minimum height=0.9cm, rounded corners=3pt, font=\footnotesize},
+    site/.style={rectangle, draw, thick, dashed, minimum height=2.2cm, minimum width=2.5cm, rounded corners=5pt},
+    arrow/.style={<->, thick, >=stealth}
+]
+
+% Control Center
+\draw[thick, rounded corners=10pt, fill=otprimary!5] (-2.5,2.5) rectangle (2.5,5.5);
+\node[font=\small\bfseries, otprimary] at (0,5.2) {Control Center};
+
+\node[block, fill=otaccent!20, minimum width=2cm] (scada) at (0,4.3) {SCADA Server};
+\node[block, fill=otinfo!20, minimum width=2cm] (hist) at (-1.2,3.2) {Historian};
+\node[block, fill=otsuccess!20, minimum width=2cm] (hmi) at (1.2,3.2) {HMI Clients};
+
+% Communication Network
+\node[draw, thick, fill=otwarning!10, minimum width=6cm, minimum height=0.6cm, rounded corners] (network) at (0,1.5) {Communication Network (WAN/Radio/Cellular)};
+
+% Remote Sites - boxes positioned lower, labels inside
+\node[site, fill=otprimary!3, minimum height=2.5cm] (site1) at (-3.5,-1.0) {};
+\node[font=\scriptsize\bfseries, otprimary] at (-3.5,-0.2) {Remote Site 1};
+\node[block, fill=otwarning!20, minimum width=1.8cm] (rtu1) at (-3.5,-0.9) {RTU};
+\node[font=\tiny] at (-3.5,-1.7) {\faIcon{tachometer-alt} Sensors};
+
+\node[site, fill=otprimary!3, minimum height=2.5cm] (site2) at (0,-1.0) {};
+\node[font=\scriptsize\bfseries, otprimary] at (0,-0.2) {Remote Site 2};
+\node[block, fill=otwarning!20, minimum width=1.8cm] (rtu2) at (0,-0.9) {PLC};
+\node[font=\tiny] at (0,-1.7) {\faIcon{cogs} Actuators};
+
+\node[site, fill=otprimary!3, minimum height=2.5cm] (site3) at (3.5,-1.0) {};
+\node[font=\scriptsize\bfseries, otprimary] at (3.5,-0.2) {Remote Site 3};
+\node[block, fill=otwarning!20, minimum width=1.8cm] (rtu3) at (3.5,-0.9) {IED};
+\node[font=\tiny] at (3.5,-1.7) {\faIcon{bolt} Substation};
+
+% Connections
+\draw[thick, otprimary!60] (scada) -- (hist);
+\draw[thick, otprimary!60] (scada) -- (hmi);
+\draw[arrow, otaccent] (scada) -- (0,1.8);
+\draw[arrow, otaccent] (-3.5,1.2) -- (site1.north);
+\draw[arrow, otaccent] (0,1.2) -- (site2.north);
+\draw[arrow, otaccent] (3.5,1.2) -- (site3.north);
+
+\end{tikzpicture}
+\caption{Typical SCADA System Architecture}
+\end{figure}
+
+\subsection{SCADA Components}
+
+\begin{definitionbox}{Core SCADA Components}
+\begin{itemize}
+    \item \textbf{Master Terminal Unit (MTU)} -- Central SCADA server that polls remote sites
+    \item \textbf{Remote Terminal Unit (RTU)} -- Field device that collects data and executes commands
+    \item \textbf{Communication Infrastructure} -- Network connecting MTU to RTUs
+    \item \textbf{HMI Workstations} -- Operator interface displays
+    \item \textbf{Historian} -- Database for long-term data storage and analysis
+\end{itemize}
+\end{definitionbox}
+
+\subsection{SCADA vs DCS}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Aspect} & \textbf{SCADA} & \textbf{DCS} \\
+\hline
+Geography & Wide area, distributed & Single site, localized \\
+Control & Supervisory (high-level) & Continuous process control \\
+Communication & WAN, radio, cellular & High-speed LAN \\
+Latency tolerance & Seconds to minutes & Milliseconds \\
+Typical industries & Utilities, pipelines, water & Chemical, refining, power gen \\
+\hline
+\end{tabular}
+\caption{SCADA vs DCS Comparison}
+\end{table}
+
+% ============================================================================
+\section{Communication Protocols}
+% ============================================================================
+
+HMI and SCADA systems use various protocols to communicate with field devices:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Protocol} & \textbf{Common Use} & \textbf{Security} \\
+\hline
+Modbus TCP/RTU & Legacy HMI-PLC communication & \risklow None \\
+DNP3 & SCADA for utilities & \riskmedium Optional auth \\
+IEC 61850 & Substation automation & \riskmedium TLS capable \\
+OPC DA/UA & HMI to multiple PLCs & \riskhigh UA has built-in \\
+IEC 60870-5-104 & Power grid SCADA & \riskmedium Optional auth \\
+\hline
+\end{tabular}
+\caption{Common HMI/SCADA Protocols}
+\end{table}
+
+% ============================================================================
+\section{Security Considerations}
+% ============================================================================
+
+\begin{dangerbox}
+HMI and SCADA systems are prime targets for attackers because compromising them provides direct control over physical processes. Many legacy systems were designed without security considerations and remain vulnerable.
+\end{dangerbox}
+
+\subsection{Common Vulnerabilities}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    vuln/.style={rectangle, draw, thick, fill=otdanger!15, minimum height=0.8cm, minimum width=4.5cm, rounded corners=3pt, font=\small}
+]
+
+\node[vuln] (v1) at (0,3) {\faIcon{unlock} Default/Weak Credentials};
+\node[vuln] (v2) at (0,2) {\faIcon{bug} Unpatched Software};
+\node[vuln] (v3) at (0,1) {\faIcon{network-wired} Insecure Protocols};
+\node[vuln] (v4) at (0,0) {\faIcon{eye-slash} Lack of Encryption};
+\node[vuln] (v5) at (0,-1) {\faIcon{user-times} No Authentication};
+\node[vuln] (v6) at (0,-2) {\faIcon{code} SQL/Command Injection};
+
+\end{tikzpicture}
+\caption{Common HMI/SCADA Vulnerabilities}
+\end{figure}
+
+\subsection{Attack Vectors}
+
+\begin{itemize}
+    \item \textbf{Network-based attacks} -- Exploiting exposed SCADA servers or HMIs on corporate networks
+    \item \textbf{Protocol manipulation} -- Injecting malicious commands via insecure protocols
+    \item \textbf{Social engineering} -- Targeting operators with phishing to gain HMI access
+    \item \textbf{Supply chain} -- Compromising HMI software updates or vendor remote access
+    \item \textbf{Insider threats} -- Malicious or negligent actions by authorized users
+\end{itemize}
+
+\subsection{Real-World Incidents}
+
+\begin{warningbox}
+\textbf{Notable HMI/SCADA attacks:}
+\begin{itemize}
+    \item \textbf{Ukraine 2015/2016} -- Attackers used HMI access to open breakers, causing blackouts
+    \item \textbf{Oldsmar 2021} -- Attacker accessed water treatment HMI via remote access, attempted to poison water supply
+    \item \textbf{Colonial Pipeline 2021} -- While ransomware hit IT, SCADA was shut down as precaution
+\end{itemize}
+\end{warningbox}
+
+% ============================================================================
+\section{Security Best Practices}
+% ============================================================================
+
+\subsection{Access Control}
+
+\begin{itemize}
+    \item Implement role-based access control (RBAC) for all HMI users
+    \item Require strong, unique passwords and enforce regular rotation
+    \item Use multi-factor authentication for remote access
+    \item Disable or remove default accounts
+    \item Log all operator actions with timestamps
+\end{itemize}
+
+\subsection{Network Security}
+
+\begin{itemize}
+    \item Isolate HMI/SCADA networks from corporate IT (network segmentation)
+    \item Use firewalls between zones with strict rule sets
+    \item Deploy intrusion detection systems (IDS) tuned for OT protocols
+    \item Encrypt communications where possible (TLS, VPN)
+    \item Disable unnecessary services and ports on HMI workstations
+\end{itemize}
+
+\subsection{System Hardening}
+
+\begin{successbox}
+\textbf{Key hardening measures:}
+\begin{itemize}
+    \item Apply security patches after thorough testing
+    \item Use application whitelisting on HMI workstations
+    \item Disable USB ports and removable media where not needed
+    \item Configure host-based firewalls
+    \item Remove unnecessary software and services
+\end{itemize}
+\end{successbox}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{HMIs} provide local operator interfaces for visualization and control of industrial processes
+    \item \textbf{SCADA systems} enable centralized monitoring of geographically distributed assets
+    \item Both systems sit at \textbf{Purdue Level 2} and are critical for process oversight
+    \item Legacy systems often lack basic security controls like authentication and encryption
+    \item Security requires \textbf{defense in depth}: access control, network segmentation, hardening, and monitoring
+    \item Compromised HMI/SCADA can lead to \textbf{direct physical consequences}
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Standards and Guidelines}
+
+\begin{itemize}
+    \item \textbf{NIST SP 800-82 Rev. 3} -- Guide to OT Security\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+    \item \textbf{IEC 62443-3-3} -- System security requirements and security levels\\
+          \url{https://webstore.iec.ch/publication/7033}
+    \item \textbf{ISA-TR62443-2-3} -- Patch management in IACS environments\\
+          \url{https://www.isa.org/products/isa-tr62443-2-3-2015-security-for-industrial-}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{CISA ICS Advisories} -- Vulnerability alerts for SCADA/HMI products\\
+          \url{https://www.cisa.gov/news-events/cybersecurity-advisories}
+    \item \textbf{SANS ICS Resources} -- Industrial control system security materials\\
+          \url{https://www.sans.org/industrial-control-systems-security/}
+\end{itemize}
+
+\subsection*{Books}
+
+\begin{itemize}
+    \item Bailey, D. \& Wright, E. -- \textit{Practical SCADA for Industry} (Newnes)
+    \item Knapp, E. \& Langill, J. -- \textit{Industrial Network Security} (Syngress)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}
