@@ -25,7 +25,8 @@ jobs:
             texlive-pictures \
             texlive-latex-recommended \
             texlive-lang-greek \
-            latexmk
+            latexmk \
+            poppler-utils
 
       - name: Build all PDFs
         run: make parallel
@@ -35,6 +36,29 @@ jobs:
           mkdir -p pdf-output
           find . -path './[0-9]*-*/[0-9]*-*/*.pdf' -exec cp {} pdf-output/ \;
           ls -la pdf-output/
+
+      - name: Check page count (max 10 pages)
+        run: |
+          MAX_PAGES=10
+          FAILED=0
+          echo "📄 Checking document page counts (max: $MAX_PAGES pages)"
+          echo "================================================"
+          for pdf in pdf-output/*.pdf; do
+            filename=$(basename "$pdf")
+            pages=$(pdfinfo "$pdf" | grep "^Pages:" | awk '{print $2}')
+            if [ "$pages" -gt "$MAX_PAGES" ]; then
+              echo "❌ FAIL: $filename has $pages pages (exceeds $MAX_PAGES)"
+              FAILED=1
+            else
+              echo "✅ OK: $filename ($pages pages)"
+            fi
+          done
+          echo "================================================"
+          if [ "$FAILED" -eq 1 ]; then
+            echo "::error::One or more documents exceed the $MAX_PAGES page limit. Please reduce content."
+            exit 1
+          fi
+          echo "✅ All documents are within the $MAX_PAGES page limit."
 
       - name: Upload PDFs as artifact
         uses: actions/upload-artifact@v4
