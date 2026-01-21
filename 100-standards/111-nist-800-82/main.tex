@@ -1,0 +1,296 @@
+% ============================================================================
+%  NIST SP 800-82 - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+\hypersetup{
+    pdftitle={NIST SP 800-82},
+    pdfsubject={Guide to Operational Technology Security},
+}
+
+\begin{document}
+
+% ----------------------------------------------------------------------------
+%  TITLE PAGE
+% ----------------------------------------------------------------------------
+
+\maketitlepage
+    {NIST SP 800-82}
+    {Guide to Operational Technology Security}
+    {OT Security Learning Series}
+    {Document 111 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+% ----------------------------------------------------------------------------
+%  TABLE OF CONTENTS
+% ----------------------------------------------------------------------------
+
+\tableofcontents
+\newpage
+
+% ----------------------------------------------------------------------------
+%  INTRODUCTION
+% ----------------------------------------------------------------------------
+
+\section{Introduction}
+
+NIST Special Publication 800-82 is the primary U.S. government guidance document for securing Operational Technology (OT) systems, including Industrial Control Systems (ICS), SCADA systems, and Distributed Control Systems (DCS).
+
+\begin{infobox}
+NIST SP 800-82 Revision 3 (2023) represents a significant update, expanding scope from ICS to all OT systems and aligning with the NIST Cybersecurity Framework and SP 800-53.
+\end{infobox}
+
+\subsection{Document Evolution}
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.5cm}p{2cm}p{8.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Version} & \textcolor{white}{\bfseries Year} & \textcolor{white}{\bfseries Key Changes} \\
+\midrule
+Original & 2006 & Initial ICS security guidance \\
+Revision 1 & 2011 & Updated threats, expanded controls \\
+Revision 2 & 2015 & Risk management, ISA/IEC 62443 alignment \\
+Revision 3 & 2023 & OT scope, supply chain, cloud, CSF alignment \\
+\end{tabular}
+\end{center}
+
+\subsection{Why NIST 800-82 Matters}
+
+\begin{itemize}
+    \item \textbf{Authoritative:} Primary U.S. federal guidance for OT security
+    \item \textbf{Comprehensive:} Covers threats, vulnerabilities, and countermeasures
+    \item \textbf{Practical:} Provides implementation guidance and overlay controls
+    \item \textbf{Referenced:} Used by regulators, auditors, and industry worldwide
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  DOCUMENT STRUCTURE
+% ----------------------------------------------------------------------------
+
+\section{Document Structure}
+
+NIST SP 800-82 Rev. 3 is organized into six main sections:
+
+\begin{conceptbox}{Document Organization}
+\begin{enumerate}
+    \item \textbf{Introduction:} Purpose, scope, and document structure
+    \item \textbf{OT Overview:} System types, architectures, and components
+    \item \textbf{OT Risk Management:} Risk assessment and management approaches
+    \item \textbf{OT Security Program:} Governance, policies, and procedures
+    \item \textbf{OT Security Architecture:} Network design and segmentation
+    \item \textbf{Security Controls:} OT-specific control recommendations
+\end{enumerate}
+\end{conceptbox}
+
+% ----------------------------------------------------------------------------
+%  OT SYSTEM OVERVIEW
+% ----------------------------------------------------------------------------
+
+\section{OT System Overview}
+
+\subsection{System Types Covered}
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{9.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries System Type} & \textcolor{white}{\bfseries Description} \\
+\midrule
+SCADA & Supervisory Control and Data Acquisition for distributed assets \\
+DCS & Distributed Control Systems for process manufacturing \\
+PLC/RTU & Programmable controllers for local automation \\
+SIS & Safety Instrumented Systems for emergency shutdown \\
+BAS/BMS & Building Automation and Management Systems \\
+IIoT & Industrial Internet of Things devices and sensors \\
+\end{tabular}
+\end{center}
+
+\subsection{Key Differences: IT vs OT}
+
+\begin{warningbox}
+NIST 800-82 emphasizes that OT environments have different priorities:
+\begin{itemize}
+    \item \textbf{Availability} is typically the highest priority (not confidentiality)
+    \item \textbf{Safety} considerations may override security decisions
+    \item \textbf{Legacy systems} often cannot be patched or upgraded
+    \item \textbf{Real-time requirements} limit security control options
+\end{itemize}
+\end{warningbox}
+
+% ----------------------------------------------------------------------------
+%  RISK MANAGEMENT
+% ----------------------------------------------------------------------------
+
+\section{Risk Management}
+
+\subsection{Risk Assessment Process}
+
+NIST 800-82 recommends a structured risk assessment approach:
+
+\begin{enumerate}
+    \item \textbf{System characterization:} Identify OT assets and boundaries
+    \item \textbf{Threat identification:} Determine relevant threat sources
+    \item \textbf{Vulnerability identification:} Assess system weaknesses
+    \item \textbf{Impact analysis:} Evaluate consequences of compromise
+    \item \textbf{Risk determination:} Calculate risk levels
+    \item \textbf{Control recommendations:} Select appropriate mitigations
+\end{enumerate}
+
+\subsection{Threat Sources}
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{9.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Threat Source} & \textcolor{white}{\bfseries Characteristics} \\
+\midrule
+Nation-states & Advanced capabilities, strategic objectives, persistent \\
+Cybercriminals & Financial motivation, ransomware, extortion \\
+Hacktivists & Political/social motivation, publicity-seeking \\
+Insiders & Authorized access, knowledge of systems \\
+Terrorists & Disruption and destruction goals \\
+\end{tabular}
+\end{center}
+
+% ----------------------------------------------------------------------------
+%  SECURITY ARCHITECTURE
+% ----------------------------------------------------------------------------
+
+\section{Security Architecture}
+
+\subsection{Defense-in-Depth}
+
+NIST 800-82 advocates for layered security:
+
+\begin{successbox}
+\textbf{Defense-in-Depth Layers:}
+\begin{itemize}
+    \item Physical security (access control, surveillance)
+    \item Network security (segmentation, firewalls, DMZ)
+    \item Host security (hardening, whitelisting, patching)
+    \item Application security (secure coding, input validation)
+    \item Data security (encryption, integrity checking)
+\end{itemize}
+\end{successbox}
+
+\subsection{Network Segmentation}
+
+The document recommends network architecture based on zones:
+
+\begin{itemize}
+    \item \textbf{Enterprise Zone:} Corporate IT network
+    \item \textbf{DMZ:} Buffer zone with shared services
+    \item \textbf{Control Zone:} OT network with control systems
+    \item \textbf{Safety Zone:} Isolated safety systems
+\end{itemize}
+
+\begin{tipbox}
+NIST 800-82 recommends using the Purdue Model or IEC 62443 zone concepts for network architecture design.
+\end{tipbox}
+
+% ----------------------------------------------------------------------------
+%  SECURITY CONTROLS
+% ----------------------------------------------------------------------------
+
+\section{Security Controls}
+
+\subsection{OT Overlay}
+
+NIST 800-82 provides an OT overlay for SP 800-53 controls, with tailored guidance for:
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{4cm}p{7cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Family} & \textcolor{white}{\bfseries Name} & \textcolor{white}{\bfseries OT Considerations} \\
+\midrule
+AC & Access Control & Physical and logical access, remote access \\
+AU & Audit & Logging without performance impact \\
+CM & Configuration Mgmt & Change control, baseline configurations \\
+CP & Contingency Planning & Backup, recovery, continuity \\
+IA & Identification/Auth & Account management, strong authentication \\
+IR & Incident Response & OT-specific procedures, coordination \\
+MA & Maintenance & Secure remote maintenance, vendor access \\
+SC & System/Comm Protection & Network segmentation, encryption \\
+\end{tabular}
+\end{center}
+
+\subsection{Key Control Recommendations}
+
+\begin{dangerbox}
+\textbf{High-Priority Controls for OT:}
+\begin{itemize}
+    \item Network segmentation and traffic filtering
+    \item Secure remote access with multi-factor authentication
+    \item Application whitelisting on critical systems
+    \item Comprehensive logging and monitoring
+    \item Regular vulnerability assessments
+    \item Incident response planning and testing
+\end{itemize}
+\end{dangerbox}
+
+% ----------------------------------------------------------------------------
+%  IMPLEMENTATION GUIDANCE
+% ----------------------------------------------------------------------------
+
+\section{Implementation Guidance}
+
+\subsection{Phased Approach}
+
+NIST 800-82 recommends implementing security in phases:
+
+\begin{enumerate}
+    \item \textbf{Assessment:} Inventory assets, assess current state
+    \item \textbf{Planning:} Develop security plan, prioritize actions
+    \item \textbf{Implementation:} Deploy controls incrementally
+    \item \textbf{Operations:} Monitor, maintain, and improve
+\end{enumerate}
+
+\subsection{Integration with Other Standards}
+
+\begin{infobox}
+NIST 800-82 aligns with and references:
+\begin{itemize}
+    \item NIST Cybersecurity Framework (CSF)
+    \item ISA/IEC 62443 series
+    \item NERC CIP (for electric utilities)
+    \item ISO 27001/27002
+\end{itemize}
+\end{infobox}
+
+% ----------------------------------------------------------------------------
+%  FURTHER READING
+% ----------------------------------------------------------------------------
+
+\section{Further Reading}
+
+\subsection*{NIST Publications}
+\begin{itemize}
+    \item \textbf{NIST SP 800-82 Rev. 3} -- Guide to OT Security\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+    \item \textbf{NIST Cybersecurity Framework 2.0}\\
+          \url{https://www.nist.gov/cyberframework}
+    \item \textbf{NIST SP 800-53 Rev. 5} -- Security Controls\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final}
+\end{itemize}
+
+\subsection*{Related Standards}
+\begin{itemize}
+    \item \textbf{ISA/IEC 62443} -- Industrial Automation Security\\
+          \url{https://www.isa.org/isa62443}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textcolor{mediumgray}{\rule{0.5\textwidth}{0.5pt}}\\[1em]
+\textcolor{mediumgray}{\small Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

@@ -77,7 +77,7 @@ make new NAME=250-new-protocol
 ## Current Documents
 
 <details>
-<summary><strong>Click to expand document list</strong> (17 documents)</summary>
+<summary><strong>Click to expand document list</strong> (22 documents)</summary>
 
 | Document | Title | Category |
 |:---------|:------|:---------|
@@ -85,18 +85,23 @@ make new NAME=250-new-protocol
 | 010-purdue-model | The Purdue Model | Fundamentals |
 | 100-standards-overview | OT Security Standards Overview | Standards & Compliance |
 | 110-iec-62443-intro | Introduction to IEC 62443 | Standards & Compliance |
+| 111-nist-800-82 | NIST SP 800-82 | Standards & Compliance |
 | 200-modbus | Modbus Protocol | Protocols & Technologies |
 | 201-opc-ua | OPC UA | Protocols & Technologies |
+| 202-dnp3 | DNP3 Protocol | Protocols & Technologies |
 | 300-network-segmentation | OT Network Segmentation | Architecture & Design |
 | 301-secure-remote-access | Secure Remote Access | Architecture & Design |
+| 302-dmz-design | Industrial DMZ Design | Architecture & Design |
 | 400-ot-incidents-overview | OT Security Incidents Overview | Threats & Attacks |
 | 410-stuxnet | Stuxnet | Threats & Attacks |
 | 411-ukraine-power-grid | Ukraine Power Grid Attacks | Threats & Attacks |
 | 412-triton-trisis | TRITON/TRISIS | Threats & Attacks |
+| 413-industroyer | Industroyer/CrashOverride | Threats & Attacks |
 | 500-ot-monitoring | OT Network Monitoring | Detection & Monitoring |
 | 510-asset-discovery | OT Asset Discovery | Detection & Monitoring |
 | 600-ot-incident-response | OT Incident Response | Incident Response |
 | 700-ot-risk-assessment | OT Risk Assessment | Assessments |
+| 710-ot-pentesting | OT Penetration Testing | Assessments |
 | 810-application-whitelisting | Application Whitelisting & System Lockdown | Solutions & Tools |
 
 </details>
@@ -107,16 +112,29 @@ make new NAME=250-new-protocol
 
 ```
 OTsecNotes/
+├── 000-fundamentals/           # Core concepts, models
+│   ├── 001-it-vs-ot/
+│   └── 010-purdue-model/
+├── 100-standards/              # Standards & compliance
+├── 200-protocols/              # Industrial protocols
+├── 300-architecture/           # Network design
+├── 400-threats/                # Threats & attacks
+├── 500-monitoring/             # Detection & monitoring
+├── 600-incident-response/      # IR procedures
+├── 700-assessments/            # Security assessments
+├── 800-solutions/              # Tools & implementations
 ├── templates/
-│   └── otsec-template.sty    # Shared LaTeX style (edit to update all docs)
-├── XXX-topic-name/
-│   ├── main.tex              # Document source
-│   ├── images/               # Document-specific images
-│   └── XXX-topic-name.pdf    # Generated PDF
+│   └── otsec-template.sty      # Shared LaTeX style
 ├── .github/workflows/
-│   └── build-pdfs.yml        # CI/CD (auto-detects documents)
-├── Makefile                  # Build system (auto-detects documents)
+│   └── build-pdfs.yml          # CI/CD pipeline
+├── Makefile                    # Build system
 └── README.md
+
+# Each document folder contains:
+category/XXX-topic-name/
+├── main.tex                    # Document source
+├── images/                     # Document-specific images
+└── XXX-topic-name.pdf          # Generated PDF
 ```
 
 ---
@@ -197,9 +215,10 @@ The shared template (`templates/otsec-template.sty`) provides:
 ## Contributing
 
 1. Create a new document using `make new NAME=XXX-topic-name`
-2. Choose the appropriate category number range
-3. Add your content to `XXX-topic-name/main.tex`
-4. Build and verify with `make XXX-topic-name`
+   - Documents are automatically placed in the correct category folder based on their number
+2. Add your content to the generated `main.tex` file
+3. Build and verify with `make XXX-topic-name`
+4. Run `make list` to see all detected documents
 
 ---
 

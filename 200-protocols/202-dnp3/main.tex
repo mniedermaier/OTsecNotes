@@ -1,0 +1,275 @@
+% ============================================================================
+%  DNP3 Protocol - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+\hypersetup{
+    pdftitle={DNP3 Protocol},
+    pdfsubject={Understanding DNP3 and Its Security Implications},
+}
+
+\begin{document}
+
+% ----------------------------------------------------------------------------
+%  TITLE PAGE
+% ----------------------------------------------------------------------------
+
+\maketitlepage
+    {DNP3 Protocol}
+    {Distributed Network Protocol for Critical Infrastructure}
+    {OT Security Learning Series}
+    {Document 202 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+% ----------------------------------------------------------------------------
+%  TABLE OF CONTENTS
+% ----------------------------------------------------------------------------
+
+\tableofcontents
+\newpage
+
+% ----------------------------------------------------------------------------
+%  INTRODUCTION
+% ----------------------------------------------------------------------------
+
+\section{Introduction}
+
+DNP3 (Distributed Network Protocol 3) is a set of communication protocols used primarily in utilities such as electric, water, and gas systems. Developed in the 1990s by Westronic (now GE Grid Solutions), it was designed to provide reliable communication between control centers and remote substations.
+
+\begin{infobox}
+DNP3 is the dominant SCADA protocol in North American utilities and is widely used in electric power, water/wastewater, and oil/gas industries. Understanding DNP3 is essential for securing critical infrastructure.
+\end{infobox}
+
+\subsection{Why DNP3 Matters}
+
+\begin{itemize}
+    \item \textbf{Critical infrastructure:} Powers electric grids, water systems, pipelines
+    \item \textbf{Reliability focus:} Designed for noisy, unreliable communication links
+    \item \textbf{Feature-rich:} Supports time synchronization, file transfer, secure authentication
+    \item \textbf{Attack target:} Used in nation-state attacks (Ukraine 2015/2016)
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  PROTOCOL OVERVIEW
+% ----------------------------------------------------------------------------
+
+\section{Protocol Overview}
+
+\subsection{Protocol Stack}
+
+DNP3 uses a layered architecture based on the EPA (Enhanced Performance Architecture) model:
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{9.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Layer} & \textcolor{white}{\bfseries Function} \\
+\midrule
+Application Layer & Data objects, function codes, fragments \\
+Transport Layer & Segmentation and reassembly of messages \\
+Data Link Layer & Framing, addressing, error detection (CRC) \\
+Physical Layer & Serial (RS-232/485) or TCP/IP (port 20000) \\
+\end{tabular}
+\end{center}
+
+\subsection{Communication Model}
+
+\begin{conceptbox}{DNP3 Architecture}
+\begin{itemize}
+    \item \textbf{Master:} Control center, SCADA system (initiates requests)
+    \item \textbf{Outstation:} RTU, IED, or data concentrator (responds to requests)
+    \item \textbf{Addresses:} 16-bit source and destination addresses (0--65519)
+    \item \textbf{Unsolicited responses:} Outstations can send data without polling
+\end{itemize}
+\end{conceptbox}
+
+\subsection{Data Objects}
+
+DNP3 organizes data into object groups and variations:
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{4cm}p{7cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Group} & \textcolor{white}{\bfseries Type} & \textcolor{white}{\bfseries Description} \\
+\midrule
+1, 10 & Binary Input/Output & Digital status points and controls \\
+20, 21 & Counters & Accumulated values, pulses \\
+30, 40 & Analog Input/Output & Measurements and setpoints \\
+50 & Time and Date & Time synchronization objects \\
+70 & File Transfer & File read/write operations \\
+\end{tabular}
+\end{center}
+
+% ----------------------------------------------------------------------------
+%  FUNCTION CODES
+% ----------------------------------------------------------------------------
+
+\section{Function Codes}
+
+DNP3 defines numerous function codes for different operations:
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.5cm}p{4cm}p{7.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Code} & \textcolor{white}{\bfseries Function} & \textcolor{white}{\bfseries Description} \\
+\midrule
+0x00 & Confirm & Acknowledge receipt of data \\
+0x01 & Read & Request data from outstation \\
+0x02 & Write & Send data to outstation \\
+0x03 & Select & Select control point (SBO) \\
+0x04 & Operate & Execute selected control (SBO) \\
+0x05 & Direct Operate & Immediate control execution \\
+0x0D & Cold Restart & Restart device completely \\
+0x0E & Warm Restart & Restart application layer \\
+0x81 & Response & Standard response from outstation \\
+0x82 & Unsolicited Response & Event-driven data from outstation \\
+\end{tabular}
+\end{center}
+
+\begin{warningbox}
+Function codes 0x02 (Write), 0x05 (Direct Operate), 0x0D, and 0x0E (Restart) can cause immediate physical impact. Without authentication, attackers can manipulate grid equipment.
+\end{warningbox}
+
+% ----------------------------------------------------------------------------
+%  SECURITY CONCERNS
+% ----------------------------------------------------------------------------
+
+\section{Security Concerns}
+
+\subsection{Original Protocol Weaknesses}
+
+\begin{dangerbox}
+\textbf{Legacy DNP3 lacks security:}
+\begin{itemize}
+    \item No authentication in original specification
+    \item No encryption -- all data transmitted in cleartext
+    \item Predictable sequence numbers enable replay attacks
+    \item Broadcast addresses allow mass device manipulation
+\end{itemize}
+\end{dangerbox}
+
+\subsection{Real-World Attacks}
+
+DNP3 was exploited in the 2015 and 2016 Ukraine power grid attacks:
+
+\begin{itemize}
+    \item Attackers sent unauthorized control commands via DNP3
+    \item Direct Operate commands opened circuit breakers
+    \item Firmware was corrupted to disable protective relays
+    \item Over 230,000 customers lost power
+\end{itemize}
+
+\subsection{Common Attack Vectors}
+
+\begin{enumerate}
+    \item \textbf{Reconnaissance:} Scanning for DNP3 devices (port 20000)
+    \item \textbf{Traffic analysis:} Capturing operational data and control sequences
+    \item \textbf{Replay attacks:} Recording and replaying valid control commands
+    \item \textbf{Command injection:} Sending unauthorized Direct Operate commands
+    \item \textbf{Firmware attacks:} Exploiting file transfer for malicious uploads
+\end{enumerate}
+
+% ----------------------------------------------------------------------------
+%  DNP3 SECURE AUTHENTICATION
+% ----------------------------------------------------------------------------
+
+\section{DNP3 Secure Authentication}
+
+IEEE 1815 introduced Secure Authentication (SA) to address DNP3 security gaps.
+
+\subsection{Security Mechanisms}
+
+\begin{successbox}
+\textbf{DNP3-SA provides:}
+\begin{itemize}
+    \item Challenge-response authentication using HMAC
+    \item Protection against replay attacks
+    \item Aggressive mode for reduced latency
+    \item Key change procedures for credential management
+\end{itemize}
+\end{successbox}
+
+\subsection{SA Versions}
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{11cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Version} & \textcolor{white}{\bfseries Features} \\
+\midrule
+SAv2 & Basic HMAC authentication, manual key management \\
+SAv5 & Improved key management, asymmetric key support, IEC 62351-5 alignment \\
+SAv6 & Enhanced security, TLS support, certificate-based authentication \\
+\end{tabular}
+\end{center}
+
+\begin{tipbox}
+SAv5 is the current recommended version. It supports both symmetric (pre-shared keys) and asymmetric (certificate-based) authentication methods.
+\end{tipbox}
+
+% ----------------------------------------------------------------------------
+%  SECURITY MITIGATIONS
+% ----------------------------------------------------------------------------
+
+\section{Security Mitigations}
+
+\subsection{Protocol-Level Security}
+
+\begin{itemize}
+    \item \textbf{Enable Secure Authentication:} Deploy SAv5 on all DNP3 communications
+    \item \textbf{Use TLS:} Encrypt DNP3/TCP with TLS 1.2 or higher
+    \item \textbf{Implement key management:} Rotate authentication keys regularly
+    \item \textbf{Disable unnecessary functions:} Block file transfer if not required
+\end{itemize}
+
+\subsection{Network-Level Controls}
+
+\begin{itemize}
+    \item \textbf{Network segmentation:} Isolate DNP3 traffic in dedicated networks
+    \item \textbf{Firewalls:} Restrict port 20000 to authorized masters only
+    \item \textbf{IDS/IPS:} Deploy DNP3-aware intrusion detection
+    \item \textbf{VPN tunnels:} Encrypt WAN communications
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  FURTHER READING
+% ----------------------------------------------------------------------------
+
+\section{Further Reading}
+
+\subsection*{Standards and Specifications}
+\begin{itemize}
+    \item \textbf{IEEE 1815-2012} -- DNP3 Standard\\
+          \url{https://standards.ieee.org/standard/1815-2012.html}
+    \item \textbf{DNP Users Group} -- Technical Resources\\
+          \url{https://www.dnp.org/}
+\end{itemize}
+
+\subsection*{Security Resources}
+\begin{itemize}
+    \item \textbf{CISA} -- ICS-CERT DNP3 Advisories\\
+          \url{https://www.cisa.gov/news-events/ics-advisories}
+    \item \textbf{NIST SP 800-82 Rev. 3} -- Guide to OT Security\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+\end{itemize}
+
+\subsection*{Books}
+\begin{itemize}
+    \item Gordon Clarke -- \textit{Practical Modern SCADA Protocols} (Newnes)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textcolor{mediumgray}{\rule{0.5\textwidth}{0.5pt}}\\[1em]
+\textcolor{mediumgray}{\small Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

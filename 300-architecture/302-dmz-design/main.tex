@@ -1,0 +1,296 @@
+% ============================================================================
+%  Industrial DMZ Design - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+\hypersetup{
+    pdftitle={Industrial DMZ Design},
+    pdfsubject={Designing Secure DMZ Architecture for OT Networks},
+}
+
+\begin{document}
+
+% ----------------------------------------------------------------------------
+%  TITLE PAGE
+% ----------------------------------------------------------------------------
+
+\maketitlepage
+    {Industrial DMZ Design}
+    {Secure Buffer Zone Architecture for OT Networks}
+    {OT Security Learning Series}
+    {Document 302 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+% ----------------------------------------------------------------------------
+%  TABLE OF CONTENTS
+% ----------------------------------------------------------------------------
+
+\tableofcontents
+\newpage
+
+% ----------------------------------------------------------------------------
+%  INTRODUCTION
+% ----------------------------------------------------------------------------
+
+\section{Introduction}
+
+An Industrial Demilitarized Zone (IDMZ) is a network segment that acts as a secure buffer between enterprise IT networks and operational technology (OT) networks. It provides controlled connectivity while preventing direct communication between business and control systems.
+
+\begin{infobox}
+The IDMZ is one of the most critical security controls in OT environments. A properly designed DMZ can prevent lateral movement from compromised IT systems to critical control networks.
+\end{infobox}
+
+\subsection{Why IDMZ Matters}
+
+\begin{itemize}
+    \item \textbf{Isolation:} Prevents direct IT-to-OT communication paths
+    \item \textbf{Control point:} Centralizes security monitoring and enforcement
+    \item \textbf{Data exchange:} Enables safe sharing of operational data
+    \item \textbf{Defense-in-depth:} Adds critical security layer
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  DMZ CONCEPTS
+% ----------------------------------------------------------------------------
+
+\section{DMZ Concepts}
+
+\subsection{Traditional IT DMZ vs Industrial DMZ}
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{4.5cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Aspect} & \textcolor{white}{\bfseries IT DMZ} & \textcolor{white}{\bfseries Industrial DMZ} \\
+\midrule
+Primary purpose & Expose services to internet & Separate IT from OT \\
+Traffic direction & Inbound from untrusted & Bidirectional, controlled \\
+Services hosted & Web, email, DNS & Historians, jump servers \\
+Trust model & Internet is untrusted & IT is semi-trusted \\
+Availability needs & High & Critical (production impact) \\
+\end{tabular}
+\end{center}
+
+\subsection{Purdue Model Context}
+
+In the Purdue Model, the IDMZ sits between Levels 3 and 4:
+
+\begin{conceptbox}{DMZ in Purdue Architecture}
+\begin{itemize}
+    \item \textbf{Level 4/5:} Enterprise network (IT)
+    \item \textbf{Level 3.5:} Industrial DMZ (IDMZ)
+    \item \textbf{Level 3:} Site operations (OT)
+    \item \textbf{Levels 0--2:} Control and field devices
+\end{itemize}
+\end{conceptbox}
+
+% ----------------------------------------------------------------------------
+%  ARCHITECTURE PATTERNS
+% ----------------------------------------------------------------------------
+
+\section{Architecture Patterns}
+
+\subsection{Single-Firewall DMZ}
+
+The simplest pattern uses one firewall with three zones:
+
+\begin{itemize}
+    \item Enterprise zone (IT network)
+    \item DMZ zone (shared services)
+    \item Control zone (OT network)
+\end{itemize}
+
+\begin{warningbox}
+Single-firewall designs create a single point of failure. If the firewall is compromised, attackers gain access to all zones. Use only for small, low-risk environments.
+\end{warningbox}
+
+\subsection{Dual-Firewall DMZ}
+
+The recommended pattern uses two firewalls:
+
+\begin{successbox}
+\textbf{Dual-Firewall Architecture:}
+\begin{itemize}
+    \item \textbf{Outer firewall:} Faces enterprise network
+    \item \textbf{DMZ segment:} Between the firewalls
+    \item \textbf{Inner firewall:} Protects OT network
+    \item \textbf{Different vendors:} Prevents single vulnerability from compromising both
+\end{itemize}
+\end{successbox}
+
+\subsection{Data Diode Integration}
+
+For highest security, add hardware-enforced unidirectional gateways:
+
+\begin{itemize}
+    \item \textbf{Outbound data diode:} OT to DMZ (historian replication)
+    \item \textbf{No inbound path:} Physically prevents attacks from IT
+    \item \textbf{Use cases:} Nuclear, critical infrastructure, high-security environments
+\end{itemize}
+
+% ----------------------------------------------------------------------------
+%  DMZ SERVICES
+% ----------------------------------------------------------------------------
+
+\section{DMZ Services}
+
+\subsection{Typical DMZ Components}
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{9.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Service} & \textcolor{white}{\bfseries Purpose} \\
+\midrule
+Historian Mirror & Read-only copy of process data for business access \\
+Jump Server & Secure remote access point for OT administration \\
+Patch Server & Staging area for tested updates before OT deployment \\
+AV/Update Server & Antivirus definitions and software updates \\
+File Transfer & Secure exchange of files between IT and OT \\
+Remote Access Gateway & VPN termination for authorized remote users \\
+Log Collector & Aggregation point for OT security logs \\
+\end{tabular}
+\end{center}
+
+\subsection{Service Placement Rules}
+
+\begin{tipbox}
+\textbf{Key principles for DMZ service placement:}
+\begin{itemize}
+    \item No service should have simultaneous connections to IT and OT
+    \item Data should ``break'' in the DMZ (no direct tunnels)
+    \item OT systems should initiate connections outbound to DMZ
+    \item IT systems connect only to DMZ, never directly to OT
+\end{itemize}
+\end{tipbox}
+
+% ----------------------------------------------------------------------------
+%  TRAFFIC FLOW DESIGN
+% ----------------------------------------------------------------------------
+
+\section{Traffic Flow Design}
+
+\subsection{Allowed Traffic Patterns}
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3cm}p{3cm}p{7cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Source} & \textcolor{white}{\bfseries Destination} & \textcolor{white}{\bfseries Purpose} \\
+\midrule
+OT $\rightarrow$ DMZ & Historian mirror & Push process data for replication \\
+OT $\rightarrow$ DMZ & Log collector & Send security events \\
+DMZ $\rightarrow$ OT & Patch server & Pull tested updates (scheduled) \\
+IT $\rightarrow$ DMZ & Historian mirror & Query operational data \\
+IT $\rightarrow$ DMZ & Jump server & Remote administration access \\
+\end{tabular}
+\end{center}
+
+\subsection{Prohibited Traffic}
+
+\begin{dangerbox}
+\textbf{Never allow these traffic flows:}
+\begin{itemize}
+    \item IT directly to OT (any protocol)
+    \item OT directly to IT (any protocol)
+    \item Internet directly to DMZ or OT
+    \item Broad ``any-any'' rules through the DMZ
+\end{itemize}
+\end{dangerbox}
+
+% ----------------------------------------------------------------------------
+%  FIREWALL RULES
+% ----------------------------------------------------------------------------
+
+\section{Firewall Configuration}
+
+\subsection{Rule Design Principles}
+
+\begin{enumerate}
+    \item \textbf{Default deny:} Block all traffic not explicitly permitted
+    \item \textbf{Least privilege:} Allow only required ports and protocols
+    \item \textbf{Specific sources/destinations:} No ``any'' in rules
+    \item \textbf{Application awareness:} Use OT-aware deep packet inspection
+    \item \textbf{Logging:} Log all traffic, especially denied connections
+\end{enumerate}
+
+\subsection{Example Rule Structure}
+
+\begin{center}
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{0.5cm}p{2.5cm}p{2.5cm}p{2cm}p{2.5cm}p{1.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries \#} & \textcolor{white}{\bfseries Source} & \textcolor{white}{\bfseries Dest} & \textcolor{white}{\bfseries Port} & \textcolor{white}{\bfseries Purpose} & \textcolor{white}{\bfseries Action} \\
+\midrule
+1 & OT-Historian & DMZ-Mirror & 1433 & DB replication & Allow \\
+2 & IT-Analysts & DMZ-Mirror & 443 & Data queries & Allow \\
+3 & Admins & DMZ-Jump & 3389 & Remote admin & Allow \\
+4 & Any & Any & Any & Default & Deny \\
+\end{tabular}
+\end{center}
+
+% ----------------------------------------------------------------------------
+%  MONITORING AND MANAGEMENT
+% ----------------------------------------------------------------------------
+
+\section{Monitoring and Management}
+
+\subsection{Security Monitoring}
+
+\begin{itemize}
+    \item \textbf{Traffic analysis:} Monitor for anomalous patterns
+    \item \textbf{IDS/IPS:} Deploy at DMZ boundaries
+    \item \textbf{Log correlation:} Aggregate logs from all DMZ systems
+    \item \textbf{Alerting:} Immediate notification of policy violations
+\end{itemize}
+
+\subsection{Change Management}
+
+\begin{infobox}
+All DMZ changes should follow strict change control:
+\begin{itemize}
+    \item Document business justification for rule changes
+    \item Test changes in non-production environment
+    \item Require approval from both IT and OT stakeholders
+    \item Maintain audit trail of all modifications
+\end{itemize}
+\end{infobox}
+
+% ----------------------------------------------------------------------------
+%  FURTHER READING
+% ----------------------------------------------------------------------------
+
+\section{Further Reading}
+
+\subsection*{Standards and Guidelines}
+\begin{itemize}
+    \item \textbf{IEC 62443-3-2} -- Security Risk Assessment and Zone Design\\
+          \url{https://www.isa.org/isa62443}
+    \item \textbf{NIST SP 800-82 Rev. 3} -- OT Security Guide\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+\end{itemize}
+
+\subsection*{Resources}
+\begin{itemize}
+    \item \textbf{CISA} -- Recommended Practices for OT\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+\end{itemize}
+
+\subsection*{Books}
+\begin{itemize}
+    \item Pascal Ackerman -- \textit{Industrial Cybersecurity} (Packt)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textcolor{mediumgray}{\rule{0.5\textwidth}{0.5pt}}\\[1em]
+\textcolor{mediumgray}{\small Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

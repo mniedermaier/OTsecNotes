@@ -33,7 +33,7 @@ jobs:
       - name: Collect PDFs
         run: |
           mkdir -p pdf-output
-          find . -maxdepth 2 -name "*.pdf" -exec cp {} pdf-output/ \;
+          find . -path './[0-9]*-*/[0-9]*-*/*.pdf' -exec cp {} pdf-output/ \;
           ls -la pdf-output/
 
       - name: Upload PDFs as artifact

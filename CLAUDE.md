@@ -22,33 +22,65 @@ Documents are organized by category using three-digit numbers:
 
 Documents are auto-detected by the Makefile. Run `make list` to see all available documents.
 
-- `001-it-vs-ot` - IT vs OT (Fundamentals)
-- `010-purdue-model` - The Purdue Model (Fundamentals)
+**000-fundamentals/**
+- `001-it-vs-ot` - IT vs OT
+- `010-purdue-model` - The Purdue Model
+
+**100-standards/**
 - `100-standards-overview` - Global OT Security Standards Overview
 - `110-iec-62443-intro` - Introduction to IEC 62443
+- `111-nist-800-82` - NIST SP 800-82
+
+**200-protocols/**
 - `200-modbus` - Modbus Protocol
 - `201-opc-ua` - OPC UA
+- `202-dnp3` - DNP3 Protocol
+
+**300-architecture/**
 - `300-network-segmentation` - OT Network Segmentation
 - `301-secure-remote-access` - Secure Remote Access
+- `302-dmz-design` - Industrial DMZ Design
+
+**400-threats/**
 - `400-ot-incidents-overview` - OT Security Incidents Overview
 - `410-stuxnet` - Stuxnet
 - `411-ukraine-power-grid` - Ukraine Power Grid Attacks
 - `412-triton-trisis` - TRITON/TRISIS
+- `413-industroyer` - Industroyer/CrashOverride
+
+**500-monitoring/**
 - `500-ot-monitoring` - OT Network Monitoring
 - `510-asset-discovery` - OT Asset Discovery
+
+**600-incident-response/**
 - `600-ot-incident-response` - OT Incident Response
+
+**700-assessments/**
 - `700-ot-risk-assessment` - OT Risk Assessment
+- `710-ot-pentesting` - OT Penetration Testing
+
+**800-solutions/**
 - `810-application-whitelisting` - Application Whitelisting & System Lockdown
 
 ## Project Structure
 ```
 OTsecNotes/
+├── 000-fundamentals/         # Category folders contain documents
+│   ├── 001-it-vs-ot/
+│   │   ├── main.tex
+│   │   ├── images/
+│   │   └── 001-it-vs-ot.pdf
+│   └── 010-purdue-model/
+├── 100-standards/
+├── 200-protocols/
+├── 300-architecture/
+├── 400-threats/
+├── 500-monitoring/
+├── 600-incident-response/
+├── 700-assessments/
+├── 800-solutions/
 ├── templates/
 │   └── otsec-template.sty    # Shared LaTeX style - ALL docs use this
-├── XXX-topic-name/
-│   ├── main.tex              # Document source
-│   ├── images/               # Document-specific images
-│   └── XXX-topic-name.pdf    # Generated PDF
 ├── .github/workflows/
 │   └── build-pdfs.yml        # GitHub Actions CI/CD
 ├── Makefile                  # Build system
@@ -89,13 +121,15 @@ Use `\faIcon{icon-name}` for icons. Pre-defined: `\iconShield`, `\iconWarning`, 
 ```bash
 make all                    # Build all documents (auto-detected)
 make parallel               # Build in parallel
-make list                   # List all auto-detected documents
-make XXX-topic-name         # Build specific document
+make list                   # List all auto-detected documents by category
+make XXX-topic-name         # Build specific document (e.g., make 200-modbus)
 make verbose-XXX-topic-name # Build with full output (debugging)
 make clean                  # Remove build artifacts
 make distclean              # Remove all generated files including PDFs
-make new NAME=XXX-topic     # Create new document (auto-detected on next build)
+make new NAME=XXX-topic     # Create new document (auto-placed in category)
 ```
+
+**Note:** When creating a new document with `make new`, it is automatically placed in the correct category folder based on its number prefix (e.g., `203-topic` goes into `200-protocols/`).
 
 ## Style Guidelines
 
