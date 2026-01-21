@@ -1,0 +1,56 @@
+name: General Issue
+description: Report a bug, suggest an improvement, or ask a question
+title: ""
+labels: []
+body:
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: Issue Type
+      description: What type of issue is this?
+      options:
+        - Bug / Error in document
+        - Content improvement
+        - Template / Styling issue
+        - Build / CI issue
+        - Question
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: document
+    attributes:
+      label: Related Document (if applicable)
+      description: Which document does this relate to?
+      placeholder: e.g., 200-modbus or otsec-template.sty
+    validations:
+      required: false
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe the issue or suggestion in detail
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce (for bugs)
+      description: If this is a bug, how can we reproduce it?
+      placeholder: |
+        1. Build document X
+        2. Open PDF
+        3. See error on page Y
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Any other information, screenshots, or context
+    validations:
+      required: false

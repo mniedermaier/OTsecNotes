@@ -1,0 +1,66 @@
+name: New Document Request
+description: Request a new document for the OT Security Learning Series
+title: "[Document Request]: "
+labels: ["document-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new document! Please provide as much detail as possible.
+
+  - type: input
+    id: document-title
+    attributes:
+      label: Document Title
+      description: What should the document be called?
+      placeholder: e.g., "DNP3 Protocol Security"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      description: Which category does this document belong to?
+      options:
+        - 001-099 Fundamentals (Core concepts, models, OT basics)
+        - 100-199 Standards & Compliance (IEC 62443, NIST, regulations)
+        - 200-299 Protocols & Technologies (Modbus, DNP3, OPC UA)
+        - 300-399 Architecture & Design (Network segmentation, DMZ)
+        - 400-499 Threats & Attacks (Attack vectors, case studies)
+        - 500-599 Detection & Monitoring (IDS, network monitoring)
+        - 600-699 Incident Response (IR procedures, forensics)
+        - 700-799 Assessments (Pentesting, risk assessment)
+        - 800-899 Solutions & Tools (Practical implementations)
+    validations:
+      required: true
+
+  - type: textarea
+    id: content-outline
+    attributes:
+      label: Content Outline
+      description: What topics should be covered in this document?
+      placeholder: |
+        - Introduction to the topic
+        - Key concepts
+        - Security considerations
+        - Best practices
+        - ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: justification
+    attributes:
+      label: Why is this document needed?
+      description: Explain why this topic is important for OT security learning
+    validations:
+      required: false
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Any standards, resources, or references that should be included?
+    validations:
+      required: false
