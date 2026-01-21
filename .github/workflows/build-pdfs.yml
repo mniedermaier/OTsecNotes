@@ -469,7 +469,12 @@ jobs:
 
               echo "$pdfs" | while read pdf_name; do
                 doc_num=${pdf_name%%-*}
-                title=$(echo "${pdf_name#*-}" | sed 's/-/ /g' | sed 's/\b\(.\)/\u\1/g')
+                # Title case, then fix common abbreviations and lowercase minor words
+                title=$(echo "${pdf_name#*-}" | sed 's/-/ /g' | sed 's/\b\(.\)/\u\1/g' | \
+                  sed 's/\bIt\b/IT/g; s/\bOt\b/OT/g; s/\bPlc\b/PLC/g; s/\bIec\b/IEC/g; s/\bNist\b/NIST/g' | \
+                  sed 's/\bDmz\b/DMZ/g; s/\bOpc\b/OPC/g; s/\bUa\b/UA/g; s/\bDnp3\b/DNP3/g; s/\bIds\b/IDS/g' | \
+                  sed 's/\bNerc\b/NERC/g; s/\bCip\b/CIP/g; s/\bSp\b/SP/g; s/\bIr\b/IR/g; s/\bTrisis\b/TRISIS/g' | \
+                  sed 's/ Vs / vs /g; s/ And / and /g; s/ Or / or /g; s/ The / the /g; s/ A / a /g; s/ An / an /g')
                 echo "                <li class=\"doc-item\" data-title=\"$title\">" >> public/index.html
                 echo "                  <span class=\"doc-num\">$doc_num</span>" >> public/index.html
                 echo "                  <a href=\"${pdf_name}.pdf\" class=\"doc-link\">$title</a>" >> public/index.html
