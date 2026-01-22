@@ -170,15 +170,28 @@
     @media (max-width: 768px) {
       .doc-title { display: none; }
       .zoom-level { display: none; }
+      .toolbar { height: 48px; padding: 0 0.75rem; gap: 0.5rem; }
+      .pdf-container { top: 48px; padding: 1rem; }
+      .nav-btn { width: 32px; height: 32px; font-size: 1rem; }
+      .back-btn { padding: 0.4rem 0.75rem; font-size: 0.85rem; }
+      .download-btn { padding: 0.4rem 0.75rem; font-size: 0.8rem; }
+      #fitPage { display: none; }
     }
     @media (max-width: 480px) {
       .download-btn span:last-child { display: none; }
+      .toolbar { height: 44px; }
+      .pdf-container { top: 44px; padding: 0.5rem; }
+      .back-btn span { display: none; }
+      .back-btn::before { content: '←'; }
+      .toolbar-center { gap: 0.25rem; }
+      .page-info { font-size: 0.8rem; }
+      .page-input { width: 40px; padding: 0.3rem; }
     }
   </style>
 </head>
 <body>
   <div class="toolbar">
-    <a href="./" class="back-btn">&#8592; Back</a>
+    <a href="index.html" class="back-btn" onclick="event.preventDefault(); if(history.length > 1) history.back(); else location.href='index.html';"><span>&#8592;</span> <span>Back</span></a>
     <span class="doc-title" id="docTitle">Loading...</span>
 
     <div class="toolbar-center">
@@ -238,6 +251,18 @@
         document.getElementById('totalPages').textContent = pdfDoc.numPages;
         document.getElementById('pageInput').max = pdfDoc.numPages;
         document.getElementById('loadingState').style.display = 'none';
+
+        // Calculate fit-to-page scale before rendering
+        const firstPage = await pdfDoc.getPage(1);
+        const viewport = firstPage.getViewport({ scale: 1 });
+        const container = document.getElementById('pdfContainer');
+        const containerWidth = container.clientWidth - 60;
+        const containerHeight = container.clientHeight - 60;
+        const scaleX = containerWidth / viewport.width;
+        const scaleY = containerHeight / viewport.height;
+        scale = Math.min(scaleX, scaleY);
+        scale = Math.max(0.5, Math.min(scale, 3));
+        updateZoomDisplay();
 
         // Render all pages
         for (let i = 1; i <= pdfDoc.numPages; i++) {
