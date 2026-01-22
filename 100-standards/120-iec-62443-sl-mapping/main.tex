@@ -1,0 +1,607 @@
+% ============================================================================
+%  120-iec-62443-sl-mapping - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+\begin{document}
+
+\maketitlepage
+    {IEC 62443 Security Levels}
+    {Mapping security solutions to SL1--SL4 requirements}
+    {OT Security Learning Series}
+    {Document 120 \quad|\quad January 2026}
+    {AI Assistant}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+IEC 62443 defines four Security Levels (SL1--SL4) that represent increasing levels of protection against different threat actors. This document maps practical security solutions to each level.
+\end{infobox}
+
+\subsection{Security Level Definitions}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|c|l|X|}
+\hline
+\textbf{SL} & \textbf{Threat Actor} & \textbf{Description} \\
+\hline
+\slone & Casual/Accidental & Protection against unintentional errors \\
+\sltwo & Intentional, Low Resources & Script kiddies, disgruntled employees \\
+\slthree & Intentional, Moderate Resources & Hacktivists, organized crime \\
+\slfour & Intentional, High Resources & Nation-states, APT groups \\
+\hline
+\end{tabularx}
+\caption{IEC 62443 Security Levels}
+\end{table}
+
+\begin{warningbox}
+Most industrial environments should target \textbf{SL2} as a baseline. Critical infrastructure (energy, water, chemical) typically requires \textbf{SL3}. \textbf{SL4} is reserved for high-value national security targets.
+\end{warningbox}
+
+% ============================================================================
+\section{Foundational Requirements Overview}
+% ============================================================================
+
+IEC 62443-3-3 defines seven Foundational Requirements (FR):
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|c|l|X|}
+\hline
+\textbf{FR} & \textbf{Name} & \textbf{Focus Area} \\
+\hline
+FR1 & Identification \& Authentication & User and device identity \\
+FR2 & Use Control & Authorization and privileges \\
+FR3 & System Integrity & Protection from tampering \\
+FR4 & Data Confidentiality & Protection of sensitive data \\
+FR5 & Restricted Data Flow & Network segmentation \\
+FR6 & Timely Response to Events & Monitoring and incident response \\
+FR7 & Resource Availability & Denial of service protection \\
+\hline
+\end{tabularx}
+\caption{IEC 62443 Foundational Requirements}
+\end{table}
+
+% ============================================================================
+\section{FR1: Identification \& Authentication}
+% ============================================================================
+
+\begin{definitionbox}{FR1 -- Identification \& Authentication}
+Controls for identifying and authenticating users, processes, and devices before granting access to system resources.
+\end{definitionbox}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Level} & \textbf{Security Solutions} \\
+\hline
+\slone &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\begin{itemize}[nosep,leftmargin=*]
+    \item Unique user accounts (no shared accounts)
+    \item Basic password policy (8+ characters)
+    \item Device identification by IP/hostname
+\end{itemize}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\sltwo &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\begin{itemize}[nosep,leftmargin=*]
+    \item Strong password policy (complexity, expiration)
+    \item Role-based access control (RBAC)
+    \item Central authentication (Active Directory)
+    \item Device certificates for critical systems
+\end{itemize}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\slthree &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\begin{itemize}[nosep,leftmargin=*]
+    \item Multi-factor authentication (MFA)
+    \item Hardware tokens or smart cards
+    \item Certificate-based device authentication
+    \item Privileged Access Management (PAM)
+\end{itemize}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\slfour &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\begin{itemize}[nosep,leftmargin=*]
+    \item Biometric authentication
+    \item Hardware Security Modules (HSM)
+    \item Mutual TLS for all connections
+    \item Continuous authentication/verification
+\end{itemize}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\end{tabularx}
+\caption{FR1 Solutions by Security Level}
+\end{table}
+
+% ============================================================================
+\section{FR2: Use Control}
+% ============================================================================
+
+\begin{definitionbox}{FR2 -- Use Control}
+Controls for enforcing assigned privileges to ensure only authorized actions are performed.
+\end{definitionbox}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Level} & \textbf{Security Solutions} \\
+\hline
+\slone &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\begin{itemize}[nosep,leftmargin=*]
+    \item Basic user permissions on HMI/workstations
+    \item Separate operator vs. engineer accounts
+    \item Session timeout after inactivity
+\end{itemize}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\sltwo &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\begin{itemize}[nosep,leftmargin=*]
+    \item Granular role-based access control
+    \item Principle of least privilege enforced
+    \item Automatic session lock
+    \item Audit logging of privilege use
+\end{itemize}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\slthree &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\begin{itemize}[nosep,leftmargin=*]
+    \item Attribute-based access control (ABAC)
+    \item Just-in-time (JIT) privilege elevation
+    \item Dual authorization for critical actions
+    \item Comprehensive access reviews
+\end{itemize}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\slfour &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\begin{itemize}[nosep,leftmargin=*]
+    \item Four-eyes principle for all changes
+    \item Real-time privilege monitoring
+    \item Automated policy enforcement
+    \item Zero-trust access model
+\end{itemize}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\end{tabularx}
+\caption{FR2 Solutions by Security Level}
+\end{table}
+
+% ============================================================================
+\section{FR3: System Integrity}
+% ============================================================================
+
+\begin{definitionbox}{FR3 -- System Integrity}
+Controls to ensure systems and data are protected from unauthorized changes.
+\end{definitionbox}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Level} & \textbf{Security Solutions} \\
+\hline
+\slone &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\begin{itemize}[nosep,leftmargin=*]
+    \item Antivirus on Windows systems
+    \item Basic change management process
+    \item Manual configuration backups
+\end{itemize}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\sltwo &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\begin{itemize}[nosep,leftmargin=*]
+    \item Application whitelisting
+    \item File integrity monitoring (FIM)
+    \item Automated backup and verification
+    \item Patch management process
+\end{itemize}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\slthree &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\begin{itemize}[nosep,leftmargin=*]
+    \item Code signing for all executables
+    \item PLC program integrity verification
+    \item Secure boot / trusted boot
+    \item Configuration management database
+\end{itemize}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\slfour &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\begin{itemize}[nosep,leftmargin=*]
+    \item Hardware root of trust (TPM)
+    \item Cryptographic integrity verification
+    \item Automated drift detection and remediation
+    \item Air-gapped golden image repository
+\end{itemize}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\end{tabularx}
+\caption{FR3 Solutions by Security Level}
+\end{table}
+
+% ============================================================================
+\section{FR4: Data Confidentiality}
+% ============================================================================
+
+\begin{definitionbox}{FR4 -- Data Confidentiality}
+Controls to protect data from unauthorized disclosure.
+\end{definitionbox}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Level} & \textbf{Security Solutions} \\
+\hline
+\slone &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\begin{itemize}[nosep,leftmargin=*]
+    \item Password-protected engineering files
+    \item Physical access control to servers
+    \item Basic network separation
+\end{itemize}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\sltwo &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\begin{itemize}[nosep,leftmargin=*]
+    \item Encrypted remote access (VPN)
+    \item HTTPS for web interfaces
+    \item Encrypted database storage
+    \item Data classification policy
+\end{itemize}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\slthree &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\begin{itemize}[nosep,leftmargin=*]
+    \item End-to-end encryption (OPC UA Secure)
+    \item Full disk encryption
+    \item DLP (Data Loss Prevention)
+    \item Encrypted protocol tunnels
+\end{itemize}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\slfour &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\begin{itemize}[nosep,leftmargin=*]
+    \item Hardware encryption (self-encrypting drives)
+    \item Encrypted memory
+    \item Quantum-resistant cryptography planning
+    \item Data diodes for sensitive flows
+\end{itemize}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\end{tabularx}
+\caption{FR4 Solutions by Security Level}
+\end{table}
+
+% ============================================================================
+\section{FR5: Restricted Data Flow}
+% ============================================================================
+
+\begin{definitionbox}{FR5 -- Restricted Data Flow}
+Controls for network segmentation and data flow enforcement between zones.
+\end{definitionbox}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Level} & \textbf{Security Solutions} \\
+\hline
+\slone &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\begin{itemize}[nosep,leftmargin=*]
+    \item Basic firewall between IT and OT
+    \item VLAN separation
+    \item Default deny rules
+\end{itemize}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\sltwo &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\begin{itemize}[nosep,leftmargin=*]
+    \item Industrial DMZ architecture
+    \item Stateful firewall inspection
+    \item Jump servers for remote access
+    \item Network access control (NAC)
+\end{itemize}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\slthree &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\begin{itemize}[nosep,leftmargin=*]
+    \item Deep packet inspection (DPI) for OT protocols
+    \item Micro-segmentation within OT
+    \item Application-aware firewalls
+    \item Unidirectional gateways (data diodes)
+\end{itemize}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\slfour &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\begin{itemize}[nosep,leftmargin=*]
+    \item Hardware-enforced data diodes
+    \item Air-gapped safety systems
+    \item Protocol break/proxy for all flows
+    \item Zero-trust network architecture
+\end{itemize}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\end{tabularx}
+\caption{FR5 Solutions by Security Level}
+\end{table}
+
+% ============================================================================
+\section{FR6: Timely Response to Events}
+% ============================================================================
+
+\begin{definitionbox}{FR6 -- Timely Response to Events}
+Controls for monitoring, logging, and responding to security events.
+\end{definitionbox}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Level} & \textbf{Security Solutions} \\
+\hline
+\slone &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\begin{itemize}[nosep,leftmargin=*]
+    \item Local logging on critical systems
+    \item Basic alerting for system failures
+    \item Manual log review process
+\end{itemize}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\sltwo &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\begin{itemize}[nosep,leftmargin=*]
+    \item Centralized log collection (SIEM)
+    \item OT network monitoring / IDS
+    \item Documented incident response plan
+    \item Regular IR drills
+\end{itemize}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\slthree &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\begin{itemize}[nosep,leftmargin=*]
+    \item OT-specific anomaly detection
+    \item 24/7 Security Operations Center
+    \item Automated threat intelligence feeds
+    \item Forensic readiness procedures
+\end{itemize}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\slfour &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\begin{itemize}[nosep,leftmargin=*]
+    \item AI/ML-based threat detection
+    \item Automated response playbooks (SOAR)
+    \item Dedicated OT SOC
+    \item Real-time threat hunting
+\end{itemize}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\end{tabularx}
+\caption{FR6 Solutions by Security Level}
+\end{table}
+
+% ============================================================================
+\section{FR7: Resource Availability}
+% ============================================================================
+
+\begin{definitionbox}{FR7 -- Resource Availability}
+Controls to ensure systems remain available under adverse conditions.
+\end{definitionbox}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Level} & \textbf{Security Solutions} \\
+\hline
+\slone &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\begin{itemize}[nosep,leftmargin=*]
+    \item UPS for critical systems
+    \item Regular backups
+    \item Basic spare parts inventory
+\end{itemize}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\sltwo &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\begin{itemize}[nosep,leftmargin=*]
+    \item Redundant network paths
+    \item Hot standby for critical servers
+    \item DoS protection on perimeter
+    \item Tested recovery procedures
+\end{itemize}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\slthree &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\begin{itemize}[nosep,leftmargin=*]
+    \item Redundant controllers (1oo2, 2oo3)
+    \item Geographic redundancy for critical data
+    \item Rate limiting on all interfaces
+    \item Automated failover testing
+\end{itemize}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\slfour &
+\begin{minipage}[t]{\linewidth}
+\vspace{2pt}
+\begin{itemize}[nosep,leftmargin=*]
+    \item Full system redundancy
+    \item Isolated backup control room
+    \item Electromagnetic pulse (EMP) protection
+    \item Continuous availability validation
+\end{itemize}
+\vspace{2pt}
+\end{minipage} \\
+\hline
+\end{tabularx}
+\caption{FR7 Solutions by Security Level}
+\end{table}
+
+% ============================================================================
+\section{Implementation Guidance}
+% ============================================================================
+
+\begin{successbox}
+Start with an SL assessment to determine your target level, then use this mapping to select appropriate security solutions. Not every control is needed---focus on your specific risks and asset criticality.
+\end{successbox}
+
+\subsection{Assessment Approach}
+
+\begin{enumerate}
+    \item \textbf{Identify zones and conduits} -- Map your OT architecture
+    \item \textbf{Determine target SL} -- Based on risk assessment and threat analysis
+    \item \textbf{Gap analysis} -- Compare current state to target SL requirements
+    \item \textbf{Prioritize} -- Address highest-risk gaps first
+    \item \textbf{Implement incrementally} -- Don't try to reach SL3 overnight
+\end{enumerate}
+
+\subsection{Common Pitfalls}
+
+\begin{itemize}
+    \item Applying IT solutions without OT adaptation
+    \item Targeting SL4 when SL2 is sufficient
+    \item Ignoring operational impact of security controls
+    \item Focusing on technology without processes and training
+\end{itemize}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{SL1--SL4} -- Increasing protection against sophisticated threats
+    \item \textbf{7 Foundational Requirements} -- Comprehensive security coverage
+    \item \textbf{SL2 baseline} -- Appropriate for most industrial environments
+    \item \textbf{SL3 for critical infrastructure} -- Energy, water, chemical sectors
+    \item \textbf{Incremental approach} -- Build security maturity over time
+    \item \textbf{Balance security and operations} -- OT availability is paramount
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Standards}
+
+\begin{itemize}
+    \item \textbf{IEC 62443-3-3} -- System security requirements and security levels\\
+          \url{https://webstore.iec.ch/publication/7033}
+    \item \textbf{IEC 62443-2-1} -- Security program requirements for asset owners\\
+          \url{https://webstore.iec.ch/publication/7030}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{ISA/IEC 62443 Series Overview}\\
+          \url{https://www.isa.org/standards-and-publications/isa-standards/isa-iec-62443-series-of-standards}
+    \item \textbf{CISA -- ICS Security}\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}
