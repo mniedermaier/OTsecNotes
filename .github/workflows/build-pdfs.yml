@@ -46,10 +46,17 @@ jobs:
             mv "pdf-output/thumbnails/${filename}-01.png" "pdf-output/thumbnails/${filename}.png" 2>/dev/null || true
           done
 
+          # Create ZIP of all PDFs for "Download All" button
+          cd pdf-output
+          zip -r OTsecNotes-all-documents.zip *.pdf
+          cd ..
+
           echo "PDFs:"
           ls -la pdf-output/*.pdf
           echo "Thumbnails:"
           ls -la pdf-output/thumbnails/
+          echo "ZIP:"
+          ls -la pdf-output/*.zip
 
       - name: Check page count (max 10 pages)
         run: |
@@ -273,6 +280,26 @@ jobs:
                 background: rgba(255,255,255,0.15);
                 transform: translateY(-3px);
                 box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+              }
+              .download-all-btn {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.6rem;
+                margin-top: 2rem;
+                padding: 1rem 2rem;
+                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                border: none;
+                border-radius: 12px;
+                color: white;
+                font-size: 1.1rem;
+                font-weight: 700;
+                text-decoration: none;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+              }
+              .download-all-btn:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 30px rgba(16, 185, 129, 0.5);
               }
               .container {
                 position: relative;
@@ -532,6 +559,9 @@ jobs:
                 <span class="badge">📖 Under 10 pages each</span>
                 <span class="badge">⚖️ CC BY-SA 4.0</span>
               </div>
+              <a href="OTsecNotes-all-documents.zip" class="download-all-btn" download>
+                📦 Download All PDFs
+              </a>
             </header>
             <main class="container">
               <div class="controls">
