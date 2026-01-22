@@ -1,0 +1,334 @@
+% ============================================================================
+%  620-containment-strategies - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+% Define colors for TikZ (matching template colors)
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {OT Containment Strategies}
+    {Isolating compromised systems while maintaining safe operations}
+    {OT Security Learning Series}
+    {Document 620 \quad|\quad January 2026}
+    {AI Assistant}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+Containment in OT environments requires balancing cybersecurity response with operational safety. Unlike IT where systems can be quickly isolated, OT containment must consider process dependencies, safety implications, and the potential for physical consequences.
+\end{infobox}
+
+Effective OT containment must:
+\begin{itemize}
+    \item Stop attacker lateral movement
+    \item Preserve evidence for forensics
+    \item Maintain safe process operations
+    \item Minimize production impact
+    \item Enable eventual recovery
+\end{itemize}
+
+\begin{dangerbox}
+\textbf{Safety First:} Never implement containment actions that could cause unsafe process conditions, environmental releases, or harm to personnel. Coordinate with operations before any action.
+\end{dangerbox}
+
+% ============================================================================
+\section{Containment Decision Framework}
+% ============================================================================
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    decision/.style={diamond, draw, thick, fill=otwarning!20, minimum height=1cm, minimum width=1.5cm, font=\tiny\bfseries, align=center, aspect=2},
+    action/.style={rectangle, draw, thick, fill=otaccent!20, minimum height=0.8cm, minimum width=2cm, rounded corners=3pt, font=\tiny\bfseries, align=center},
+    arrow/.style={->, thick, >=stealth}
+]
+
+\node[decision] (safety) at (0,0) {Safety\\risk?};
+\node[action, fill=otdanger!20] (shutdown) at (-2.5,-1.5) {Safe\\shutdown};
+\node[decision] (spread) at (2.5,-1.5) {Active\\spread?};
+\node[action, fill=otwarning!20] (isolate) at (1,-3) {Immediate\\isolation};
+\node[action, fill=otsuccess!20] (monitor) at (4,-3) {Monitor \&\\plan};
+
+\draw[arrow] (safety) -- node[left, font=\tiny] {Yes} (shutdown);
+\draw[arrow] (safety) -- node[above, font=\tiny] {No} (spread);
+\draw[arrow] (spread) -- node[left, font=\tiny] {Yes} (isolate);
+\draw[arrow] (spread) -- node[right, font=\tiny] {No} (monitor);
+
+\end{tikzpicture}
+\caption{Containment Decision Tree}
+\end{figure}
+
+\subsection{Key Questions}
+
+Before containment actions, assess:
+\begin{enumerate}
+    \item Is there immediate safety risk from the compromise?
+    \item Is the attack actively spreading?
+    \item What systems are affected or at risk?
+    \item What are the dependencies between systems?
+    \item Can we isolate without causing process upset?
+\end{enumerate}
+
+% ============================================================================
+\section{Containment Levels}
+% ============================================================================
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\textbf{Level} & \textbf{Scope} & \textbf{Actions} \\
+\hline
+Level 1 & Single host & Disable network, isolate logically \\
+Level 2 & Network segment & Block at switch/firewall, VLAN isolation \\
+Level 3 & Zone & Isolate entire Purdue zone \\
+Level 4 & IT/OT boundary & Sever all IT-OT connectivity \\
+Level 5 & Full isolation & Air-gap entire OT network \\
+\hline
+\end{tabularx}
+\caption{Containment Levels}
+\end{table}
+
+\subsection{Level Selection Criteria}
+
+\begin{itemize}
+    \item \textbf{Level 1} -- Single compromised workstation, no lateral movement
+    \item \textbf{Level 2} -- Multiple hosts in one segment affected
+    \item \textbf{Level 3} -- Compromise spans segment boundaries
+    \item \textbf{Level 4} -- Attack originated from IT, OT integrity uncertain
+    \item \textbf{Level 5} -- Widespread compromise, unknown scope
+\end{itemize}
+
+% ============================================================================
+\section{Network Containment Techniques}
+% ============================================================================
+
+\subsection{Firewall-Based Isolation}
+
+\begin{definitionbox}{Firewall Containment Actions}
+\begin{itemize}
+    \item \textbf{Block specific hosts} -- Deny all traffic to/from compromised IPs
+    \item \textbf{Block protocols} -- Disable specific services (RDP, SMB)
+    \item \textbf{Deny outbound} -- Prevent C2 communication and exfiltration
+    \item \textbf{Zone isolation} -- Block inter-zone traffic at boundaries
+    \item \textbf{Allow-list only} -- Permit only known-good traffic
+\end{itemize}
+\end{definitionbox}
+
+\begin{warningbox}
+\textbf{Pre-plan rules:} Have containment firewall rules pre-written and tested. During an incident is not the time to figure out syntax.
+\end{warningbox}
+
+\subsection{Switch-Based Isolation}
+
+\begin{itemize}
+    \item \textbf{Port shutdown} -- Disable switch ports for compromised hosts
+    \item \textbf{VLAN reassignment} -- Move host to quarantine VLAN
+    \item \textbf{MAC filtering} -- Block specific MAC addresses
+    \item \textbf{ACLs} -- Apply access control lists at Layer 2
+\end{itemize}
+
+\subsection{Physical Isolation}
+
+When logical isolation is insufficient:
+\begin{itemize}
+    \item Disconnect network cables (document which ones)
+    \item Remove fiber connections at patch panels
+    \item Power down non-critical network equipment
+    \item Physically disconnect IT/OT boundary links
+\end{itemize}
+
+% ============================================================================
+\section{Process-Safe Containment}
+% ============================================================================
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    zone/.style={rectangle, draw, thick, minimum height=2cm, minimum width=2.5cm, rounded corners=5pt},
+    arrow/.style={->, thick, >=stealth, dashed, otdanger}
+]
+
+\node[zone, fill=otdanger!10] (l3) at (0,0) {};
+\node[font=\scriptsize\bfseries] at (0,1.3) {Level 3};
+\node[font=\tiny, align=center] at (0,0) {Compromised\\HMI};
+
+\node[zone, fill=otsuccess!10] (l2) at (4,0) {};
+\node[font=\scriptsize\bfseries] at (4,1.3) {Level 2};
+\node[font=\tiny, align=center] at (4,0) {Controllers\\(Protected)};
+
+\node[zone, fill=otsuccess!10] (l1) at (8,0) {};
+\node[font=\scriptsize\bfseries] at (8,1.3) {Level 1/0};
+\node[font=\tiny, align=center] at (8,0) {Safety \& Field\\Devices};
+
+\draw[arrow] (1.5,0) -- (2.5,0);
+\node[font=\tiny, otdanger] at (2,-0.5) {Block};
+
+\draw[->, thick, otsuccess] (5.5,0) -- (6.5,0);
+\node[font=\tiny, otsuccess] at (6,0.5) {Allow};
+
+\end{tikzpicture}
+\caption{Selective Zone Isolation}
+\end{figure}
+
+\subsection{Maintaining Process Control}
+
+\begin{successbox}
+\textbf{Key Principle:} Isolate compromised systems while preserving control paths to field devices. A PLC can often operate independently even if HMI access is lost.
+\end{successbox}
+
+Strategies for safe containment:
+\begin{itemize}
+    \item \textbf{Isolate supervisory, preserve control} -- Block HMI traffic while allowing PLC-to-field communication
+    \item \textbf{Read-only mode} -- Allow monitoring but block control commands
+    \item \textbf{Local control} -- Switch to local/manual operation at field level
+    \item \textbf{Backup systems} -- Activate redundant HMIs or control paths
+\end{itemize}
+
+\subsection{Operations Coordination}
+
+Before any containment action:
+\begin{enumerate}
+    \item Notify operations/control room of planned actions
+    \item Identify process dependencies on affected systems
+    \item Prepare for manual operation if needed
+    \item Have rollback plan ready
+    \item Station personnel at critical equipment
+\end{enumerate}
+
+% ============================================================================
+\section{Containment by System Type}
+% ============================================================================
+
+\subsection{Compromised HMI/SCADA}
+
+\begin{enumerate}
+    \item Disconnect from network (preserve power for evidence)
+    \item Activate backup HMI if available
+    \item Verify PLCs continue operating correctly
+    \item Enable local indication/control panels
+    \item Monitor process via historian or alternate views
+\end{enumerate}
+
+\subsection{Compromised Engineering Workstation}
+
+\begin{enumerate}
+    \item Immediately disconnect from all networks
+    \item Verify no unauthorized changes were downloaded to controllers
+    \item Compare controller programs against known-good baselines
+    \item Block remote programming ports on controllers
+    \item Review audit logs for recent project changes
+\end{enumerate}
+
+\subsection{Suspected PLC Compromise}
+
+\begin{dangerbox}
+\textbf{Critical:} Do not power cycle or stop a potentially compromised PLC without assessing process impact. The current logic may be maintaining safe operations even if modified.
+\end{dangerbox}
+
+\begin{enumerate}
+    \item Upload and preserve current program for forensics
+    \item Compare against known-good baseline
+    \item Block network access to PLC (if safe to do so)
+    \item Monitor physical process behavior closely
+    \item Prepare for controlled shutdown if logic is malicious
+\end{enumerate}
+
+% ============================================================================
+\section{Communication During Containment}
+% ============================================================================
+
+\begin{itemize}
+    \item \textbf{Internal teams} -- IR team, OT engineers, operations, safety
+    \item \textbf{Management} -- Escalation triggers, decision authority
+    \item \textbf{External} -- Regulators, law enforcement (as required)
+    \item \textbf{Vendors} -- May need support for proprietary systems
+\end{itemize}
+
+Use out-of-band communication:
+\begin{itemize}
+    \item Phone calls (not VoIP on compromised network)
+    \item Mobile devices on cellular network
+    \item Physical runners for critical messages
+\end{itemize}
+
+% ============================================================================
+\section{Documentation}
+% ============================================================================
+
+Document all containment actions:
+\begin{itemize}
+    \item Timestamp of each action
+    \item Who authorized and who executed
+    \item What systems were affected
+    \item Configuration changes made
+    \item Impact observed (process, safety, evidence)
+\end{itemize}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Safety first} -- Never compromise safety for containment
+    \item \textbf{Coordinate with operations} -- No surprises to control room
+    \item \textbf{Graduated response} -- Match containment level to threat scope
+    \item \textbf{Preserve control paths} -- Isolate supervisory, maintain control
+    \item \textbf{Pre-plan actions} -- Have containment procedures ready
+    \item \textbf{Document everything} -- Timestamps, actions, impacts
+    \item \textbf{Out-of-band comms} -- Don't rely on compromised networks
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Standards and Guidelines}
+
+\begin{itemize}
+    \item \textbf{NIST SP 800-82 Rev. 3} -- Guide to OT Security\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+    \item \textbf{IEC 62443-2-1} -- Security program requirements\\
+          \url{https://webstore.iec.ch/publication/7030}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{CISA -- ICS Incident Response}\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+    \item \textbf{SANS ICS -- Incident Response}\\
+          \url{https://www.sans.org/blog/industrial-control-system-security/}
+\end{itemize}
+
+\subsection*{Books}
+
+\begin{itemize}
+    \item Knapp, E. \& Langill, J. -- \textit{Industrial Network Security} (Syngress)
+    \item NIST -- \textit{Guide to Industrial Control Systems Security}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

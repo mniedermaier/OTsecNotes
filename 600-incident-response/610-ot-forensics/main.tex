@@ -1,0 +1,331 @@
+% ============================================================================
+%  610-ot-forensics - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+% Define colors for TikZ (matching template colors)
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {OT Forensics}
+    {Evidence collection and analysis in industrial control system environments}
+    {OT Security Learning Series}
+    {Document 610 \quad|\quad January 2026}
+    {AI Assistant}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+Digital forensics in OT environments requires specialized approaches that balance evidence preservation with operational continuity. Unlike IT forensics, OT investigators must work with proprietary systems, real-time constraints, and equipment that cannot be easily taken offline.
+\end{infobox}
+
+OT forensics challenges include:
+\begin{itemize}
+    \item Systems that cannot be shut down for imaging
+    \item Proprietary file systems and data formats
+    \item Limited or no logging capabilities
+    \item Volatile evidence in controller memory
+    \item Chain of custody across IT and OT boundaries
+\end{itemize}
+
+% ============================================================================
+\section{OT vs IT Forensics}
+% ============================================================================
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|X|}
+\hline
+\textbf{Aspect} & \textbf{IT Forensics} & \textbf{OT Forensics} \\
+\hline
+System access & Can often image offline & Must preserve operations \\
+Evidence sources & Disk, memory, logs & Controllers, network, historian \\
+Tools & Standard forensic suites & Vendor-specific, custom tools \\
+File systems & NTFS, ext4, APFS & Proprietary, embedded \\
+Time sensitivity & Hours to days & Minutes to hours \\
+Expertise & IT security analysts & OT engineers + forensics \\
+\hline
+\end{tabularx}
+\caption{IT vs OT Forensics Comparison}
+\end{table}
+
+\begin{warningbox}
+\textbf{Critical Difference:} In IT, you typically take systems offline for imaging. In OT, shutting down a PLC or HMI may halt production or create safety hazards. Live forensics is often the only option.
+\end{warningbox}
+
+% ============================================================================
+\section{Evidence Sources}
+% ============================================================================
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    source/.style={rectangle, draw, thick, fill=otaccent!20, minimum height=1cm, minimum width=2.3cm, rounded corners=3pt, font=\tiny\bfseries, align=center},
+    arrow/.style={->, thick, >=stealth}
+]
+
+\node[source] (network) at (0,0) {Network\\Traffic};
+\node[source] (historian) at (2.8,0) {Historian\\Data};
+\node[source] (logs) at (5.6,0) {System\\Logs};
+\node[source] (plc) at (8.4,0) {Controller\\Memory};
+\node[source] (hmi) at (11.2,0) {HMI/SCADA\\Systems};
+
+\node[font=\tiny, text width=2cm, align=center] at (0,-1.2) {PCAPs\\Protocol data\\Flow records};
+\node[font=\tiny, text width=2cm, align=center] at (2.8,-1.2) {Process values\\Alarms\\Trends};
+\node[font=\tiny, text width=2cm, align=center] at (5.6,-1.2) {Event logs\\Auth logs\\Audit trails};
+\node[font=\tiny, text width=2cm, align=center] at (8.4,-1.2) {Program logic\\Variables\\Diagnostics};
+\node[font=\tiny, text width=2cm, align=center] at (11.2,-1.2) {Screenshots\\Configs\\User actions};
+
+\end{tikzpicture}
+\caption{OT Evidence Sources}
+\end{figure}
+
+\subsection{Network Evidence}
+
+\begin{itemize}
+    \item \textbf{Packet captures} -- Full PCAP from network taps or SPAN ports
+    \item \textbf{NetFlow/IPFIX} -- Connection metadata and flow statistics
+    \item \textbf{Firewall logs} -- Allowed and denied connections
+    \item \textbf{IDS/IPS alerts} -- Detection events with packet samples
+    \item \textbf{Protocol-specific logs} -- Modbus, DNP3, OPC UA transactions
+\end{itemize}
+
+\subsection{Historian Data}
+
+\begin{successbox}
+\textbf{Key Evidence:} Historians often contain the best timeline of process anomalies. Sudden setpoint changes, unusual values, or gaps in data collection can indicate compromise.
+\end{successbox}
+
+\begin{itemize}
+    \item Process variable trends (before, during, after incident)
+    \item Alarm and event sequences
+    \item Operator actions and acknowledgments
+    \item System health metrics
+\end{itemize}
+
+\subsection{Controller Evidence}
+
+\begin{itemize}
+    \item \textbf{Program files} -- Current logic vs known-good baseline
+    \item \textbf{Runtime variables} -- Current values in memory
+    \item \textbf{Diagnostic buffers} -- Error logs, communication stats
+    \item \textbf{Firmware version} -- Check for unauthorized changes
+    \item \textbf{Project files} -- Engineering workstation copies
+\end{itemize}
+
+\subsection{Endpoint Evidence}
+
+\begin{itemize}
+    \item HMI screenshots and session recordings
+    \item Engineering workstation disk images
+    \item USB device connection logs
+    \item Remote access session logs
+    \item Antivirus/EDR detection logs
+\end{itemize}
+
+% ============================================================================
+\section{Evidence Collection Process}
+% ============================================================================
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    procstep/.style={rectangle, draw, thick, fill=otaccent!20, minimum height=0.9cm, minimum width=1.6cm, rounded corners=3pt, font=\tiny\bfseries, align=center},
+    arrow/.style={->, thick, >=stealth}
+]
+
+\node[procstep] (scope) at (0,0) {1. Define\\Scope};
+\node[procstep] (volatile) at (2.3,0) {2. Capture\\Volatile};
+\node[procstep] (network) at (4.6,0) {3. Network\\Evidence};
+\node[procstep] (storage) at (6.9,0) {4. Storage\\Imaging};
+\node[procstep] (document) at (9.2,0) {5. Document\\Everything};
+
+\draw[arrow, otprimary] (scope) -- (volatile);
+\draw[arrow, otprimary] (volatile) -- (network);
+\draw[arrow, otprimary] (network) -- (storage);
+\draw[arrow, otprimary] (storage) -- (document);
+
+\end{tikzpicture}
+\caption{Evidence Collection Workflow}
+\end{figure}
+
+\subsection{Order of Volatility}
+
+Collect evidence in order of how quickly it may be lost:
+
+\begin{enumerate}
+    \item \textbf{Network traffic} -- Capture immediately, flows constantly
+    \item \textbf{Controller memory} -- Runtime state, may change with process
+    \item \textbf{System memory} -- RAM on Windows/Linux systems
+    \item \textbf{Running processes} -- Active connections, loaded modules
+    \item \textbf{Historian data} -- May be overwritten by retention policies
+    \item \textbf{Disk storage} -- Most persistent, collect last
+\end{enumerate}
+
+\subsection{Live Collection Techniques}
+
+\begin{definitionbox}{Non-Disruptive Collection}
+\begin{itemize}
+    \item \textbf{Network tap} -- Passive copy of all traffic
+    \item \textbf{SPAN/mirror port} -- Switch-based traffic copy
+    \item \textbf{Read-only PLC upload} -- Extract program without stopping
+    \item \textbf{Historian export} -- Query historical data via API
+    \item \textbf{Log forwarding} -- Real-time copy to forensic server
+\end{itemize}
+\end{definitionbox}
+
+\begin{dangerbox}
+\textbf{Do Not:}
+\begin{itemize}
+    \item Stop or restart controllers during evidence collection
+    \item Install forensic agents on production OT systems
+    \item Run active network scans that may disrupt protocols
+    \item Modify system configurations to enable logging
+\end{itemize}
+\end{dangerbox}
+
+% ============================================================================
+\section{Chain of Custody}
+% ============================================================================
+
+Maintain rigorous documentation:
+
+\begin{itemize}
+    \item \textbf{Who} collected the evidence
+    \item \textbf{What} was collected (hashes, descriptions)
+    \item \textbf{When} collection occurred (timestamps)
+    \item \textbf{Where} evidence was stored
+    \item \textbf{How} collection was performed (tools, methods)
+\end{itemize}
+
+\subsection{Evidence Integrity}
+
+\begin{itemize}
+    \item Calculate cryptographic hashes (SHA-256) immediately
+    \item Use write-blockers for disk imaging
+    \item Store evidence on encrypted, access-controlled media
+    \item Maintain detailed logs of all access
+    \item Create working copies for analysis
+\end{itemize}
+
+% ============================================================================
+\section{Analysis Techniques}
+% ============================================================================
+
+\subsection{Timeline Analysis}
+
+Correlate events across multiple sources:
+\begin{itemize}
+    \item Historian timestamps (process anomalies)
+    \item Network capture timestamps (malicious traffic)
+    \item Log timestamps (authentication, errors)
+    \item Normalize all times to UTC
+\end{itemize}
+
+\subsection{PLC Program Analysis}
+
+\begin{itemize}
+    \item Compare current program to known-good baseline
+    \item Identify unauthorized function blocks or logic changes
+    \item Check for hidden routines or conditional triggers
+    \item Analyze program upload/download history
+\end{itemize}
+
+\subsection{Network Traffic Analysis}
+
+\begin{itemize}
+    \item Identify unauthorized connections
+    \item Analyze industrial protocol commands
+    \item Look for reconnaissance (scans, enumeration)
+    \item Detect data exfiltration patterns
+    \item Check for C2 communication signatures
+\end{itemize}
+
+% ============================================================================
+\section{Tools for OT Forensics}
+% ============================================================================
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Category} & \textbf{Tools} \\
+\hline
+Network capture & Wireshark, tcpdump, NetworkMiner \\
+Protocol analysis & Wireshark dissectors, custom parsers \\
+Disk imaging & FTK Imager, dd, Guymager \\
+Memory analysis & Volatility, Rekall \\
+Timeline & log2timeline/Plaso, Timesketch \\
+PLC analysis & Vendor tools, custom scripts \\
+\hline
+\end{tabularx}
+\caption{OT Forensics Tool Categories}
+\end{table}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Operational priority} -- Evidence collection must not disrupt operations
+    \item \textbf{Multiple sources} -- Network, historian, controllers, endpoints
+    \item \textbf{Order of volatility} -- Capture ephemeral evidence first
+    \item \textbf{Live forensics} -- Often the only option in OT
+    \item \textbf{Chain of custody} -- Document everything for legal proceedings
+    \item \textbf{Baseline comparison} -- Compare against known-good configurations
+    \item \textbf{Cross-domain expertise} -- Requires both OT and forensics skills
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Standards and Guidelines}
+
+\begin{itemize}
+    \item \textbf{NIST SP 800-86} -- Guide to Integrating Forensic Techniques\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-86/final}
+    \item \textbf{IEC 62443-2-1} -- Security program requirements\\
+          \url{https://webstore.iec.ch/publication/7030}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{CISA -- ICS Forensics Resources}\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+    \item \textbf{SANS ICS -- Digital Forensics}\\
+          \url{https://www.sans.org/cyber-security-courses/ics-digital-forensics/}
+\end{itemize}
+
+\subsection*{Books}
+
+\begin{itemize}
+    \item Knapp, E. \& Langill, J. -- \textit{Industrial Network Security} (Syngress)
+    \item NIST -- \textit{Guide to Industrial Control Systems Security}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

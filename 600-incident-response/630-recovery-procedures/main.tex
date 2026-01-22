@@ -1,0 +1,406 @@
+% ============================================================================
+%  630-recovery-procedures - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+% Define colors for TikZ (matching template colors)
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {OT Recovery Procedures}
+    {Safely restoring industrial control systems after a security incident}
+    {OT Security Learning Series}
+    {Document 630 \quad|\quad January 2026}
+    {AI Assistant}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+Recovery in OT environments requires careful, methodical restoration of systems while ensuring the threat has been fully eradicated. Rushing recovery can reintroduce malware, cause process upsets, or create new safety hazards.
+\end{infobox}
+
+Recovery challenges in OT:
+\begin{itemize}
+    \item Systems may have been compromised for extended periods
+    \item Backups may also be compromised
+    \item Process startup sequences are complex
+    \item Safety systems must be verified before restart
+    \item Production pressure to restore quickly
+\end{itemize}
+
+\begin{dangerbox}
+\textbf{Do Not Rush:} Pressure to restore production can lead to incomplete recovery. Restarting on compromised systems will result in repeat incidents.
+\end{dangerbox}
+
+% ============================================================================
+\section{Recovery Phases}
+% ============================================================================
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    phase/.style={rectangle, draw, thick, fill=otaccent!20, minimum height=1cm, minimum width=2cm, rounded corners=3pt, font=\tiny\bfseries, align=center},
+    arrow/.style={->, thick, >=stealth}
+]
+
+\node[phase] (assess) at (0,0) {1. Assess\\Damage};
+\node[phase] (plan) at (2.5,0) {2. Plan\\Recovery};
+\node[phase] (rebuild) at (5,0) {3. Rebuild\\Systems};
+\node[phase] (validate) at (7.5,0) {4. Validate\\Function};
+\node[phase] (restore) at (10,0) {5. Restore\\Operations};
+
+\draw[arrow, otprimary] (assess) -- (plan);
+\draw[arrow, otprimary] (plan) -- (rebuild);
+\draw[arrow, otprimary] (rebuild) -- (validate);
+\draw[arrow, otprimary] (validate) -- (restore);
+
+\end{tikzpicture}
+\caption{OT Recovery Phases}
+\end{figure}
+
+% ============================================================================
+\section{Phase 1: Damage Assessment}
+% ============================================================================
+
+\subsection{Scope Determination}
+
+Identify all affected systems:
+\begin{itemize}
+    \item Which systems were directly compromised?
+    \item What systems did the attacker access?
+    \item Were any configurations or programs modified?
+    \item Is historian data trustworthy?
+    \item Are backups known to be clean?
+\end{itemize}
+
+\subsection{Backup Integrity Verification}
+
+\begin{warningbox}
+\textbf{Critical Check:} Attackers often persist by compromising backups. Verify backup integrity before restoration:
+\begin{itemize}
+    \item When was the backup created relative to initial compromise?
+    \item Has the backup been accessed or modified?
+    \item Can you verify backup contents against known-good hashes?
+\end{itemize}
+\end{warningbox}
+
+\subsection{Clean Baseline Identification}
+
+Determine what ``known good'' looks like:
+\begin{itemize}
+    \item Last verified-clean system images
+    \item Validated PLC program versions
+    \item Documented configuration baselines
+    \item Factory default recovery options
+\end{itemize}
+
+% ============================================================================
+\section{Phase 2: Recovery Planning}
+% ============================================================================
+
+\subsection{Prioritization}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\textbf{Priority} & \textbf{Systems} & \textbf{Rationale} \\
+\hline
+1 & Safety systems & Must be verified before any restart \\
+2 & Critical PLCs & Core process control \\
+3 & Primary HMIs & Operator visibility \\
+4 & Historians & Process monitoring \\
+5 & Engineering stations & Can operate without initially \\
+\hline
+\end{tabularx}
+\caption{Recovery Priority Order}
+\end{table}
+
+\subsection{Recovery Strategy Selection}
+
+\begin{definitionbox}{Recovery Options}
+\begin{itemize}
+    \item \textbf{Restore from backup} -- Fastest if backups are verified clean
+    \item \textbf{Rebuild from scratch} -- Most thorough but time-consuming
+    \item \textbf{Hybrid approach} -- Rebuild critical systems, restore others
+    \item \textbf{Vendor recovery} -- Engage vendor for complex systems
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Resource Requirements}
+
+Identify what you need:
+\begin{itemize}
+    \item Clean installation media
+    \item Verified backup files
+    \item Vendor software licenses
+    \item Engineering expertise (internal or vendor)
+    \item Test environment for validation
+    \item Maintenance window duration
+\end{itemize}
+
+% ============================================================================
+\section{Phase 3: System Rebuild}
+% ============================================================================
+
+\subsection{General Rebuild Process}
+
+\begin{enumerate}
+    \item Disconnect system from all networks
+    \item Wipe or replace storage media
+    \item Install clean OS from verified media
+    \item Apply security patches and hardening
+    \item Install applications from verified sources
+    \item Restore configurations from clean backups
+    \item Change all credentials and keys
+    \item Document all changes made
+\end{enumerate}
+
+\subsection{PLC/Controller Recovery}
+
+\begin{enumerate}
+    \item Verify hardware integrity (no physical tampering)
+    \item Factory reset controller if possible
+    \item Reload firmware from verified vendor source
+    \item Download verified-clean program
+    \item Verify program matches baseline (compare checksums)
+    \item Test in simulation mode if available
+    \item Reconnect I/O carefully, verifying signals
+\end{enumerate}
+
+\begin{successbox}
+\textbf{Best Practice:} If PLC program baseline doesn't exist, consider having vendor or integrator review the logic before restoration to ensure no malicious modifications persist.
+\end{successbox}
+
+\subsection{HMI/SCADA Recovery}
+
+\begin{enumerate}
+    \item Rebuild operating system from clean media
+    \item Install SCADA software from verified installation files
+    \item Restore project files from clean backup
+    \item Verify all tags and communications
+    \item Restore alarm configurations
+    \item Test all displays and controls in simulation
+    \item Reconnect to controllers one at a time
+\end{enumerate}
+
+\subsection{Network Infrastructure}
+
+\begin{enumerate}
+    \item Reset network devices to factory defaults
+    \item Reload firmware from verified sources
+    \item Reconfigure from documented baselines
+    \item Implement improved segmentation if identified in post-incident
+    \item Update firewall rules based on lessons learned
+    \item Re-establish monitoring and logging
+\end{enumerate}
+
+% ============================================================================
+\section{Phase 4: Validation}
+% ============================================================================
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    test/.style={rectangle, draw, thick, fill=otsuccess!20, minimum height=0.9cm, minimum width=2.5cm, rounded corners=3pt, font=\tiny\bfseries, align=center},
+    arrow/.style={->, thick, >=stealth}
+]
+
+\node[test] (safety) at (0,0) {Safety System\\Verification};
+\node[test] (func) at (3.5,0) {Functional\\Testing};
+\node[test] (integ) at (7,0) {Integration\\Testing};
+\node[test] (security) at (10.5,0) {Security\\Verification};
+
+\draw[arrow, otsuccess] (safety) -- (func);
+\draw[arrow, otsuccess] (func) -- (integ);
+\draw[arrow, otsuccess] (integ) -- (security);
+
+\end{tikzpicture}
+\caption{Validation Sequence}
+\end{figure}
+
+\subsection{Safety System Verification}
+
+\begin{dangerbox}
+\textbf{Mandatory:} Safety systems must be fully validated before process restart. This is non-negotiable regardless of production pressure.
+\end{dangerbox}
+
+\begin{itemize}
+    \item Verify SIS logic against approved design
+    \item Test all safety instrumented functions
+    \item Confirm voting logic operates correctly
+    \item Validate emergency shutdown sequences
+    \item Document all safety system test results
+\end{itemize}
+
+\subsection{Functional Testing}
+
+\begin{itemize}
+    \item Verify all I/O points read correctly
+    \item Test control loops in manual mode
+    \item Confirm setpoints and tuning parameters
+    \item Validate alarm points and limits
+    \item Test interlocks and permissives
+    \item Verify HMI displays match process state
+\end{itemize}
+
+\subsection{Integration Testing}
+
+\begin{itemize}
+    \item Test communication between all systems
+    \item Verify historian is collecting data
+    \item Confirm remote access works (if applicable)
+    \item Test alarm routing and notifications
+    \item Validate reporting functions
+\end{itemize}
+
+\subsection{Security Verification}
+
+Before returning to production:
+\begin{itemize}
+    \item Verify all credentials were changed
+    \item Confirm network segmentation is correct
+    \item Validate firewall rules are in place
+    \item Check monitoring and logging is active
+    \item Scan for indicators of compromise
+    \item Verify backup systems are operational
+\end{itemize}
+
+% ============================================================================
+\section{Phase 5: Return to Operations}
+% ============================================================================
+
+\subsection{Staged Startup}
+
+\begin{enumerate}
+    \item Start with non-critical systems first
+    \item Bring up one area/unit at a time
+    \item Monitor closely for anomalies
+    \item Validate each stage before proceeding
+    \item Have rollback plan ready at each step
+\end{enumerate}
+
+\subsection{Enhanced Monitoring}
+
+During initial operation period:
+\begin{itemize}
+    \item Increased logging verbosity
+    \item More frequent security scans
+    \item Additional operator oversight
+    \item Regular system health checks
+    \item Watching for signs of re-compromise
+\end{itemize}
+
+\subsection{Handover to Operations}
+
+\begin{itemize}
+    \item Formal handover meeting with operations
+    \item Document any temporary restrictions
+    \item Provide updated procedures if any
+    \item Establish escalation contacts
+    \item Schedule follow-up reviews
+\end{itemize}
+
+% ============================================================================
+\section{Post-Recovery Activities}
+% ============================================================================
+
+\subsection{Lessons Learned}
+
+Conduct post-incident review:
+\begin{itemize}
+    \item How did the attacker gain access?
+    \item What detection gaps existed?
+    \item Were containment actions effective?
+    \item What slowed recovery?
+    \item What should be improved?
+\end{itemize}
+
+\subsection{Documentation Update}
+
+\begin{itemize}
+    \item Update recovery procedures based on experience
+    \item Refresh baseline documentation
+    \item Create new verified-clean backups
+    \item Update asset inventory
+    \item Revise incident response plans
+\end{itemize}
+
+\subsection{Security Improvements}
+
+Implement identified improvements:
+\begin{itemize}
+    \item Additional monitoring controls
+    \item Improved network segmentation
+    \item Enhanced backup procedures
+    \item Better detection capabilities
+    \item Updated access controls
+\end{itemize}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Don't rush} -- Incomplete recovery leads to repeat incidents
+    \item \textbf{Verify backups} -- Attackers target backup systems too
+    \item \textbf{Safety first} -- Validate safety systems before restart
+    \item \textbf{Rebuild vs restore} -- Choose based on compromise scope
+    \item \textbf{Change credentials} -- Assume all passwords are compromised
+    \item \textbf{Staged startup} -- Bring systems up incrementally
+    \item \textbf{Enhanced monitoring} -- Watch closely after recovery
+    \item \textbf{Learn and improve} -- Update procedures based on experience
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Standards and Guidelines}
+
+\begin{itemize}
+    \item \textbf{NIST SP 800-184} -- Guide for Cybersecurity Event Recovery\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-184/final}
+    \item \textbf{NIST SP 800-82 Rev. 3} -- Guide to OT Security\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{CISA -- ICS Recovery Resources}\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+    \item \textbf{SANS ICS -- Incident Response and Recovery}\\
+          \url{https://www.sans.org/blog/industrial-control-system-security/}
+\end{itemize}
+
+\subsection*{Books}
+
+\begin{itemize}
+    \item Knapp, E. \& Langill, J. -- \textit{Industrial Network Security} (Syngress)
+    \item NIST -- \textit{Guide to Industrial Control Systems Security}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

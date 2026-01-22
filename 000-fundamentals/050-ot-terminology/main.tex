@@ -1,0 +1,267 @@
+% ============================================================================
+%  050-ot-terminology - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+\begin{document}
+
+\maketitlepage
+    {OT Terminology and Glossary}
+    {Essential terms, acronyms, and concepts for OT security professionals}
+    {OT Security Learning Series}
+    {Document 050 \quad|\quad January 2026}
+    {AI Assistant}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+Operational Technology (OT) has its own vocabulary distinct from IT. Understanding these terms is essential for effective communication between security teams, engineers, and operators in industrial environments.
+\end{infobox}
+
+This glossary provides definitions for common terms encountered in OT security, organized by category for easy reference.
+
+% ============================================================================
+\section{System Types}
+% ============================================================================
+
+\begin{definitionbox}{Core OT Systems}
+\begin{description}[style=nextline, leftmargin=1.5cm]
+    \item[SCADA] \textit{Supervisory Control and Data Acquisition} -- System for remote monitoring and control of distributed assets (pipelines, power grids, water systems)
+    \item[DCS] \textit{Distributed Control System} -- Integrated control system for continuous processes (refineries, chemical plants, power generation)
+    \item[PLC] \textit{Programmable Logic Controller} -- Ruggedized computer for automating industrial processes and machinery
+    \item[RTU] \textit{Remote Terminal Unit} -- Field device that interfaces with sensors/actuators and communicates with SCADA
+    \item[IED] \textit{Intelligent Electronic Device} -- Smart device in power systems (protective relays, meters)
+    \item[HMI] \textit{Human-Machine Interface} -- Operator interface for monitoring and controlling industrial processes
+    \item[SIS] \textit{Safety Instrumented System} -- Independent system designed to bring processes to safe state
+\end{description}
+\end{definitionbox}
+
+% ============================================================================
+\section{Network and Communication}
+% ============================================================================
+
+\subsection{Network Terms}
+
+\begin{description}[style=nextline, leftmargin=1.5cm]
+    \item[OT Network] Network connecting industrial control systems, isolated from corporate IT
+    \item[Air Gap] Physical isolation of a network with no connection to other networks
+    \item[DMZ] \textit{Demilitarized Zone} -- Network segment between IT and OT for controlled data exchange
+    \item[Conduit] Communication path between security zones (IEC 62443 term)
+    \item[Zone] Grouping of assets with common security requirements (IEC 62443 term)
+    \item[Fieldbus] Industrial network connecting field devices to controllers
+    \item[Backhaul] Communication link from remote sites to central control
+\end{description}
+
+\subsection{Protocols}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|l|}
+\hline
+\textbf{Protocol} & \textbf{Full Name} & \textbf{Use Case} \\
+\hline
+Modbus & -- & Register-based comms \\
+DNP3 & Distributed Network Protocol & SCADA, utilities \\
+OPC UA & Open Platform Communications UA & Industrial interop \\
+EtherNet/IP & EtherNet Industrial Protocol & Rockwell systems \\
+PROFINET & Process Field Net & Siemens environments \\
+BACnet & Building Automation Control & Building automation \\
+IEC 61850 & -- & Substation automation \\
+HART & Highway Addressable Remote Transducer & Smart instruments \\
+\hline
+\end{tabularx}
+\caption{Common Industrial Protocols}
+\end{table}
+
+% ============================================================================
+\section{Hardware Components}
+% ============================================================================
+
+\subsection{Field Devices}
+
+\begin{description}[style=nextline, leftmargin=1.5cm]
+    \item[Sensor] Device that measures physical parameters (temperature, pressure, flow, level)
+    \item[Transmitter] Sensor with built-in signal conditioning and communication
+    \item[Actuator] Device that performs physical action (valve, motor, relay)
+    \item[VFD/VSD] \textit{Variable Frequency/Speed Drive} -- Controls motor speed
+    \item[I/O Module] Interface between controller and field devices (inputs/outputs)
+    \item[Marshalling Cabinet] Enclosure where field wiring terminates before connecting to I/O
+\end{description}
+
+\subsection{Control Equipment}
+
+\begin{description}[style=nextline, leftmargin=1.5cm]
+    \item[Controller] Device executing control logic (PLC, DCS controller, RTU)
+    \item[Safety Controller] PLC certified for safety functions (SIL-rated)
+    \item[PAC] \textit{Programmable Automation Controller} -- Advanced PLC with PC-like features
+    \item[Engineering Workstation] PC used to program and configure controllers
+    \item[Historian] Server that collects and stores time-series process data
+    \item[OPC Server] Software that translates between industrial protocols and OPC
+\end{description}
+
+% ============================================================================
+\section{Programming and Logic}
+% ============================================================================
+
+\begin{definitionbox}{IEC 61131-3 Programming Languages}
+\begin{description}[style=nextline, leftmargin=1.5cm]
+    \item[Ladder Logic (LD)] Graphical language resembling electrical relay diagrams
+    \item[Function Block Diagram (FBD)] Graphical language using interconnected function blocks
+    \item[Structured Text (ST)] Text-based language similar to Pascal
+    \item[Instruction List (IL)] Low-level assembly-like language (deprecated)
+    \item[Sequential Function Chart (SFC)] Graphical language for sequential processes
+\end{description}
+\end{definitionbox}
+
+\subsection{Control Concepts}
+
+\begin{description}[style=nextline, leftmargin=1.5cm]
+    \item[Scan Cycle] Time for PLC to read inputs, execute logic, update outputs
+    \item[Tag] Named data point representing a process variable
+    \item[Setpoint] Target value for a controlled variable
+    \item[PID] \textit{Proportional-Integral-Derivative} -- Common control algorithm
+    \item[Interlock] Logic that prevents unsafe operations
+    \item[Permissive] Condition that must be true before an action is allowed
+\end{description}
+
+% ============================================================================
+\section{Safety Terms}
+% ============================================================================
+
+\begin{warningbox}
+Safety systems use specific terminology defined in IEC 61511 and IEC 61508. Precise understanding is critical as these systems protect human life.
+\end{warningbox}
+
+\begin{description}[style=nextline, leftmargin=1.5cm]
+    \item[SIF] \textit{Safety Instrumented Function} -- Specific safety action (sensor + logic + actuator)
+    \item[SIL] \textit{Safety Integrity Level} -- Risk reduction capability (SIL 1-4)
+    \item[PFD] \textit{Probability of Failure on Demand} -- Likelihood SIF fails when needed
+    \item[BPCS] \textit{Basic Process Control System} -- Normal process control (not safety)
+    \item[ESD] \textit{Emergency Shutdown} -- System or action to stop process safely
+    \item[F\&G] \textit{Fire and Gas} -- Detection system for fires and gas releases
+    \item[HAZOP] \textit{Hazard and Operability Study} -- Risk assessment methodology
+    \item[LOPA] \textit{Layer of Protection Analysis} -- Method to determine required SIL
+\end{description}
+
+% ============================================================================
+\section{Security Terms}
+% ============================================================================
+
+\subsection{Standards and Frameworks}
+
+\begin{description}[style=nextline, leftmargin=1.5cm]
+    \item[IEC 62443] International standard series for industrial cybersecurity
+    \item[NIST 800-82] US guide to OT security
+    \item[NERC CIP] North American electric grid security standards
+    \item[SL] \textit{Security Level} -- IEC 62443 security capability rating (SL 1-4)
+    \item[SAL] \textit{Security Assurance Level} -- Development rigor level
+\end{description}
+
+\subsection{Security Concepts}
+
+\begin{description}[style=nextline, leftmargin=1.5cm]
+    \item[Defense in Depth] Multiple security layers to protect assets
+    \item[Least Privilege] Minimum access rights needed for a task
+    \item[Segmentation] Dividing networks into isolated zones
+    \item[Allowlisting] Permitting only approved applications/traffic
+    \item[OT IDS] Intrusion detection system designed for industrial protocols
+    \item[Asset Inventory] Comprehensive list of all OT devices and software
+\end{description}
+
+% ============================================================================
+\section{Operational Terms}
+% ============================================================================
+
+\begin{description}[style=nextline, leftmargin=1.5cm]
+    \item[Availability] System uptime and operational readiness
+    \item[Downtime] Period when system is not operational
+    \item[Maintenance Window] Scheduled time for system updates/changes
+    \item[MOC] \textit{Management of Change} -- Formal process for system modifications
+    \item[FAT] \textit{Factory Acceptance Test} -- Testing at vendor before delivery
+    \item[SAT] \textit{Site Acceptance Test} -- Testing after installation at site
+    \item[Commissioning] Process of verifying and starting up new systems
+    \item[Brownfield] Existing facility with legacy systems
+    \item[Greenfield] New facility built from scratch
+\end{description}
+
+% ============================================================================
+\section{Industry-Specific Terms}
+% ============================================================================
+
+\subsection{Process Industries}
+
+\begin{description}[style=nextline, leftmargin=1.5cm]
+    \item[Batch Process] Production in discrete quantities (pharmaceuticals, food)
+    \item[Continuous Process] Uninterrupted production flow (refining, chemicals)
+    \item[Recipe] Set of parameters and steps for batch production
+    \item[Unit Operation] Single processing step (mixing, heating, filtering)
+\end{description}
+
+\subsection{Utilities and Infrastructure}
+
+\begin{description}[style=nextline, leftmargin=1.5cm]
+    \item[DERMS] \textit{Distributed Energy Resource Management System}
+    \item[AMI] \textit{Advanced Metering Infrastructure} -- Smart meter network
+    \item[Substation] Facility for transforming voltage levels in power grid
+    \item[WWTP] \textit{Wastewater Treatment Plant}
+    \item[WTP] \textit{Water Treatment Plant}
+\end{description}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Categories}
+\begin{itemize}
+    \item \textbf{Systems} -- SCADA, DCS, PLC, RTU, HMI, SIS
+    \item \textbf{Networks} -- DMZ, fieldbus, zones and conduits
+    \item \textbf{Protocols} -- Modbus, DNP3, OPC UA, EtherNet/IP
+    \item \textbf{Safety} -- SIF, SIL, PFD, ESD, HAZOP
+    \item \textbf{Security} -- IEC 62443, defense in depth, segmentation
+    \item \textbf{Operations} -- MOC, FAT/SAT, maintenance windows
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Standards}
+
+\begin{itemize}
+    \item \textbf{IEC 62443 Series} -- Industrial cybersecurity terminology\\
+          \url{https://webstore.iec.ch/publication/7029}
+    \item \textbf{IEC 61131-3} -- PLC programming languages\\
+          \url{https://webstore.iec.ch/publication/4552}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{CISA -- ICS Glossary}\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+    \item \textbf{ISA -- Automation Terms}\\
+          \url{https://www.isa.org/}
+\end{itemize}
+
+\subsection*{Books}
+
+\begin{itemize}
+    \item Boyer, S. -- \textit{SCADA: Supervisory Control and Data Acquisition} (ISA)
+    \item Knapp, E. \& Langill, J. -- \textit{Industrial Network Security} (Syngress)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}
