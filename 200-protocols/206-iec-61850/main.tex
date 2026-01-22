@@ -1,0 +1,363 @@
+% ============================================================================
+%  206-iec-61850 - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {IEC 61850 Protocol}
+    {Communication standard for electrical substation automation}
+    {OT Security Learning Series}
+    {Document 206 \quad|\quad January 2026}
+    {AI Assistant}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+IEC 61850 is the international standard for communication in electrical substations. It enables interoperability between protective relays, circuit breakers, transformers, and control systems in power grid infrastructure.
+\end{infobox}
+
+Key characteristics:
+\begin{itemize}
+    \item International standard for substation automation
+    \item Object-oriented data modeling
+    \item Multiple communication services (MMS, GOOSE, SV)
+    \item Designed for power utility environments
+    \item Critical infrastructure protocol
+\end{itemize}
+
+\begin{dangerbox}
+IEC 61850 controls protective relays and circuit breakers in the power grid. Attacks on this protocol can cause equipment damage, widespread outages, or safety hazards. The Industroyer/CrashOverride malware targeted IEC 61850.
+\end{dangerbox}
+
+% ============================================================================
+\section{Protocol Architecture}
+% ============================================================================
+
+\subsection{Data Model}
+
+IEC 61850 uses a hierarchical object model:
+
+\begin{itemize}
+    \item \textbf{Physical Device} -- The actual hardware
+    \item \textbf{Logical Device} -- Functional grouping within physical device
+    \item \textbf{Logical Node} -- Specific function (e.g., XCBR for circuit breaker)
+    \item \textbf{Data Object} -- Attributes of the logical node
+    \item \textbf{Data Attribute} -- Individual values
+\end{itemize}
+
+\subsection{Logical Node Examples}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Logical Node} & \textbf{Function} \\
+\hline
+XCBR & Circuit breaker \\
+XSWI & Disconnector/switch \\
+PDIS & Distance protection \\
+PTOC & Overcurrent protection \\
+MMXU & Measurement unit \\
+CSWI & Switch controller \\
+\hline
+\end{tabular}
+\caption{Common IEC 61850 Logical Nodes}
+\end{table}
+
+% ============================================================================
+\section{Communication Services}
+% ============================================================================
+
+\subsection{Service Types}
+
+\begin{definitionbox}{IEC 61850 Communication Services}
+\begin{itemize}
+    \item \textbf{MMS (Manufacturing Message Specification)} -- Client/server for configuration, reporting
+    \item \textbf{GOOSE (Generic Object Oriented Substation Event)} -- Fast multicast for protection events
+    \item \textbf{SV (Sampled Values)} -- Real-time measurement streaming
+    \item \textbf{Time Sync} -- Precision time protocol (IEEE 1588 PTP)
+\end{itemize}
+\end{definitionbox}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    device/.style={rectangle, draw, thick, minimum height=0.8cm, minimum width=1.6cm, rounded corners=2pt, font=\tiny\bfseries, align=center},
+    bus/.style={thick},
+    arrow/.style={->, thick, >=stealth}
+]
+
+% Station level
+\node[device, fill=otinfo!20] (hmi) at (-1,3) {HMI};
+\node[device, fill=otinfo!20] (gateway) at (4,3) {Gateway};
+
+% Station bus
+\draw[bus, otprimary] (-3,2) -- (6,2);
+\node[font=\tiny, otprimary, anchor=west] at (6.2,2) {Station Bus (MMS)};
+
+% Bay level - IEDs
+\node[device, fill=otaccent!20] (ied1) at (-1.5,1) {IED};
+\node[device, fill=otaccent!20] (ied2) at (1.5,1) {IED};
+\node[device, fill=otaccent!20] (ied3) at (4.5,1) {IED};
+
+% Process bus
+\draw[bus, otdanger] (-3,0) -- (6,0);
+\node[font=\tiny, otdanger, anchor=west] at (6.2,0) {Process Bus (GOOSE/SV)};
+
+% Field devices
+\node[device, fill=otsuccess!20] (ct1) at (-1.5,-1) {CT/VT};
+\node[device, fill=otsuccess!20] (cb) at (1.5,-1) {Breaker};
+\node[device, fill=otsuccess!20] (ct2) at (4.5,-1) {CT/VT};
+
+% Connections
+\draw[arrow] (hmi) -- (-1,2);
+\draw[arrow] (gateway) -- (4,2);
+\draw[arrow] (ied1) -- (-1.5,2);
+\draw[arrow] (ied2) -- (1.5,2);
+\draw[arrow] (ied3) -- (4.5,2);
+\draw[arrow] (ied1) -- (-1.5,0);
+\draw[arrow] (ied2) -- (1.5,0);
+\draw[arrow] (ied3) -- (4.5,0);
+\draw[arrow] (ct1) -- (-1.5,0);
+\draw[arrow] (cb) -- (1.5,0);
+\draw[arrow] (ct2) -- (4.5,0);
+
+% GOOSE between IEDs (arrows above the boxes)
+\draw[arrow, otdanger, dashed] (-0.6,1.5) -- node[above, font=\tiny] {GOOSE} (0.6,1.5);
+\draw[arrow, otdanger, dashed] (2.4,1.5) -- node[above, font=\tiny] {GOOSE} (3.6,1.5);
+
+\end{tikzpicture}
+\caption{IEC 61850 Substation Architecture}
+\end{figure}
+
+\subsection{Network Ports}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Service} & \textbf{Port/Type} & \textbf{Purpose} \\
+\hline
+MMS & TCP/102 & Configuration, reporting \\
+GOOSE & EtherType 0x88B8 & Protection events (Layer 2) \\
+SV & EtherType 0x88BA & Sampled measurements (Layer 2) \\
+PTP & UDP/319, 320 & Time synchronization \\
+\hline
+\end{tabular}
+\caption{IEC 61850 Network Services}
+\end{table}
+
+% ============================================================================
+\section{GOOSE Protocol}
+% ============================================================================
+
+\subsection{GOOSE Characteristics}
+
+\begin{itemize}
+    \item Layer 2 multicast (no IP routing)
+    \item Sub-4ms transmission for protection
+    \item Publisher/subscriber model
+    \item Carries binary status and commands
+    \item Critical for protection coordination
+\end{itemize}
+
+\subsection{GOOSE Message Structure}
+
+\begin{itemize}
+    \item \textbf{goID} -- GOOSE identifier
+    \item \textbf{gocbRef} -- Control block reference
+    \item \textbf{datSet} -- Dataset reference
+    \item \textbf{stNum} -- State number (increments on change)
+    \item \textbf{sqNum} -- Sequence number
+    \item \textbf{allData} -- Actual data values
+\end{itemize}
+
+\begin{warningbox}
+GOOSE operates at Layer 2 with no authentication. An attacker on the same network segment can inject GOOSE messages to trip breakers or block protection signals.
+\end{warningbox}
+
+% ============================================================================
+\section{Security Vulnerabilities}
+% ============================================================================
+
+\begin{dangerbox}
+The base IEC 61850 standard (Edition 1 and 2) includes no security mechanisms. GOOSE and SV are particularly vulnerable as they operate at Layer 2 and must be processed within milliseconds.
+\end{dangerbox}
+
+\subsection{Protocol Weaknesses}
+
+\begin{itemize}
+    \item \textbf{No authentication} -- Messages accepted from any source
+    \item \textbf{No encryption} -- All traffic in cleartext
+    \item \textbf{Layer 2 protocols} -- GOOSE/SV bypass IP firewalls
+    \item \textbf{Time-critical} -- Security checks may impact performance
+    \item \textbf{Multicast} -- Easy to sniff and replay
+\end{itemize}
+
+\subsection{Attack Vectors}
+
+\begin{itemize}
+    \item \textbf{GOOSE injection} -- Send fake trip commands to breakers
+    \item \textbf{GOOSE blocking} -- Prevent legitimate protection signals
+    \item \textbf{SV manipulation} -- Inject false measurements
+    \item \textbf{MMS exploitation} -- Unauthorized configuration changes
+    \item \textbf{Time sync attacks} -- Disrupt PTP to desynchronize protection
+    \item \textbf{Replay attacks} -- Capture and replay GOOSE messages
+\end{itemize}
+
+\subsection{Industroyer/CrashOverride}
+
+The 2016 Ukraine power grid attack used IEC 61850:
+\begin{itemize}
+    \item Targeted IEC 61850 and other substation protocols
+    \item Opened circuit breakers causing outages
+    \item Demonstrated real-world IEC 61850 attack capability
+\end{itemize}
+
+% ============================================================================
+\section{IEC 62351 Security Standard}
+% ============================================================================
+
+\begin{successbox}
+IEC 62351 provides security extensions for IEC 61850 and other power system protocols. It addresses authentication, integrity, and confidentiality requirements.
+\end{successbox}
+
+\subsection{IEC 62351 Components}
+
+\begin{itemize}
+    \item \textbf{Part 3} -- TLS for TCP-based protocols (MMS)
+    \item \textbf{Part 4} -- Security for MMS specifically
+    \item \textbf{Part 6} -- Security for GOOSE and SV (digital signatures)
+    \item \textbf{Part 8} -- Role-based access control
+    \item \textbf{Part 9} -- Key management
+\end{itemize}
+
+\subsection{GOOSE Security (IEC 62351-6)}
+
+\begin{itemize}
+    \item Digital signatures for message authentication
+    \item Requires hardware acceleration for timing
+    \item Adds ~20 bytes overhead per message
+    \item Limited vendor implementation
+\end{itemize}
+
+\begin{warningbox}
+IEC 62351 adoption is slow. Most installed IEC 61850 devices lack security features, requiring network-based protection.
+\end{warningbox}
+
+% ============================================================================
+\section{Security Mitigations}
+% ============================================================================
+
+\subsection{Network Architecture}
+
+\begin{itemize}
+    \item \textbf{Physical isolation} -- Separate process bus from station bus
+    \item \textbf{VLAN segmentation} -- Isolate GOOSE/SV traffic
+    \item \textbf{Managed switches} -- Port security, disable unused ports
+    \item \textbf{No remote access} -- Or strictly controlled VPN only
+\end{itemize}
+
+\subsection{Layer 2 Security}
+
+Since GOOSE/SV are Layer 2:
+\begin{itemize}
+    \item MAC address filtering
+    \item 802.1X port authentication
+    \item Private VLANs
+    \item Physical access control to network equipment
+\end{itemize}
+
+\subsection{Monitoring}
+
+\begin{itemize}
+    \item Monitor for unauthorized GOOSE publishers
+    \item Alert on stNum/sqNum anomalies
+    \item Detect unexpected MMS connections
+    \item Log all configuration changes
+    \item Watch for time synchronization issues
+\end{itemize}
+
+% ============================================================================
+\section{Substation Architecture}
+% ============================================================================
+
+\subsection{Network Zones}
+
+\begin{itemize}
+    \item \textbf{Process Bus} -- GOOSE/SV between bays (most critical)
+    \item \textbf{Station Bus} -- MMS to station controller
+    \item \textbf{Remote Access} -- Connection to control center
+\end{itemize}
+
+\subsection{Defense in Depth}
+
+\begin{itemize}
+    \item Physical perimeter security
+    \item Network segmentation between buses
+    \item Firewall between substation and control center
+    \item Intrusion detection for IEC 61850 protocols
+    \item Secure engineering access procedures
+\end{itemize}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Substation standard} -- Controls breakers, relays in power grid
+    \item \textbf{Multiple services} -- MMS (TCP), GOOSE/SV (Layer 2)
+    \item \textbf{Time-critical} -- GOOSE requires sub-4ms response
+    \item \textbf{No native security} -- Base standard lacks authentication
+    \item \textbf{Industroyer target} -- Real attacks have occurred
+    \item \textbf{IEC 62351} -- Security extensions, limited adoption
+    \item \textbf{Layer 2 isolation} -- Critical for GOOSE/SV protection
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Standards}
+
+\begin{itemize}
+    \item \textbf{IEC 61850} -- Communication networks in substations\\
+          \url{https://webstore.iec.ch/publication/6028}
+    \item \textbf{IEC 62351} -- Power systems security\\
+          \url{https://webstore.iec.ch/publication/6912}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{NERC CIP Standards}\\
+          \url{https://www.nerc.com/pa/Stand/Pages/CIPStandards.aspx}
+    \item \textbf{CISA -- Energy Sector Security}\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

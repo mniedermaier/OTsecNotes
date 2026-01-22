@@ -1,0 +1,298 @@
+% ============================================================================
+%  203-ethernet-ip - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {EtherNet/IP Protocol}
+    {Industrial Ethernet protocol for Rockwell and Allen-Bradley systems}
+    {OT Security Learning Series}
+    {Document 203 \quad|\quad January 2026}
+    {AI Assistant}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+EtherNet/IP (Ethernet Industrial Protocol) is one of the most widely deployed industrial Ethernet protocols, particularly dominant in North American manufacturing. It is the primary protocol for Rockwell Automation and Allen-Bradley control systems.
+\end{infobox}
+
+Key characteristics:
+\begin{itemize}
+    \item Uses standard Ethernet and TCP/IP infrastructure
+    \item Built on Common Industrial Protocol (CIP)
+    \item Supports both discrete and process control
+    \item Real-time I/O and messaging capabilities
+    \item Managed by ODVA (Open DeviceNet Vendors Association)
+\end{itemize}
+
+% ============================================================================
+\section{Protocol Architecture}
+% ============================================================================
+
+\subsection{Protocol Stack}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    layer/.style={rectangle, draw, thick, minimum height=0.8cm, minimum width=6cm, font=\small},
+    arrow/.style={->, thick, >=stealth}
+]
+
+\node[layer, fill=otaccent!30] (app) at (0,3.2) {CIP (Common Industrial Protocol)};
+\node[layer, fill=otinfo!20] (trans) at (0,2.4) {TCP (explicit) / UDP (implicit)};
+\node[layer, fill=otsuccess!20] (net) at (0,1.6) {IP};
+\node[layer, fill=otwarning!20] (link) at (0,0.8) {Ethernet (802.3)};
+\node[layer, fill=lightgray] (phys) at (0,0) {Physical (copper / fiber)};
+
+\node[font=\tiny, anchor=west] at (3.3,3.2) {Application};
+\node[font=\tiny, anchor=west] at (3.3,2.4) {Transport};
+\node[font=\tiny, anchor=west] at (3.3,1.6) {Network};
+\node[font=\tiny, anchor=west] at (3.3,0.8) {Data Link};
+\node[font=\tiny, anchor=west] at (3.3,0) {Physical};
+
+\end{tikzpicture}
+\caption{EtherNet/IP Protocol Stack}
+\end{figure}
+
+\subsection{Common Industrial Protocol (CIP)}
+
+\begin{definitionbox}{CIP - The Foundation}
+CIP is an application layer protocol shared by EtherNet/IP, DeviceNet, and ControlNet. It provides:
+\begin{itemize}
+    \item Object-oriented device modeling
+    \item Standardized device profiles
+    \item Common services across networks
+    \item Producer/consumer communication model
+\end{itemize}
+\end{definitionbox}
+
+\subsection{Communication Types}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, minimum height=1.2cm, minimum width=2.5cm, rounded corners=3pt, font=\small\bfseries, align=center},
+    arrow/.style={->, thick, >=stealth}
+]
+
+% Devices
+\node[box, fill=otaccent!20] (scanner) at (0,0) {Scanner\\(PLC)};
+\node[box, fill=otsuccess!20] (adapter) at (7,0) {Adapter\\(I/O Device)};
+
+% Explicit messaging (TCP)
+\draw[arrow, otinfo, dashed] (1.5,0.3) -- node[above, font=\tiny] {Explicit (TCP:44818)} (5.5,0.3);
+\draw[arrow, otinfo, dashed] (5.5,0.1) -- node[below, font=\tiny] {Configuration, Diagnostics} (1.5,0.1);
+
+% Implicit messaging (UDP)
+\draw[arrow, otdanger] (1.5,-0.3) -- node[above, font=\tiny] {Implicit (UDP:2222)} (5.5,-0.3);
+\draw[arrow, otsuccess] (5.5,-0.5) -- node[below, font=\tiny] {Real-time I/O Data} (1.5,-0.5);
+
+\end{tikzpicture}
+\caption{EtherNet/IP Communication Types}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{Explicit Messaging} -- TCP-based, connection-oriented, for configuration and diagnostics
+    \item \textbf{Implicit Messaging} -- UDP-based, for real-time I/O data exchange
+    \item \textbf{Unconnected} -- Single request/response transactions
+    \item \textbf{Connected} -- Established sessions for ongoing communication
+\end{itemize}
+
+% ============================================================================
+\section{Network Ports and Services}
+% ============================================================================
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Port} & \textbf{Protocol} & \textbf{Purpose} \\
+\hline
+TCP/44818 & CIP Explicit & Configuration, diagnostics \\
+UDP/44818 & CIP Explicit & Unconnected messages \\
+UDP/2222 & CIP Implicit & Real-time I/O data \\
+TCP/80 & HTTP & Web interface (if enabled) \\
+UDP/67-68 & DHCP/BootP & Address assignment \\
+\hline
+\end{tabular}
+\caption{EtherNet/IP Network Ports}
+\end{table}
+
+% ============================================================================
+\section{CIP Objects and Services}
+% ============================================================================
+
+\subsection{Object Model}
+
+EtherNet/IP devices are modeled as collections of objects:
+
+\begin{itemize}
+    \item \textbf{Identity Object (0x01)} -- Device information, serial number, vendor
+    \item \textbf{Message Router (0x02)} -- Routes requests to appropriate objects
+    \item \textbf{Assembly Object (0x04)} -- Groups I/O data for transmission
+    \item \textbf{Connection Manager (0x06)} -- Manages connections
+    \item \textbf{TCP/IP Interface (0xF5)} -- Network configuration
+    \item \textbf{Ethernet Link (0xF6)} -- Ethernet statistics
+\end{itemize}
+
+\subsection{Common Services}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Code} & \textbf{Service} & \textbf{Purpose} \\
+\hline
+0x01 & Get\_Attribute\_All & Read all object attributes \\
+0x0E & Get\_Attribute\_Single & Read single attribute \\
+0x10 & Set\_Attribute\_Single & Write single attribute \\
+0x4C & Forward\_Open & Establish connection \\
+0x4E & Forward\_Close & Terminate connection \\
+0x52 & Unconnected\_Send & Send without connection \\
+\hline
+\end{tabular}
+\caption{Common CIP Services}
+\end{table}
+
+% ============================================================================
+\section{Security Vulnerabilities}
+% ============================================================================
+
+\begin{dangerbox}
+EtherNet/IP was designed for reliability and interoperability, not security. Like most industrial protocols, it lacks built-in authentication and encryption.
+\end{dangerbox}
+
+\subsection{Protocol Weaknesses}
+
+\begin{itemize}
+    \item \textbf{No authentication} -- Any device can send commands
+    \item \textbf{No encryption} -- All traffic is plaintext
+    \item \textbf{No integrity protection} -- Messages can be modified
+    \item \textbf{Predictable ports} -- Easy to identify on network
+    \item \textbf{Information disclosure} -- Identity object reveals device details
+\end{itemize}
+
+\subsection{Known Attack Vectors}
+
+\begin{itemize}
+    \item \textbf{Device enumeration} -- Query Identity objects to map network
+    \item \textbf{Unauthorized configuration} -- Change device settings via Set\_Attribute
+    \item \textbf{I/O manipulation} -- Inject or modify implicit messages
+    \item \textbf{Connection hijacking} -- Take over established connections
+    \item \textbf{Denial of service} -- Flood with connection requests
+    \item \textbf{Firmware manipulation} -- Upload malicious firmware
+\end{itemize}
+
+% ============================================================================
+\section{Security Mitigations}
+% ============================================================================
+
+\subsection{Network-Level Controls}
+
+\begin{successbox}
+Since EtherNet/IP lacks native security, protection must come from network architecture and external controls.
+\end{successbox}
+
+\begin{itemize}
+    \item \textbf{Network segmentation} -- Isolate EtherNet/IP traffic in dedicated VLANs
+    \item \textbf{Firewall rules} -- Restrict access to ports 44818 and 2222
+    \item \textbf{Industrial firewalls} -- Deep packet inspection for CIP
+    \item \textbf{Access control lists} -- Limit which devices can communicate
+\end{itemize}
+
+\subsection{CIP Security (Recent Addition)}
+
+ODVA has developed CIP Security extensions:
+\begin{itemize}
+    \item TLS/DTLS for encrypted communications
+    \item X.509 certificates for device authentication
+    \item Integrity protection for messages
+    \item Requires newer devices with CIP Security support
+\end{itemize}
+
+\begin{warningbox}
+CIP Security adoption is still limited. Most installed devices do not support it, requiring network-based protection.
+\end{warningbox}
+
+\subsection{Monitoring and Detection}
+
+\begin{itemize}
+    \item Monitor for unauthorized CIP service requests
+    \item Alert on Identity object queries (reconnaissance)
+    \item Detect configuration changes via Set\_Attribute services
+    \item Baseline normal I/O patterns, alert on anomalies
+    \item Watch for connections from unauthorized IP addresses
+\end{itemize}
+
+% ============================================================================
+\section{Common Implementations}
+% ============================================================================
+
+\begin{itemize}
+    \item \textbf{Rockwell/Allen-Bradley} -- ControlLogix, CompactLogix PLCs
+    \item \textbf{Drives} -- PowerFlex variable frequency drives
+    \item \textbf{I/O} -- POINT I/O, FLEX I/O modules
+    \item \textbf{HMI} -- PanelView terminals
+    \item \textbf{Third-party} -- Many vendors support EtherNet/IP
+\end{itemize}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Dominant protocol} -- Primary for Rockwell/Allen-Bradley systems
+    \item \textbf{CIP-based} -- Shares application layer with DeviceNet, ControlNet
+    \item \textbf{Standard Ethernet} -- Uses TCP/UDP on ports 44818, 2222
+    \item \textbf{No native security} -- Authentication and encryption absent
+    \item \textbf{CIP Security} -- New extension, limited adoption
+    \item \textbf{Network protection} -- Segmentation and firewalls essential
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Standards}
+
+\begin{itemize}
+    \item \textbf{ODVA -- EtherNet/IP Specification}\\
+          \url{https://www.odva.org/}
+    \item \textbf{IEC 61158} -- Industrial communication networks\\
+          \url{https://webstore.iec.ch/}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{CISA -- ICS Advisories}\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+    \item \textbf{Rockwell Automation Security}\\
+          \url{https://www.rockwellautomation.com/en-us/capabilities/industrial-cybersecurity.html}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

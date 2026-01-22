@@ -1,0 +1,324 @@
+% ============================================================================
+%  204-profinet - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {PROFINET Protocol}
+    {Industrial Ethernet standard for Siemens and European automation}
+    {OT Security Learning Series}
+    {Document 204 \quad|\quad January 2026}
+    {AI Assistant}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+PROFINET (Process Field Network) is the industrial Ethernet standard developed by Siemens and PROFIBUS International. It is the dominant industrial protocol in European manufacturing and widely used globally with Siemens automation systems.
+\end{infobox}
+
+Key characteristics:
+\begin{itemize}
+    \item Real-time Ethernet communication
+    \item Successor to PROFIBUS fieldbus
+    \item Three performance classes (RT, IRT, NRT)
+    \item Supports motion control and isochronous applications
+    \item Managed by PROFIBUS \& PROFINET International (PI)
+\end{itemize}
+
+% ============================================================================
+\section{Protocol Architecture}
+% ============================================================================
+
+\subsection{Communication Classes}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    class/.style={rectangle, draw, thick, minimum height=1.2cm, minimum width=3.2cm, rounded corners=3pt, font=\small\bfseries, align=center},
+]
+
+\node[class, fill=otinfo!20] (nrt) at (0,0) {NRT\\{\tiny Non-Real-Time}};
+\node[class, fill=otwarning!20] (rt) at (4.2,0) {RT\\{\tiny Real-Time}};
+\node[class, fill=otdanger!20] (irt) at (8.4,0) {IRT\\{\tiny Isochronous RT}};
+
+\node[font=\tiny, text width=3cm, align=center] at (0,-1.2) {TCP/UDP\\Configuration\\100+ ms};
+\node[font=\tiny, text width=3cm, align=center] at (4.2,-1.2) {Layer 2 frames\\Prioritized\\1-10 ms};
+\node[font=\tiny, text width=3cm, align=center] at (8.4,-1.2) {Hardware sync\\Motion control\\<1 ms};
+
+\draw[->, thick, otprimary] (1.8,-0.8) -- (2.4,-0.8);
+\draw[->, thick, otprimary] (6,-0.8) -- (6.6,-0.8);
+\node[font=\tiny, otprimary] at (4.2,-2) {Increasing real-time performance $\rightarrow$};
+
+\end{tikzpicture}
+\caption{PROFINET Communication Classes}
+\end{figure}
+
+\subsection{Protocol Stack}
+
+\begin{itemize}
+    \item \textbf{NRT Channel} -- Standard TCP/IP for parameterization, diagnostics
+    \item \textbf{RT Channel} -- Layer 2 Ethernet frames (EtherType 0x8892)
+    \item \textbf{IRT Channel} -- Time-synchronized slots, requires special hardware
+\end{itemize}
+
+\subsection{Device Roles}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    device/.style={rectangle, draw, thick, minimum height=0.8cm, minimum width=2.2cm, rounded corners=3pt, font=\tiny\bfseries, align=center},
+    arrow/.style={<->, thick, >=stealth}
+]
+
+\node[device, fill=otaccent!30] (controller) at (0,0) {IO Controller\\(PLC)};
+\node[device, fill=otsuccess!20] (device1) at (5,1.2) {IO Device};
+\node[device, fill=otsuccess!20] (device2) at (5,0) {IO Device};
+\node[device, fill=otsuccess!20] (device3) at (5,-1.2) {IO Device};
+\node[device, fill=otwarning!20] (supervisor) at (0,2) {IO Supervisor};
+
+\draw[arrow, otprimary] (controller) -- (device1);
+\draw[arrow, otprimary] (controller) -- (device2);
+\draw[arrow, otprimary] (controller) -- (device3);
+\draw[arrow, otinfo, dashed] (supervisor) -- (controller);
+
+\node[font=\tiny] at (2.5,0.8) {RT I/O};
+\node[font=\tiny] at (-0.8,1) {Config};
+
+\end{tikzpicture}
+\caption{PROFINET Device Roles}
+\end{figure}
+
+\begin{definitionbox}{PROFINET Device Types}
+\begin{itemize}
+    \item \textbf{IO Controller} -- PLC that controls the process (master)
+    \item \textbf{IO Device} -- Field device providing I/O data (slave)
+    \item \textbf{IO Supervisor} -- Engineering/diagnostic station
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Network Identification}
+% ============================================================================
+
+\subsection{Ports and Protocols}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Port/Type} & \textbf{Protocol} & \textbf{Purpose} \\
+\hline
+EtherType 0x8892 & PROFINET RT & Real-time I/O data \\
+UDP/34964 & PROFINET DCP & Discovery, configuration \\
+TCP/102 & ISO-TSAP (S7) & Often used alongside \\
+UDP/161 & SNMP & Device management \\
+TCP/80/443 & HTTP/HTTPS & Web interface \\
+\hline
+\end{tabular}
+\caption{PROFINET Network Identifiers}
+\end{table}
+
+\subsection{Discovery and Configuration Protocol (DCP)}
+
+DCP is used for:
+\begin{itemize}
+    \item Device discovery on the network
+    \item Setting device names and IP addresses
+    \item Identifying devices by MAC address
+    \item Reading device information
+\end{itemize}
+
+\begin{warningbox}
+DCP operates at Layer 2 and has no authentication. Any device on the same network segment can discover and reconfigure PROFINET devices.
+\end{warningbox}
+
+% ============================================================================
+\section{PROFINET Communication}
+% ============================================================================
+
+\subsection{Application Relations (AR)}
+
+Communication is organized into Application Relations:
+\begin{itemize}
+    \item \textbf{IO AR} -- Cyclic I/O data exchange
+    \item \textbf{Supervisor AR} -- Diagnostic and configuration access
+    \item \textbf{Device Access AR} -- Device-level management
+\end{itemize}
+
+\subsection{Cyclic Data Exchange}
+
+\begin{enumerate}
+    \item Controller establishes AR with device
+    \item Controller sends output data in RT frames
+    \item Device responds with input data
+    \item Cycle repeats at configured interval
+    \item Watchdog monitors communication health
+\end{enumerate}
+
+% ============================================================================
+\section{Security Vulnerabilities}
+% ============================================================================
+
+\begin{dangerbox}
+PROFINET was designed before cybersecurity was a primary concern. The protocol lacks authentication, encryption, and integrity protection in its base specification.
+\end{dangerbox}
+
+\subsection{Protocol Weaknesses}
+
+\begin{itemize}
+    \item \textbf{No authentication} -- Any device can act as controller
+    \item \textbf{No encryption} -- All data transmitted in cleartext
+    \item \textbf{DCP vulnerabilities} -- Unauthenticated device configuration
+    \item \textbf{Layer 2 attacks} -- RT traffic bypasses IP-based firewalls
+    \item \textbf{Predictable timing} -- IRT schedules can be analyzed
+\end{itemize}
+
+\subsection{Known Attack Vectors}
+
+\begin{itemize}
+    \item \textbf{DCP attacks} -- Change device names/IPs to disrupt communication
+    \item \textbf{AR hijacking} -- Take over controller role
+    \item \textbf{I/O injection} -- Send fake RT frames to devices
+    \item \textbf{Denial of service} -- Flood network with RT traffic
+    \item \textbf{Network mapping} -- Use DCP to enumerate all devices
+    \item \textbf{Man-in-the-middle} -- Intercept and modify RT traffic
+\end{itemize}
+
+% ============================================================================
+\section{PROFINET Security Extensions}
+% ============================================================================
+
+\subsection{PROFINET Security Class 1}
+
+PI has developed security extensions:
+\begin{itemize}
+    \item Integrity protection for RT communication
+    \item Authentication of devices
+    \item Based on IEC 62443 requirements
+    \item Requires compatible devices
+\end{itemize}
+
+\subsection{Secure Communication}
+
+Newer implementations support:
+\begin{itemize}
+    \item TLS for NRT/TCP communications
+    \item SNMPv3 for secure management
+    \item Secure DCP (authenticated configuration)
+    \item Certificate-based device identity
+\end{itemize}
+
+\begin{warningbox}
+Security extensions require newer hardware and software. Most existing installations lack these capabilities and must rely on network-level protection.
+\end{warningbox}
+
+% ============================================================================
+\section{Security Mitigations}
+% ============================================================================
+
+\subsection{Network Architecture}
+
+\begin{successbox}
+Since PROFINET RT uses Layer 2 frames, standard IP firewalls cannot filter this traffic. Use Layer 2 segmentation and PROFINET-aware security devices.
+\end{successbox}
+
+\begin{itemize}
+    \item \textbf{VLAN segmentation} -- Isolate PROFINET traffic
+    \item \textbf{Managed switches} -- Control port access, disable unused ports
+    \item \textbf{Industrial firewalls} -- PROFINET-aware deep packet inspection
+    \item \textbf{Cell protection} -- Segment network into isolated cells
+\end{itemize}
+
+\subsection{Device Hardening}
+
+\begin{itemize}
+    \item Disable unused services (HTTP, SNMP, Telnet)
+    \item Use strong passwords for web interfaces
+    \item Enable SNMPv3 instead of v1/v2c
+    \item Keep firmware updated
+    \item Disable DCP if static configuration is acceptable
+\end{itemize}
+
+\subsection{Monitoring}
+
+\begin{itemize}
+    \item Monitor for unexpected DCP requests
+    \item Alert on new devices appearing on network
+    \item Baseline normal RT traffic patterns
+    \item Detect AR establishment from unauthorized sources
+    \item Watch for configuration changes
+\end{itemize}
+
+% ============================================================================
+\section{Common Implementations}
+% ============================================================================
+
+\begin{itemize}
+    \item \textbf{Siemens} -- S7-1200, S7-1500 PLCs, ET 200 I/O
+    \item \textbf{Drives} -- SINAMICS variable frequency drives
+    \item \textbf{HMI} -- SIMATIC HMI panels
+    \item \textbf{Third-party} -- Many vendors support PROFINET
+    \item \textbf{Motion control} -- Servo drives with IRT
+\end{itemize}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Siemens ecosystem} -- Dominant in European automation
+    \item \textbf{Three classes} -- NRT, RT, IRT for different timing needs
+    \item \textbf{Layer 2 RT traffic} -- Bypasses IP firewalls
+    \item \textbf{DCP risks} -- Unauthenticated discovery and configuration
+    \item \textbf{No native security} -- Base protocol lacks protection
+    \item \textbf{Security extensions} -- Available but limited adoption
+    \item \textbf{VLAN segmentation} -- Critical for protection
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Standards}
+
+\begin{itemize}
+    \item \textbf{PROFIBUS \& PROFINET International}\\
+          \url{https://www.profibus.com/}
+    \item \textbf{IEC 61158/61784} -- PROFINET standards\\
+          \url{https://webstore.iec.ch/}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{Siemens Industrial Security}\\
+          \url{https://www.siemens.com/global/en/products/automation/topic-areas/industrial-security.html}
+    \item \textbf{CISA -- ICS Advisories}\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

@@ -1,0 +1,324 @@
+% ============================================================================
+%  205-bacnet - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {BACnet Protocol}
+    {Building Automation and Control Networks protocol}
+    {OT Security Learning Series}
+    {Document 205 \quad|\quad January 2026}
+    {AI Assistant}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+BACnet (Building Automation and Control Networks) is the dominant protocol for building automation systems. It controls HVAC, lighting, access control, fire systems, and elevators in commercial buildings, hospitals, data centers, and critical facilities.
+\end{infobox}
+
+Key characteristics:
+\begin{itemize}
+    \item ASHRAE/ANSI/ISO standard (ISO 16484-5)
+    \item Designed for building automation interoperability
+    \item Supports multiple network technologies
+    \item Object-oriented data model
+    \item Used in critical infrastructure (hospitals, data centers)
+\end{itemize}
+
+% ============================================================================
+\section{Protocol Architecture}
+% ============================================================================
+
+\subsection{Network Options}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    level/.style={rectangle, draw, thick, minimum height=0.9cm, minimum width=3cm, rounded corners=3pt, font=\tiny\bfseries, align=center},
+    arrow/.style={-, thick}
+]
+
+% Management level
+\node[level, fill=otinfo!20] (mgmt) at (0,2.5) {Building Management\\System};
+
+% BACnet/IP network
+\draw[thick, otprimary] (-3,1.5) -- (3,1.5);
+\node[font=\tiny, otprimary] at (4,1.5) {BACnet/IP};
+
+% Controllers
+\node[level, fill=otaccent!20] (ctrl1) at (-2,0.5) {HVAC\\Controller};
+\node[level, fill=otaccent!20] (ctrl2) at (2,0.5) {Lighting\\Controller};
+
+% MS/TP network
+\draw[thick, otwarning] (-3.5,-0.5) -- (-0.5,-0.5);
+\draw[thick, otwarning] (0.5,-0.5) -- (3.5,-0.5);
+\node[font=\tiny, otwarning] at (-4.2,-0.5) {MS/TP};
+\node[font=\tiny, otwarning] at (4.2,-0.5) {MS/TP};
+
+% Field devices
+\node[level, fill=otsuccess!20, minimum width=1.5cm] (vav1) at (-3,-1.5) {VAV};
+\node[level, fill=otsuccess!20, minimum width=1.5cm] (vav2) at (-1,-1.5) {VAV};
+\node[level, fill=otsuccess!20, minimum width=1.5cm] (light1) at (1,-1.5) {Light};
+\node[level, fill=otsuccess!20, minimum width=1.5cm] (light2) at (3,-1.5) {Light};
+
+% Connections
+\draw[arrow] (mgmt) -- (0,1.5);
+\draw[arrow] (ctrl1) -- (-2,1.5);
+\draw[arrow] (ctrl2) -- (2,1.5);
+\draw[arrow] (ctrl1) -- (-2,-0.5);
+\draw[arrow] (ctrl2) -- (2,-0.5);
+\draw[arrow] (vav1) -- (-3,-0.5);
+\draw[arrow] (vav2) -- (-1,-0.5);
+\draw[arrow] (light1) -- (1,-0.5);
+\draw[arrow] (light2) -- (3,-0.5);
+
+\end{tikzpicture}
+\caption{BACnet Building Automation Architecture}
+\end{figure}
+
+BACnet can run over multiple network types:
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Network} & \textbf{Common Name} & \textbf{Use Case} \\
+\hline
+BACnet/IP & UDP/47808 & Primary modern deployment \\
+BACnet/Ethernet & 802.3 direct & Legacy installations \\
+BACnet MS/TP & RS-485 serial & Field-level devices \\
+BACnet/SC & Secure Connect & TLS-secured BACnet/IP \\
+\hline
+\end{tabular}
+\caption{BACnet Network Types}
+\end{table}
+
+\subsection{Object Model}
+
+\begin{definitionbox}{BACnet Objects}
+BACnet uses an object-oriented model where everything is represented as objects with properties:
+\begin{itemize}
+    \item \textbf{Analog Input/Output} -- Temperature, pressure, setpoints
+    \item \textbf{Binary Input/Output} -- On/off states, alarms
+    \item \textbf{Schedule} -- Time-based control programs
+    \item \textbf{Trend Log} -- Historical data storage
+    \item \textbf{Device} -- Represents the device itself
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Network Communication}
+% ============================================================================
+
+\subsection{BACnet/IP Details}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Port} & \textbf{Protocol} & \textbf{Purpose} \\
+\hline
+UDP/47808 & BACnet/IP & Standard communication \\
+UDP/47808 & BBMD & Broadcast management \\
+TCP/47808 & BACnet/IP (rare) & Some implementations \\
+\hline
+\end{tabular}
+\caption{BACnet/IP Network Ports}
+\end{table}
+
+\subsection{Key Services}
+
+\begin{itemize}
+    \item \textbf{Who-Is / I-Am} -- Device discovery
+    \item \textbf{ReadProperty} -- Read object properties
+    \item \textbf{WriteProperty} -- Modify object properties
+    \item \textbf{SubscribeCOV} -- Change of Value notifications
+    \item \textbf{DeviceCommunicationControl} -- Enable/disable device
+    \item \textbf{ReinitializeDevice} -- Reboot or reset device
+\end{itemize}
+
+\subsection{Broadcast Management Device (BBMD)}
+
+\begin{warningbox}
+BBMDs forward BACnet broadcasts across IP subnets. A compromised or misconfigured BBMD can expose BACnet networks to wider attack surface.
+\end{warningbox}
+
+% ============================================================================
+\section{Security Vulnerabilities}
+% ============================================================================
+
+\begin{dangerbox}
+Traditional BACnet has no authentication or encryption. Any device on the network can read, write, and control building systems. This is particularly dangerous given BACnet's presence in critical facilities.
+\end{dangerbox}
+
+\subsection{Protocol Weaknesses}
+
+\begin{itemize}
+    \item \textbf{No authentication} -- All commands accepted from any source
+    \item \textbf{No encryption} -- Traffic easily intercepted
+    \item \textbf{Broadcast discovery} -- Easy to enumerate all devices
+    \item \textbf{Powerful commands} -- ReinitializeDevice, WriteProperty
+    \item \textbf{Internet exposure} -- Many systems accessible online
+\end{itemize}
+
+\subsection{Attack Vectors}
+
+\begin{itemize}
+    \item \textbf{HVAC manipulation} -- Change temperatures to damage equipment or create discomfort
+    \item \textbf{Access control} -- Unlock doors, disable alarms
+    \item \textbf{Fire system interference} -- Suppress alarms or trigger false alarms
+    \item \textbf{Energy attacks} -- Maximize energy consumption
+    \item \textbf{Device disruption} -- ReinitializeDevice to cause outages
+    \item \textbf{Data exfiltration} -- Read occupancy patterns, schedules
+\end{itemize}
+
+\subsection{Internet Exposure}
+
+\begin{warningbox}
+Thousands of BACnet devices are directly accessible on the internet. Shodan and similar tools easily find them via port 47808/UDP.
+\end{warningbox}
+
+% ============================================================================
+\section{BACnet Secure Connect (BACnet/SC)}
+% ============================================================================
+
+\begin{successbox}
+BACnet/SC is a security-focused update that adds TLS encryption and certificate-based authentication while maintaining BACnet compatibility.
+\end{successbox}
+
+\subsection{BACnet/SC Features}
+
+\begin{itemize}
+    \item \textbf{TLS 1.3} -- Encrypted communications
+    \item \textbf{X.509 certificates} -- Device authentication
+    \item \textbf{Hub-and-spoke topology} -- Primary/failover hubs
+    \item \textbf{WebSocket transport} -- Firewall-friendly
+    \item \textbf{Backward compatible} -- Routers bridge to legacy
+\end{itemize}
+
+\subsection{Adoption Challenges}
+
+\begin{itemize}
+    \item Requires new hardware or firmware updates
+    \item Certificate management complexity
+    \item Performance overhead
+    \item Mixed environments need careful planning
+\end{itemize}
+
+% ============================================================================
+\section{Security Mitigations}
+% ============================================================================
+
+\subsection{Network Segmentation}
+
+\begin{itemize}
+    \item \textbf{Dedicated VLAN} -- Isolate BACnet traffic
+    \item \textbf{Firewall BACnet} -- Block 47808 at network perimeter
+    \item \textbf{No internet exposure} -- Never expose directly online
+    \item \textbf{Segment by function} -- Separate HVAC, access control, fire
+\end{itemize}
+
+\subsection{Access Controls}
+
+\begin{itemize}
+    \item Restrict physical access to BACnet infrastructure
+    \item Use VPN for remote building management access
+    \item Implement IP allowlists where possible
+    \item Audit who has access to building automation systems
+\end{itemize}
+
+\subsection{Monitoring}
+
+\begin{itemize}
+    \item Log all WriteProperty and ReinitializeDevice commands
+    \item Alert on Who-Is broadcasts from unknown sources
+    \item Monitor for unexpected schedule or setpoint changes
+    \item Detect devices appearing or disappearing
+    \item Watch for after-hours control activity
+\end{itemize}
+
+% ============================================================================
+\section{Building Automation Context}
+% ============================================================================
+
+\subsection{Critical Facility Risks}
+
+BACnet controls systems in:
+\begin{itemize}
+    \item \textbf{Hospitals} -- HVAC for operating rooms, isolation wards
+    \item \textbf{Data centers} -- Cooling systems (overheating = outage)
+    \item \textbf{Pharmaceutical} -- Clean room environmental control
+    \item \textbf{Government} -- Secure facility access control
+\end{itemize}
+
+\subsection{Convergence with OT}
+
+Building automation increasingly connects to:
+\begin{itemize}
+    \item Enterprise IT networks
+    \item Cloud-based management platforms
+    \item IoT sensors and analytics
+    \item Smart grid demand response
+\end{itemize}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Building automation standard} -- HVAC, lighting, access, fire
+    \item \textbf{BACnet/IP dominant} -- UDP port 47808
+    \item \textbf{No native security} -- Traditional BACnet lacks authentication
+    \item \textbf{Internet exposure common} -- Many systems directly online
+    \item \textbf{BACnet/SC} -- New secure option with TLS, limited adoption
+    \item \textbf{Critical facilities} -- Hospitals, data centers at risk
+    \item \textbf{Network isolation essential} -- Never expose to internet
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Standards}
+
+\begin{itemize}
+    \item \textbf{ASHRAE -- BACnet Standards}\\
+          \url{https://www.bacnetinternational.org/}
+    \item \textbf{ISO 16484-5} -- Building automation standard\\
+          \url{https://www.iso.org/standard/79079.html}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{CISA -- Building Automation Security}\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+    \item \textbf{BACnet International}\\
+          \url{https://www.bacnetinternational.org/}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

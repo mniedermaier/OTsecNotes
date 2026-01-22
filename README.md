@@ -7,21 +7,29 @@
 [![Build PDFs](https://github.com/mniedermaier/OTsecNotes/actions/workflows/build-pdfs.yml/badge.svg)](https://github.com/mniedermaier/OTsecNotes/actions/workflows/build-pdfs.yml)
 [![LaTeX](https://img.shields.io/badge/Made%20with-LaTeX-1f425f.svg)](https://www.latex-project.org/)
 [![License: CC BY-SA 4.0](https://img.shields.io/badge/License-CC%20BY--SA%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by-sa/4.0/)
-[![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-blue)](https://mniedermaier.github.io/OTsecNotes/)
-
-**Comprehensive learning documents for ICS/SCADA security professionals**
-
-</div>
 
 ---
 
+## :books: Read the Documents
+
+### **[:point_right: mniedermaier.github.io/OTsecNotes :point_left:](https://mniedermaier.github.io/OTsecNotes/)**
+
+All documents are available as PDFs on GitHub Pages.
+No download or build required — just click and read.
+
+---
+
+</div>
+
 ## About This Project
 
-This repository contains a comprehensive collection of professionally formatted learning documents focused on **Operational Technology (OT)** and **Industrial Control System (ICS)** security. The documents are designed to provide clear, vendor-neutral educational content for security professionals, engineers, and students working with critical infrastructure.
+This repository contains the **source files** for the OT Security Notes learning series.
 
-Each document covers a specific topic in depth, ranging from foundational concepts like the Purdue Model to advanced subjects such as incident response procedures and security assessments. The series draws from established standards including **IEC 62443**, **NIST SP 800-82**, and real-world case studies of significant OT security incidents. All documents are kept concise and focused — **under 10 pages each** — making them quick to read while still providing essential knowledge.
+**Looking to read the documents?** Visit **[mniedermaier.github.io/OTsecNotes](https://mniedermaier.github.io/OTsecNotes/)**
 
-> **Quick Access:** Browse all documents at [mniedermaier.github.io/OTsecNotes](https://mniedermaier.github.io/OTsecNotes/)
+**Looking to contribute or build locally?** Continue reading below.
+
+The documents provide clear, vendor-neutral educational content on **Operational Technology (OT)** and **Industrial Control System (ICS)** security for security professionals, engineers, and students. Topics range from foundational concepts like the Purdue Model to advanced subjects such as incident response and security assessments. The series references established standards including **IEC 62443**, **NIST SP 800-82**, and real-world case studies. All documents are concise — **under 10 pages each**.
 
 ---
 
@@ -71,40 +79,6 @@ make parallel
 # Create a new document
 make new NAME=250-new-protocol
 ```
-
----
-
-## Current Documents
-
-<details>
-<summary><strong>Click to expand document list</strong> (22 documents)</summary>
-
-| Document | Title | Category |
-|:---------|:------|:---------|
-| 001-it-vs-ot | IT vs OT | Fundamentals |
-| 010-purdue-model | The Purdue Model | Fundamentals |
-| 100-standards-overview | OT Security Standards Overview | Standards & Compliance |
-| 110-iec-62443-intro | Introduction to IEC 62443 | Standards & Compliance |
-| 111-nist-800-82 | NIST SP 800-82 | Standards & Compliance |
-| 200-modbus | Modbus Protocol | Protocols & Technologies |
-| 201-opc-ua | OPC UA | Protocols & Technologies |
-| 202-dnp3 | DNP3 Protocol | Protocols & Technologies |
-| 300-network-segmentation | OT Network Segmentation | Architecture & Design |
-| 301-secure-remote-access | Secure Remote Access | Architecture & Design |
-| 302-dmz-design | Industrial DMZ Design | Architecture & Design |
-| 400-ot-incidents-overview | OT Security Incidents Overview | Threats & Attacks |
-| 410-stuxnet | Stuxnet | Threats & Attacks |
-| 411-ukraine-power-grid | Ukraine Power Grid Attacks | Threats & Attacks |
-| 412-triton-trisis | TRITON/TRISIS | Threats & Attacks |
-| 413-industroyer | Industroyer/CrashOverride | Threats & Attacks |
-| 500-ot-monitoring | OT Network Monitoring | Detection & Monitoring |
-| 510-asset-discovery | OT Asset Discovery | Detection & Monitoring |
-| 600-ot-incident-response | OT Incident Response | Incident Response |
-| 700-ot-risk-assessment | OT Risk Assessment | Assessments |
-| 710-ot-pentesting | OT Penetration Testing | Assessments |
-| 810-application-whitelisting | Application Whitelisting & System Lockdown | Solutions & Tools |
-
-</details>
 
 ---
 

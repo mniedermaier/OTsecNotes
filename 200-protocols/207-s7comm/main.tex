@@ -1,0 +1,395 @@
+% ============================================================================
+%  207-s7comm - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {S7comm Protocol}
+    {Siemens S7 communication protocol for SIMATIC PLCs}
+    {OT Security Learning Series}
+    {Document 207 \quad|\quad January 2026}
+    {AI Assistant}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+S7comm is Siemens' proprietary protocol for communication with SIMATIC S7 PLCs. It is one of the most widely deployed PLC protocols globally and was the primary target of the Stuxnet malware.
+\end{infobox}
+
+Key characteristics:
+\begin{itemize}
+    \item Proprietary Siemens protocol
+    \item Used by S7-300, S7-400, S7-1200, S7-1500 PLCs
+    \item Runs over ISO-TSAP (TCP port 102)
+    \item Provides read/write access to PLC memory
+    \item Supports program upload/download
+\end{itemize}
+
+\begin{dangerbox}
+S7comm was the protocol exploited by Stuxnet to reprogram PLCs controlling uranium enrichment centrifuges. Understanding S7comm security is essential for protecting Siemens-based industrial systems.
+\end{dangerbox}
+
+% ============================================================================
+\section{Protocol Versions}
+% ============================================================================
+
+\subsection{S7comm vs S7comm-Plus}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|X|}
+\hline
+\textbf{Aspect} & \textbf{S7comm} & \textbf{S7comm-Plus} \\
+\hline
+PLCs & S7-300, S7-400 & S7-1200, S7-1500 \\
+Security & None & Optional encryption/auth \\
+Complexity & Simpler & More complex \\
+Documentation & Reverse-engineered & Partially documented \\
+\hline
+\end{tabularx}
+\caption{S7comm Protocol Versions}
+\end{table}
+
+\subsection{Protocol Stack}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    layer/.style={rectangle, draw, thick, minimum height=0.7cm, minimum width=5.5cm, font=\small},
+]
+
+\node[layer, fill=otdanger!20] (app) at (0,2.8) {S7comm / S7comm-Plus};
+\node[layer, fill=otwarning!20] (cotp) at (0,2.1) {COTP (ISO 8073)};
+\node[layer, fill=otwarning!20] (tsap) at (0,1.4) {ISO-TSAP};
+\node[layer, fill=otinfo!20] (tcp) at (0,0.7) {TCP (Port 102)};
+\node[layer, fill=otsuccess!20] (ip) at (0,0) {IP / Ethernet};
+
+\node[font=\tiny, anchor=west] at (3,2.8) {Application};
+\node[font=\tiny, anchor=west] at (3,2.1) {Presentation};
+\node[font=\tiny, anchor=west] at (3,1.4) {Session};
+\node[font=\tiny, anchor=west] at (3,0.7) {Transport};
+\node[font=\tiny, anchor=west] at (3,0) {Network};
+
+\end{tikzpicture}
+\caption{S7comm Protocol Stack}
+\end{figure}
+
+% ============================================================================
+\section{Network Communication}
+% ============================================================================
+
+\subsection{Connection Establishment}
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, minimum height=0.8cm, minimum width=2cm, rounded corners=2pt, font=\tiny\bfseries, align=center},
+    arrow/.style={->, thick, >=stealth}
+]
+
+\node[box, fill=otaccent!20] (client) at (0,0) {Client\\(TIA Portal)};
+\node[box, fill=otsuccess!20] (plc) at (6,0) {PLC\\(S7-1500)};
+
+% Connection sequence
+\draw[arrow, otprimary] (1.2,0) -- node[above, font=\tiny] {1. TCP SYN (port 102)} (4.8,0);
+\draw[arrow, otprimary] (4.8,-0.5) -- node[above, font=\tiny] {2. TCP SYN-ACK} (1.2,-0.5);
+\draw[arrow, otinfo] (1.2,-1) -- node[above, font=\tiny] {3. COTP CR} (4.8,-1);
+\draw[arrow, otinfo] (4.8,-1.5) -- node[above, font=\tiny] {4. COTP CC} (1.2,-1.5);
+\draw[arrow, otdanger] (1.2,-2) -- node[above, font=\tiny] {5. S7comm Setup} (4.8,-2);
+\draw[arrow, otdanger] (4.8,-2.5) -- node[above, font=\tiny] {6. S7comm ACK} (1.2,-2.5);
+
+\node[font=\tiny, otsuccess] at (3,-3) {Connection Established};
+
+\end{tikzpicture}
+\caption{S7comm Connection Establishment}
+\end{figure}
+
+\begin{enumerate}
+    \item TCP connection to port 102
+    \item COTP Connection Request (CR)
+    \item COTP Connection Confirm (CC)
+    \item S7comm Setup Communication
+    \item S7comm communication established
+\end{enumerate}
+
+\subsection{TSAP Addressing}
+
+Connections use TSAP (Transport Service Access Point) addresses:
+\begin{itemize}
+    \item \textbf{Local TSAP} -- Client identifier
+    \item \textbf{Remote TSAP} -- Identifies rack/slot (e.g., 0x0102 = rack 0, slot 2)
+\end{itemize}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Remote TSAP} & \textbf{Target} \\
+\hline
+0x0100 & Programming access \\
+0x0102 & Rack 0, Slot 2 (typical CPU) \\
+0x0103 & Rack 0, Slot 3 \\
+0x0200 & Rack 1, Slot 0 \\
+\hline
+\end{tabular}
+\caption{Common TSAP Addresses}
+\end{table}
+
+% ============================================================================
+\section{S7comm Functions}
+% ============================================================================
+
+\subsection{Function Codes}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Code} & \textbf{Function} & \textbf{Risk} \\
+\hline
+0x04 & Read Variable & Information disclosure \\
+0x05 & Write Variable & Process manipulation \\
+0x1A & Request Download & Code injection \\
+0x1B & Download Block & Code injection \\
+0x1C & Download Ended & Code injection \\
+0x1D & Start Upload & Code theft \\
+0x1E & Upload & Code theft \\
+0x28 & PLC Control & Start/stop PLC \\
+0x29 & PLC Stop & Denial of service \\
+\hline
+\end{tabular}
+\caption{S7comm Function Codes and Security Risks}
+\end{table}
+
+\subsection{Memory Areas}
+
+S7comm can access various PLC memory areas:
+\begin{itemize}
+    \item \textbf{I (Inputs)} -- Physical input states
+    \item \textbf{Q (Outputs)} -- Physical output states
+    \item \textbf{M (Markers)} -- Internal memory bits
+    \item \textbf{DB (Data Blocks)} -- Structured data storage
+    \item \textbf{T (Timers)} -- Timer values
+    \item \textbf{C (Counters)} -- Counter values
+\end{itemize}
+
+% ============================================================================
+\section{Security Vulnerabilities}
+% ============================================================================
+
+\begin{dangerbox}
+Classic S7comm (S7-300/400) has no authentication whatsoever. Anyone with network access can read memory, write values, upload/download programs, and stop the PLC.
+\end{dangerbox}
+
+\subsection{Protocol Weaknesses}
+
+\begin{itemize}
+    \item \textbf{No authentication} -- Connections accepted from any client
+    \item \textbf{No encryption} -- All traffic in plaintext
+    \item \textbf{No integrity} -- Messages can be modified
+    \item \textbf{Password weakness} -- CPU passwords easily bypassed
+    \item \textbf{Full access} -- Read/write any memory area
+    \item \textbf{Program transfer} -- Upload/download without verification
+\end{itemize}
+
+\subsection{CPU Password Limitations}
+
+S7-300/400 CPU passwords:
+\begin{itemize}
+    \item Only 8 characters maximum
+    \item Stored in plaintext in project files
+    \item Can be read via S7comm in some cases
+    \item Bypass possible through various techniques
+    \item Provides false sense of security
+\end{itemize}
+
+\subsection{Attack Vectors}
+
+\begin{itemize}
+    \item \textbf{Memory read} -- Extract process data, recipes, IP
+    \item \textbf{Memory write} -- Manipulate setpoints, outputs
+    \item \textbf{Program theft} -- Upload and reverse-engineer logic
+    \item \textbf{Logic injection} -- Download malicious program
+    \item \textbf{PLC stop} -- Halt production
+    \item \textbf{Stuxnet-style} -- Modify logic while hiding changes
+\end{itemize}
+
+% ============================================================================
+\section{Stuxnet and S7comm}
+% ============================================================================
+
+\begin{warningbox}
+Stuxnet demonstrated the devastating potential of S7comm attacks, causing physical destruction of Iranian uranium enrichment centrifuges by manipulating PLC logic.
+\end{warningbox}
+
+\subsection{Stuxnet Techniques}
+
+\begin{itemize}
+    \item Targeted specific S7-315 and S7-417 PLCs
+    \item Intercepted and modified OB1 (main program block)
+    \item Injected malicious code into OB35 (timed interrupt)
+    \item Hid changes from engineering software
+    \item Manipulated frequency converter outputs
+    \item Caused centrifuge over/under-speed damage
+\end{itemize}
+
+% ============================================================================
+\section{S7comm-Plus Security}
+% ============================================================================
+
+\subsection{S7-1200/1500 Improvements}
+
+Newer PLCs offer security features:
+\begin{itemize}
+    \item \textbf{Access protection levels} -- Configurable read/write restrictions
+    \item \textbf{Know-how protection} -- Block encryption
+    \item \textbf{Copy protection} -- Bind program to specific CPU
+    \item \textbf{TLS option} -- Encrypted communication (TIA Portal V17+)
+    \item \textbf{Integrity protection} -- Digital signatures for programs
+\end{itemize}
+
+\subsection{Access Protection Levels}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Level} & \textbf{Protection} \\
+\hline
+No protection & Full access (default) \\
+Write protection & Read allowed, write requires password \\
+Read/Write protection & Password required for both \\
+Full protection & No HMI access, password for everything \\
+\hline
+\end{tabularx}
+\caption{S7-1500 Access Protection Levels}
+\end{table}
+
+\begin{warningbox}
+Even with S7-1500 security features, many deployments use default settings with no protection enabled. Always verify security configuration.
+\end{warningbox}
+
+% ============================================================================
+\section{Security Mitigations}
+% ============================================================================
+
+\subsection{Network Controls}
+
+\begin{successbox}
+Given S7comm's lack of native security (especially on S7-300/400), network-level protection is essential.
+\end{successbox}
+
+\begin{itemize}
+    \item \textbf{Firewall port 102} -- Block from unauthorized networks
+    \item \textbf{Network segmentation} -- Isolate PLCs in dedicated VLAN
+    \item \textbf{Access lists} -- Limit which IPs can connect to PLCs
+    \item \textbf{Industrial firewall} -- S7comm-aware deep packet inspection
+\end{itemize}
+
+\subsection{PLC Configuration}
+
+\begin{itemize}
+    \item Enable access protection (S7-1200/1500)
+    \item Use strong passwords (where supported)
+    \item Enable know-how protection for sensitive blocks
+    \item Restrict PUT/GET communication
+    \item Disable unused communication functions
+\end{itemize}
+
+\subsection{Monitoring}
+
+\begin{itemize}
+    \item Log all connections to port 102
+    \item Alert on download/upload operations
+    \item Detect PLC stop commands
+    \item Monitor for connections from new sources
+    \item Compare running program against baseline
+\end{itemize}
+
+% ============================================================================
+\section{Tools and Detection}
+% ============================================================================
+
+\subsection{Analysis Tools}
+
+\begin{itemize}
+    \item \textbf{Wireshark} -- S7comm dissector built-in
+    \item \textbf{Snap7} -- Open-source S7comm library
+    \item \textbf{PLCScan} -- Siemens PLC scanner
+    \item \textbf{Metasploit} -- S7comm auxiliary modules
+\end{itemize}
+
+\subsection{Detection Signatures}
+
+Monitor for:
+\begin{itemize}
+    \item COTP CR packets to port 102
+    \item S7comm function codes 0x1A-0x1E (download/upload)
+    \item S7comm function code 0x29 (stop)
+    \item Unusual TSAP addressing patterns
+    \item High-frequency read/write operations
+\end{itemize}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Siemens protocol} -- Primary for S7 PLC family
+    \item \textbf{TCP port 102} -- Via ISO-TSAP/COTP
+    \item \textbf{Stuxnet target} -- Proven attack surface
+    \item \textbf{No security (S7-300/400)} -- Full unauthenticated access
+    \item \textbf{S7comm-Plus} -- Improved security options
+    \item \textbf{Enable protection} -- Configure access levels on S7-1500
+    \item \textbf{Network isolation} -- Critical for older PLCs
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{Siemens Industrial Security}\\
+          \url{https://www.siemens.com/global/en/products/automation/topic-areas/industrial-security.html}
+    \item \textbf{CISA -- Siemens Advisories}\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+\end{itemize}
+
+\subsection*{Research}
+
+\begin{itemize}
+    \item \textbf{Langner -- Stuxnet Analysis}\\
+          \url{https://www.langner.com/}
+    \item \textbf{Snap7 Project}\\
+          \url{https://snap7.sourceforge.net/}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}
