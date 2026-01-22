@@ -1,0 +1,324 @@
+% ============================================================================
+%  830-endpoint-protection - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+\begin{document}
+
+\maketitlepage
+    {Endpoint Protection for OT}
+    {Antivirus, EDR, and endpoint security in industrial environments}
+    {OT Security Learning Series}
+    {Document 830 \quad|\quad January 2026}
+    {AI Assistant}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+Endpoint protection in OT environments requires balancing security with operational stability. Traditional IT security tools can disrupt industrial processes, while no protection leaves systems vulnerable to malware like Stuxnet, TRITON, and Industroyer.
+\end{infobox}
+
+OT endpoints include:
+\begin{itemize}
+    \item HMI workstations and operator consoles
+    \item Engineering workstations
+    \item Historian servers
+    \item SCADA servers
+    \item Windows-based PLCs and embedded systems
+    \item Jump servers and remote access systems
+\end{itemize}
+
+\begin{warningbox}
+Never deploy endpoint protection without thorough testing in a non-production environment. A false positive blocking a critical DLL could halt production.
+\end{warningbox}
+
+% ============================================================================
+\section{Endpoint Protection Options}
+% ============================================================================
+
+\subsection{Protection Technologies}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|l|}
+\hline
+\textbf{Technology} & \textbf{Description} & \textbf{OT Fit} \\
+\hline
+Traditional AV & Signature-based malware detection & Limited \\
+Next-Gen AV (NGAV) & Behavioral + signature detection & Moderate \\
+Application Whitelisting & Only approved apps can run & Excellent \\
+EDR & Detection, investigation, response & Moderate \\
+XDR & Extended detection across endpoints/network & Emerging \\
+Host-based Firewall & Control network connections & Good \\
+Device Control & USB and removable media control & Excellent \\
+\hline
+\end{tabularx}
+\caption{Endpoint Protection Technologies}
+\end{table}
+
+\subsection{Technology Comparison}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Criteria} & \textbf{AV} & \textbf{Whitelisting} & \textbf{EDR} & \textbf{Device Ctrl} \\
+\hline
+Stops known malware & Yes & Yes & Yes & Partial \\
+Stops unknown malware & Limited & Yes & Moderate & Limited \\
+Low false positives & Moderate & High* & Moderate & High \\
+Low system impact & Moderate & High & Moderate & High \\
+Works offline & Limited & Yes & Limited & Yes \\
+Legacy OS support & Varies & Good & Limited & Good \\
+\hline
+\end{tabular}
+\caption{Comparison of Endpoint Protection Approaches}
+\end{table}
+\small{* After proper baselining}
+
+% ============================================================================
+\section{OT-Specific Challenges}
+% ============================================================================
+
+\begin{dangerbox}
+\textbf{Why IT endpoint security fails in OT:}
+\begin{itemize}
+    \item Signature updates require internet (air-gapped networks)
+    \item Scans consume CPU during critical operations
+    \item False positives can block control system software
+    \item Reboots for updates are often impossible
+    \item Legacy OS (Windows XP, Server 2003) unsupported
+    \item Vendor support voided by third-party security software
+\end{itemize}
+\end{dangerbox}
+
+\subsection{Vendor Compatibility}
+
+\begin{warningbox}
+Many OT vendors only support specific antivirus products. Check compatibility before deployment:
+\begin{itemize}
+    \item Siemens -- Publishes tested AV compatibility list
+    \item Rockwell -- Certifies specific products
+    \item ABB, Schneider -- Provide security guidelines
+    \item GE, Honeywell -- May void support for untested software
+\end{itemize}
+\end{warningbox}
+
+% ============================================================================
+\section{Recommended Approach}
+% ============================================================================
+
+\subsection{Layered Strategy}
+
+\begin{successbox}
+\textbf{OT endpoint protection stack (recommended):}
+\begin{enumerate}
+    \item \textbf{Application Whitelisting} -- Primary control
+    \item \textbf{Device Control} -- Block unauthorized USB/media
+    \item \textbf{Host Firewall} -- Limit network connections
+    \item \textbf{AV/EDR} -- Secondary, where compatible
+\end{enumerate}
+\end{successbox}
+
+\subsection{Protection by System Type}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{System Type} & \textbf{Recommended Protection} \\
+\hline
+Engineering Workstation & Full EDR + AV + Whitelisting + Device Control \\
+HMI / Operator Station & Whitelisting + Device Control + Host Firewall \\
+Historian Server & AV + Whitelisting + Host Firewall \\
+SCADA Server & Whitelisting + Device Control \\
+Jump Server & Full EDR + AV + MFA \\
+Legacy Windows (XP) & Whitelisting + Network isolation \\
+Embedded Windows & Whitelisting or Write Filter \\
+\hline
+\end{tabularx}
+\caption{Endpoint Protection by System Type}
+\end{table}
+
+% ============================================================================
+\section{Application Whitelisting}
+% ============================================================================
+
+\begin{definitionbox}{Application Whitelisting}
+A security approach that only allows pre-approved applications to execute. All other executables are blocked by default---the opposite of traditional AV which blocks known-bad.
+\end{definitionbox}
+
+\subsection{Benefits for OT}
+
+\begin{itemize}
+    \item \textbf{Stops unknown malware} -- Including zero-days
+    \item \textbf{Low resource usage} -- No signature scanning
+    \item \textbf{Works offline} -- No updates required
+    \item \textbf{Stable environments} -- OT systems rarely change
+    \item \textbf{Audit trail} -- Log of execution attempts
+\end{itemize}
+
+\subsection{Implementation Steps}
+
+\begin{enumerate}
+    \item \textbf{Audit mode} -- Monitor what executes without blocking
+    \item \textbf{Build baseline} -- Capture all legitimate applications
+    \item \textbf{Create policies} -- Define allowed executables/publishers
+    \item \textbf{Test thoroughly} -- Validate all operations work
+    \item \textbf{Enable enforcement} -- Block unauthorized execution
+    \item \textbf{Maintain} -- Update for patches and software changes
+\end{enumerate}
+
+% ============================================================================
+\section{Device Control}
+% ============================================================================
+
+\subsection{USB and Removable Media Risks}
+
+\begin{itemize}
+    \item Stuxnet spread via infected USB drives
+    \item Contractors introducing malware
+    \item Data exfiltration
+    \item Unauthorized software installation
+\end{itemize}
+
+\subsection{Device Control Policies}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Policy} & \textbf{Description} \\
+\hline
+Block all USB & Most restrictive, may impact operations \\
+Read-only USB & Allow data export, prevent execution \\
+Approved devices only & Whitelist specific USB serial numbers \\
+Scan before access & AV scan on USB mount \\
+Secure transfer station & Dedicated kiosk for file transfer \\
+\hline
+\end{tabularx}
+\caption{USB Control Policy Options}
+\end{table}
+
+% ============================================================================
+\section{EDR in OT}
+% ============================================================================
+
+\subsection{EDR Capabilities}
+
+\begin{itemize}
+    \item Real-time process monitoring
+    \item Behavioral analysis
+    \item Threat hunting queries
+    \item Incident investigation
+    \item Remote response actions
+\end{itemize}
+
+\subsection{EDR Considerations for OT}
+
+\begin{warningbox}
+\textbf{EDR deployment cautions:}
+\begin{itemize}
+    \item Test ``response'' actions carefully---never auto-quarantine in OT
+    \item Ensure agent doesn't interfere with real-time processes
+    \item Plan for offline/air-gapped operation
+    \item Verify compatibility with control system software
+    \item Consider network bandwidth for telemetry
+\end{itemize}
+\end{warningbox}
+
+\subsection{Where to Deploy EDR}
+
+\begin{itemize}
+    \item Engineering workstations -- Yes
+    \item Jump servers -- Yes
+    \item HMIs with internet access -- Consider
+    \item Isolated HMIs -- Whitelisting preferred
+    \item Control servers -- Test thoroughly first
+    \item PLCs/RTUs -- Not applicable (no OS agent)
+\end{itemize}
+
+% ============================================================================
+\section{Legacy System Protection}
+% ============================================================================
+
+For unsupported operating systems (Windows XP, Server 2003):
+
+\begin{itemize}
+    \item \textbf{Application whitelisting} -- Primary defense
+    \item \textbf{Network isolation} -- Strict firewall rules
+    \item \textbf{Disable unnecessary services} -- Reduce attack surface
+    \item \textbf{Remove internet access} -- No browsing, email
+    \item \textbf{Virtual patching} -- IPS rules at network level
+    \item \textbf{Plan migration} -- Upgrade path to supported OS
+\end{itemize}
+
+% ============================================================================
+\section{Deployment Best Practices}
+% ============================================================================
+
+\begin{enumerate}
+    \item \textbf{Test in lab} -- Never deploy untested in production
+    \item \textbf{Check vendor compatibility} -- Get written approval
+    \item \textbf{Start with monitoring} -- Audit mode before enforcement
+    \item \textbf{Exclude control processes} -- Whitelist critical executables
+    \item \textbf{Schedule scans carefully} -- During maintenance windows
+    \item \textbf{Plan update strategy} -- Offline updates for air-gapped
+    \item \textbf{Document exceptions} -- Track all exclusions
+    \item \textbf{Monitor performance} -- Watch for CPU/memory impact
+\end{enumerate}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Whitelisting first} -- Best fit for stable OT environments
+    \item \textbf{Device control} -- Essential for USB/removable media
+    \item \textbf{Test thoroughly} -- Never deploy without validation
+    \item \textbf{Vendor approval} -- Check compatibility lists
+    \item \textbf{No auto-remediation} -- Disable automatic blocking/quarantine
+    \item \textbf{Legacy protection} -- Isolation + whitelisting for old OS
+    \item \textbf{Layered approach} -- Combine multiple technologies
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Standards}
+
+\begin{itemize}
+    \item \textbf{IEC 62443-2-4} -- Security program requirements\\
+          \url{https://webstore.iec.ch/publication/7031}
+    \item \textbf{NIST SP 800-82} -- Guide to ICS Security\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{CISA -- ICS Security}\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

@@ -1,0 +1,293 @@
+% ============================================================================
+%  305-wireless-in-ot - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+\begin{document}
+
+\maketitlepage
+    {Wireless in OT Environments}
+    {WiFi, 5G, LoRaWAN, and industrial wireless security}
+    {OT Security Learning Series}
+    {Document 305 \quad|\quad January 2026}
+    {AI Assistant}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+Wireless technologies are increasingly deployed in OT environments for mobility, flexibility, and cost reduction. However, they introduce unique security challenges that differ significantly from wired networks.
+\end{infobox}
+
+Common wireless use cases in OT:
+\begin{itemize}
+    \item Mobile HMI and tablets for operators
+    \item Wireless sensor networks
+    \item Remote asset monitoring (IoT/IIoT)
+    \item Temporary connections during maintenance
+    \item Connectivity in hazardous or hard-to-wire areas
+\end{itemize}
+
+\begin{warningbox}
+Wireless extends the attack surface beyond the physical perimeter. An attacker doesn't need physical access---they only need to be within radio range.
+\end{warningbox}
+
+% ============================================================================
+\section{Wireless Technologies in OT}
+% ============================================================================
+
+\subsection{Technology Comparison}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|l|l|X|}
+\hline
+\textbf{Technology} & \textbf{Range} & \textbf{Speed} & \textbf{OT Use Case} \\
+\hline
+WiFi (802.11) & 50--100m & High & HMI, video, general data \\
+5G / LTE & 1--10km & High & Remote sites, mobile assets \\
+LoRaWAN & 2--15km & Low & Sensors, metering \\
+WirelessHART & 50--250m & Low & Process instrumentation \\
+ISA100.11a & 50--250m & Low & Process automation \\
+Zigbee & 10--100m & Low & Building automation \\
+Bluetooth & 10--100m & Medium & Local device pairing \\
+\hline
+\end{tabularx}
+\caption{Wireless Technologies Comparison}
+\end{table}
+
+\subsection{Industrial Wireless Standards}
+
+\begin{definitionbox}{Industrial Wireless Protocols}
+\begin{itemize}
+    \item \textbf{WirelessHART} -- Extension of HART protocol for process control
+    \item \textbf{ISA100.11a} -- ISA standard for industrial automation
+    \item \textbf{WiFi (802.11)} -- General purpose, widely deployed
+    \item \textbf{5G/Private LTE} -- High bandwidth, low latency, wide area
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Security Risks}
+% ============================================================================
+
+\subsection{Wireless-Specific Threats}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Threat} & \textbf{Description} \\
+\hline
+Eavesdropping & Passive interception of wireless traffic \\
+Rogue Access Points & Unauthorized APs capturing credentials \\
+Evil Twin & Fake AP mimicking legitimate network \\
+Deauthentication & Forcing clients to disconnect (DoS) \\
+Man-in-the-Middle & Intercepting and modifying communications \\
+Jamming & Radio interference causing denial of service \\
+Wardriving & Scanning for vulnerable wireless networks \\
+Credential Theft & Capturing authentication handshakes \\
+\hline
+\end{tabularx}
+\caption{Wireless Security Threats}
+\end{table}
+
+\subsection{OT-Specific Concerns}
+
+\begin{dangerbox}
+\textbf{Critical OT wireless risks:}
+\begin{itemize}
+    \item Safety system commands over wireless
+    \item Unencrypted legacy industrial protocols
+    \item Interference with control system timing
+    \item Extended attack surface beyond fence line
+    \item Difficulty detecting rogue devices
+\end{itemize}
+\end{dangerbox}
+
+% ============================================================================
+\section{WiFi Security}
+% ============================================================================
+
+\subsection{WiFi Security Standards}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Standard} & \textbf{Encryption} & \textbf{Recommendation} \\
+\hline
+WEP & RC4 (broken) & \textcolor{red}{Never use} \\
+WPA & TKIP & \textcolor{red}{Avoid} \\
+WPA2-Personal & AES-CCMP & Acceptable for low-risk \\
+WPA2-Enterprise & AES + 802.1X & Recommended \\
+WPA3 & SAE + AES-GCM & Best available \\
+\hline
+\end{tabular}
+\caption{WiFi Security Standards}
+\end{table}
+
+\subsection{WiFi Best Practices}
+
+\begin{successbox}
+\textbf{Minimum requirements for OT WiFi:}
+\begin{itemize}
+    \item WPA2-Enterprise or WPA3
+    \item 802.1X authentication with RADIUS
+    \item Dedicated SSIDs for OT (separate from corporate)
+    \item Certificate-based authentication where possible
+    \item Wireless IDS/IPS deployment
+\end{itemize}
+\end{successbox}
+
+\begin{itemize}
+    \item Disable SSID broadcast (limited value but reduces casual discovery)
+    \item Use strong, unique passwords (if PSK required)
+    \item Enable client isolation where appropriate
+    \item Implement MAC filtering as additional layer
+    \item Regular wireless surveys to detect rogues
+    \item Position APs to minimize signal leakage outside facility
+\end{itemize}
+
+% ============================================================================
+\section{5G and Private LTE}
+% ============================================================================
+
+\subsection{Benefits for OT}
+
+\begin{itemize}
+    \item \textbf{Private networks} -- Dedicated spectrum, full control
+    \item \textbf{Low latency} -- Suitable for real-time control
+    \item \textbf{High reliability} -- Carrier-grade availability
+    \item \textbf{Wide coverage} -- Large facilities, remote sites
+    \item \textbf{Built-in security} -- SIM-based authentication
+\end{itemize}
+
+\subsection{5G Security Considerations}
+
+\begin{itemize}
+    \item Use private 5G networks, not public carriers for critical systems
+    \item Implement network slicing for traffic isolation
+    \item Secure the 5G core infrastructure
+    \item Monitor for IMSI catchers and fake base stations
+    \item Encrypt application layer (don't rely only on 5G encryption)
+\end{itemize}
+
+% ============================================================================
+\section{LPWAN (LoRaWAN, NB-IoT)}
+% ============================================================================
+
+\subsection{Low-Power Wide-Area Networks}
+
+Common for remote sensors and metering:
+\begin{itemize}
+    \item \textbf{LoRaWAN} -- Long range, low power, open standard
+    \item \textbf{NB-IoT} -- Cellular-based, carrier managed
+    \item \textbf{Sigfox} -- Ultra-narrow band, limited messages
+\end{itemize}
+
+\subsection{LPWAN Security}
+
+\begin{warningbox}
+Many LPWAN deployments use default keys or weak security. Always:
+\begin{itemize}
+    \item Change default application and network keys
+    \item Use unique keys per device
+    \item Enable encryption (LoRaWAN AES-128)
+    \item Implement secure join procedures (OTAA over ABP)
+\end{itemize}
+\end{warningbox}
+
+% ============================================================================
+\section{Implementation Guidelines}
+% ============================================================================
+
+\subsection{OT Wireless Architecture}
+
+\begin{enumerate}
+    \item \textbf{Segment} -- Separate SSID/VLAN for OT wireless
+    \item \textbf{Firewall} -- All wireless traffic through OT firewall
+    \item \textbf{Authenticate} -- 802.1X, certificates, or strong PSK
+    \item \textbf{Encrypt} -- WPA2-Enterprise minimum, WPA3 preferred
+    \item \textbf{Monitor} -- Wireless IDS, rogue AP detection
+    \item \textbf{Limit} -- Restrict wireless to non-safety applications
+\end{enumerate}
+
+\subsection{What NOT to Put on Wireless}
+
+\begin{dangerbox}
+\textbf{Avoid wireless for:}
+\begin{itemize}
+    \item Safety Instrumented Systems (SIS)
+    \item Emergency shutdown commands
+    \item Primary control loops
+    \item High-speed motion control
+    \item Any application where latency/jitter is critical
+\end{itemize}
+\end{dangerbox}
+
+% ============================================================================
+\section{Monitoring and Detection}
+% ============================================================================
+
+\begin{itemize}
+    \item Deploy Wireless Intrusion Detection Systems (WIDS)
+    \item Conduct regular wireless site surveys
+    \item Monitor for unauthorized SSIDs and clients
+    \item Alert on deauthentication floods
+    \item Track RF spectrum for jamming attempts
+    \item Maintain inventory of authorized wireless devices
+\end{itemize}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Extended attack surface} -- Wireless reaches beyond physical perimeter
+    \item \textbf{WPA2-Enterprise minimum} -- No WEP, no WPA-Personal in OT
+    \item \textbf{Segment OT wireless} -- Separate from corporate networks
+    \item \textbf{Monitor continuously} -- Rogue AP and intrusion detection
+    \item \textbf{Avoid for safety} -- Don't use wireless for safety-critical functions
+    \item \textbf{Industrial protocols} -- WirelessHART, ISA100.11a for process control
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Standards}
+
+\begin{itemize}
+    \item \textbf{IEC 62443-3-3} -- Wireless security requirements\\
+          \url{https://webstore.iec.ch/publication/7033}
+    \item \textbf{ISA-TR100.15.01} -- Wireless backhaul recommendation\\
+          \url{https://www.isa.org/}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{NIST SP 800-153} -- Guidelines for Securing WLAN\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-153/final}
+    \item \textbf{CISA -- Wireless Security}\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

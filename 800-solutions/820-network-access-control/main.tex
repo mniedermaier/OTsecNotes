@@ -1,0 +1,290 @@
+% ============================================================================
+%  820-network-access-control - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+\begin{document}
+
+\maketitlepage
+    {Network Access Control for OT}
+    {NAC implementation in industrial environments}
+    {OT Security Learning Series}
+    {Document 820 \quad|\quad January 2026}
+    {AI Assistant}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+Network Access Control (NAC) ensures that only authorized and compliant devices can connect to the OT network. It provides visibility into connected assets and enforces security policies before granting network access.
+\end{infobox}
+
+NAC addresses critical OT challenges:
+\begin{itemize}
+    \item Unauthorized devices connecting to the network
+    \item Contractors bringing unmanaged laptops
+    \item Rogue devices introduced during maintenance
+    \item Shadow IT and unauthorized equipment
+    \item Lack of visibility into connected assets
+\end{itemize}
+
+\begin{warningbox}
+Traditional IT NAC solutions may not work in OT environments. Many industrial devices cannot run agents, support 802.1X, or tolerate authentication delays.
+\end{warningbox}
+
+% ============================================================================
+\section{NAC Fundamentals}
+% ============================================================================
+
+\subsection{NAC Functions}
+
+\begin{definitionbox}{Core NAC Capabilities}
+\begin{itemize}
+    \item \textbf{Authentication} -- Verify identity of users and devices
+    \item \textbf{Authorization} -- Determine access level based on policy
+    \item \textbf{Assessment} -- Check device compliance (patches, AV, etc.)
+    \item \textbf{Remediation} -- Quarantine or fix non-compliant devices
+    \item \textbf{Visibility} -- Inventory all connected devices
+\end{itemize}
+\end{definitionbox}
+
+\subsection{NAC Methods}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|l|}
+\hline
+\textbf{Method} & \textbf{Description} & \textbf{OT Suitability} \\
+\hline
+802.1X & Port-based authentication via RADIUS & Limited \\
+MAC Authentication Bypass & Authenticate by MAC address & Common \\
+Agent-based & Software agent on endpoint & Very limited \\
+Agentless & Passive profiling, no endpoint software & Recommended \\
+Inline & NAC device inline with traffic & Moderate \\
+Out-of-band & NAC monitors via SPAN/mirror & Recommended \\
+\hline
+\end{tabularx}
+\caption{NAC Methods and OT Applicability}
+\end{table}
+
+% ============================================================================
+\section{OT NAC Challenges}
+% ============================================================================
+
+\begin{dangerbox}
+\textbf{Why traditional NAC fails in OT:}
+\begin{itemize}
+    \item PLCs and RTUs cannot run authentication agents
+    \item Legacy devices don't support 802.1X
+    \item Authentication delays may disrupt real-time control
+    \item Blocking a device could stop production
+    \item Many OT devices use static IPs and configurations
+    \item Rebooting devices for NAC enrollment may be impossible
+\end{itemize}
+\end{dangerbox}
+
+\subsection{OT Device Limitations}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Device Type} & \textbf{802.1X} & \textbf{Agent} & \textbf{MAC Auth} \\
+\hline
+Modern Windows HMI & Yes & Yes & Yes \\
+Legacy Windows XP & Limited & Limited & Yes \\
+Engineering Workstation & Yes & Yes & Yes \\
+PLC / RTU & No & No & Yes \\
+Network Switch (managed) & Yes & No & N/A \\
+Field Sensor / Actuator & No & No & Maybe \\
+IP Camera & Limited & No & Yes \\
+\hline
+\end{tabular}
+\caption{OT Device NAC Capability Matrix}
+\end{table}
+
+% ============================================================================
+\section{OT NAC Architecture}
+% ============================================================================
+
+\subsection{Recommended Approach}
+
+\begin{successbox}
+\textbf{OT NAC best practices:}
+\begin{itemize}
+    \item Use \textbf{agentless, passive} profiling for OT devices
+    \item Deploy \textbf{out-of-band} monitoring (not inline blocking)
+    \item Implement \textbf{802.1X} only for capable devices (HMIs, workstations)
+    \item Use \textbf{MAC Authentication Bypass (MAB)} for PLCs, RTUs
+    \item Start in \textbf{monitor mode} before enforcement
+    \item Integrate with \textbf{OT asset inventory} solutions
+\end{itemize}
+\end{successbox}
+
+\subsection{Deployment Zones}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\textbf{Zone} & \textbf{NAC Mode} & \textbf{Rationale} \\
+\hline
+Enterprise IT & Full 802.1X & Standard IT devices support it \\
+Industrial DMZ & 802.1X + MAB & Mix of IT and OT devices \\
+Manufacturing & MAB + Monitoring & HMIs may support 802.1X \\
+Control & Monitor only & Cannot risk blocking PLCs \\
+Safety & No NAC & Isolation is better than NAC \\
+\hline
+\end{tabularx}
+\caption{NAC Deployment by Zone}
+\end{table}
+
+% ============================================================================
+\section{Implementation Strategy}
+% ============================================================================
+
+\subsection{Phased Rollout}
+
+\begin{enumerate}
+    \item \textbf{Phase 1: Visibility}
+    \begin{itemize}
+        \item Deploy passive monitoring
+        \item Build complete asset inventory
+        \item Profile all device types
+        \item No enforcement, only alerting
+    \end{itemize}
+
+    \item \textbf{Phase 2: Classification}
+    \begin{itemize}
+        \item Categorize devices by type and criticality
+        \item Define policy groups
+        \item Identify 802.1X-capable devices
+        \item Document MAC addresses for MAB
+    \end{itemize}
+
+    \item \textbf{Phase 3: Selective Enforcement}
+    \begin{itemize}
+        \item Enable 802.1X on IT-like OT devices
+        \item Implement MAB for industrial devices
+        \item Start with low-risk zones
+        \item Monitor for issues
+    \end{itemize}
+
+    \item \textbf{Phase 4: Full Deployment}
+    \begin{itemize}
+        \item Extend to all zones (except safety)
+        \item Automate quarantine for unknown devices
+        \item Integrate with incident response
+    \end{itemize}
+\end{enumerate}
+
+% ============================================================================
+\section{Device Profiling}
+% ============================================================================
+
+\subsection{Profiling Techniques}
+
+\begin{itemize}
+    \item \textbf{DHCP fingerprinting} -- Identify device by DHCP options
+    \item \textbf{MAC OUI lookup} -- Manufacturer identification
+    \item \textbf{Traffic analysis} -- Protocols and behavior patterns
+    \item \textbf{Active scanning} -- Probe devices (use carefully in OT)
+    \item \textbf{Integration} -- Import from asset management tools
+\end{itemize}
+
+\subsection{OT Device Signatures}
+
+NAC systems should recognize:
+\begin{itemize}
+    \item Industrial protocols (Modbus, EtherNet/IP, PROFINET)
+    \item PLC vendors (Siemens, Rockwell, Schneider, ABB)
+    \item HMI systems and historians
+    \item Industrial switches and routers
+\end{itemize}
+
+% ============================================================================
+\section{Policy Examples}
+% ============================================================================
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Condition} & \textbf{Action} \\
+\hline
+Known PLC (MAC in inventory) & Allow, assign to Control VLAN \\
+Known HMI with valid certificate & Allow, assign to Manufacturing VLAN \\
+Unknown device on control network & Alert SOC, monitor traffic \\
+Contractor laptop & Quarantine VLAN, require approval \\
+Device fails posture check & Limited access, remediation portal \\
+Known device, wrong port & Alert, investigate \\
+\hline
+\end{tabularx}
+\caption{Example NAC Policies for OT}
+\end{table}
+
+% ============================================================================
+\section{Integration Points}
+% ============================================================================
+
+\begin{itemize}
+    \item \textbf{SIEM} -- Send NAC events for correlation
+    \item \textbf{Asset Management} -- Sync device inventory
+    \item \textbf{CMDB} -- Validate against authorized asset list
+    \item \textbf{Firewall} -- Dynamic policy updates
+    \item \textbf{Vulnerability Scanner} -- Trigger scans on new devices
+    \item \textbf{Ticketing} -- Auto-create tickets for violations
+\end{itemize}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Agentless for OT} -- Most industrial devices can't run agents
+    \item \textbf{MAB for PLCs} -- MAC Authentication Bypass for non-802.1X devices
+    \item \textbf{Monitor first} -- Start passive before enforcement
+    \item \textbf{Zone-based} -- Different NAC modes for different zones
+    \item \textbf{Don't block control} -- Alert rather than block critical devices
+    \item \textbf{Visibility is key} -- NAC provides asset inventory benefit
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Standards}
+
+\begin{itemize}
+    \item \textbf{IEEE 802.1X} -- Port-Based Network Access Control\\
+          \url{https://standards.ieee.org/standard/802_1X-2020.html}
+    \item \textbf{IEC 62443-3-3} -- System security requirements\\
+          \url{https://webstore.iec.ch/publication/7033}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{NIST SP 800-82} -- Guide to ICS Security\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

@@ -1,0 +1,294 @@
+% ============================================================================
+%  303-zone-conduit-model - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {Zone \& Conduit Model}
+    {IEC 62443 network segmentation architecture}
+    {OT Security Learning Series}
+    {Document 303 \quad|\quad January 2026}
+    {AI Assistant}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+The Zone and Conduit Model is the foundational architecture concept in IEC 62443 for segmenting industrial control systems. It provides a structured approach to grouping assets by security requirements and controlling communication between groups.
+\end{infobox}
+
+Key principles:
+\begin{itemize}
+    \item Group assets with similar security requirements into \textbf{zones}
+    \item Control all communication between zones through \textbf{conduits}
+    \item Assign Security Levels (SL) to each zone based on risk
+    \item Apply appropriate controls at conduit boundaries
+\end{itemize}
+
+% ============================================================================
+\section{Core Concepts}
+% ============================================================================
+
+\subsection{Zones}
+
+\begin{definitionbox}{Security Zone}
+A grouping of logical or physical assets that share common security requirements. All assets within a zone have the same Security Level (SL) target.
+\end{definitionbox}
+
+Zone characteristics:
+\begin{itemize}
+    \item \textbf{Clear boundary} -- Defined perimeter with controlled entry/exit
+    \item \textbf{Common SL} -- All assets share the same target Security Level
+    \item \textbf{Trust relationship} -- Assets within a zone trust each other
+    \item \textbf{Managed independently} -- Each zone has defined ownership
+\end{itemize}
+
+\subsection{Conduits}
+
+\begin{definitionbox}{Conduit}
+A logical grouping of communication channels that share common security requirements, connecting two or more zones.
+\end{definitionbox}
+
+Conduit characteristics:
+\begin{itemize}
+    \item \textbf{Controlled path} -- All traffic between zones flows through conduits
+    \item \textbf{Security controls} -- Firewalls, data diodes, or other mechanisms
+    \item \textbf{Defined protocols} -- Only approved communication is permitted
+    \item \textbf{Monitored} -- Traffic is logged and inspected
+\end{itemize}
+
+% ============================================================================
+\section{Zone Architecture}
+% ============================================================================
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    zone/.style={rectangle, draw, thick, rounded corners=5pt, minimum width=3cm, minimum height=2cm, align=center},
+    conduit/.style={rectangle, draw, thick, fill=otwarning!30, minimum width=0.8cm, minimum height=0.5cm, font=\tiny},
+    arrow/.style={<->, thick, >=stealth}
+]
+
+% Enterprise Zone
+\node[zone, fill=otinfo!15, minimum width=10cm, minimum height=1.5cm] (enterprise) at (0,5.5) {Enterprise Zone (SL1)\\ERP, Email, Business Systems};
+
+% DMZ
+\node[zone, fill=otwarning!15, minimum width=10cm, minimum height=1.5cm] (dmz) at (0,2.5) {Industrial DMZ\\Historians, Jump Servers, Patch Management};
+
+% Manufacturing Zone
+\node[zone, fill=otsuccess!15, minimum width=4.5cm, minimum height=2cm] (mfg1) at (-2.5,-1.5) {Manufacturing\\Zone A (SL2)\\HMI, Engineering};
+
+\node[zone, fill=otsuccess!15, minimum width=4.5cm, minimum height=2cm] (mfg2) at (2.5,-1.5) {Manufacturing\\Zone B (SL2)\\HMI, Engineering};
+
+% Control Zones
+\node[zone, fill=otdanger!15, minimum width=4.5cm, minimum height=1.5cm] (ctrl1) at (-2.5,-5) {Control Zone A (SL3)\\PLCs, RTUs, I/O};
+
+\node[zone, fill=otdanger!15, minimum width=4.5cm, minimum height=1.5cm] (ctrl2) at (2.5,-5) {Control Zone B (SL3)\\PLCs, RTUs, I/O};
+
+% Safety Zone
+\node[zone, fill=otdanger!30, minimum width=2cm, minimum height=1cm] (safety) at (0,-7) {Safety (SL4)\\SIS};
+
+% Conduits - positioned with more space from zones
+\node[conduit] (c1) at (0,4) {FW};
+\node[conduit] (c2) at (-2.5,0.5) {FW};
+\node[conduit] (c3) at (2.5,0.5) {FW};
+\node[conduit] (c4) at (-2.5,-3.25) {FW};
+\node[conduit] (c5) at (2.5,-3.25) {FW};
+
+% Arrows
+\draw[arrow, otprimary] (enterprise) -- (c1);
+\draw[arrow, otprimary] (c1) -- (dmz);
+\draw[arrow, otprimary] (dmz.south -| c2) -- (c2);
+\draw[arrow, otprimary] (c2) -- (mfg1);
+\draw[arrow, otprimary] (dmz.south -| c3) -- (c3);
+\draw[arrow, otprimary] (c3) -- (mfg2);
+\draw[arrow, otprimary] (mfg1) -- (c4);
+\draw[arrow, otprimary] (c4) -- (ctrl1);
+\draw[arrow, otprimary] (mfg2) -- (c5);
+\draw[arrow, otprimary] (c5) -- (ctrl2);
+
+\end{tikzpicture}
+\caption{Zone and Conduit Architecture Example}
+\end{figure}
+
+% ============================================================================
+\section{Zone Types}
+% ============================================================================
+
+\subsection{Common Zone Classifications}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\textbf{Zone Type} & \textbf{Typical SL} & \textbf{Contents} \\
+\hline
+Enterprise & SL1 & Corporate IT, ERP, email, internet access \\
+Industrial DMZ & SL2 & Historians, patch servers, jump hosts \\
+Manufacturing & SL2 & HMI, engineering workstations, SCADA \\
+Control & SL2--SL3 & PLCs, RTUs, DCS controllers \\
+Safety & SL3--SL4 & SIS, emergency shutdown systems \\
+Field & SL1--SL2 & Sensors, actuators, field devices \\
+\hline
+\end{tabularx}
+\caption{Common Zone Types and Security Levels}
+\end{table}
+
+\subsection{Zone Sizing Considerations}
+
+\begin{itemize}
+    \item \textbf{Too large} -- Difficult to manage, broad attack surface
+    \item \textbf{Too small} -- Excessive complexity, operational burden
+    \item \textbf{Right size} -- Based on function, criticality, and connectivity
+\end{itemize}
+
+\begin{warningbox}
+Avoid creating zones purely based on vendor or equipment type. Zone boundaries should reflect security requirements and operational dependencies.
+\end{warningbox}
+
+% ============================================================================
+\section{Conduit Design}
+% ============================================================================
+
+\subsection{Conduit Security Controls}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Control Type} & \textbf{Description} \\
+\hline
+Firewall & Stateful packet filtering, application awareness \\
+Data Diode & Hardware-enforced unidirectional flow \\
+Jump Server & Controlled access point for administration \\
+Protocol Proxy & Protocol break, inspection, and translation \\
+VPN Gateway & Encrypted tunnel for remote connectivity \\
+IDS/IPS & Traffic inspection and threat detection \\
+\hline
+\end{tabularx}
+\caption{Conduit Security Control Options}
+\end{table}
+
+\subsection{Conduit Rules}
+
+\begin{successbox}
+Every conduit should have explicitly defined rules specifying:
+\begin{itemize}
+    \item Permitted protocols and ports
+    \item Allowed source and destination addresses
+    \item Direction of data flow
+    \item Authentication requirements
+\end{itemize}
+\end{successbox}
+
+\subsection{Conduit SL Requirements}
+
+The conduit must meet the \textbf{higher} SL of the two zones it connects:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Zone A SL} & \textbf{Zone B SL} & \textbf{Conduit SL} \\
+\hline
+SL1 & SL2 & SL2 \\
+SL2 & SL2 & SL2 \\
+SL2 & SL3 & SL3 \\
+SL3 & SL4 & SL4 \\
+\hline
+\end{tabular}
+\caption{Conduit Security Level Determination}
+\end{table}
+
+% ============================================================================
+\section{Implementation Steps}
+% ============================================================================
+
+\begin{enumerate}
+    \item \textbf{Asset Inventory} -- Identify all assets in the IACS
+    \item \textbf{Group by Function} -- Cluster assets by operational role
+    \item \textbf{Identify Dependencies} -- Map communication requirements
+    \item \textbf{Define Zone Boundaries} -- Draw logical/physical perimeters
+    \item \textbf{Assign Security Levels} -- Based on risk assessment
+    \item \textbf{Design Conduits} -- Define allowed flows between zones
+    \item \textbf{Implement Controls} -- Deploy firewalls, monitoring
+    \item \textbf{Validate} -- Test that zones are properly isolated
+    \item \textbf{Document} -- Maintain zone/conduit diagrams and rules
+\end{enumerate}
+
+% ============================================================================
+\section{Common Mistakes}
+% ============================================================================
+
+\begin{dangerbox}
+\textbf{Anti-patterns to avoid:}
+\begin{itemize}
+    \item Flat networks with no segmentation
+    \item Single firewall between IT and all of OT
+    \item Zones based on physical location only
+    \item Conduits with ``allow all'' rules
+    \item Undocumented or forgotten connections
+    \item Mixing different SL requirements in one zone
+\end{itemize}
+\end{dangerbox}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Zones} -- Group assets with same security requirements
+    \item \textbf{Conduits} -- Controlled paths between zones
+    \item \textbf{Security Levels} -- Drive control requirements per zone
+    \item \textbf{Defense in depth} -- Multiple zone layers increase security
+    \item \textbf{Documentation} -- Maintain accurate zone/conduit diagrams
+    \item \textbf{IEC 62443-3-2} -- Standard for zone/conduit design
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Standards}
+
+\begin{itemize}
+    \item \textbf{IEC 62443-3-2} -- Security risk assessment and zone design\\
+          \url{https://webstore.iec.ch/publication/7032}
+    \item \textbf{IEC 62443-3-3} -- System security requirements\\
+          \url{https://webstore.iec.ch/publication/7033}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{CISA -- Network Segmentation}\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}
