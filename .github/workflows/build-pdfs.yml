@@ -41,8 +41,9 @@ jobs:
           for pdf in pdf-output/*.pdf; do
             filename=$(basename "$pdf" .pdf)
             pdftoppm -png -f 1 -l 1 -scale-to 400 "$pdf" "pdf-output/thumbnails/${filename}"
-            # pdftoppm adds -1 suffix, rename it
-            mv "pdf-output/thumbnails/${filename}-1.png" "pdf-output/thumbnails/${filename}.png" 2>/dev/null || true
+            # pdftoppm adds -1 or -01 suffix depending on version, rename it
+            mv "pdf-output/thumbnails/${filename}-1.png" "pdf-output/thumbnails/${filename}.png" 2>/dev/null || \
+            mv "pdf-output/thumbnails/${filename}-01.png" "pdf-output/thumbnails/${filename}.png" 2>/dev/null || true
           done
 
           echo "PDFs:"
