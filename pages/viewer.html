@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>PDF Viewer - OT Security Notes</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
   <style>
@@ -16,6 +16,7 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; overflow: hidden; }
+    a, button { touch-action: manipulation; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: var(--primary);
@@ -132,6 +133,8 @@
       overflow: auto;
       background: #1a1a2e;
       padding: 2rem;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
     }
 
     .page-wrapper {
@@ -150,9 +153,10 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: calc(100vh - 56px);
+      min-height: 50vh;
       gap: 1rem;
       text-align: center;
+      padding: 2rem;
     }
 
     .loading-spinner {
@@ -180,18 +184,19 @@
     @media (max-width: 480px) {
       .download-btn span:last-child { display: none; }
       .toolbar { height: 44px; }
-      .pdf-container { top: 44px; padding: 0.5rem; }
+      .pdf-container { top: 44px; padding: 0.25rem; }
       .back-btn span { display: none; }
       .back-btn::before { content: '←'; }
       .toolbar-center { gap: 0.25rem; }
       .page-info { font-size: 0.8rem; }
-      .page-input { width: 40px; padding: 0.3rem; }
+      .page-input { width: 40px; padding: 0.3rem; font-size: 16px; }
+      .page-wrapper { margin-bottom: 0.5rem; }
     }
   </style>
 </head>
 <body>
   <div class="toolbar">
-    <a href="index.html" class="back-btn" onclick="event.preventDefault(); if(history.length > 1) history.back(); else location.href='index.html';"><span>&#8592;</span> <span>Back</span></a>
+    <a href="index.html" class="back-btn"><span>&#8592;</span> <span>Back</span></a>
     <span class="doc-title" id="docTitle">Loading...</span>
 
     <div class="toolbar-center">
@@ -256,8 +261,9 @@
         const firstPage = await pdfDoc.getPage(1);
         const viewport = firstPage.getViewport({ scale: 1 });
         const container = document.getElementById('pdfContainer');
-        const containerWidth = container.clientWidth - 60;
-        const containerHeight = container.clientHeight - 60;
+        const padding = window.innerWidth <= 480 ? 10 : 40;
+        const containerWidth = container.clientWidth - padding;
+        const containerHeight = container.clientHeight - padding;
         const scaleX = containerWidth / viewport.width;
         const scaleY = containerHeight / viewport.height;
         scale = Math.min(scaleX, scaleY);
@@ -322,9 +328,10 @@
       const viewport = page.getViewport({ scale: 1 });
       const container = document.getElementById('pdfContainer');
 
-      // Calculate scale to fit page in viewport (with some padding)
-      const containerWidth = container.clientWidth - 60;
-      const containerHeight = container.clientHeight - 60;
+      // Calculate scale to fit page in viewport (less padding on mobile)
+      const padding = window.innerWidth <= 480 ? 10 : 40;
+      const containerWidth = container.clientWidth - padding;
+      const containerHeight = container.clientHeight - padding;
 
       const scaleX = containerWidth / viewport.width;
       const scaleY = containerHeight / viewport.height;
@@ -338,7 +345,7 @@
     }
 
     function updateZoomDisplay() {
-      document.getElementById('zoomLevel').textContent = Math.round(scale * 100 / 1.5) + '%';
+      document.getElementById('zoomLevel').textContent = Math.round(scale * 100) + '%';
     }
 
     function goToPrevPage() {
@@ -439,6 +446,13 @@
           }
         }
       };
+
+      // Handle orientation change on mobile
+      let resizeTimeout;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => fitToPage(), 250);
+      });
     }
 
     function scrollToPage(num) {
@@ -452,7 +466,7 @@
         '<div class="error"><div class="error-icon">&#9888;</div>' +
         '<div class="error-message">' + title + '</div>' +
         '<div>' + msg + '</div>' +
-        '<a href="./" class="back-btn" style="margin-top:1rem">&#8592; Back</a></div>';
+        '<a href="index.html" class="back-btn" style="margin-top:1rem">&#8592; Back</a></div>';
     }
   </script>
 </body>
