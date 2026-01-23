@@ -1,0 +1,327 @@
+% ============================================================================
+%  421-cyber-kill-chain - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {Cyber Kill Chain for OT}
+    {Understanding attack methodologies in industrial environments}
+    {OT Security Learning Series}
+    {Document 421 \quad|\quad January 2026}
+    {AI Assistant}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+The Cyber Kill Chain is a framework for understanding the stages of a cyberattack. Originally developed for IT environments, specialized models have emerged for OT/ICS that account for the unique characteristics of industrial control systems.
+\end{infobox}
+
+Why kill chains matter for OT:
+\begin{itemize}
+    \item \textbf{Structured defense} -- Identify where to detect and disrupt attacks
+    \item \textbf{Threat intelligence} -- Map adversary behavior to stages
+    \item \textbf{Gap analysis} -- Find weaknesses in defensive coverage
+    \item \textbf{Incident response} -- Understand attack progression
+\end{itemize}
+
+\begin{warningbox}
+OT attacks typically require more stages than IT attacks because adversaries must understand physical processes before causing impact. This extended timeline provides more opportunities for detection.
+\end{warningbox}
+
+% ============================================================================
+\section{Lockheed Martin Cyber Kill Chain}
+% ============================================================================
+
+The original Cyber Kill Chain, developed by Lockheed Martin, defines seven stages of an intrusion:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    stage/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=2.2cm, minimum height=0.8cm, align=center, font=\scriptsize},
+    arrow/.style={->, thick, >=stealth}
+]
+
+% Stages in a flow
+\node[stage, fill=otinfo!30] (recon) at (0,0) {1. Recon};
+\node[stage, fill=otinfo!30] (weap) at (2.5,0) {2. Weaponize};
+\node[stage, fill=otwarning!30] (deliv) at (5,0) {3. Deliver};
+\node[stage, fill=otwarning!30] (exploit) at (7.5,0) {4. Exploit};
+\node[stage, fill=otdanger!30] (install) at (10,0) {5. Install};
+\node[stage, fill=otdanger!30] (c2) at (5,-1.5) {6. Command \& Control};
+\node[stage, fill=otdanger!40] (action) at (10,-1.5) {7. Actions on Objectives};
+
+% Arrows
+\draw[arrow] (recon) -- (weap);
+\draw[arrow] (weap) -- (deliv);
+\draw[arrow] (deliv) -- (exploit);
+\draw[arrow] (exploit) -- (install);
+\draw[arrow] (install) -- (10,-0.75) -- (c2);
+\draw[arrow] (c2) -- (action);
+
+\end{tikzpicture}
+\caption{Lockheed Martin Cyber Kill Chain}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|X|}
+\hline
+\textbf{Stage} & \textbf{Description} & \textbf{OT Example} \\
+\hline
+1. Reconnaissance & Gather information about target & Research SCADA vendors, job postings \\
+2. Weaponization & Create malware/exploit & Develop PLC-specific payload \\
+3. Delivery & Transmit weapon to target & Spear phishing, USB drop \\
+4. Exploitation & Trigger vulnerability & Exploit unpatched HMI \\
+5. Installation & Install persistent access & Deploy RAT on engineering WS \\
+6. Command \& Control & Establish communication & C2 via encrypted tunnel \\
+7. Actions & Achieve objectives & Manipulate process, steal data \\
+\hline
+\end{tabularx}
+\caption{Kill Chain Stages with OT Examples}
+\end{table}
+
+% ============================================================================
+\section{SANS ICS Kill Chain}
+% ============================================================================
+
+\begin{definitionbox}{Two-Stage Model}
+The SANS ICS Kill Chain recognizes that attacks on industrial control systems require two distinct phases: initial intrusion (similar to IT) followed by ICS-specific attack development and execution.
+\end{definitionbox}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    stage/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=1.6cm, minimum height=0.7cm, align=center, font=\tiny},
+    phase/.style={rectangle, draw, thick, rounded corners=5pt, minimum height=1.2cm, align=center, font=\small\bfseries},
+    arrow/.style={->, thick, >=stealth}
+]
+
+% Stage 1 - IT Intrusion
+\node[phase, fill=otinfo!20, minimum width=13cm] (phase1) at (6,2) {};
+\node[above] at (6,2.7) {\small\bfseries Stage 1: IT/Corporate Intrusion};
+
+\node[stage, fill=otinfo!40] (s1recon) at (0.5,2) {Recon};
+\node[stage, fill=otinfo!40] (s1weap) at (2.7,2) {Weaponize};
+\node[stage, fill=otinfo!40] (s1deliv) at (4.9,2) {Deliver};
+\node[stage, fill=otinfo!40] (s1exploit) at (7.1,2) {Exploit};
+\node[stage, fill=otinfo!40] (s1install) at (9.3,2) {Install};
+\node[stage, fill=otinfo!40] (s1c2) at (11.5,2) {C2};
+
+\draw[arrow] (s1recon) -- (s1weap);
+\draw[arrow] (s1weap) -- (s1deliv);
+\draw[arrow] (s1deliv) -- (s1exploit);
+\draw[arrow] (s1exploit) -- (s1install);
+\draw[arrow] (s1install) -- (s1c2);
+
+% Stage 2 - ICS Attack
+\node[phase, fill=otdanger!20, minimum width=13cm] (phase2) at (6,0) {};
+\node[above] at (6,0.7) {\small\bfseries Stage 2: ICS Attack Development \& Execution};
+
+\node[stage, fill=otdanger!40] (s2dev) at (1,0) {Develop};
+\node[stage, fill=otdanger!40] (s2test) at (3.5,0) {Test};
+\node[stage, fill=otdanger!40] (s2deliver) at (6,0) {Deliver};
+\node[stage, fill=otdanger!40] (s2install) at (8.5,0) {Install};
+\node[stage, fill=otdanger!40] (s2exec) at (11,0) {Execute};
+
+\draw[arrow] (s2dev) -- (s2test);
+\draw[arrow] (s2test) -- (s2deliver);
+\draw[arrow] (s2deliver) -- (s2install);
+\draw[arrow] (s2install) -- (s2exec);
+
+% Connection between stages
+\draw[arrow, dashed, thick] (s1c2.south) -- ++(0,-0.4) -| (s2dev.north);
+
+\end{tikzpicture}
+\caption{SANS ICS Kill Chain (Two-Stage Model)}
+\end{figure}
+
+\subsection{Stage 1: IT/Corporate Intrusion}
+
+Follows the traditional kill chain to gain access to the corporate network:
+\begin{itemize}
+    \item Target IT systems, email, corporate network
+    \item Goal: Establish foothold and pivot toward OT
+    \item May take weeks to months
+\end{itemize}
+
+\subsection{Stage 2: ICS Attack Development}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Step} & \textbf{Description} \\
+\hline
+Develop & Create ICS-specific attack capability (requires process knowledge) \\
+Test & Validate attack in lab environment or simulator \\
+Deliver & Transfer attack tools to ICS network \\
+Install/Modify & Deploy on ICS components, modify control logic \\
+Execute & Trigger attack to cause physical impact \\
+\hline
+\end{tabularx}
+\caption{Stage 2 ICS Attack Steps}
+\end{table}
+
+\begin{successbox}
+\textbf{Key insight:} Stage 2 requires significant ICS knowledge. Attackers must understand the physical process, control logic, and potential impacts. This typically requires reconnaissance within the OT environment, extending the attack timeline.
+\end{successbox}
+
+% ============================================================================
+\section{Real-World Examples}
+% ============================================================================
+
+\subsection{Stuxnet Kill Chain}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Stage} & \textbf{Stuxnet Activity} \\
+\hline
+Reconnaissance & Years of intelligence gathering on Iranian nuclear program \\
+Weaponization & Custom malware with 4 zero-days, Siemens S7 payloads \\
+Delivery & USB drives, possibly via contractors \\
+Exploitation & Windows vulnerabilities, WinCC database exploit \\
+Installation & Rootkit on Windows, inject code into PLCs \\
+C2 & Peer-to-peer updates, limited external C2 \\
+ICS Attack & Modified centrifuge speeds while hiding from operators \\
+\hline
+\end{tabularx}
+\caption{Stuxnet Mapped to Kill Chain}
+\end{table}
+
+\subsection{Ukraine Power Grid (2015)}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Stage} & \textbf{Attack Activity} \\
+\hline
+Reconnaissance & Months of network mapping, learning SCADA systems \\
+Weaponization & BlackEnergy malware, KillDisk wiper \\
+Delivery & Spear phishing with malicious Word documents \\
+Exploitation & Macro execution, credential theft \\
+Installation & Persistent access on corporate and SCADA networks \\
+C2 & VPN connections using stolen credentials \\
+ICS Attack & Remote HMI access, opened breakers, wiped systems \\
+\hline
+\end{tabularx}
+\caption{Ukraine Attack Mapped to Kill Chain}
+\end{table}
+
+% ============================================================================
+\section{Defensive Strategies by Stage}
+% ============================================================================
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Stage} & \textbf{Defensive Measures} \\
+\hline
+Reconnaissance & Limit public information, monitor for scanning \\
+Weaponization & Threat intelligence, malware analysis \\
+Delivery & Email filtering, USB controls, web filtering \\
+Exploitation & Patching, application whitelisting, hardening \\
+Installation & Endpoint detection, integrity monitoring \\
+C2 & Network monitoring, DNS analysis, egress filtering \\
+ICS Attack & Process monitoring, anomaly detection, safety systems \\
+\hline
+\end{tabularx}
+\caption{Defenses Mapped to Kill Chain Stages}
+\end{table}
+
+\begin{warningbox}
+\textbf{Defense in depth:} No single control stops all attacks. Implement detection and prevention at multiple stages to increase the chances of disrupting an attack before impact.
+\end{warningbox}
+
+% ============================================================================
+\section{MITRE ATT\&CK for ICS}
+% ============================================================================
+
+\begin{infobox}
+MITRE ATT\&CK for ICS provides a more detailed framework with specific tactics, techniques, and procedures (TTPs) observed in real ICS attacks. It complements kill chain models with actionable threat intelligence.
+\end{infobox}
+
+Key ICS-specific tactics:
+\begin{itemize}
+    \item \textbf{Initial Access} -- How attackers enter OT networks
+    \item \textbf{Execution} -- Running malicious code on ICS
+    \item \textbf{Persistence} -- Maintaining access
+    \item \textbf{Evasion} -- Avoiding detection
+    \item \textbf{Discovery} -- Learning OT environment
+    \item \textbf{Lateral Movement} -- Moving through OT network
+    \item \textbf{Collection} -- Gathering process data
+    \item \textbf{Command \& Control} -- Maintaining communication
+    \item \textbf{Inhibit Response} -- Preventing operator action
+    \item \textbf{Impair Process} -- Disrupting physical operations
+    \item \textbf{Impact} -- Causing damage or safety incidents
+\end{itemize}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Traditional kill chain} -- 7 stages from recon to actions
+    \item \textbf{ICS kill chain} -- Two-stage model (IT intrusion + ICS attack)
+    \item \textbf{Extended timeline} -- OT attacks require process knowledge
+    \item \textbf{Detection opportunities} -- More stages mean more chances to detect
+    \item \textbf{Defense in depth} -- Layer controls across all stages
+    \item \textbf{MITRE ATT\&CK} -- Detailed TTPs for threat-informed defense
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Frameworks}
+
+\begin{itemize}
+    \item \textbf{MITRE ATT\&CK for ICS}\\
+          \url{https://attack.mitre.org/techniques/ics/}
+    \item \textbf{Lockheed Martin Cyber Kill Chain}\\
+          \url{https://www.lockheedmartin.com/en-us/capabilities/cyber/cyber-kill-chain.html}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{SANS ICS Kill Chain Paper}\\
+          \url{https://www.sans.org/white-papers/36297/}
+    \item \textbf{CISA ICS Security}\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

@@ -1,0 +1,377 @@
+% ============================================================================
+%  420-ot-attack-vectors - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {OT Attack Vectors}
+    {Common attack paths targeting industrial control systems}
+    {OT Security Learning Series}
+    {Document 420 \quad|\quad January 2026}
+    {AI Assistant}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+Attack vectors are the paths or methods attackers use to gain access to OT systems. Understanding these vectors is essential for implementing effective defenses. OT environments face both IT-style attacks and OT-specific threats targeting industrial protocols and processes.
+\end{infobox}
+
+Attack vector categories:
+\begin{itemize}
+    \item \textbf{Network-based} -- Exploiting network connectivity
+    \item \textbf{Physical} -- Direct access to equipment
+    \item \textbf{Supply chain} -- Compromised vendors or components
+    \item \textbf{Human} -- Social engineering and insider threats
+    \item \textbf{Wireless} -- Exploiting RF communications
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    zone/.style={rectangle, draw, thick, rounded corners=5pt, minimum width=3.5cm, minimum height=1cm, align=center, font=\small},
+    attack/.style={->, thick, >=stealth, color=otdanger},
+    label/.style={font=\tiny, color=otdanger}
+]
+
+% OT Environment (center)
+\node[zone, fill=otsuccess!20, minimum width=4cm, minimum height=2.5cm] (ot) at (0,0) {OT\\Environment\\(Target)};
+
+% Attack vectors pointing to OT
+% Network (top)
+\node[font=\scriptsize] (net) at (0,3) {Network-based};
+\draw[attack] (net) -- node[right, label] {VPN, Firewall} (0,1.4);
+
+% Physical (left)
+\node[font=\scriptsize] (phys) at (-4,0) {Physical};
+\draw[attack] (phys) -- node[above, label] {USB, Serial} (-2.1,0);
+
+% Supply Chain (right)
+\node[font=\scriptsize] (supply) at (5,0) {Supply Chain};
+\draw[attack] (supply) -- node[above, label, pos=0.4] {Vendor, Updates} (2.1,0);
+
+% Human (bottom left)
+\node[font=\scriptsize] (human) at (-3,-2.5) {Human};
+\draw[attack] (human) -- node[below, label, sloped] {Phishing, Insider} (-1,-1.4);
+
+% Wireless (bottom right)
+\node[font=\scriptsize] (wireless) at (3,-2.5) {Wireless};
+\draw[attack] (wireless) -- node[below, label, sloped] {WiFi, RF} (1,-1.4);
+
+\end{tikzpicture}
+\caption{Attack Vectors Targeting OT Environments}
+\end{figure}
+
+% ============================================================================
+\section{Network-Based Vectors}
+% ============================================================================
+
+\subsection{IT/OT Boundary Attacks}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Vector} & \textbf{Description} \\
+\hline
+Firewall misconfiguration & Overly permissive rules allowing lateral movement \\
+VPN compromise & Stolen credentials or vulnerabilities in VPN \\
+Jump server exploitation & Compromising shared administration points \\
+Historian pivoting & Using data historians as bridge to control networks \\
+DMZ bypass & Exploiting poorly segmented DMZ architecture \\
+\hline
+\end{tabularx}
+\caption{IT/OT Boundary Attack Vectors}
+\end{table}
+
+\subsection{Protocol Exploitation}
+
+\begin{dangerbox}
+\textbf{Industrial protocols lack authentication:}
+\begin{itemize}
+    \item Modbus -- No authentication, commands accepted from any source
+    \item DNP3 -- Optional security features rarely enabled
+    \item EtherNet/IP -- CIP protocol has limited security
+    \item S7comm -- Legacy protocol with weak authentication
+    \item OPC Classic -- DCOM-based with known vulnerabilities
+\end{itemize}
+\end{dangerbox}
+
+\subsection{Man-in-the-Middle Attacks}
+
+\begin{itemize}
+    \item ARP spoofing to intercept OT traffic
+    \item Modifying commands between HMI and PLCs
+    \item Injecting false data into historian
+    \item Intercepting engineering uploads/downloads
+\end{itemize}
+
+% ============================================================================
+\section{Remote Access Vectors}
+% ============================================================================
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|l|}
+\hline
+\textbf{Vector} & \textbf{Attack Method} & \textbf{Risk} \\
+\hline
+VPN credentials & Phishing, credential stuffing & \riskhigh \\
+RDP exposure & Brute force, BlueKeep exploits & \riskcritical \\
+Vendor backdoors & Default/hardcoded credentials & \riskhigh \\
+TeamViewer/AnyDesk & Compromised remote tools & \riskhigh \\
+Cellular modems & Exposed management interfaces & \riskmedium \\
+\hline
+\end{tabularx}
+\caption{Remote Access Attack Vectors}
+\end{table}
+
+\begin{warningbox}
+Remote access is one of the most exploited vectors in OT attacks. The Ukraine power grid attacks (2015/2016) used stolen VPN credentials to gain initial access.
+\end{warningbox}
+
+% ============================================================================
+\section{Physical Vectors}
+% ============================================================================
+
+\subsection{Direct Physical Access}
+
+\begin{itemize}
+    \item \textbf{USB devices} -- Malware delivery (Stuxnet spread via USB)
+    \item \textbf{Serial ports} -- Direct connection to PLCs/RTUs
+    \item \textbf{Network jacks} -- Connecting rogue devices
+    \item \textbf{Exposed equipment} -- Substations, pump stations
+    \item \textbf{Maintenance laptops} -- Infected contractor equipment
+\end{itemize}
+
+\subsection{Removable Media Risks}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Media Type} & \textbf{Risk Scenario} \\
+\hline
+USB flash drives & Malware autorun, BadUSB attacks \\
+External hard drives & Infected backup restoration \\
+SD cards & Compromised firmware updates \\
+CDs/DVDs & Legacy systems without USB \\
+\hline
+\end{tabular}
+\caption{Removable Media Attack Vectors}
+\end{table}
+
+% ============================================================================
+\section{Supply Chain Vectors}
+% ============================================================================
+
+\begin{dangerbox}
+\textbf{Supply chain compromises are difficult to detect:}
+\begin{itemize}
+    \item Trojanized software updates (SolarWinds-style)
+    \item Compromised firmware from manufacturer
+    \item Malicious code in third-party libraries
+    \item Counterfeit hardware with backdoors
+    \item Compromised vendor remote access
+\end{itemize}
+\end{dangerbox}
+
+\subsection{Vendor Access Risks}
+
+\begin{itemize}
+    \item Persistent vendor VPN connections
+    \item Shared credentials among vendor staff
+    \item Unmonitored maintenance sessions
+    \item Vendor laptops connecting to OT networks
+    \item Cloud-based vendor management platforms
+\end{itemize}
+
+% ============================================================================
+\section{Human Vectors}
+% ============================================================================
+
+\subsection{Social Engineering}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Technique} & \textbf{OT-Specific Example} \\
+\hline
+Phishing & Fake vendor security bulletin with malicious link \\
+Spear phishing & Targeting control engineers with project files \\
+Pretexting & Impersonating vendor support for credentials \\
+Baiting & Dropping infected USB near control room \\
+Tailgating & Following authorized person into secure area \\
+\hline
+\end{tabularx}
+\caption{Social Engineering Techniques}
+\end{table}
+
+\subsection{Insider Threats}
+
+\begin{itemize}
+    \item Disgruntled employees with system access
+    \item Contractors with excessive privileges
+    \item Unintentional errors by operators
+    \item Knowledge transfer during layoffs
+    \item Credential sharing among staff
+\end{itemize}
+
+% ============================================================================
+\section{Wireless Vectors}
+% ============================================================================
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Vector} & \textbf{Description} \\
+\hline
+Rogue access points & Unauthorized WiFi bridging IT and OT \\
+WiFi attacks & WPA2 cracking, evil twin APs \\
+Bluetooth & Exploiting industrial Bluetooth devices \\
+Cellular/LTE & Attacking exposed cellular modems \\
+RF protocols & ZigBee, LoRa, WirelessHART vulnerabilities \\
+Radio jamming & Disrupting wireless control communications \\
+\hline
+\end{tabularx}
+\caption{Wireless Attack Vectors}
+\end{table}
+
+% ============================================================================
+\section{Attack Chain Example}
+% ============================================================================
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    node distance=0.3cm,
+    stage/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=2.8cm, minimum height=0.8cm, align=center, font=\scriptsize},
+    arrow/.style={->, thick, >=stealth}
+]
+
+% Attack stages - top row
+\node[stage, fill=otinfo!20] (phish) {1. Phishing\\Email};
+\node[stage, fill=otinfo!20, right=0.4cm of phish] (foot) {2. Establish\\Foothold};
+\node[stage, fill=otinfo!20, right=0.4cm of foot] (lateral) {3. Lateral\\Movement};
+\node[stage, fill=otwarning!30, right=0.4cm of lateral] (boundary) {4. IT/OT\\Boundary};
+
+% Attack stages - bottom row
+\node[stage, fill=otwarning!30, below=0.8cm of boundary] (recon) {5. OT\\Recon};
+\node[stage, fill=otdanger!20, left=0.4cm of recon] (target) {6. Target\\ID};
+\node[stage, fill=otdanger!20, left=0.4cm of target] (develop) {7. Develop\\Payload};
+\node[stage, fill=otdanger!40, left=0.4cm of develop] (execute) {8. Execute\\Attack};
+
+% Arrows
+\draw[arrow] (phish) -- (foot);
+\draw[arrow] (foot) -- (lateral);
+\draw[arrow] (lateral) -- (boundary);
+\draw[arrow] (boundary) -- (recon);
+\draw[arrow] (recon) -- (target);
+\draw[arrow] (target) -- (develop);
+\draw[arrow] (develop) -- (execute);
+
+% Zone labels
+\node[above=0.3cm of foot, font=\tiny\bfseries, color=otinfo] {IT Network};
+\node[below=0.3cm of target, font=\tiny\bfseries, color=otdanger] {OT Network};
+
+\end{tikzpicture}
+\caption{Typical OT Attack Chain Progression}
+\end{figure}
+
+\begin{successbox}
+\textbf{Typical OT attack progression:}
+\begin{enumerate}
+    \item \textbf{Initial Access} -- Phishing email to corporate user
+    \item \textbf{Establish Foothold} -- Malware on IT workstation
+    \item \textbf{Lateral Movement} -- Pivot through IT network
+    \item \textbf{IT/OT Boundary} -- Exploit jump server or historian
+    \item \textbf{OT Reconnaissance} -- Map industrial network
+    \item \textbf{Target Identification} -- Find critical controllers
+    \item \textbf{Develop Capability} -- Create OT-specific payload
+    \item \textbf{Execute Attack} -- Manipulate physical process
+\end{enumerate}
+\end{successbox}
+
+% ============================================================================
+\section{Defensive Priorities}
+% ============================================================================
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Attack Vector} & \textbf{Primary Defense} \\
+\hline
+Remote access & MFA, jump servers, session monitoring \\
+Network-based & Segmentation, firewalls, IDS \\
+Protocol attacks & Network monitoring, protocol validation \\
+Physical access & Access controls, USB restrictions \\
+Supply chain & Vendor management, integrity verification \\
+Social engineering & Security awareness training \\
+Wireless & WPA3-Enterprise, WIDS, RF monitoring \\
+\hline
+\end{tabularx}
+\caption{Defenses by Attack Vector}
+\end{table}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Remote access} -- Most commonly exploited initial vector
+    \item \textbf{Protocol weakness} -- Industrial protocols lack authentication
+    \item \textbf{Physical access} -- USB and direct connections remain threats
+    \item \textbf{Supply chain} -- Trusted vendors can be attack paths
+    \item \textbf{Defense in depth} -- No single control stops all vectors
+    \item \textbf{Monitor boundaries} -- IT/OT interface is critical chokepoint
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{MITRE ATT\&CK for ICS}\\
+          \url{https://attack.mitre.org/techniques/ics/}
+    \item \textbf{CISA -- ICS Attack Vectors}\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+    \item \textbf{NIST SP 800-82} -- Guide to ICS Security\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

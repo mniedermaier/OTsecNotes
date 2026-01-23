@@ -1,0 +1,359 @@
+% ============================================================================
+%  860-patch-management - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {OT Patch Management}
+    {Strategies for updating industrial control systems}
+    {OT Security Learning Series}
+    {Document 860 \quad|\quad January 2026}
+    {AI Assistant}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+Patch management in OT environments is one of the most challenging security tasks. Unlike IT systems where patches can be applied quickly, OT systems often run 24/7, require vendor approval, and may have dependencies that make patching risky or impossible.
+\end{infobox}
+
+OT patching challenges:
+\begin{itemize}
+    \item \textbf{Uptime requirements} -- Systems cannot be rebooted easily
+    \item \textbf{Vendor dependencies} -- Patches may void support
+    \item \textbf{Legacy systems} -- No patches available for old OS
+    \item \textbf{Testing requirements} -- Must validate in lab first
+    \item \textbf{Change management} -- Strict approval processes
+\end{itemize}
+
+\begin{dangerbox}
+Never apply patches to production OT systems without thorough testing. A failed patch can halt production and cause safety incidents.
+\end{dangerbox}
+
+% ============================================================================
+\section{OT vs IT Patching}
+% ============================================================================
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|X|}
+\hline
+\textbf{Aspect} & \textbf{IT Patching} & \textbf{OT Patching} \\
+\hline
+Frequency & Weekly/Monthly & Quarterly/Annually \\
+Downtime tolerance & Hours acceptable & Minutes may be unacceptable \\
+Testing & Limited/Staged rollout & Extensive lab testing required \\
+Vendor approval & Rarely needed & Often mandatory \\
+Automation & Highly automated & Mostly manual \\
+Rollback & Usually straightforward & May require full restore \\
+Lifecycle & 3-5 years & 15-25 years \\
+\hline
+\end{tabularx}
+\caption{IT vs OT Patching Comparison}
+\end{table}
+
+% ============================================================================
+\section{Patch Management Process}
+% ============================================================================
+
+\subsection{OT Patch Lifecycle}
+
+\begin{enumerate}
+    \item \textbf{Identification} -- Monitor for new patches and vulnerabilities
+    \item \textbf{Assessment} -- Evaluate relevance and risk to OT systems
+    \item \textbf{Vendor Check} -- Verify vendor approval and compatibility
+    \item \textbf{Lab Testing} -- Test in representative environment
+    \item \textbf{Planning} -- Schedule during maintenance window
+    \item \textbf{Backup} -- Full system backup before patching
+    \item \textbf{Deployment} -- Apply patch with rollback plan ready
+    \item \textbf{Validation} -- Verify system functionality post-patch
+    \item \textbf{Documentation} -- Record changes and outcomes
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    process/.style={rectangle, draw, thick, rounded corners=3pt, fill=otinfo!20, minimum width=1.8cm, minimum height=0.7cm, align=center, font=\scriptsize},
+    decision/.style={diamond, draw, thick, fill=otwarning!20, minimum width=1.2cm, minimum height=0.8cm, align=center, font=\scriptsize, aspect=2},
+    arrow/.style={->, thick, >=stealth}
+]
+
+% Top row - using absolute positions with more spacing
+\node[process] (identify) at (0,0) {Identify\\Patch};
+\node[process] (assess) at (3,0) {Assess\\Risk};
+\node[decision] (vendor) at (6,0) {Vendor\\OK?};
+\node[process] (test) at (9,0) {Lab\\Test};
+\node[decision] (pass) at (12,0) {Test\\Pass?};
+
+% Bottom row - positioned lower
+\node[process] (backup) at (12,-2.5) {Backup\\System};
+\node[process] (deploy) at (9,-2.5) {Deploy\\Patch};
+\node[decision] (valid) at (6,-2.5) {System\\OK?};
+\node[process] (doc) at (3,-2.5) {Document};
+
+% Compensating control - far left bottom
+\node[process, fill=otdanger!20] (comp) at (0,-2.5) {Compensating\\Controls};
+
+% Main flow arrows
+\draw[arrow] (identify) -- (assess);
+\draw[arrow] (assess) -- (vendor);
+\draw[arrow] (vendor) -- node[above, font=\tiny] {Yes} (test);
+\draw[arrow] (test) -- (pass);
+\draw[arrow] (pass) -- node[right, font=\tiny] {Yes} (backup);
+\draw[arrow] (backup) -- (deploy);
+\draw[arrow] (deploy) -- (valid);
+\draw[arrow] (valid) -- node[above, font=\tiny] {Yes} (doc);
+
+% Test fail loop (above)
+\draw[arrow] (pass.north) -- ++(0,0.5) -| node[above, font=\tiny, pos=0.25] {No} (test.north);
+
+% Rollback loop (below)
+\draw[arrow] (valid.south) -- ++(0,-0.5) -| node[below, font=\tiny, pos=0.25] {Rollback} (backup.south);
+
+% Vendor No -> Compensating Controls (straight down then left)
+\draw[arrow] (vendor.south) -- (6,-1.25) -- (0,-1.25) -- node[left, font=\tiny] {No} (comp.north);
+
+\end{tikzpicture}
+\caption{OT Patch Management Process Flow}
+\end{figure}
+
+\subsection{Risk-Based Prioritization}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Priority} & \textbf{Criteria} & \textbf{Timeline} \\
+\hline
+Critical & Active exploitation, safety impact & Next maintenance window \\
+High & Remote exploit, no authentication & Within 30 days \\
+Medium & Local exploit or complex attack & Within 90 days \\
+Low & Theoretical or low impact & Next scheduled outage \\
+\hline
+\end{tabular}
+\caption{Patch Prioritization Framework}
+\end{table}
+
+% ============================================================================
+\section{Vendor Considerations}
+% ============================================================================
+
+\begin{warningbox}
+\textbf{Before patching any OT system:}
+\begin{itemize}
+    \item Check vendor compatibility list for OS patches
+    \item Verify if vendor has tested the specific patch
+    \item Understand impact on support agreements
+    \item Review vendor security bulletins
+    \item Contact vendor support if uncertain
+\end{itemize}
+\end{warningbox}
+
+\subsection{Vendor Patch Programs}
+
+Major OT vendors provide patch guidance:
+\begin{itemize}
+    \item \textbf{Siemens} -- Monthly security bulletins, tested patch lists
+    \item \textbf{Rockwell} -- Patch qualification reports
+    \item \textbf{Schneider Electric} -- Security notifications
+    \item \textbf{ABB} -- Cybersecurity advisories
+    \item \textbf{Honeywell} -- Security update notifications
+\end{itemize}
+
+% ============================================================================
+\section{Patching Strategies}
+% ============================================================================
+
+\subsection{Strategy by System Type}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{System Type} & \textbf{Patching Strategy} \\
+\hline
+Engineering Workstations & Regular patching, similar to IT \\
+HMI/Operator Stations & Vendor-approved patches only \\
+Historians & Patch during maintenance windows \\
+SCADA Servers & Vendor coordination required \\
+PLCs/RTUs & Firmware updates during outages \\
+Legacy Systems (XP, 2003) & Compensating controls instead \\
+Safety Systems & Extreme caution, vendor mandatory \\
+\hline
+\end{tabularx}
+\caption{Patching Strategy by System Type}
+\end{table}
+
+\subsection{Compensating Controls}
+
+When patching is not possible:
+
+\begin{successbox}
+\textbf{Alternative protections for unpatched systems:}
+\begin{itemize}
+    \item Network segmentation and firewall rules
+    \item Application whitelisting
+    \item Disable unnecessary services and ports
+    \item Enhanced monitoring and logging
+    \item Virtual patching via IPS/IDS rules
+    \item Physical access controls
+\end{itemize}
+\end{successbox}
+
+% ============================================================================
+\section{Testing Requirements}
+% ============================================================================
+
+\subsection{Lab Environment}
+
+\begin{itemize}
+    \item Mirror production configuration
+    \item Include same software versions
+    \item Test integration with connected systems
+    \item Validate control logic execution
+    \item Verify communication protocols
+    \item Test failover and redundancy
+\end{itemize}
+
+\subsection{Testing Checklist}
+
+\begin{enumerate}
+    \item System boots correctly after patch
+    \item All services start properly
+    \item Control logic executes as expected
+    \item HMI displays update correctly
+    \item Alarms and events function
+    \item Communication with field devices works
+    \item Historian data collection continues
+    \item Performance is not degraded
+    \item Redundancy/failover still works
+\end{enumerate}
+
+% ============================================================================
+\section{Deployment Best Practices}
+% ============================================================================
+
+\begin{enumerate}
+    \item \textbf{Maintenance windows} -- Only patch during planned outages
+    \item \textbf{Full backup} -- Image-level backup before any changes
+    \item \textbf{Rollback plan} -- Document exact steps to restore
+    \item \textbf{Staged deployment} -- Non-critical systems first
+    \item \textbf{Monitor closely} -- Watch for issues after patching
+    \item \textbf{Keep records} -- Document all patch activities
+    \item \textbf{Communicate} -- Inform operations team of changes
+\end{enumerate}
+
+\subsection{Air-Gapped System Patching}
+
+\begin{warningbox}
+For systems without network connectivity:
+\begin{itemize}
+    \item Use dedicated, scanned USB media
+    \item Verify patch integrity (checksums)
+    \item Scan media at secure transfer station
+    \item Maintain strict chain of custody
+    \item Document media handling process
+\end{itemize}
+\end{warningbox}
+
+% ============================================================================
+\section{Legacy System Challenges}
+% ============================================================================
+
+For systems running unsupported operating systems:
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Challenge} & \textbf{Mitigation} \\
+\hline
+No security patches & Network isolation, virtual patching \\
+Vulnerable services & Disable or firewall unused services \\
+No vendor support & Third-party extended support \\
+Incompatible AV & Application whitelisting \\
+End of life & Plan and budget for migration \\
+\hline
+\end{tabularx}
+\caption{Legacy System Mitigations}
+\end{table}
+
+% ============================================================================
+\section{Patch Management Tools}
+% ============================================================================
+
+\begin{itemize}
+    \item \textbf{WSUS/SCCM} -- Microsoft patch distribution (IT-focused)
+    \item \textbf{OT-specific tools} -- Vendor patch management solutions
+    \item \textbf{Asset inventory} -- Know what needs patching
+    \item \textbf{Vulnerability scanners} -- Identify missing patches
+    \item \textbf{Change management} -- Track and approve changes
+\end{itemize}
+
+\begin{infobox}
+Consider OT-specific patch management solutions that understand industrial protocols and can coordinate with maintenance schedules.
+\end{infobox}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Test first} -- Never patch production without lab testing
+    \item \textbf{Vendor approval} -- Check compatibility before patching
+    \item \textbf{Maintenance windows} -- Patch only during planned outages
+    \item \textbf{Backup always} -- Full backup before any changes
+    \item \textbf{Compensating controls} -- Protect what cannot be patched
+    \item \textbf{Risk-based} -- Prioritize by criticality and exposure
+    \item \textbf{Document everything} -- Maintain patch records
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Standards}
+
+\begin{itemize}
+    \item \textbf{IEC 62443-2-3} -- Patch management in IACS\\
+          \url{https://webstore.iec.ch/publication/7030}
+    \item \textbf{NIST SP 800-82} -- Guide to ICS Security\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{CISA -- ICS Patch Management}\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

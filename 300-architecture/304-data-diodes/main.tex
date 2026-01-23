@@ -1,0 +1,371 @@
+% ============================================================================
+%  304-data-diodes - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {Data Diodes}
+    {Unidirectional security gateways for OT environments}
+    {OT Security Learning Series}
+    {Document 304 \quad|\quad January 2026}
+    {AI Assistant}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+Data diodes (also called unidirectional security gateways) are hardware-enforced, one-way data transfer devices. They physically prevent any data from flowing back to the source network, providing the highest level of network isolation while still allowing data export.
+\end{infobox}
+
+Key benefits:
+\begin{itemize}
+    \item \textbf{Hardware-enforced} -- Cannot be bypassed by software attacks
+    \item \textbf{Air-gap with data flow} -- Isolation without losing visibility
+    \item \textbf{No return path} -- Physically impossible to send commands back
+    \item \textbf{Regulatory compliance} -- Meets strict isolation requirements
+\end{itemize}
+
+\begin{warningbox}
+Data diodes are not firewalls. They provide absolute one-way data flow, not filtered bidirectional communication. Choose the right tool for the requirement.
+\end{warningbox}
+
+% ============================================================================
+\section{How Data Diodes Work}
+% ============================================================================
+
+\subsection{Physical Principle}
+
+\begin{definitionbox}{Unidirectional Communication}
+Data diodes use hardware that physically supports only one-way transmission. The most common implementation uses fiber optic cables with a transmitter on one side and a receiver on the other---with no transmitter on the receiving side.
+\end{definitionbox}
+
+Components:
+\begin{itemize}
+    \item \textbf{TX (Transmit) appliance} -- Connects to source network, sends data
+    \item \textbf{Optical fiber} -- One-way light transmission medium
+    \item \textbf{RX (Receive) appliance} -- Receives data, connects to destination
+    \item \textbf{No return fiber} -- Physical absence of backward path
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=2.5cm, minimum height=1.5cm, align=center, font=\small},
+    fiber/.style={->, very thick, >=stealth},
+    nofiber/.style={dashed, thick, color=otdanger}
+]
+
+% Source Network
+\node[box, fill=otsuccess!20] (source) at (0,0) {OT Network\\(Source)};
+
+% TX Appliance
+\node[box, fill=otaccent!20] (tx) at (3.5,0) {TX\\Appliance};
+
+% Fiber (one-way)
+\draw[fiber, color=otsuccess, line width=2pt] (5.2,0.2) -- (7.3,0.2);
+\node[above, font=\scriptsize] at (6.25,0.3) {Fiber (TX only)};
+
+% No return path
+\draw[nofiber] (7.3,-0.2) -- (5.2,-0.2);
+\node[below, font=\scriptsize, color=otdanger] at (6.25,-0.3) {No return path};
+
+% RX Appliance
+\node[box, fill=otaccent!20] (rx) at (9,0) {RX\\Appliance};
+
+% Destination Network
+\node[box, fill=otinfo!20] (dest) at (12.5,0) {IT/DMZ\\(Destination)};
+
+% Connections
+\draw[<->, thick] (source) -- (tx);
+\draw[<->, thick] (rx) -- (dest);
+
+% Data flow arrow
+\draw[->, very thick, color=otprimary, dashed] (0,-1.2) -- (12.5,-1.2);
+\node[below, font=\small] at (6.25,-1.2) {Data flows one direction only};
+
+\end{tikzpicture}
+\caption{Physical Data Diode Architecture}
+\end{figure}
+
+\subsection{Protocol Handling}
+
+Since TCP/IP requires bidirectional communication (ACKs), data diodes must handle protocols specially:
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Protocol} & \textbf{Native Support} & \textbf{Diode Handling} \\
+\hline
+UDP & Yes (stateless) & Direct transfer \\
+TCP & No (requires ACKs) & Protocol break/proxy \\
+File transfer & No (bidirectional) & Store-and-forward \\
+Database sync & No & Specialized replication \\
+Video streams & Yes (UDP-based) & Direct or buffered \\
+\hline
+\end{tabular}
+\caption{Protocol Handling in Data Diodes}
+\end{table}
+
+% ============================================================================
+\section{Use Cases}
+% ============================================================================
+
+\subsection{Common OT Applications}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|X|}
+\hline
+\textbf{Use Case} & \textbf{Description} \\
+\hline
+Historian replication & Export process data to enterprise without inbound risk \\
+Log export & Send security logs to corporate SIEM \\
+SCADA to business & Share production data with ERP systems \\
+Regulatory reporting & Export compliance data to external systems \\
+Backup export & Send backups out without allowing restore commands \\
+Video surveillance & Export camera feeds from secure areas \\
+\hline
+\end{tabularx}
+\caption{Data Diode Use Cases}
+\end{table}
+
+\subsection{Industry Applications}
+
+\begin{itemize}
+    \item \textbf{Nuclear} -- Regulatory requirement for safety system isolation
+    \item \textbf{Defense} -- Classified network boundaries
+    \item \textbf{Energy} -- NERC CIP compliance for critical assets
+    \item \textbf{Manufacturing} -- Protecting proprietary processes
+    \item \textbf{Water/Utilities} -- Critical infrastructure protection
+\end{itemize}
+
+% ============================================================================
+\section{Architecture Patterns}
+% ============================================================================
+
+\subsection{Basic Data Export}
+
+\begin{successbox}
+\textbf{Pattern: OT to IT data export}
+\begin{enumerate}
+    \item OT historian collects process data
+    \item Data diode TX reads from OT historian
+    \item One-way transfer to RX appliance
+    \item RX writes to replica historian in IT/DMZ
+    \item Enterprise applications read from replica
+\end{enumerate}
+\end{successbox}
+
+\subsection{Deployment Locations}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    zone/.style={rectangle, draw, thick, rounded corners=5pt, minimum width=3.5cm, minimum height=0.8cm, align=center, font=\small},
+    device/.style={rectangle, draw, thick, minimum width=0.8cm, minimum height=0.5cm, font=\tiny}
+]
+
+% Zones - stacked vertically
+\node[zone, fill=otinfo!15] (enterprise) at (0,6) {Enterprise Zone};
+\node[zone, fill=otwarning!15] (dmz) at (0,4) {Industrial DMZ};
+\node[zone, fill=otsuccess!15] (control) at (0,2) {Control Zone};
+\node[zone, fill=otdanger!15] (safety) at (0,0) {Safety Zone};
+
+% Left side: Firewalls (between Enterprise/DMZ and DMZ/Control)
+\node[device, fill=otinfo!30] (fw1) at (-3,5) {FW};
+\node[device, fill=otinfo!30] (fw2) at (-3,3) {FW};
+
+% Right side: Data Diodes (between each zone going up)
+\node[device, fill=otwarning!40] (d1) at (3,5) {DD};
+\node[device, fill=otwarning!40] (d2) at (3,3) {DD};
+\node[device, fill=otwarning!40] (d3) at (3,1) {DD};
+
+% Firewall vertical lines with bidirectional arrows
+\draw[<->, thick] (fw1.north) -- (fw1.north |- enterprise.south);
+\draw[<->, thick] (fw1.south) -- (fw1.south |- dmz.north);
+\draw[<->, thick] (fw2.north) -- (fw2.north |- dmz.south);
+\draw[<->, thick] (fw2.south) -- (fw2.south |- control.north);
+
+% Data Diode vertical lines (one-way UP)
+\draw[thick, color=otsuccess] (d1.south) -- (d1.south |- dmz.north);
+\draw[->, thick, color=otsuccess] (d1.north) -- (d1.north |- enterprise.south);
+\draw[thick, color=otsuccess] (d2.south) -- (d2.south |- control.north);
+\draw[->, thick, color=otsuccess] (d2.north) -- (d2.north |- dmz.south);
+\draw[thick, color=otsuccess] (d3.south) -- (d3.south |- safety.north);
+\draw[->, thick, color=otsuccess] (d3.north) -- (d3.north |- control.south);
+
+% Labels for data flows
+\node[font=\scriptsize, right] at (3.5,5) {Logs};
+\node[font=\scriptsize, right] at (3.5,3) {Process Data};
+\node[font=\scriptsize, right] at (3.5,1) {Safety Status};
+
+% Legend labels
+\node[font=\scriptsize, left] at (-4.5,6) {Bidirectional};
+\node[font=\scriptsize, color=otsuccess, right] at (5,6) {One-way (up)};
+
+\end{tikzpicture}
+\caption{Data Diode Deployment in Zone Architecture}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabularx}{\textwidth}{|l|l|X|}
+\hline
+\textbf{Boundary} & \textbf{Direction} & \textbf{Data Flow} \\
+\hline
+Control $\rightarrow$ DMZ & Outbound & Process data, logs, alarms \\
+Safety $\rightarrow$ Control & Outbound & Safety status (read-only) \\
+OT $\rightarrow$ Enterprise & Outbound & Business intelligence data \\
+OT $\rightarrow$ Cloud & Outbound & Analytics, monitoring \\
+\hline
+\end{tabularx}
+\caption{Data Diode Deployment Locations}
+\end{table}
+
+% ============================================================================
+\section{Data Diode vs Firewall}
+% ============================================================================
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Capability} & \textbf{Firewall} & \textbf{Data Diode} \\
+\hline
+Bidirectional communication & Yes & No \\
+Software configurable & Yes & Limited \\
+Can be misconfigured & Yes & Minimal \\
+Hackable via software & Possible & No (hardware) \\
+Supports TCP natively & Yes & Requires proxy \\
+Allows remote access & Yes & No \\
+Cost & Lower & Higher \\
+Complexity & Moderate & Higher initially \\
+\hline
+\end{tabular}
+\caption{Data Diode vs Firewall Comparison}
+\end{table}
+
+\begin{dangerbox}
+\textbf{When NOT to use data diodes:}
+\begin{itemize}
+    \item When bidirectional communication is required
+    \item For remote access or engineering connections
+    \item When cost is prohibitive for the risk level
+    \item If protocol support is not available
+\end{itemize}
+\end{dangerbox}
+
+% ============================================================================
+\section{Implementation Considerations}
+% ============================================================================
+
+\subsection{Protocol Support}
+
+Verify the data diode supports your required protocols:
+\begin{itemize}
+    \item OPC UA/DA (requires special handling)
+    \item Modbus (typically UDP mode)
+    \item Database replication (vendor-specific)
+    \item File transfer (FTP/SFTP proxy)
+    \item Syslog (native UDP support)
+    \item SNMP traps (outbound only)
+\end{itemize}
+
+\subsection{Performance}
+
+\begin{itemize}
+    \item \textbf{Throughput} -- Ranges from 10 Mbps to 10 Gbps
+    \item \textbf{Latency} -- Protocol conversion adds delay
+    \item \textbf{Buffering} -- TX side must buffer if RX cannot keep up
+    \item \textbf{Reliability} -- No ACKs means potential data loss
+\end{itemize}
+
+\subsection{Reliability Without ACKs}
+
+\begin{warningbox}
+Since there's no return path for acknowledgments, data diodes use techniques to ensure reliability:
+\begin{itemize}
+    \item Forward Error Correction (FEC)
+    \item Redundant transmission (send data multiple times)
+    \item Application-level verification on receiving side
+    \item Buffering and store-and-forward
+\end{itemize}
+\end{warningbox}
+
+% ============================================================================
+\section{Deployment Best Practices}
+% ============================================================================
+
+\begin{enumerate}
+    \item \textbf{Define data requirements} -- What data must flow and in which direction
+    \item \textbf{Verify protocol support} -- Ensure diode handles your protocols
+    \item \textbf{Plan for no return path} -- Applications must work without bidirectional communication
+    \item \textbf{Size appropriately} -- Consider throughput and latency requirements
+    \item \textbf{Test thoroughly} -- Validate all data flows before production
+    \item \textbf{Document architecture} -- Clear diagrams showing data flow direction
+    \item \textbf{Plan maintenance} -- How to update/maintain systems on both sides
+\end{enumerate}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Hardware-enforced} -- Cannot be bypassed by software attacks
+    \item \textbf{One-way only} -- Data export without inbound risk
+    \item \textbf{Air-gap alternative} -- Maintain isolation while sharing data
+    \item \textbf{Protocol handling} -- Requires proxies for TCP-based protocols
+    \item \textbf{High assurance} -- Meets strictest regulatory requirements
+    \item \textbf{Not for remote access} -- Cannot replace VPN/jump servers
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Standards}
+
+\begin{itemize}
+    \item \textbf{IEC 62443-3-3} -- System security requirements\\
+          \url{https://webstore.iec.ch/publication/7033}
+    \item \textbf{NIST SP 800-82} -- Guide to ICS Security\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{CISA -- Data Diodes}\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}
