@@ -231,6 +231,10 @@
     // Use older stable version of pdf.js with simpler API
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
+    let pdfDoc = null;
+    let scale = 1.5;
+    let currentPage = 1;
+
     const urlParams = new URLSearchParams(window.location.search);
     const pdfFile = urlParams.get('file');
 
@@ -239,10 +243,6 @@
     } else {
       initViewer(pdfFile);
     }
-
-    let pdfDoc = null;
-    let scale = 1.5;
-    let currentPage = 1;
 
     async function initViewer(pdfUrl) {
       // Set title
