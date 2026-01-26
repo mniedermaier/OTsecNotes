@@ -255,6 +255,21 @@ make new NAME=XXX-topic     # Create new document (auto-placed in category)
 - DO include standards, government resources, and books in Further Reading
 - Use `\url{}` for links (xurl package handles line breaks)
 
+### URL Accessibility Requirements
+All URLs in the Further Reading sections must be verified as accessible before inclusion:
+- **Verify before adding:** Check that URLs return HTTP 200 status
+- **Use official sources:** Prefer official organization URLs over third-party mirrors
+- **Avoid deep links:** Use stable top-level pages when possible (e.g., `/standards/` instead of `/standards/page/123`)
+- **Periodic review:** URLs should be checked periodically as websites restructure
+- **Common working URLs:**
+  - NIST publications: `https://csrc.nist.gov/pubs/sp/...`
+  - IEC standards: `https://webstore.iec.ch/publication/...`
+  - ISA standards: `https://www.isa.org/standards-and-publications/isa-standards/...`
+  - CISA resources: `https://www.cisa.gov/topics/...` or `https://www.cisa.gov/resources-tools/...`
+  - SANS ICS: `https://www.sans.org/cybersecurity-focus-areas/industrial-control-systems-security`
+  - NERC CIP: `https://www.nerc.com/standards/reliability-standards/cip`
+  - Modbus: `https://www.modbus.org/modbus-specifications`
+
 ### Further Reading Section Structure
 ```latex
 \section{Further Reading}
