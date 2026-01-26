@@ -4,6 +4,15 @@
 
 \documentclass[11pt,a4paper]{article}
 \usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
 
 \hypersetup{
     pdftitle={Ukraine Power Grid Attacks},
@@ -65,6 +74,34 @@ Attribution & Sandworm (Russian state-sponsored group) \\
 \end{tabular}
 \end{center}
 
+\subsection{Attack Timeline}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.85]
+    % Timeline
+    \draw[->, line width=1pt] (0,0) -- (14,0);
+
+    % Date markers
+    \foreach \x/\date in {1/Spring, 4/Summer, 7/Fall, 10/Dec 23, 13/Dec 24} {
+        \draw[line width=0.5pt] (\x,-0.15) -- (\x,0.15);
+        \node[font=\scriptsize] at (\x,-0.5) {\date};
+    }
+
+    % Year label
+    \node[font=\small\bfseries] at (7,-1.2) {2015};
+
+    % Events
+    \node[fill=otdanger!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (1,0.3) {Spearphish\\emails sent};
+    \node[fill=otwarning!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (4,0.3) {BlackEnergy\\installed};
+    \node[fill=otwarning!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (7,0.3) {Network\\reconnaissance};
+    \node[fill=otdanger!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (10,0.3) {Breakers\\opened};
+    \node[fill=otsuccess!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (13,0.3) {Manual\\restoration};
+
+\end{tikzpicture}
+\caption{2015 Ukraine Attack Timeline}
+\end{figure}
+
 \subsection{Attack Chain}
 
 \begin{conceptbox}{2015 Attack Sequence}
@@ -85,6 +122,35 @@ Attribution & Sandworm (Russian state-sponsored group) \\
 Attackers used legitimate remote access tools (VPNs, remote desktop) to control SCADA systems. They opened circuit breakers while operators watched helplessly, unable to regain control.
 \end{warningbox}
 
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=2cm, minimum height=1cm, align=center, font=\small},
+    arrow/.style={->, very thick, >=stealth}
+]
+
+% Attack path
+\node[box, fill=otdanger!20] (phish) at (0,0) {Spearphish\\Email};
+\node[box, fill=otwarning!20] (it) at (3.2,0) {IT\\Network};
+\node[box, fill=otwarning!20] (vpn) at (6.4,0) {VPN to\\OT};
+\node[box, fill=otwarning!20] (scada) at (9.6,0) {SCADA\\HMI};
+\node[box, fill=otdanger!20] (breaker) at (12.8,0) {Circuit\\Breakers};
+
+\draw[arrow, otdanger] (phish) -- (it);
+\draw[arrow, otdanger] (it) -- (vpn);
+\draw[arrow, otdanger] (vpn) -- (scada);
+\draw[arrow, otdanger] (scada) -- (breaker);
+
+% Labels
+\node[font=\tiny, below] at (1.6,-0.7) {BlackEnergy};
+\node[font=\tiny, below] at (4.8,-0.7) {Lateral movement};
+\node[font=\tiny, below] at (8,-0.7) {Remote desktop};
+\node[font=\tiny, below] at (11.2,-0.7) {Manual open};
+
+\end{tikzpicture}
+\caption{2015 Ukraine Attack Path}
+\end{figure}
+
 The attackers demonstrated sophisticated operational planning:
 
 \begin{itemize}
@@ -94,6 +160,24 @@ The attackers demonstrated sophisticated operational planning:
     \item \textbf{Recovery hindrance:} Deployed KillDisk to wipe workstations
     \item \textbf{UPS sabotage:} Modified UPS firmware to fail during recovery
 \end{itemize}
+
+\subsection{Impact}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    impact/.style={rectangle, draw, thick, fill=otdanger!15, minimum width=5.5cm, minimum height=0.7cm, rounded corners=3pt, font=\small, align=left}
+]
+
+\node[impact] at (0,2.5) {\faIcon{building} 3 utilities attacked simultaneously};
+\node[impact] at (0,1.5) {\faIcon{users} 225,000 customers without power};
+\node[impact] at (0,0.5) {\faIcon{clock} 1--6 hours of outages};
+\node[impact] at (0,-0.5) {\faIcon{phone} Call centers flooded (DoS)};
+\node[impact] at (0,-1.5) {\faIcon{hdd} Systems wiped with KillDisk};
+
+\end{tikzpicture}
+\caption{2015 Attack Impact}
+\end{figure}
 
 \subsection{Recovery}
 
@@ -132,6 +216,34 @@ Malware & Industroyer / CrashOverride \\
 Attribution & Sandworm (Russian state-sponsored group) \\
 \end{tabular}
 \end{center}
+
+\subsection{Attack Timeline}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.9]
+    % Timeline
+    \draw[->, line width=1pt] (0,0) -- (13,0);
+
+    % Time markers
+    \foreach \x/\time in {1/23:00, 4/23:50, 7/00:00, 10/00:30, 13/01:00+} {
+        \draw[line width=0.5pt] (\x,-0.15) -- (\x,0.15);
+        \node[font=\scriptsize] at (\x,-0.5) {\time};
+    }
+
+    % Date label
+    \node[font=\small\bfseries] at (6.5,-1.2) {December 17, 2016};
+
+    % Events
+    \node[fill=otwarning!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (1,0.3) {Malware\\staged};
+    \node[fill=otwarning!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (4,0.3) {Launcher\\activates};
+    \node[fill=otdanger!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (7,0.3) {Breakers\\opened};
+    \node[fill=otdanger!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (10,0.3) {Data wiper\\runs};
+    \node[fill=otsuccess!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (13,0.3) {Manual\\restoration};
+
+\end{tikzpicture}
+\caption{2016 Ukraine Attack Timeline}
+\end{figure}
 
 \subsection{Industroyer Malware}
 

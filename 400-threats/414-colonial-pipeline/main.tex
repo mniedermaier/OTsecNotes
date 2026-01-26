@@ -1,0 +1,350 @@
+% ============================================================================
+%  Colonial Pipeline Attack - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {Colonial Pipeline Attack}
+    {Ransomware incident that disrupted US fuel supply}
+    {OT Security Learning Series}
+    {Document 414 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+The Colonial Pipeline ransomware attack in May 2021 demonstrated how IT security incidents can cascade into OT operational disruptions. While the attack targeted IT systems, the company shut down pipeline operations as a precaution, causing widespread fuel shortages across the US East Coast.
+
+\begin{dangerbox}
+The Colonial Pipeline incident showed that \textbf{IT/OT convergence creates new risks}. An IT-only attack led to OT shutdown, causing physical-world consequences: fuel shortages, panic buying, and economic disruption affecting millions of people.
+\end{dangerbox}
+
+\subsection{Key Facts}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Attribute} & \textcolor{white}{\bfseries Details} \\
+\midrule
+Date & May 7, 2021 \\
+Target & Colonial Pipeline Company (US) \\
+Attack Type & Ransomware (DarkSide) \\
+Initial Vector & Compromised VPN credentials \\
+Systems Affected & IT systems (billing, business) \\
+OT Impact & Voluntary shutdown of pipeline operations \\
+Duration & 6 days of shutdown \\
+Ransom Paid & \$4.4 million (75 Bitcoin) \\
+Recovery & \$2.3 million recovered by DOJ \\
+\end{tabular}
+\end{center}
+
+% ============================================================================
+\section{Attack Overview}
+% ============================================================================
+
+\subsection{Attack Timeline}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.85]
+    % Timeline
+    \draw[->, line width=1pt] (0,0) -- (14,0);
+
+    % Date markers
+    \foreach \x/\date in {1/Apr, 4/May 6, 7/May 7, 10/May 12, 13/May 13} {
+        \draw[line width=0.5pt] (\x,-0.15) -- (\x,0.15);
+        \node[font=\scriptsize] at (\x,-0.5) {\date};
+    }
+
+    % Events
+    \node[fill=otdanger!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (1,0.3) {Credentials\\compromised};
+    \node[fill=otdanger!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (4,0.3) {Attackers\\enter network};
+    \node[fill=otwarning!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (7,0.3) {Ransomware\\deployed};
+    \node[fill=otinfo!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (10,0.3) {Operations\\resume};
+    \node[fill=otsuccess!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (13,0.3) {Full\\restoration};
+
+\end{tikzpicture}
+\caption{Colonial Pipeline Attack Timeline}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{April 2021:} VPN credentials exposed (likely from prior data breach)
+    \item \textbf{May 6:} Attackers access Colonial's IT network via VPN
+    \item \textbf{May 7:} DarkSide ransomware deployed, ~100GB data exfiltrated
+    \item \textbf{May 7:} Colonial shuts down pipeline operations
+    \item \textbf{May 8:} Emergency declaration by US government
+    \item \textbf{May 12:} Pipeline operations resume
+    \item \textbf{May 13:} Full operational restoration
+\end{itemize}
+
+\subsection{Initial Access}
+
+\begin{warningbox}
+\textbf{Attack Vector:} A single compromised VPN account without multi-factor authentication (MFA). The credentials were found in a batch of leaked passwords from another breach---the account was no longer actively used but remained enabled.
+\end{warningbox}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=2.5cm, minimum height=1cm, align=center, font=\small},
+    arrow/.style={->, very thick, >=stealth}
+]
+
+% Attack path
+\node[box, fill=otdanger!20] (creds) at (0,0) {Leaked\\Credentials};
+\node[box, fill=otdanger!20] (vpn) at (4,0) {VPN\\Access};
+\node[box, fill=otwarning!20] (it) at (8,0) {IT Network\\Compromise};
+\node[box, fill=otwarning!20] (ransom) at (12,0) {Ransomware\\Deployment};
+
+\draw[arrow, otdanger] (creds) -- (vpn);
+\draw[arrow, otdanger] (vpn) -- (it);
+\draw[arrow, otdanger] (it) -- (ransom);
+
+% Labels
+\node[font=\tiny, below] at (2,-.7) {No MFA};
+\node[font=\tiny, below] at (6,-.7) {Lateral movement};
+\node[font=\tiny, below] at (10,-.7) {Data exfil + encrypt};
+
+\end{tikzpicture}
+\caption{Colonial Pipeline Attack Path}
+\end{figure}
+
+% ============================================================================
+\section{Impact Analysis}
+% ============================================================================
+
+\subsection{Operational Impact}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    impact/.style={rectangle, draw, thick, fill=otdanger!15, minimum width=5cm, minimum height=0.7cm, rounded corners=3pt, font=\small, align=left}
+]
+
+\node[impact] at (0,3) {\faIcon{gas-pump} 5,500 miles of pipeline shut down};
+\node[impact] at (0,2) {\faIcon{car} Fuel shortages in 17 states};
+\node[impact] at (0,1) {\faIcon{dollar-sign} Gas prices spiked to 7-year high};
+\node[impact] at (0,0) {\faIcon{exclamation-triangle} Panic buying, long queues};
+\node[impact] at (0,-1) {\faIcon{plane} Airlines affected (fuel supply)};
+
+\end{tikzpicture}
+\caption{Real-World Impact of the Attack}
+\end{figure}
+
+\subsection{Why OT Was Shut Down}
+
+\begin{infobox}
+\textbf{Colonial's OT systems were not directly attacked.} The company shut down pipeline operations because:
+\begin{itemize}
+    \item Billing systems were encrypted---couldn't invoice customers
+    \item Uncertainty about whether attackers had reached OT
+    \item Risk of OT compromise through IT/OT connections
+    \item Need to safely assess the situation before resuming
+\end{itemize}
+\end{infobox}
+
+This highlights a critical lesson: IT and OT are increasingly interdependent, even when not directly connected.
+
+\subsection{Economic Impact}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{5cm}p{8cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Impact Area} & \textcolor{white}{\bfseries Description} \\
+\midrule
+Ransom payment & \$4.4 million (partially recovered) \\
+Fuel price increase & Average 6 cents/gallon spike \\
+Business disruption & Estimated hundreds of millions \\
+Emergency response & Federal, state, and local resources \\
+Reputational damage & Long-term trust implications \\
+\end{tabular}
+\caption{Economic Impact Summary}
+\end{table}
+
+% ============================================================================
+\section{Technical Analysis}
+% ============================================================================
+
+\subsection{DarkSide Ransomware}
+
+DarkSide operated as a Ransomware-as-a-Service (RaaS) model:
+
+\begin{itemize}
+    \item \textbf{Double extortion:} Encrypt data AND threaten to leak it
+    \item \textbf{Affiliate model:} Developers provide tools, affiliates execute attacks
+    \item \textbf{Target selection:} Claimed to avoid hospitals, schools, non-profits
+    \item \textbf{Negotiation portal:} Professional-looking victim communication
+\end{itemize}
+
+\begin{warningbox}
+DarkSide publicly stated they ``only'' wanted money and didn't intend to cause social consequences. After the Colonial incident's massive impact, the group claimed to be shutting down---though members likely continued under different names.
+\end{warningbox}
+
+\subsection{Security Gaps Exploited}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4.5cm}p{8.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Gap} & \textcolor{white}{\bfseries Impact} \\
+\midrule
+No MFA on VPN & Single password compromise = network access \\
+Unused account enabled & Dormant account provided attack vector \\
+Credential reuse & Password from other breach worked \\
+Insufficient monitoring & Attackers operated undetected \\
+IT/OT interdependence & IT compromise forced OT shutdown \\
+\end{tabular}
+\caption{Security Gaps That Enabled the Attack}
+\end{table}
+
+% ============================================================================
+\section{Lessons Learned}
+% ============================================================================
+
+\subsection{Defensive Recommendations}
+
+\begin{successbox}
+\textbf{Key takeaways for OT security:}
+\begin{enumerate}
+    \item \textbf{Enforce MFA everywhere:} Especially on remote access (VPN, RDP)
+    \item \textbf{Audit dormant accounts:} Disable unused accounts promptly
+    \item \textbf{Segment IT and OT:} Limit blast radius of IT compromises
+    \item \textbf{Plan for billing loss:} OT operations may need IT systems
+    \item \textbf{Incident response planning:} Know when and how to isolate OT
+    \item \textbf{Backup strategy:} Offline backups resistant to ransomware
+\end{enumerate}
+\end{successbox}
+
+\subsection{IT/OT Interdependence}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    zone/.style={rectangle, draw, thick, rounded corners=5pt, minimum width=4cm, minimum height=1.2cm, align=center, font=\small\bfseries},
+    dep/.style={<->, thick, dashed}
+]
+
+\node[zone, fill=otinfo!20] (it) at (0,2) {IT Systems};
+\node[zone, fill=otsuccess!20] (ot) at (0,-1) {OT Systems};
+
+% Dependencies
+\node[font=\scriptsize, align=left] at (4,2) {Billing, invoicing\\Email, communications\\Business intelligence};
+\node[font=\scriptsize, align=left] at (4,-1) {Pipeline control\\SCADA systems\\Safety systems};
+
+% Interdependence arrows
+\draw[dep, otwarning] (-2,1.3) -- (-2,-0.3);
+\node[font=\tiny, rotate=90, anchor=south] at (-2.4,0.5) {Data flow};
+
+\draw[dep, otwarning] (2,1.3) -- (2,-0.3);
+\node[font=\tiny, rotate=90, anchor=north] at (2.4,0.5) {Business need};
+
+\end{tikzpicture}
+\caption{IT/OT Interdependence}
+\end{figure}
+
+\begin{tipbox}
+Even with perfect IT/OT segmentation, business processes may require both systems. Plan for how OT operations can continue (or safely pause) if IT is unavailable.
+\end{tipbox}
+
+% ============================================================================
+\section{Regulatory Response}
+% ============================================================================
+
+The Colonial Pipeline attack triggered significant regulatory action:
+
+\begin{itemize}
+    \item \textbf{TSA Security Directives:} New cybersecurity requirements for pipelines
+    \item \textbf{Executive Order 14028:} Improving the Nation's Cybersecurity
+    \item \textbf{CISA guidance:} Updated ransomware and critical infrastructure guidance
+    \item \textbf{FBI/DOJ action:} Recovered portion of ransom, pursued attackers
+\end{itemize}
+
+\subsection{TSA Pipeline Security Directives}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3cm}p{10cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Requirement} & \textcolor{white}{\bfseries Description} \\
+\midrule
+Incident reporting & Report cybersecurity incidents to CISA within 12 hours \\
+Cybersecurity coordinator & Designate 24/7 security contact \\
+Vulnerability assessment & Review current practices against TSA guidelines \\
+Remediation plan & Address identified gaps with timelines \\
+\end{tabular}
+\caption{TSA Pipeline Security Requirements (Post-Colonial)}
+\end{table}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{IT attacks have OT consequences} -- Business system loss forced operational shutdown
+    \item \textbf{Basic security failures} -- No MFA, unused accounts enabled the attack
+    \item \textbf{Ransomware is an OT risk} -- Even without direct OT targeting
+    \item \textbf{Critical infrastructure impact} -- Fuel shortages affected millions
+    \item \textbf{MFA is essential} -- Single most impactful control for remote access
+    \item \textbf{Plan for IT/OT dependencies} -- Know how OT operates without IT
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Official Reports}
+\begin{itemize}
+    \item \textbf{CISA} -- DarkSide Ransomware Alert\\
+          \url{https://www.cisa.gov/news-events/cybersecurity-advisories/aa21-131a}
+    \item \textbf{FBI Flash} -- DarkSide Ransomware Indicators\\
+          \url{https://www.ic3.gov/Media/News/2021/210510.pdf}
+\end{itemize}
+
+\subsection*{Analysis}
+\begin{itemize}
+    \item \textbf{Dragos} -- Colonial Pipeline Ransomware Analysis\\
+          \url{https://www.dragos.com/blog/industry-news/recommendations-following-the-colonial-pipeline-cyber-attack/}
+    \item \textbf{Mandiant} -- DarkSide Ransomware Operations\\
+          \url{https://www.mandiant.com/resources/blog/shining-a-light-on-darkside-ransomware-operations}
+\end{itemize}
+
+\subsection*{Regulatory}
+\begin{itemize}
+    \item \textbf{TSA} -- Pipeline Security Directives\\
+          \url{https://www.tsa.gov/sd-and-ea}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textcolor{mediumgray}{\rule{0.5\textwidth}{0.5pt}}\\[1em]
+\textcolor{mediumgray}{\small Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

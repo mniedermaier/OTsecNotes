@@ -1,0 +1,469 @@
+% ============================================================================
+%  OT Security Audits - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {OT Security Audits}
+    {Conducting effective security assessments in industrial environments}
+    {OT Security Learning Series}
+    {Document 730 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+Security audits systematically evaluate an organization's security controls against established standards, policies, or regulatory requirements. In OT environments, audits must balance thoroughness with operational safety and often involve unique constraints not found in IT audits.
+\end{infobox}
+
+OT security audit objectives:
+\begin{itemize}
+    \item \textbf{Compliance verification:} Meet regulatory and industry standards
+    \item \textbf{Control assessment:} Evaluate effectiveness of security measures
+    \item \textbf{Gap identification:} Find weaknesses before attackers do
+    \item \textbf{Risk quantification:} Support risk management decisions
+    \item \textbf{Improvement roadmap:} Prioritize security investments
+\end{itemize}
+
+% ============================================================================
+\section{Types of OT Security Audits}
+% ============================================================================
+
+\subsection{Audit Categories}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=5pt, minimum width=3cm, minimum height=1.2cm, align=center, font=\small\bfseries},
+    sub/.style={font=\scriptsize, text width=3cm, align=center}
+]
+
+% Audit types
+\node[box, fill=otinfo!20] (compliance) at (0,3) {Compliance\\Audit};
+\node[box, fill=otsuccess!20] (technical) at (5,3) {Technical\\Audit};
+\node[box, fill=otwarning!20] (operational) at (10,3) {Operational\\Audit};
+
+% Descriptions
+\node[sub] at (0,1.5) {IEC 62443\\NERC CIP\\ISO 27001};
+\node[sub] at (5,1.5) {Network review\\Configuration audit\\Vulnerability scan};
+\node[sub] at (10,1.5) {Procedures\\Training\\Incident response};
+
+\end{tikzpicture}
+\caption{Types of OT Security Audits}
+\end{figure}
+
+\subsection{Compliance Audits}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{4cm}p{5.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Standard} & \textcolor{white}{\bfseries Industry} & \textcolor{white}{\bfseries Focus Areas} \\
+\midrule
+IEC 62443 & All industrial & Security levels, zones, risk assessment \\
+NERC CIP & Power/utilities & Critical infrastructure protection \\
+NIST 800-82 & Government, critical & OT security framework \\
+ISO 27001 & General & ISMS with OT scope \\
+TSA Pipeline & Oil \& gas pipelines & Cybersecurity directives \\
+\end{tabular}
+\caption{Common OT Compliance Standards}
+\end{table}
+
+\subsection{Technical Audits}
+
+\begin{itemize}
+    \item \textbf{Network architecture review:} Segmentation, firewall rules, data flows
+    \item \textbf{Configuration audit:} System hardening, default credentials, services
+    \item \textbf{Access control review:} User management, privilege levels, authentication
+    \item \textbf{Vulnerability assessment:} Known CVEs, missing patches, exposures
+    \item \textbf{Backup and recovery:} Configuration backups, restore testing
+\end{itemize}
+
+\subsection{Operational Audits}
+
+\begin{itemize}
+    \item \textbf{Policy and procedure review:} Documentation completeness and currency
+    \item \textbf{Training assessment:} Security awareness, role-specific training
+    \item \textbf{Change management:} Process effectiveness, documentation
+    \item \textbf{Incident response:} Plan review, tabletop exercises
+    \item \textbf{Vendor management:} Third-party access controls
+\end{itemize}
+
+% ============================================================================
+\section{Audit Planning}
+% ============================================================================
+
+\subsection{Pre-Audit Activities}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    stepbox/.style={rectangle, draw, thick, fill=otaccent!15, minimum width=8cm, minimum height=0.7cm, rounded corners=3pt, font=\small},
+    num/.style={circle, fill=otprimary, text=white, font=\small\bfseries, minimum size=0.6cm}
+]
+
+\node[stepbox] (s1) at (0,4) {Define audit scope and objectives};
+\node[num] at (-4.5,4) {1};
+
+\node[stepbox] (s2) at (0,3) {Identify applicable standards/requirements};
+\node[num] at (-4.5,3) {2};
+
+\node[stepbox] (s3) at (0,2) {Request documentation and network diagrams};
+\node[num] at (-4.5,2) {3};
+
+\node[stepbox] (s4) at (0,1) {Coordinate with OT operations team};
+\node[num] at (-4.5,1) {4};
+
+\node[stepbox] (s5) at (0,0) {Plan on-site activities and safety briefing};
+\node[num] at (-4.5,0) {5};
+
+\end{tikzpicture}
+\caption{Audit Planning Checklist}
+\end{figure}
+
+\subsection{Scope Definition}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Element} & \textcolor{white}{\bfseries Considerations} \\
+\midrule
+Locations & Which facilities, remote sites? \\
+Systems & All OT assets or specific zones/systems? \\
+Standards & Which frameworks (IEC 62443, NERC CIP, etc.)? \\
+Depth & Full assessment or focused review? \\
+Testing & Passive review only or include active testing? \\
+Timeline & Audit duration, final report deadline \\
+\end{tabular}
+\caption{Audit Scope Definition Elements}
+\end{table}
+
+\subsection{Stakeholder Engagement}
+
+\begin{warningbox}
+\textbf{Critical Stakeholders for OT Audits:}
+\begin{itemize}
+    \item OT Operations -- System access, operational context
+    \item Engineering -- Technical documentation, architecture knowledge
+    \item IT Security -- IT/OT integration, enterprise policies
+    \item Safety -- Safety system considerations, access procedures
+    \item Management -- Authorization, resource allocation
+\end{itemize}
+\end{warningbox}
+
+% ============================================================================
+\section{Audit Execution}
+% ============================================================================
+
+\subsection{Document Review}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{5cm}p{8cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Document Type} & \textcolor{white}{\bfseries Review Focus} \\
+\midrule
+Network diagrams & Accuracy, segmentation, data flows \\
+Security policies & OT-specific policies, coverage \\
+Procedures & Change management, incident response \\
+Asset inventory & Completeness, currency \\
+Risk assessments & Methodology, findings, treatment \\
+Previous audits & Prior findings, remediation status \\
+\end{tabular}
+\caption{Documentation Review Areas}
+\end{table}
+
+\subsection{Technical Assessment}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    area/.style={rectangle, draw, thick, fill=otsuccess!15, minimum width=4cm, minimum height=0.7cm, rounded corners=3pt, font=\small, align=left}
+]
+
+\node[font=\small\bfseries, otprimary] at (0,4) {Network Security};
+\node[area] at (0,3.3) {Segmentation validation};
+\node[area] at (0,2.5) {Firewall rule review};
+\node[area] at (0,1.7) {Remote access controls};
+
+\node[font=\small\bfseries, otprimary] at (6,4) {System Security};
+\node[area] at (6,3.3) {Configuration hardening};
+\node[area] at (6,2.5) {Patch status review};
+\node[area] at (6,1.7) {Authentication mechanisms};
+
+\node[font=\small\bfseries, otprimary] at (12,4) {Data Security};
+\node[area] at (12,3.3) {Backup verification};
+\node[area] at (12,2.5) {Encryption status};
+\node[area] at (12,1.7) {Log management};
+
+\end{tikzpicture}
+\caption{Technical Assessment Areas}
+\end{figure}
+
+\subsection{Interview and Observation}
+
+\begin{itemize}
+    \item \textbf{Operator interviews:} Security awareness, procedure adherence
+    \item \textbf{Engineer interviews:} Change management, system knowledge
+    \item \textbf{Physical observation:} Access controls, badge usage, unlocked doors
+    \item \textbf{Process observation:} How procedures are actually followed
+\end{itemize}
+
+\subsection{On-Site Safety Considerations}
+
+\begin{dangerbox}
+\textbf{Safety Requirements for OT Auditors:}
+\begin{itemize}
+    \item Complete site safety orientation
+    \item Wear required PPE (hard hat, safety glasses, etc.)
+    \item Never touch or operate OT equipment without authorization
+    \item Coordinate all testing activities with operations
+    \item Know emergency procedures and evacuation routes
+    \item Never compromise safety for audit completeness
+\end{itemize}
+\end{dangerbox}
+
+% ============================================================================
+\section{Common Audit Findings}
+% ============================================================================
+
+\subsection{Frequently Identified Issues}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{5cm}p{8cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Finding Category} & \textcolor{white}{\bfseries Common Examples} \\
+\midrule
+Network security & Insufficient segmentation, overly permissive rules \\
+Access control & Shared accounts, weak passwords, no MFA \\
+Asset management & Incomplete inventory, unknown devices \\
+Patch management & Outdated systems, no patching process \\
+Remote access & Direct internet connections, no logging \\
+Monitoring & Limited visibility, no alerting \\
+Documentation & Outdated diagrams, missing procedures \\
+Training & No OT security awareness program \\
+\end{tabular}
+\caption{Common OT Security Audit Findings}
+\end{table}
+
+\subsection{Finding Severity Levels}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    badge/.style={rectangle, draw, thick, minimum width=2cm, minimum height=0.6cm, rounded corners=3pt, font=\small\bfseries, align=center},
+    desc/.style={font=\small, anchor=west}
+]
+
+\node[badge, fill=otdanger!40] (c) at (0,2.4) {CRITICAL};
+\node[desc] at (1.3,2.4) {Immediate risk to safety or operations};
+
+\node[badge, fill=otwarning!40] (h) at (0,1.6) {HIGH};
+\node[desc] at (1.3,1.6) {Significant security gap, high likelihood};
+
+\node[badge, fill=otwarning!25] (m) at (0,0.8) {MEDIUM};
+\node[desc] at (1.3,0.8) {Moderate risk, should be addressed};
+
+\node[badge, fill=otsuccess!40] (l) at (0,0) {LOW};
+\node[desc] at (1.3,0) {Minor issue, improvement opportunity};
+
+\end{tikzpicture}
+\caption{Finding Severity Classification}
+\end{figure}
+
+% ============================================================================
+\section{Reporting and Remediation}
+% ============================================================================
+
+\subsection{Audit Report Structure}
+
+\begin{successbox}
+\textbf{Effective Audit Report Components:}
+\begin{enumerate}
+    \item \textbf{Executive summary:} Key findings, overall assessment, priorities
+    \item \textbf{Scope and methodology:} What was assessed and how
+    \item \textbf{Detailed findings:} Issue, evidence, risk, recommendation
+    \item \textbf{Prioritized remediation:} Actions ranked by risk and effort
+    \item \textbf{Compliance mapping:} Findings linked to specific requirements
+    \item \textbf{Appendices:} Supporting evidence, technical details
+\end{enumerate}
+\end{successbox}
+
+\subsection{Finding Documentation}
+
+Each finding should include:
+\begin{itemize}
+    \item \textbf{Description:} Clear explanation of the issue
+    \item \textbf{Evidence:} Screenshots, logs, observations
+    \item \textbf{Risk:} Potential impact and likelihood
+    \item \textbf{Affected systems:} Scope of the issue
+    \item \textbf{Recommendation:} Specific remediation guidance
+    \item \textbf{Reference:} Related standard/requirement
+\end{itemize}
+
+\subsection{Remediation Planning}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=2.2cm, minimum height=1cm, align=center, font=\small},
+    arrow/.style={->, thick, >=stealth}
+]
+
+% Process
+\node[box, fill=otdanger!20] (finding) at (0,0) {Finding};
+\node[box, fill=otwarning!20] (owner) at (3,0) {Assign\\Owner};
+\node[box, fill=otaccent!20] (plan) at (6,0) {Create\\Action Plan};
+\node[box, fill=otsuccess!20] (implement) at (9,0) {Implement\\Fix};
+\node[box, fill=otinfo!20] (verify) at (12,0) {Verify \&\\Close};
+
+\draw[arrow] (finding) -- (owner);
+\draw[arrow] (owner) -- (plan);
+\draw[arrow] (plan) -- (implement);
+\draw[arrow] (implement) -- (verify);
+
+\end{tikzpicture}
+\caption{Finding Remediation Process}
+\end{figure}
+
+% ============================================================================
+\section{Audit Program Management}
+% ============================================================================
+
+\subsection{Audit Frequency}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{4cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Audit Type} & \textcolor{white}{\bfseries Frequency} & \textcolor{white}{\bfseries Driver} \\
+\midrule
+Full compliance audit & Annual & Regulatory requirement \\
+Technical assessment & Semi-annual & Risk management \\
+Focused review & As needed & Major changes, incidents \\
+Self-assessment & Quarterly & Continuous improvement \\
+Third-party audit & 1--3 years & Certification, verification \\
+\end{tabular}
+\caption{Recommended Audit Frequency}
+\end{table}
+
+\subsection{Continuous Improvement}
+
+\begin{itemize}
+    \item Track remediation progress against deadlines
+    \item Monitor for recurring findings
+    \item Update audit scope based on threat landscape
+    \item Benchmark against industry peers
+    \item Incorporate lessons from security incidents
+\end{itemize}
+
+\subsection{Audit Metrics}
+
+\begin{itemize}
+    \item \textbf{Findings by severity:} Track distribution over time
+    \item \textbf{Remediation rate:} Percentage of findings addressed on time
+    \item \textbf{Repeat findings:} Issues that recur between audits
+    \item \textbf{Compliance score:} Percentage of requirements met
+    \item \textbf{Time to remediate:} Average days from finding to closure
+\end{itemize}
+
+% ============================================================================
+\section{Internal vs External Audits}
+% ============================================================================
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{5cm}p{4.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Aspect} & \textcolor{white}{\bfseries Internal Audit} & \textcolor{white}{\bfseries External Audit} \\
+\midrule
+Independence & Limited & High \\
+OT knowledge & May be high & Varies by firm \\
+Cost & Lower & Higher \\
+Credibility & Internal use & Third-party verification \\
+Frequency & More frequent & Less frequent \\
+Scope flexibility & High & Often fixed \\
+\end{tabular}
+\caption{Internal vs External Audit Comparison}
+\end{table}
+
+\begin{tipbox}
+\textbf{Best Practice:} Use internal audits for continuous monitoring and improvement, and external audits for independent verification and certification requirements.
+\end{tipbox}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Multiple audit types:} Compliance, technical, and operational
+    \item \textbf{OT-specific considerations:} Safety, availability, operations coordination
+    \item \textbf{Thorough planning:} Scope, stakeholders, safety requirements
+    \item \textbf{Evidence-based findings:} Document issues with clear evidence
+    \item \textbf{Risk-based prioritization:} Focus remediation on highest risks
+    \item \textbf{Continuous improvement:} Regular audits drive security maturity
+    \item \textbf{Track progress:} Monitor remediation and measure improvement
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Standards}
+\begin{itemize}
+    \item \textbf{IEC 62443-2-1} -- Security management system requirements\\
+          \url{https://webstore.iec.ch/publication/7030}
+    \item \textbf{IEC 62443-3-2} -- Security risk assessment for system design\\
+          \url{https://webstore.iec.ch/publication/30727}
+    \item \textbf{NIST SP 800-82 Rev. 3} -- Guide to OT Security\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+\end{itemize}
+
+\subsection*{Resources}
+\begin{itemize}
+    \item \textbf{CISA} -- Assessments and Services\\
+          \url{https://www.cisa.gov/resources-tools/services/cisa-assessments}
+    \item \textbf{ISACA} -- IT Audit Framework\\
+          \url{https://www.isaca.org/}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

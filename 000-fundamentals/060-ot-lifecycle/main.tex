@@ -1,0 +1,385 @@
+% ============================================================================
+%  060-ot-lifecycle - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {OT System Lifecycle}
+    {Security considerations across the industrial asset lifecycle}
+    {OT Security Learning Series}
+    {Document 060 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+The OT system lifecycle spans from initial procurement through decommissioning. Security must be integrated at every phase---not bolted on afterward. Unlike IT systems with 3--5 year lifecycles, OT assets often operate for 15--30 years, requiring long-term security planning.
+\end{infobox}
+
+Key challenges in OT lifecycle management:
+\begin{itemize}
+    \item \textbf{Extended lifespans} -- Equipment outlives vendor support
+    \item \textbf{Legacy systems} -- Older devices lack security features
+    \item \textbf{Availability requirements} -- Limited maintenance windows
+    \item \textbf{Safety constraints} -- Changes require careful validation
+    \item \textbf{Supply chain risks} -- Compromised components or firmware
+\end{itemize}
+
+% ============================================================================
+\section{Lifecycle Phases Overview}
+% ============================================================================
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    phase/.style={rectangle, draw, thick, rounded corners=5pt, minimum width=2.2cm, minimum height=1.2cm, align=center, font=\small\bfseries},
+    arrow/.style={->, very thick, >=stealth}
+]
+
+% Phases in a cycle
+\node[phase, fill=otinfo!20] (proc) at (0,3) {Procurement};
+\node[phase, fill=otaccent!20] (deploy) at (4,3) {Deployment};
+\node[phase, fill=otsuccess!20] (ops) at (7,1.5) {Operations};
+\node[phase, fill=otwarning!20] (maint) at (4,0) {Maintenance};
+\node[phase, fill=otdanger!20] (decom) at (0,0) {Decommission};
+
+% Arrows connecting phases
+\draw[arrow, otprimary] (proc) -- (deploy);
+\draw[arrow, otprimary] (deploy) -- (ops);
+\draw[arrow, otprimary] (ops) -- (maint);
+\draw[arrow, otprimary] (maint) -- (decom);
+
+% Loop back from maintenance to operations
+\draw[arrow, otsuccess, dashed] (maint.north east) to[bend right=20] (ops.south);
+
+% Time indicators
+\node[font=\tiny, otinfo] at (0,2.3) {Weeks};
+\node[font=\tiny, otaccent] at (4,2.3) {Months};
+\node[font=\tiny, otsuccess] at (7,0.7) {Years};
+\node[font=\tiny, otwarning] at (4,-0.7) {Ongoing};
+\node[font=\tiny, otdanger] at (0,-0.7) {End of Life};
+
+\end{tikzpicture}
+\caption{OT System Lifecycle Phases}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3cm}p{4cm}p{6cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Phase} & \textcolor{white}{\bfseries Duration} & \textcolor{white}{\bfseries Security Focus} \\
+\midrule
+Procurement & Weeks to months & Vendor assessment, security requirements \\
+Deployment & Weeks to months & Secure configuration, hardening \\
+Operations & 10--30 years & Monitoring, access control, patching \\
+Maintenance & Ongoing & Change management, vendor access \\
+Decommissioning & Weeks & Data sanitization, secure disposal \\
+\end{tabular}
+\caption{Lifecycle Phases and Security Focus}
+\end{table}
+
+% ============================================================================
+\section{Procurement Phase}
+% ============================================================================
+
+\begin{successbox}
+\textbf{Security starts at procurement.} Specify security requirements before purchase---retrofitting security is expensive and often impossible with OT equipment.
+\end{successbox}
+
+\subsection{Security Requirements}
+
+Include in procurement specifications:
+\begin{itemize}
+    \item \textbf{Authentication} -- Support for strong authentication (no hardcoded credentials)
+    \item \textbf{Encryption} -- TLS/secure protocols for communications
+    \item \textbf{Logging} -- Security event logging capabilities
+    \item \textbf{Patching} -- Vendor patch support commitment and timeline
+    \item \textbf{Certifications} -- IEC 62443-4-1/4-2 compliance
+    \item \textbf{Documentation} -- Security hardening guides, network diagrams
+\end{itemize}
+
+\subsection{Vendor Assessment}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Criteria} & \textcolor{white}{\bfseries Questions to Ask} \\
+\midrule
+Security development & Does vendor follow secure SDLC (IEC 62443-4-1)? \\
+Vulnerability handling & How are CVEs disclosed and patched? \\
+Support lifecycle & How long will security patches be provided? \\
+Supply chain & Where are components sourced? Firmware integrity? \\
+Incident response & How does vendor communicate security issues? \\
+\end{tabular}
+\caption{Vendor Security Assessment Criteria}
+\end{table}
+
+\begin{warningbox}
+\textbf{Supply Chain Risk:} Counterfeit components and compromised firmware are real threats. Verify component authenticity and require firmware integrity verification (signed updates).
+\end{warningbox}
+
+% ============================================================================
+\section{Deployment Phase}
+% ============================================================================
+
+\subsection{Secure Configuration}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    stepbox/.style={rectangle, draw, thick, fill=otaccent!15, minimum width=10cm, minimum height=0.7cm, rounded corners=3pt, font=\small},
+    num/.style={circle, fill=otprimary, text=white, font=\small\bfseries, minimum size=0.6cm}
+]
+
+\node[stepbox] (s1) at (0,4) {Change default credentials immediately};
+\node[num] at (-5.5,4) {1};
+
+\node[stepbox] (s2) at (0,3) {Disable unnecessary services and ports};
+\node[num] at (-5.5,3) {2};
+
+\node[stepbox] (s3) at (0,2) {Configure network segmentation and firewall rules};
+\node[num] at (-5.5,2) {3};
+
+\node[stepbox] (s4) at (0,1) {Enable logging and connect to monitoring};
+\node[num] at (-5.5,1) {4};
+
+\node[stepbox] (s5) at (0,0) {Document baseline configuration and create backup};
+\node[num] at (-5.5,0) {5};
+
+\end{tikzpicture}
+\caption{Secure Deployment Checklist}
+\end{figure}
+
+\subsection{Hardening Guidelines}
+
+\begin{itemize}
+    \item Follow vendor hardening guides (if available)
+    \item Apply latest firmware/patches before deployment
+    \item Configure role-based access control
+    \item Disable remote access unless required
+    \item Implement network segmentation per zone model
+    \item Create configuration backup before going live
+\end{itemize}
+
+\subsection{Acceptance Testing}
+
+Before operational handover:
+\begin{enumerate}
+    \item Verify security controls are implemented
+    \item Test authentication and access controls
+    \item Validate network segmentation
+    \item Confirm logging is functioning
+    \item Document as-built security configuration
+\end{enumerate}
+
+% ============================================================================
+\section{Operations Phase}
+% ============================================================================
+
+\begin{infobox}
+The operations phase is the longest---often 15--30 years for OT equipment. Security must be maintained throughout this extended period, even as threats evolve and vendor support ends.
+\end{infobox}
+
+\subsection{Ongoing Security Activities}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{5cm}p{4cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Activity} & \textcolor{white}{\bfseries Description} & \textcolor{white}{\bfseries Frequency} \\
+\midrule
+Vulnerability monitoring & Track CVEs for deployed assets & Continuous \\
+Patch management & Evaluate and apply security updates & As released \\
+Access reviews & Verify user access remains appropriate & Quarterly \\
+Configuration audits & Check for drift from baseline & Annually \\
+Backup verification & Test configuration backups & Monthly \\
+Security monitoring & Review logs and alerts & Daily \\
+\end{tabular}
+\caption{Operational Security Activities}
+\end{table}
+
+\subsection{Managing Legacy Systems}
+
+\begin{dangerbox}
+\textbf{End-of-Support Systems:} When vendors stop providing patches, implement compensating controls:
+\begin{itemize}
+    \item Network isolation (firewall, VLAN, data diode)
+    \item Application whitelisting on connected systems
+    \item Enhanced monitoring for anomalies
+    \item Plan for replacement or upgrade
+\end{itemize}
+\end{dangerbox}
+
+% ============================================================================
+\section{Maintenance Phase}
+% ============================================================================
+
+\subsection{Change Management}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=2cm, minimum height=1cm, align=center, font=\small},
+    arrow/.style={->, thick, >=stealth}
+]
+
+\node[box, fill=otinfo!20] (request) at (0,0) {Change\\Request};
+\node[box, fill=otwarning!20] (review) at (3,0) {Security\\Review};
+\node[box, fill=otaccent!20] (test) at (6,0) {Test in\\Lab};
+\node[box, fill=otsuccess!20] (implement) at (9,0) {Implement\\Change};
+\node[box, fill=otprimary!20] (verify) at (12,0) {Verify \&\\Document};
+
+\draw[arrow] (request) -- (review);
+\draw[arrow] (review) -- (test);
+\draw[arrow] (test) -- (implement);
+\draw[arrow] (implement) -- (verify);
+
+% Rejection path
+\draw[arrow, otdanger, dashed] (review.south) -- ++(0,-0.8) -| (request.south);
+\node[font=\tiny, otdanger] at (1.5,-1.2) {Reject};
+
+\end{tikzpicture}
+\caption{OT Change Management Process}
+\end{figure}
+
+\subsection{Vendor and Contractor Access}
+
+\begin{warningbox}
+\textbf{Third-Party Access Risks:}
+\begin{itemize}
+    \item Require documented authorization for each access
+    \item Escort or monitor vendor activities
+    \item Use time-limited, audited remote access
+    \item Verify changes made during maintenance
+    \item Scan vendor media before connecting to OT
+\end{itemize}
+\end{warningbox}
+
+\subsection{Patching Considerations}
+
+\begin{itemize}
+    \item \textbf{Test first} -- Validate patches in lab environment
+    \item \textbf{Schedule carefully} -- Use maintenance windows
+    \item \textbf{Have rollback plan} -- Ability to restore if issues occur
+    \item \textbf{Document everything} -- Record patch levels and dates
+    \item \textbf{Coordinate with vendor} -- Ensure patches don't void support
+\end{itemize}
+
+% ============================================================================
+\section{Decommissioning Phase}
+% ============================================================================
+
+\begin{dangerbox}
+\textbf{Security doesn't end at shutdown.} Decommissioned equipment may contain sensitive data, credentials, or network information that could be exploited if improperly disposed.
+\end{dangerbox}
+
+\subsection{Data Sanitization}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Data Type} & \textcolor{white}{\bfseries Sanitization Method} \\
+\midrule
+Configuration files & Factory reset, verify deletion \\
+Credentials & Remove all accounts, reset to defaults \\
+Process data/recipes & Secure deletion or physical destruction \\
+Network settings & Clear IP addresses, firewall rules \\
+Logs & Export for retention, then delete \\
+Firmware & Consider reinstalling clean firmware \\
+\end{tabular}
+\caption{Data Sanitization Requirements}
+\end{table}
+
+\subsection{Disposal Options}
+
+\begin{itemize}
+    \item \textbf{Certified destruction} -- Physical destruction with certificate
+    \item \textbf{Resale/reuse} -- Only after complete sanitization
+    \item \textbf{Return to vendor} -- May be required for leased equipment
+    \item \textbf{Recycling} -- Remove storage media first
+\end{itemize}
+
+\subsection{Documentation Updates}
+
+\begin{itemize}
+    \item Remove from asset inventory
+    \item Update network diagrams
+    \item Revoke access credentials
+    \item Archive relevant documentation
+    \item Update firewall rules to remove references
+\end{itemize}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Lifecycle thinking} -- Security at every phase, not just operations
+    \item \textbf{Procurement} -- Specify security requirements before purchase
+    \item \textbf{Extended lifespans} -- Plan for 15--30 year asset lifecycles
+    \item \textbf{Vendor management} -- Assess security practices and support commitments
+    \item \textbf{Change control} -- All modifications through documented process
+    \item \textbf{Legacy systems} -- Compensating controls when patches unavailable
+    \item \textbf{Decommissioning} -- Sanitize data before disposal
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Standards}
+
+\begin{itemize}
+    \item \textbf{IEC 62443-2-4} -- Security program requirements for IACS service providers\\
+          \url{https://webstore.iec.ch/publication/7031}
+    \item \textbf{IEC 62443-4-1} -- Secure product development lifecycle requirements\\
+          \url{https://webstore.iec.ch/publication/33615}
+    \item \textbf{NIST SP 800-82 Rev. 3} -- Guide to OT Security\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{CISA} -- Securing Industrial Control Systems: A Unified Initiative\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+    \item \textbf{ENISA} -- Good Practices for Security of IoT in Manufacturing\\
+          \url{https://www.enisa.europa.eu/publications}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

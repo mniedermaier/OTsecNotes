@@ -4,6 +4,15 @@
 
 \documentclass[11pt,a4paper]{article}
 \usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
 
 \hypersetup{
     pdftitle={Stuxnet: The First Cyber Weapon},
@@ -81,6 +90,32 @@ Stuxnet used multiple methods to spread and reach its target:
 Stuxnet crossed the ``air gap'' through infected USB drives carried by contractors and employees. Physical isolation alone is not sufficient protection.
 \end{warningbox}
 
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=2.2cm, minimum height=1cm, align=center, font=\small},
+    arrow/.style={->, very thick, >=stealth}
+]
+
+% Attack path
+\node[box, fill=otdanger!20] (usb) at (0,0) {Infected\\USB Drive};
+\node[box, fill=otwarning!20] (win) at (3.5,0) {Windows\\Workstation};
+\node[box, fill=otwarning!20] (step7) at (7,0) {Step 7\\Project};
+\node[box, fill=otdanger!20] (plc) at (10.5,0) {Siemens\\S7-300 PLC};
+
+\draw[arrow, otdanger] (usb) -- (win);
+\draw[arrow, otdanger] (win) -- (step7);
+\draw[arrow, otdanger] (step7) -- (plc);
+
+% Labels
+\node[font=\tiny, below] at (1.75,-0.7) {Zero-day exploits};
+\node[font=\tiny, below] at (5.25,-0.7) {Project infection};
+\node[font=\tiny, below] at (8.75,-0.7) {PLC rootkit};
+
+\end{tikzpicture}
+\caption{Stuxnet Attack Path}
+\end{figure}
+
 \subsection{Target Identification}
 
 Stuxnet was highly selective in its targeting:
@@ -148,7 +183,8 @@ Stuxnet implemented a man-in-the-middle attack between the HMI/SCADA system and 
 
 \section{Attack Timeline}
 
-\begin{center}
+\begin{figure}[H]
+\centering
 \begin{tikzpicture}[scale=0.9]
     % Timeline
     \draw[->, line width=1pt] (0,0) -- (13,0);
@@ -160,13 +196,14 @@ Stuxnet implemented a man-in-the-middle attack between the HMI/SCADA system and 
     }
 
     % Events
-    \node[fill=warning!30, rounded corners, font=\scriptsize, align=center, anchor=south] at (1,0.3) {Development\\begins};
-    \node[fill=danger!30, rounded corners, font=\scriptsize, align=center, anchor=south] at (4,0.3) {First infections\\detected};
-    \node[fill=danger!30, rounded corners, font=\scriptsize, align=center, anchor=south] at (7,0.3) {Major variant\\deployed};
-    \node[fill=info!30, rounded corners, font=\scriptsize, align=center, anchor=south] at (10,0.3) {Publicly\\discovered};
-    \node[fill=success!30, rounded corners, font=\scriptsize, align=center, anchor=south] at (12,0.3) {Analysis\\complete};
+    \node[fill=otwarning!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (1,0.3) {Development\\begins};
+    \node[fill=otdanger!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (4,0.3) {First infections\\detected};
+    \node[fill=otdanger!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (7,0.3) {Major variant\\deployed};
+    \node[fill=otinfo!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (10,0.3) {Publicly\\discovered};
+    \node[fill=otsuccess!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (13,0.3) {Analysis\\complete};
 \end{tikzpicture}
-\end{center}
+\caption{Stuxnet Timeline (2007--2011)}
+\end{figure}
 
 \begin{itemize}
     \item \textbf{2005--2007:} Development phase (estimated)
@@ -184,6 +221,22 @@ Stuxnet implemented a man-in-the-middle attack between the HMI/SCADA system and 
 \section{Impact and Consequences}
 
 \subsection{Immediate Impact}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    impact/.style={rectangle, draw, thick, fill=otdanger!15, minimum width=6cm, minimum height=0.7cm, rounded corners=3pt, font=\small, align=left}
+]
+
+\node[impact] at (0,3) {\faIcon{cog} ~1,000 centrifuges destroyed};
+\node[impact] at (0,2) {\faIcon{clock} Nuclear program delayed 1--2 years};
+\node[impact] at (0,1) {\faIcon{globe} 100,000+ systems infected worldwide};
+\node[impact] at (0,0) {\faIcon{code} 4 zero-day vulnerabilities burned};
+\node[impact] at (0,-1) {\faIcon{shield-alt} Changed OT threat landscape forever};
+
+\end{tikzpicture}
+\caption{Stuxnet Impact Summary}
+\end{figure}
 
 \begin{itemize}
     \item Approximately 1,000 IR-1 centrifuges destroyed at Natanz

@@ -1,0 +1,402 @@
+% ============================================================================
+%  SIEM for OT - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {SIEM for OT Environments}
+    {Security Information and Event Management for industrial systems}
+    {OT Security Learning Series}
+    {Document 530 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+Security Information and Event Management (SIEM) platforms aggregate, correlate, and analyze security data from across the enterprise. Extending SIEM to OT environments provides unified visibility but requires careful consideration of OT-specific data sources and operational constraints.
+\end{infobox}
+
+SIEM benefits for OT security:
+\begin{itemize}
+    \item \textbf{Unified visibility:} Single view across IT and OT security events
+    \item \textbf{Correlation:} Detect attacks spanning IT/OT boundaries
+    \item \textbf{Compliance:} Centralized logging for regulatory requirements
+    \item \textbf{Incident response:} Faster investigation with correlated data
+    \item \textbf{Historical analysis:} Long-term storage for forensics
+\end{itemize}
+
+% ============================================================================
+\section{SIEM Architecture for OT}
+% ============================================================================
+
+\subsection{Data Flow Architecture}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.9, every node/.style={scale=0.9},
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=1.8cm, minimum height=0.7cm, align=center, font=\small},
+    zone/.style={rectangle, draw, dashed, rounded corners=5pt, minimum width=3.5cm, minimum height=2.8cm},
+    arrow/.style={->, thick, >=stealth}
+]
+
+% OT Zone
+\node[zone, fill=otsuccess!5, minimum width=2.5cm, minimum height=3.5cm] (otzone) at (-4.5,0) {};
+\node[font=\small\bfseries] at (-4.5,2) {OT Zone};
+\node[box, fill=otsuccess!20] (plc) at (-4.5,1) {PLCs};
+\node[box, fill=otsuccess!20] (hmi) at (-4.5,0) {HMIs};
+\node[box, fill=otsuccess!20] (hist) at (-4.5,-1) {Historian};
+
+% DMZ
+\node[zone, fill=otwarning!5, minimum height=2.8cm] (dmzzone) at (0,0) {};
+\node[font=\small\bfseries] at (0,1.7) {DMZ};
+\node[box, fill=otwarning!20] (collector) at (0,0.3) {Log\\Collector};
+\node[box, fill=otwarning!20] (diode) at (0,-0.8) {Data Diode};
+
+% IT Zone
+\node[zone, fill=otinfo!5] (itzone) at (4,0) {};
+\node[font=\small\bfseries] at (4,1.7) {IT/SOC};
+\node[box, fill=otinfo!20] (siem) at (4,0.3) {SIEM};
+\node[box, fill=otinfo!20] (analyst) at (4,-0.8) {Analysts};
+
+% Arrows
+\draw[arrow, otsuccess] (plc.east) -- (collector.west);
+\draw[arrow, otsuccess] (hmi.east) -- (collector.west);
+\draw[arrow, otsuccess] (hist.east) -- (collector.west);
+\draw[arrow, otwarning] (collector) -- (diode);
+\draw[arrow, otwarning] (diode.east) -- (siem.west);
+\draw[arrow, otinfo] (siem) -- (analyst);
+
+\end{tikzpicture}
+\caption{OT SIEM Data Flow Architecture}
+\end{figure}
+
+\begin{warningbox}
+\textbf{One-Way Data Flow:} Log data should flow from OT to IT/SIEM, never the reverse. Use data diodes or strict firewall rules to prevent SIEM access back into OT networks.
+\end{warningbox}
+
+\subsection{Deployment Options}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{4.5cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Option} & \textcolor{white}{\bfseries Advantages} & \textcolor{white}{\bfseries Considerations} \\
+\midrule
+Unified SIEM & Single platform, IT/OT correlation & Requires OT protocol support \\
+Separate OT SIEM & OT-focused, isolated & Limited IT correlation \\
+Federated & Local OT + central IT & Complex management \\
+Cloud SIEM & Scalable, managed & Data sovereignty concerns \\
+\end{tabular}
+\caption{SIEM Deployment Options for OT}
+\end{table}
+
+% ============================================================================
+\section{OT Data Sources}
+% ============================================================================
+
+\subsection{Log Sources by Zone}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    source/.style={rectangle, draw, thick, fill=otaccent!15, minimum width=5cm, minimum height=0.5cm, rounded corners=2pt, font=\scriptsize, align=left}
+]
+
+% Zone 3 - Control
+\node[font=\scriptsize\bfseries, otprimary, anchor=east] at (-0.5,3.5) {Level 3 (Control)};
+\node[source, anchor=west] at (0,3.5) {Engineering workstations, servers};
+\node[source, anchor=west] at (0,2.9) {Historians, OPC servers};
+
+% Zone 2 - Supervisory
+\node[font=\scriptsize\bfseries, otprimary, anchor=east] at (-0.5,2.1) {Level 2 (Supervisory)};
+\node[source, anchor=west] at (0,2.1) {SCADA servers, HMIs};
+\node[source, anchor=west] at (0,1.5) {Application servers};
+
+% Zone 1 - Basic Control
+\node[font=\scriptsize\bfseries, otprimary, anchor=east] at (-0.5,0.7) {Level 1 (Basic Control)};
+\node[source, anchor=west] at (0,0.7) {PLCs, RTUs (if capable)};
+\node[source, anchor=west] at (0,0.1) {Network switches, firewalls};
+
+% Zone 0 - Process
+\node[font=\scriptsize\bfseries, otprimary, anchor=east] at (-0.5,-0.7) {Level 0 (Process)};
+\node[source, anchor=west] at (0,-0.7) {Smart instruments (limited)};
+
+\end{tikzpicture}
+\caption{OT Log Sources by Purdue Level}
+\end{figure}
+
+\subsection{Data Types for OT SIEM}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Data Type} & \textcolor{white}{\bfseries Examples} \\
+\midrule
+Authentication logs & User logins to HMIs, engineering workstations \\
+Network traffic & Firewall logs, IDS alerts, NetFlow \\
+System events & Windows/Linux events, service status \\
+Application logs & Historian queries, SCADA events \\
+Configuration changes & PLC logic modifications, setpoint changes \\
+Physical security & Badge access, camera systems \\
+Process alarms & Safety alerts, limit violations \\
+\end{tabular}
+\caption{OT Data Types for SIEM}
+\end{table}
+
+\subsection{Challenges with OT Log Collection}
+
+\begin{warningbox}
+\textbf{OT Logging Limitations:}
+\begin{itemize}
+    \item Many PLCs have no logging capability
+    \item Legacy systems may lack syslog support
+    \item Bandwidth constraints in some OT networks
+    \item Time synchronization issues affect correlation
+    \item Proprietary formats require custom parsing
+\end{itemize}
+\end{warningbox}
+
+% ============================================================================
+\section{Use Cases and Detection Rules}
+% ============================================================================
+
+\subsection{OT-Specific Detection Rules}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{5cm}p{8cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Use Case} & \textcolor{white}{\bfseries Detection Logic} \\
+\midrule
+Unauthorized remote access & VPN/RDP from unexpected IP or outside hours \\
+Engineering workstation compromise & Malware detection, unusual outbound connections \\
+PLC logic modification & Configuration change without change ticket \\
+Protocol anomaly & Unknown function codes, new communication pairs \\
+Cross-zone traffic & IT device communicating directly to OT \\
+Credential abuse & Multiple failed logins, privilege escalation \\
+\end{tabular}
+\caption{OT SIEM Detection Use Cases}
+\end{table}
+
+\subsection{Correlation Rules}
+
+\begin{successbox}
+\textbf{Multi-Source Correlation Examples:}
+\begin{enumerate}
+    \item VPN login + firewall allow + HMI access = normal remote session
+    \item VPN login + firewall deny + repeated attempts = potential attack
+    \item Badge out + remote access from inside = credential sharing/theft
+    \item IT malware alert + OT traffic anomaly = possible lateral movement
+\end{enumerate}
+\end{successbox}
+
+\subsection{Alert Prioritization}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    badge/.style={rectangle, draw, thick, minimum width=2cm, minimum height=0.6cm, rounded corners=3pt, font=\small\bfseries, align=center},
+    desc/.style={font=\small, anchor=west}
+]
+
+\node[badge, fill=otdanger!40] (c) at (0,2.4) {CRITICAL};
+\node[desc] at (1.2,2.4) {Safety system modifications};
+
+\node[badge, fill=otdanger!25] (h) at (0,1.6) {HIGH};
+\node[desc] at (1.2,1.6) {PLC logic changes, unauthorized access};
+
+\node[badge, fill=otwarning!40] (m) at (0,0.8) {MEDIUM};
+\node[desc] at (1.2,0.8) {Protocol anomalies, failed logins};
+
+\node[badge, fill=otsuccess!40] (l) at (0,0) {LOW};
+\node[desc] at (1.2,0) {Informational events, normal deviations};
+
+\end{tikzpicture}
+\caption{Alert Priority Levels}
+\end{figure}
+
+% ============================================================================
+\section{Implementation Considerations}
+% ============================================================================
+
+\subsection{Network Architecture}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.9, every node/.style={scale=0.9},
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=2cm, minimum height=0.7cm, align=center, font=\small},
+    arrow/.style={->, thick, >=stealth}
+]
+
+% OT sources
+\node[box, fill=otsuccess!20] (fw) at (-4,1.2) {OT Firewall};
+\node[box, fill=otsuccess!20] (hist) at (-4,0.4) {Historian};
+\node[box, fill=otsuccess!20] (ids) at (-4,-0.4) {OT IDS};
+\node[box, fill=otsuccess!20] (ws) at (-4,-1.2) {Workstations};
+
+% Collector
+\node[box, fill=otwarning!20, minimum width=2cm, minimum height=2.8cm] (coll) at (0,0) {Log\\Collector\\(DMZ)};
+
+% Transport
+\node[box, fill=otinfo!20] (diode) at (3,0) {Data\\Diode};
+
+% SIEM
+\node[box, fill=otaccent!20, minimum width=2cm, minimum height=1.5cm] (siem) at (6,0) {SIEM\\Platform};
+
+% Arrows - direct from each source to collector
+\draw[arrow] (fw.east) -- (coll.west);
+\draw[arrow] (hist.east) -- (coll.west);
+\draw[arrow] (ids.east) -- (coll.west);
+\draw[arrow] (ws.east) -- (coll.west);
+\draw[arrow] (coll) -- (diode);
+\draw[arrow] (diode) -- (siem);
+
+\end{tikzpicture}
+\caption{OT Log Collection Architecture}
+\end{figure}
+
+\subsection{Time Synchronization}
+
+\begin{dangerbox}
+\textbf{Critical:} All OT and IT systems must use synchronized time sources (NTP/PTP). Without accurate timestamps, event correlation is impossible and forensic analysis is unreliable.
+\end{dangerbox}
+
+Time synchronization requirements:
+\begin{itemize}
+    \item Deploy NTP servers in OT network (isolated from internet)
+    \item Synchronize all logging sources
+    \item Use UTC for log timestamps
+    \item Monitor for time drift
+    \item Document timezone handling
+\end{itemize}
+
+\subsection{Storage and Retention}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{4cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Data Type} & \textcolor{white}{\bfseries Typical Retention} & \textcolor{white}{\bfseries Regulatory Driver} \\
+\midrule
+Security events & 1--3 years & NERC CIP, IEC 62443 \\
+Authentication logs & 1--2 years & Compliance, forensics \\
+Network flows & 90 days--1 year & Capacity, forensics \\
+Raw packet capture & 7--30 days & Storage cost \\
+Configuration changes & 3--7 years & Audit requirements \\
+\end{tabular}
+\caption{Log Retention Guidelines}
+\end{table}
+
+% ============================================================================
+\section{Integration with SOC}
+% ============================================================================
+
+\subsection{SOC Operating Model}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=3cm, minimum height=1cm, align=center, font=\small},
+    arrow/.style={->, thick, >=stealth}
+]
+
+% Tiers
+\node[box, fill=otinfo!20] (t1) at (0,0) {Tier 1\\IT SOC};
+\node[box, fill=otwarning!20] (t2) at (4,0) {Tier 2\\OT Specialist};
+\node[box, fill=otdanger!20] (t3) at (8,0) {Tier 3\\OT Engineering};
+
+% Arrows
+\draw[arrow] (t1) -- node[above, font=\tiny] {Escalate} (t2);
+\draw[arrow] (t2) -- node[above, font=\tiny] {Escalate} (t3);
+
+% Labels below
+\node[font=\tiny, text width=2.8cm, align=center] at (0,-1) {Initial triage\\Known patterns};
+\node[font=\tiny, text width=2.8cm, align=center] at (4,-1) {OT context\\Investigation};
+\node[font=\tiny, text width=2.8cm, align=center] at (8,-1) {Process knowledge\\Response actions};
+
+\end{tikzpicture}
+\caption{Tiered SOC Model for OT}
+\end{figure}
+
+\subsection{OT Context Requirements}
+
+\begin{tipbox}
+\textbf{SOC analysts need OT context:}
+\begin{itemize}
+    \item Asset criticality information
+    \item Normal communication patterns
+    \item Maintenance schedules and change windows
+    \item Contact information for OT personnel
+    \item Response constraints (no automatic blocking)
+\end{itemize}
+\end{tipbox}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Unified visibility:} SIEM enables IT/OT correlation
+    \item \textbf{One-way flow:} Logs flow from OT to SIEM, not reverse
+    \item \textbf{OT data sources:} Historians, HMIs, firewalls, IDS
+    \item \textbf{Protocol support:} SIEM must parse OT-specific data
+    \item \textbf{Time sync critical:} Accurate timestamps enable correlation
+    \item \textbf{OT context:} SOC needs asset and process knowledge
+    \item \textbf{Tiered response:} Escalate to OT specialists for context
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Standards}
+\begin{itemize}
+    \item \textbf{IEC 62443-2-1} -- Security management system requirements\\
+          \url{https://webstore.iec.ch/publication/7030}
+    \item \textbf{NIST SP 800-82 Rev. 3} -- Guide to OT Security\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+\end{itemize}
+
+\subsection*{Resources}
+\begin{itemize}
+    \item \textbf{CISA} -- Logging and Monitoring Guidance\\
+          \url{https://www.cisa.gov/resources-tools/resources}
+    \item \textbf{SANS} -- Building an ICS Security Operations Center\\
+          \url{https://www.sans.org/white-papers/}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

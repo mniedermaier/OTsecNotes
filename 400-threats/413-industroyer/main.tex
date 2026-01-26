@@ -4,6 +4,15 @@
 
 \documentclass[11pt,a4paper]{article}
 \usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
 
 \hypersetup{
     pdftitle={Industroyer/CrashOverride},
@@ -80,6 +89,41 @@ Industroyer uses a highly modular architecture:
 \end{itemize}
 \end{conceptbox}
 
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    module/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=2.2cm, minimum height=0.8cm, align=center, font=\scriptsize\bfseries},
+    arrow/.style={->, thick, >=stealth}
+]
+
+% Main backdoor at top
+\node[module, fill=otdanger!20] (backdoor) at (5,3) {Main Backdoor\\(C2)};
+
+% Launcher
+\node[module, fill=otwarning!20] (launcher) at (5,1.5) {Launcher};
+
+% Protocol modules
+\node[module, fill=otinfo!20] (iec101) at (0,0) {IEC 101};
+\node[module, fill=otinfo!20] (iec104) at (2.5,0) {IEC 104};
+\node[module, fill=otinfo!20] (iec61850) at (5,0) {IEC 61850};
+\node[module, fill=otinfo!20] (opcda) at (7.5,0) {OPC DA};
+\node[module, fill=otdanger!20] (wiper) at (10,0) {Data Wiper};
+
+% Arrows
+\draw[arrow, otdanger] (backdoor) -- (launcher);
+\draw[arrow, otwarning] (launcher) -- (iec101);
+\draw[arrow, otwarning] (launcher) -- (iec104);
+\draw[arrow, otwarning] (launcher) -- (iec61850);
+\draw[arrow, otwarning] (launcher) -- (opcda);
+\draw[arrow, otdanger] (launcher) -- (wiper);
+
+% Target label
+\node[font=\tiny, below] at (5,-0.7) {Protocol-specific attack modules};
+
+\end{tikzpicture}
+\caption{Industroyer Modular Architecture}
+\end{figure}
+
 \subsection{ICS Protocol Modules}
 
 The malware includes four payload modules targeting industrial protocols:
@@ -108,7 +152,64 @@ The inclusion of multiple protocol modules shows extensive knowledge of power gr
 
 \section{Attack Sequence}
 
+\subsection{Attack Timeline}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.9]
+    % Timeline
+    \draw[->, line width=1pt] (0,0) -- (13,0);
+
+    % Time markers
+    \foreach \x/\time in {1/23:50, 4/00:00, 7/00:10, 10/00:15, 13/01:00} {
+        \draw[line width=0.5pt] (\x,-0.15) -- (\x,0.15);
+        \node[font=\scriptsize] at (\x,-0.5) {\time};
+    }
+
+    % Date label
+    \node[font=\small\bfseries] at (6.5,-1.2) {December 17, 2016};
+
+    % Events
+    \node[fill=otwarning!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (1,0.3) {Launcher\\activates};
+    \node[fill=otdanger!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (4,0.3) {IEC 104\\scanning};
+    \node[fill=otdanger!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (7,0.3) {Breakers\\opened};
+    \node[fill=otdanger!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (10,0.3) {Data wiper\\runs};
+    \node[fill=otsuccess!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (13,0.3) {Manual\\restoration};
+
+\end{tikzpicture}
+\caption{Industroyer Attack Timeline}
+\end{figure}
+
 \subsection{Kill Chain}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=2cm, minimum height=1cm, align=center, font=\small},
+    arrow/.style={->, very thick, >=stealth}
+]
+
+% Attack path
+\node[box, fill=otdanger!20] (phish) at (0,0) {Initial\\Access};
+\node[box, fill=otwarning!20] (it) at (3.2,0) {Enterprise\\Network};
+\node[box, fill=otwarning!20] (ot) at (6.4,0) {OT\\Network};
+\node[box, fill=otdanger!20] (iec) at (9.6,0) {IEC 104\\Commands};
+\node[box, fill=otdanger!20] (breaker) at (12.8,0) {Blackout};
+
+\draw[arrow, otdanger] (phish) -- (it);
+\draw[arrow, otdanger] (it) -- (ot);
+\draw[arrow, otdanger] (ot) -- (iec);
+\draw[arrow, otdanger] (iec) -- (breaker);
+
+% Labels
+\node[font=\tiny, below] at (1.6,-0.7) {Backdoor};
+\node[font=\tiny, below] at (4.8,-0.7) {Pivot};
+\node[font=\tiny, below] at (8,-0.7) {Open breakers};
+\node[font=\tiny, below] at (11.2,-0.7) {200MW lost};
+
+\end{tikzpicture}
+\caption{Industroyer Attack Path}
+\end{figure}
 
 \begin{enumerate}
     \item \textbf{Initial access:} Spearphishing or supply chain compromise
@@ -213,6 +314,22 @@ Recovery impact & Firmware damage & Data wiping \\
 \begin{infobox}
 Industroyer represents an evolution from manual attacks to automated, repeatable capabilities. The modular design allows rapid adaptation to different targets.
 \end{infobox}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    impact/.style={rectangle, draw, thick, fill=otdanger!15, minimum width=5.5cm, minimum height=0.7cm, rounded corners=3pt, font=\small, align=left}
+]
+
+\node[impact] at (0,2) {\faIcon{bolt} ~200MW load disconnected};
+\node[impact] at (0,1) {\faIcon{city} Portion of Kyiv without power};
+\node[impact] at (0,0) {\faIcon{clock} ~1 hour blackout};
+\node[impact] at (0,-1) {\faIcon{hdd} Systems wiped to hinder forensics};
+\node[impact] at (0,-2) {\faIcon{code} First grid-specific ICS malware};
+
+\end{tikzpicture}
+\caption{Industroyer Attack Impact}
+\end{figure}
 
 % ----------------------------------------------------------------------------
 %  DETECTION AND DEFENSE

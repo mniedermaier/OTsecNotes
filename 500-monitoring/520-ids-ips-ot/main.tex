@@ -1,0 +1,391 @@
+% ============================================================================
+%  OT Intrusion Detection Systems - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {Intrusion Detection for OT}
+    {IDS/IPS deployment strategies for industrial environments}
+    {OT Security Learning Series}
+    {Document 520 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+Intrusion Detection Systems (IDS) and Intrusion Prevention Systems (IPS) monitor network traffic for malicious activity. In OT environments, these systems must understand industrial protocols and prioritize availability over aggressive blocking.
+\end{infobox}
+
+Key differences in OT intrusion detection:
+\begin{itemize}
+    \item \textbf{Protocol awareness:} Must parse Modbus, DNP3, OPC, EtherNet/IP, etc.
+    \item \textbf{Availability focus:} False positives can disrupt operations
+    \item \textbf{Passive preferred:} Active blocking requires careful consideration
+    \item \textbf{Deterministic traffic:} OT traffic patterns are predictable
+    \item \textbf{Long baselines:} Systems run unchanged for extended periods
+\end{itemize}
+
+% ============================================================================
+\section{IDS vs IPS in OT}
+% ============================================================================
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3cm}p{5cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Aspect} & \textcolor{white}{\bfseries IDS (Detection)} & \textcolor{white}{\bfseries IPS (Prevention)} \\
+\midrule
+Action & Alert only & Block malicious traffic \\
+Deployment & Passive (SPAN/TAP) & Inline \\
+Availability risk & Low & Higher (can block legitimate) \\
+Response time & Human review required & Immediate automated response \\
+OT suitability & Preferred for OT & Use with caution \\
+\end{tabular}
+\caption{IDS vs IPS Comparison}
+\end{table}
+
+\begin{warningbox}
+\textbf{IPS Caution in OT:} Inline IPS can block legitimate traffic due to false positives, potentially disrupting critical processes. Most OT environments use IDS (detection) rather than IPS (prevention) to avoid availability impacts.
+\end{warningbox}
+
+\subsection{Deployment Modes}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.85, every node/.style={scale=0.85},
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=2cm, minimum height=1cm, align=center, font=\small},
+    ids/.style={rectangle, draw, thick, fill=otsuccess!20, rounded corners=3pt, minimum width=1.5cm, minimum height=0.8cm, align=center, font=\small},
+    arrow/.style={->, thick, >=stealth}
+]
+
+% IDS Passive Mode
+\node[font=\small\bfseries] at (-5,3) {IDS (Passive)};
+\node[box, fill=otinfo!20] (sw1) at (-5,1.5) {Switch};
+\node[ids] (ids1) at (-5,-0.5) {IDS};
+\node[box, fill=otaccent!20] (plc1) at (-8,1.5) {PLC};
+\node[box, fill=otaccent!20] (hmi1) at (-2,1.5) {HMI};
+
+\draw[<->, thick] (plc1) -- (sw1);
+\draw[<->, thick] (sw1) -- (hmi1);
+\draw[->, thick, dashed, otsuccess] (sw1) -- (ids1);
+\node[font=\tiny] at (-5,0.5) {SPAN/TAP};
+
+% IPS Inline Mode
+\node[font=\small\bfseries] at (5,3) {IPS (Inline)};
+\node[box, fill=otinfo!20] (sw2) at (5,1.5) {Switch};
+\node[ids, fill=otwarning!20] (ips) at (5,-0.5) {IPS};
+\node[box, fill=otaccent!20] (plc2) at (2,1.5) {PLC};
+\node[box, fill=otaccent!20] (hmi2) at (8,1.5) {HMI};
+
+\draw[<->, thick] (plc2) -- (sw2);
+\draw[<->, thick] (sw2) -- (hmi2);
+\draw[<->, thick, otwarning] (sw2) -- (ips);
+\node[font=\tiny] at (5,0.5) {All traffic};
+
+\end{tikzpicture}
+\caption{IDS (Passive) vs IPS (Inline) Deployment}
+\end{figure}
+
+% ============================================================================
+\section{Detection Methods}
+% ============================================================================
+
+\subsection{Signature-Based Detection}
+
+\begin{definitionbox}{Signature-Based Detection}
+Compares network traffic against a database of known attack patterns (signatures). Effective for known threats but cannot detect novel attacks.
+\end{definitionbox}
+
+\begin{itemize}
+    \item \textbf{Pros:} Low false positives, well-understood, fast
+    \item \textbf{Cons:} Requires signature updates, misses zero-days
+    \item \textbf{OT consideration:} Need OT-specific signatures (Modbus exploits, etc.)
+\end{itemize}
+
+\subsection{Anomaly-Based Detection}
+
+\begin{definitionbox}{Anomaly-Based Detection}
+Establishes a baseline of ``normal'' behavior and alerts on deviations. Can detect novel attacks but may generate more false positives.
+\end{definitionbox}
+
+\begin{itemize}
+    \item \textbf{Pros:} Detects unknown attacks, learns environment
+    \item \textbf{Cons:} Higher false positive rate, requires tuning
+    \item \textbf{OT advantage:} OT traffic is predictable---anomalies stand out
+\end{itemize}
+
+\subsection{Protocol-Aware Detection}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    layer/.style={rectangle, draw, thick, minimum width=8cm, minimum height=0.8cm, align=center, font=\small}
+]
+
+\node[layer, fill=otdanger!15] (app) at (0,3) {Application Layer (OT protocol commands)};
+\node[layer, fill=otwarning!15] (proto) at (0,2) {Protocol Layer (Modbus, DNP3, S7)};
+\node[layer, fill=otinfo!15] (trans) at (0,1) {Transport Layer (TCP/UDP)};
+\node[layer, fill=otsuccess!15] (net) at (0,0) {Network Layer (IP)};
+
+% Annotation
+\node[font=\scriptsize, align=left] at (6,3) {Validate commands};
+\node[font=\scriptsize, align=left] at (6,2) {Parse industrial protocols};
+\node[font=\scriptsize, align=left] at (6,1) {Port/connection analysis};
+\node[font=\scriptsize, align=left] at (6,0) {IP reputation, geolocation};
+
+\end{tikzpicture}
+\caption{Deep Packet Inspection for OT Protocols}
+\end{figure}
+
+\begin{successbox}
+\textbf{OT Protocol Inspection Examples:}
+\begin{itemize}
+    \item Detect unauthorized Modbus write commands to PLCs
+    \item Alert on DNP3 commands from unexpected sources
+    \item Identify firmware upload attempts via S7comm
+    \item Flag changes to safety system parameters
+\end{itemize}
+\end{successbox}
+
+% ============================================================================
+\section{OT-Specific Considerations}
+% ============================================================================
+
+\subsection{Industrial Protocol Support}
+
+Essential protocol support for OT IDS:
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{9.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Protocol} & \textcolor{white}{\bfseries Detection Capabilities} \\
+\midrule
+Modbus TCP/RTU & Function codes, register addresses, read vs write \\
+DNP3 & Object types, data link layer, secure authentication \\
+EtherNet/IP & CIP commands, tag access, configuration changes \\
+OPC UA/DA & Node access, browse requests, write operations \\
+S7comm & Block transfers, program downloads, start/stop \\
+IEC 61850/GOOSE & Substation communications, control commands \\
+BACnet & Building automation, property writes \\
+\end{tabular}
+\caption{OT Protocol Detection Capabilities}
+\end{table}
+
+\subsection{Baseline Considerations}
+
+\begin{itemize}
+    \item \textbf{Learning period:} Allow sufficient time to capture normal operations
+    \item \textbf{Operational modes:} Include startup, shutdown, maintenance periods
+    \item \textbf{Seasonal variations:} Some processes vary by time of year
+    \item \textbf{Update on changes:} Re-baseline after legitimate modifications
+\end{itemize}
+
+\begin{warningbox}
+\textbf{Baseline Risks:} If the network is already compromised during baseline creation, malicious traffic may be learned as ``normal.'' Conduct security assessment before establishing baselines.
+\end{warningbox}
+
+% ============================================================================
+\section{Deployment Architecture}
+% ============================================================================
+
+\subsection{Sensor Placement}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    zone/.style={rectangle, draw, thick, rounded corners=5pt, minimum width=3cm, minimum height=0.8cm, align=center, font=\small},
+    sensor/.style={circle, fill=otsuccess, text=white, font=\tiny\bfseries, minimum size=0.6cm}
+]
+
+% Zones stacked vertically
+\node[zone, fill=otinfo!15] (enterprise) at (0,5) {Enterprise};
+\node[zone, fill=otwarning!15] (dmz) at (0,3.5) {DMZ};
+\node[zone, fill=otsuccess!15] (control) at (0,2) {Control};
+\node[zone, fill=otdanger!15] (field) at (0,0.5) {Field};
+
+% Sensors at boundaries
+\node[sensor] (s1) at (3.5,4.25) {};
+\node[sensor] (s2) at (3.5,2.75) {};
+\node[sensor] (s3) at (3.5,1.25) {};
+
+% Connections (anchor to west of sensors)
+\draw[thick] (enterprise.east) -- ++(0.5,0) |- (s1.west);
+\draw[thick] (dmz.east) -- ++(0.5,0) |- (s1.west);
+\draw[thick] (dmz.east) -- ++(0.5,0) |- (s2.west);
+\draw[thick] (control.east) -- ++(0.5,0) |- (s2.west);
+\draw[thick] (control.east) -- ++(0.5,0) |- (s3.west);
+\draw[thick] (field.east) -- ++(0.5,0) |- (s3.west);
+
+% Labels (positioned above sensors)
+\node[font=\scriptsize, anchor=south] at (3.5,4.55) {IT/OT};
+\node[font=\scriptsize, anchor=south] at (3.5,3.05) {DMZ};
+\node[font=\scriptsize, anchor=south] at (3.5,1.55) {Control};
+
+% Central management
+\node[rectangle, draw, thick, fill=otaccent!20, minimum width=2cm, minimum height=0.6cm, font=\small] (mgmt) at (6,2.75) {IDS Manager};
+\draw[dashed, ->] (s1) -- (mgmt);
+\draw[dashed, ->] (s2) -- (mgmt);
+\draw[dashed, ->] (s3) -- (mgmt);
+
+\end{tikzpicture}
+\caption{IDS Sensor Placement by Zone}
+\end{figure}
+
+\subsection{Key Monitoring Points}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Location} & \textcolor{white}{\bfseries Monitoring Focus} \\
+\midrule
+IT/OT boundary & North-south traffic, unauthorized access attempts \\
+DMZ connections & Data transfers, remote access sessions \\
+Control network & East-west OT traffic, protocol anomalies \\
+Engineering workstations & Configuration changes, downloads to PLCs \\
+Remote access points & VPN sessions, jump server activity \\
+\end{tabular}
+\caption{Key IDS Monitoring Points}
+\end{table}
+
+% ============================================================================
+\section{Implementation Best Practices}
+% ============================================================================
+
+\subsection{Deployment Checklist}
+
+\begin{enumerate}
+    \item \textbf{Assess before deploying:} Understand network architecture first
+    \item \textbf{Start in detection mode:} Alert only, no blocking initially
+    \item \textbf{Allow adequate baseline:} Capture normal operational patterns
+    \item \textbf{Tune aggressively:} Reduce false positives before expanding
+    \item \textbf{Integrate with SIEM:} Correlate with other security data
+    \item \textbf{Define response procedures:} Know what to do with alerts
+    \item \textbf{Test regularly:} Verify detection capabilities
+\end{enumerate}
+
+\subsection{Alert Management}
+
+\begin{tipbox}
+\textbf{Reducing Alert Fatigue:}
+\begin{itemize}
+    \item Prioritize alerts by asset criticality
+    \item Suppress known false positives
+    \item Correlate related events into single incidents
+    \item Route OT alerts to personnel who understand the context
+    \item Establish clear escalation procedures
+\end{itemize}
+\end{tipbox}
+
+\subsection{IPS Deployment (If Required)}
+
+If inline prevention is required:
+\begin{itemize}
+    \item \textbf{Fail-open mode:} If IPS fails, traffic continues
+    \item \textbf{Whitelist approach:} Block only confirmed threats
+    \item \textbf{Test extensively:} Validate in lab before production
+    \item \textbf{Bypass capability:} Ability to disable quickly if issues
+    \item \textbf{High availability:} Redundant deployment for critical paths
+\end{itemize}
+
+% ============================================================================
+\section{Integration Points}
+% ============================================================================
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=2.2cm, minimum height=1cm, align=center, font=\small},
+    arrow/.style={->, thick, >=stealth}
+]
+
+% Central IDS
+\node[box, fill=otsuccess!20, minimum width=3cm, minimum height=1.5cm] (ids) at (0,0) {OT IDS/IPS};
+
+% Integration points
+\node[box, fill=otinfo!20] (siem) at (-4,2) {SIEM};
+\node[box, fill=otaccent!20] (soar) at (0,2) {SOAR};
+\node[box, fill=otwarning!20] (asset) at (4,2) {Asset\\Inventory};
+\node[box, fill=otdanger!20] (threat) at (-4,-2) {Threat\\Intel};
+\node[box, fill=otprimary!20] (fw) at (0,-2) {Firewalls};
+\node[box, fill=otsuccess!15] (hist) at (4,-2) {Historian};
+
+% Arrows
+\draw[arrow] (ids) -- (siem);
+\draw[arrow] (ids) -- (soar);
+\draw[arrow] (asset) -- (ids);
+\draw[arrow] (threat) -- (ids);
+\draw[<->] (ids) -- (fw);
+\draw[arrow] (ids) -- (hist);
+
+\end{tikzpicture}
+\caption{IDS Integration Architecture}
+\end{figure}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Detection over prevention:} IDS preferred over IPS in OT
+    \item \textbf{Protocol awareness:} Must understand Modbus, DNP3, etc.
+    \item \textbf{Anomaly detection:} OT traffic predictability is an advantage
+    \item \textbf{Strategic placement:} Monitor zone boundaries and critical segments
+    \item \textbf{Baseline carefully:} Ensure network is clean before learning
+    \item \textbf{Tune thoroughly:} Reduce false positives before expanding
+    \item \textbf{Integrate:} Connect to SIEM, asset inventory, threat intel
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Standards}
+\begin{itemize}
+    \item \textbf{IEC 62443-3-3} -- System security requirements and security levels\\
+          \url{https://webstore.iec.ch/publication/7033}
+    \item \textbf{NIST SP 800-82 Rev. 3} -- Guide to OT Security\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+\end{itemize}
+
+\subsection*{Resources}
+\begin{itemize}
+    \item \textbf{CISA} -- Industrial Control Systems Detection and Response\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+    \item \textbf{SANS ICS} -- ICS Security Resources\\
+          \url{https://www.sans.org/ics-security/}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

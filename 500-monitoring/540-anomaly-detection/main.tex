@@ -1,0 +1,429 @@
+% ============================================================================
+%  Anomaly Detection in OT - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {Anomaly Detection in OT}
+    {Behavioral analysis for industrial security monitoring}
+    {OT Security Learning Series}
+    {Document 540 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+\begin{infobox}
+Anomaly detection identifies deviations from established normal behavior. OT environments are ideal for anomaly detection because industrial processes are predictable, repetitive, and change slowly---making unusual activity easier to spot.
+\end{infobox}
+
+Why anomaly detection is powerful for OT:
+\begin{itemize}
+    \item \textbf{Predictable traffic:} PLCs communicate in consistent patterns
+    \item \textbf{Stable configurations:} Systems rarely change once deployed
+    \item \textbf{Defined processes:} Operations follow predictable cycles
+    \item \textbf{Novel attack detection:} Can find threats without signatures
+    \item \textbf{Insider threat detection:} Identifies unusual authorized user activity
+\end{itemize}
+
+% ============================================================================
+\section{Types of Anomaly Detection}
+% ============================================================================
+
+\subsection{Detection Categories}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=5pt, minimum width=3.5cm, minimum height=1.2cm, align=center, font=\small\bfseries},
+    sub/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=3cm, minimum height=0.7cm, align=center, font=\scriptsize}
+]
+
+% Main categories
+\node[box, fill=otinfo!20] (network) at (0,3) {Network\\Anomalies};
+\node[box, fill=otsuccess!20] (process) at (5,3) {Process\\Anomalies};
+\node[box, fill=otwarning!20] (behavior) at (10,3) {Behavioral\\Anomalies};
+
+% Sub-items
+\node[sub, fill=otinfo!10] at (0,1.5) {Traffic patterns};
+\node[sub, fill=otinfo!10] at (0,0.7) {Protocol violations};
+\node[sub, fill=otinfo!10] at (0,-0.1) {New connections};
+
+\node[sub, fill=otsuccess!10] at (5,1.5) {Sensor values};
+\node[sub, fill=otsuccess!10] at (5,0.7) {Setpoint changes};
+\node[sub, fill=otsuccess!10] at (5,-0.1) {Timing deviations};
+
+\node[sub, fill=otwarning!10] at (10,1.5) {User actions};
+\node[sub, fill=otwarning!10] at (10,0.7) {Access patterns};
+\node[sub, fill=otwarning!10] at (10,-0.1) {Command sequences};
+
+\end{tikzpicture}
+\caption{Categories of Anomaly Detection in OT}
+\end{figure}
+
+\subsection{Network Anomalies}
+
+\begin{definitionbox}{Network-Based Anomaly Detection}
+Monitors network traffic patterns to identify unusual communications, new devices, unexpected protocols, or abnormal data volumes.
+\end{definitionbox}
+
+Detectable network anomalies:
+\begin{itemize}
+    \item New device on OT network (unauthorized asset)
+    \item Communication between devices that never communicated before
+    \item Unusual traffic volume or timing patterns
+    \item Protocol violations or malformed packets
+    \item Connections to external/internet addresses
+    \item Port scans or reconnaissance activity
+\end{itemize}
+
+\subsection{Process Anomalies}
+
+\begin{definitionbox}{Process-Based Anomaly Detection}
+Analyzes physical process data (sensor values, control signals) to detect deviations that may indicate attacks or equipment problems.
+\end{definitionbox}
+
+Detectable process anomalies:
+\begin{itemize}
+    \item Sensor values outside normal operating ranges
+    \item Unexpected setpoint modifications
+    \item Control commands inconsistent with process state
+    \item Timing anomalies in control loops
+    \item Correlation breaks between related variables
+\end{itemize}
+
+\subsection{Behavioral Anomalies}
+
+\begin{definitionbox}{Behavioral Anomaly Detection}
+Tracks user and system behavior to identify actions that deviate from established patterns, potentially indicating compromise or insider threats.
+\end{definitionbox}
+
+Detectable behavioral anomalies:
+\begin{itemize}
+    \item User accessing systems outside normal hours
+    \item Unusual command sequences from operators
+    \item Access to assets outside normal job function
+    \item Excessive data downloads or queries
+    \item Login from unusual locations
+\end{itemize}
+
+% ============================================================================
+\section{OT-Specific Advantages}
+% ============================================================================
+
+\subsection{Why OT is Ideal for Anomaly Detection}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    compare/.style={rectangle, draw, thick, minimum width=5cm, minimum height=0.7cm, rounded corners=3pt, font=\small}
+]
+
+% IT characteristics
+\node[font=\small\bfseries] at (-5,3.5) {IT Environment};
+\node[compare, fill=otdanger!15] at (-5,2.8) {Dynamic, changing traffic};
+\node[compare, fill=otdanger!15] at (-5,2) {Many users, varied behavior};
+\node[compare, fill=otdanger!15] at (-5,1.2) {Frequent software changes};
+\node[compare, fill=otdanger!15] at (-5,0.4) {High baseline variance};
+
+% OT characteristics
+\node[font=\small\bfseries] at (5,3.5) {OT Environment};
+\node[compare, fill=otsuccess!15] at (5,2.8) {Predictable, cyclic traffic};
+\node[compare, fill=otsuccess!15] at (5,2) {Few users, defined roles};
+\node[compare, fill=otsuccess!15] at (5,1.2) {Rare configuration changes};
+\node[compare, fill=otsuccess!15] at (5,0.4) {Low baseline variance};
+
+% Arrow
+\draw[<->, very thick, otprimary] (-2,1.5) -- (2,1.5);
+\node[font=\scriptsize] at (0,0.9) {Anomalies more detectable in OT};
+
+\end{tikzpicture}
+\caption{IT vs OT Anomaly Detection Suitability}
+\end{figure}
+
+\begin{successbox}
+\textbf{OT Anomaly Detection Advantages:}
+\begin{itemize}
+    \item PLCs poll sensors at fixed intervals---timing anomalies are obvious
+    \item Communication pairs are static---new connections stand out
+    \item Process values follow physical laws---violations indicate problems
+    \item Operators follow procedures---deviations may indicate compromise
+\end{itemize}
+\end{successbox}
+
+% ============================================================================
+\section{Detection Techniques}
+% ============================================================================
+
+\subsection{Statistical Methods}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Method} & \textcolor{white}{\bfseries Application} \\
+\midrule
+Threshold-based & Alert when values exceed defined limits \\
+Standard deviation & Flag values outside N standard deviations \\
+Moving average & Detect sudden changes from recent baseline \\
+Seasonal patterns & Account for time-of-day, day-of-week variations \\
+Correlation analysis & Identify breaks in related variable relationships \\
+\end{tabular}
+\caption{Statistical Anomaly Detection Methods}
+\end{table}
+
+\subsection{Machine Learning Approaches}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Approach} & \textcolor{white}{\bfseries Description} \\
+\midrule
+Clustering & Group similar behaviors, flag outliers \\
+Autoencoders & Learn to reconstruct normal data, flag reconstruction errors \\
+One-class SVM & Model normal class boundary, detect outside points \\
+LSTM networks & Learn temporal sequences, detect sequence breaks \\
+Isolation forests & Efficiently identify outliers in high-dimensional data \\
+\end{tabular}
+\caption{Machine Learning for Anomaly Detection}
+\end{table}
+
+\begin{warningbox}
+\textbf{ML Model Considerations:}
+\begin{itemize}
+    \item Training data must represent true ``normal'' (not already compromised)
+    \item Models need retraining after legitimate system changes
+    \item Black-box models may be difficult to explain to operators
+    \item False positive rates must be acceptable for OT operations
+\end{itemize}
+\end{warningbox}
+
+\subsection{Rule-Based Detection}
+
+\begin{itemize}
+    \item \textbf{Whitelist approach:} Define allowed behaviors, alert on anything else
+    \item \textbf{Communication matrix:} Specify valid source/destination/protocol combinations
+    \item \textbf{Command validation:} Verify commands are appropriate for current process state
+    \item \textbf{Sequence rules:} Define valid command sequences, flag violations
+\end{itemize}
+
+% ============================================================================
+\section{Baseline Development}
+% ============================================================================
+
+\subsection{Creating Effective Baselines}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    stepbox/.style={rectangle, draw, thick, fill=otaccent!15, minimum width=9cm, minimum height=0.7cm, rounded corners=3pt, font=\small},
+    num/.style={circle, fill=otprimary, text=white, font=\small\bfseries, minimum size=0.6cm}
+]
+
+\node[stepbox] (s1) at (0,4) {Verify network is not already compromised};
+\node[num] at (-5,4) {1};
+
+\node[stepbox] (s2) at (0,3) {Collect data across all operational modes};
+\node[num] at (-5,3) {2};
+
+\node[stepbox] (s3) at (0,2) {Include startup, shutdown, maintenance periods};
+\node[num] at (-5,2) {3};
+
+\node[stepbox] (s4) at (0,1) {Account for seasonal/cyclical variations};
+\node[num] at (-5,1) {4};
+
+\node[stepbox] (s5) at (0,0) {Validate baseline with OT personnel};
+\node[num] at (-5,0) {5};
+
+\end{tikzpicture}
+\caption{Baseline Development Process}
+\end{figure}
+
+\subsection{Baseline Elements}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Element} & \textcolor{white}{\bfseries What to Capture} \\
+\midrule
+Communication pairs & Source IP, dest IP, ports, protocols \\
+Traffic volume & Bytes/packets per time period \\
+Timing patterns & Request/response intervals, polling rates \\
+Protocol content & Function codes, register addresses \\
+User behavior & Login times, systems accessed, commands used \\
+Process values & Normal ranges, correlations, trends \\
+\end{tabular}
+\caption{Baseline Elements for OT Anomaly Detection}
+\end{table}
+
+\begin{tipbox}
+\textbf{Baseline Duration:} Capture at least 2--4 weeks of normal operations, including any scheduled maintenance periods. For seasonal processes, longer baselines may be needed.
+\end{tipbox}
+
+% ============================================================================
+\section{Implementation Architecture}
+% ============================================================================
+
+\subsection{Data Collection Points}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    zone/.style={rectangle, draw, thick, rounded corners=5pt, minimum width=2.5cm, minimum height=0.8cm, align=center, font=\small},
+    sensor/.style={rectangle, fill=otsuccess, text=white, font=\tiny\bfseries, minimum width=0.5cm, minimum height=0.4cm, rounded corners=2pt}
+]
+
+% Network diagram - zones
+\node[zone, fill=otinfo!15] (enterprise) at (0,3) {Enterprise};
+\node[zone, fill=otwarning!15] (dmz) at (0,2) {DMZ};
+\node[zone, fill=otsuccess!15] (control) at (0,1) {Control};
+\node[zone, fill=otdanger!15] (field) at (0,0) {Field};
+
+% Network sensors (right side)
+\node[sensor] (s1) at (3,2.5) {N};
+\node[sensor] (s2) at (3,1.5) {N};
+\node[sensor] (s3) at (3,0.5) {N};
+
+% Process sensor (left side)
+\node[sensor, fill=otaccent] (p1) at (-2.5,0.5) {P};
+
+% Anomaly detection engine
+\node[rectangle, draw, thick, fill=otprimary!20, minimum width=2.2cm, minimum height=1.8cm, font=\small, align=center] (engine) at (6,1.5) {Anomaly\\Detection\\Engine};
+
+% Zone to network sensor connections
+\draw[thick, dashed] (enterprise.east) -| (s1);
+\draw[thick, dashed] (dmz.east) -| (s2);
+\draw[thick, dashed] (control.east) -| (s3);
+
+% Network sensors to engine
+\draw[->] (s1.east) -- (engine.west);
+\draw[->] (s2.east) -- (engine.west);
+\draw[->] (s3.east) -- (engine.west);
+
+% Process sensor connections
+\draw[thick, dashed] (control.west) -- (p1);
+\draw[thick, dashed] (field.west) -- (p1);
+\draw[->] (p1.south) |- (-2.5,-0.8) -| (engine.south);
+
+% Legend
+\node[font=\scriptsize, anchor=west] at (4.5,3.5) {N = Network sensor};
+\node[font=\scriptsize, anchor=west] at (4.5,3) {P = Process sensor};
+
+\end{tikzpicture}
+\caption{Anomaly Detection Sensor Placement}
+\end{figure}
+
+\subsection{Integration with Other Systems}
+
+\begin{itemize}
+    \item \textbf{SIEM integration:} Send alerts for correlation with other events
+    \item \textbf{Asset inventory:} Context about device type, criticality, owner
+    \item \textbf{Change management:} Suppress alerts during planned changes
+    \item \textbf{Historian:} Process data for process anomaly detection
+    \item \textbf{IDS/IPS:} Complement signature-based detection
+\end{itemize}
+
+% ============================================================================
+\section{Operational Considerations}
+% ============================================================================
+
+\subsection{Handling False Positives}
+
+\begin{warningbox}
+\textbf{False Positive Management:}
+\begin{itemize}
+    \item High false positive rates cause alert fatigue
+    \item Operators may disable or ignore detection systems
+    \item Tune thresholds carefully based on operational feedback
+    \item Create exception rules for known acceptable deviations
+    \item Continuously refine models based on feedback
+\end{itemize}
+\end{warningbox}
+
+\subsection{Responding to Anomalies}
+
+\begin{enumerate}
+    \item \textbf{Alert triage:} Determine if anomaly is security-relevant
+    \item \textbf{Context gathering:} Check for planned changes, maintenance
+    \item \textbf{OT consultation:} Verify with operators if behavior is expected
+    \item \textbf{Investigation:} If suspicious, investigate further
+    \item \textbf{Feedback loop:} Update model if false positive confirmed
+\end{enumerate}
+
+\subsection{Model Maintenance}
+
+\begin{itemize}
+    \item Retrain models after significant system changes
+    \item Periodically validate detection effectiveness
+    \item Update baselines when legitimate changes occur
+    \item Document all model changes and tuning decisions
+    \item Test detection with red team exercises
+\end{itemize}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{OT is ideal for anomaly detection:} Predictable, stable, cyclic
+    \item \textbf{Three categories:} Network, process, and behavioral anomalies
+    \item \textbf{Baseline is critical:} Must capture true normal before deployment
+    \item \textbf{Multiple techniques:} Statistical, ML, and rule-based approaches
+    \item \textbf{False positives matter:} High rates cause operational rejection
+    \item \textbf{OT context required:} Operators must validate anomalies
+    \item \textbf{Continuous refinement:} Models need ongoing maintenance
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Standards}
+\begin{itemize}
+    \item \textbf{IEC 62443-3-3} -- System security requirements\\
+          \url{https://webstore.iec.ch/publication/7033}
+    \item \textbf{NIST SP 800-82 Rev. 3} -- Guide to OT Security\\
+          \url{https://csrc.nist.gov/publications/detail/sp/800-82/rev-3/final}
+\end{itemize}
+
+\subsection*{Resources}
+\begin{itemize}
+    \item \textbf{CISA} -- Industrial Control Systems Monitoring\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+    \item \textbf{MITRE ATT\&CK for ICS} -- Adversary Behaviors\\
+          \url{https://attack.mitre.org/matrices/ics/}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

@@ -4,6 +4,15 @@
 
 \documentclass[11pt,a4paper]{article}
 \usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
 
 \hypersetup{
     pdftitle={TRITON/TRISIS: Targeting Safety Systems},
@@ -82,20 +91,22 @@ A SIS is an autonomous control system designed to bring a process to a safe stat
 
 \subsection{Defense in Depth Model}
 
-\begin{center}
+\begin{figure}[H]
+\centering
 \begin{tikzpicture}[scale=0.9]
     % Layers
-    \node[rectangle, rounded corners, minimum width=10cm, minimum height=0.8cm, fill=success!30, draw=success] at (0,3) {Process Design (inherently safer)};
-    \node[rectangle, rounded corners, minimum width=8.5cm, minimum height=0.8cm, fill=info!30, draw=info] at (0,2) {Basic Process Control System (BPCS)};
-    \node[rectangle, rounded corners, minimum width=7cm, minimum height=0.8cm, fill=warning!30, draw=warning] at (0,1) {Alarms \& Operator Response};
-    \node[rectangle, rounded corners, minimum width=5.5cm, minimum height=0.8cm, fill=danger!30, draw=danger, line width=1.5pt] at (0,0) {\textbf{Safety Instrumented System (SIS)}};
-    \node[rectangle, rounded corners, minimum width=4cm, minimum height=0.8cm, fill=secondary!30, draw=secondary] at (0,-1) {Physical Protection};
+    \node[rectangle, rounded corners, minimum width=10cm, minimum height=0.8cm, fill=otsuccess!30, draw=otsuccess] at (0,3) {Process Design (inherently safer)};
+    \node[rectangle, rounded corners, minimum width=8.5cm, minimum height=0.8cm, fill=otinfo!30, draw=otinfo] at (0,2) {Basic Process Control System (BPCS)};
+    \node[rectangle, rounded corners, minimum width=7cm, minimum height=0.8cm, fill=otwarning!30, draw=otwarning] at (0,1) {Alarms \& Operator Response};
+    \node[rectangle, rounded corners, minimum width=5.5cm, minimum height=0.8cm, fill=otdanger!30, draw=otdanger, line width=1.5pt] at (0,0) {\textbf{Safety Instrumented System (SIS)}};
+    \node[rectangle, rounded corners, minimum width=4cm, minimum height=0.8cm, fill=otaccent!30, draw=otaccent] at (0,-1) {Physical Protection};
 
     % Arrow and label
     \draw[->, line width=1pt] (6,3) -- (6,-1);
     \node[font=\scriptsize, align=center, anchor=west] at (6.2,1) {Layers of\\Protection};
 \end{tikzpicture}
-\end{center}
+\caption{Industrial Defense in Depth -- TRITON Targeted the SIS Layer}
+\end{figure}
 
 \begin{warningbox}
 The SIS is the last automated barrier before physical protection devices (relief valves, rupture discs) and potential disaster. Compromising a SIS could allow dangerous conditions to escalate unchecked.
@@ -108,6 +119,29 @@ The SIS is the last automated barrier before physical protection devices (relief
 \section{Attack Analysis}
 
 \subsection{Attack Timeline}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.85]
+    % Timeline
+    \draw[->, line width=1pt] (0,0) -- (14,0);
+
+    % Year markers
+    \foreach \x/\year in {1/2014, 4/2015, 7/2016, 10/Aug 2017, 13/Dec 2017} {
+        \draw[line width=0.5pt] (\x,-0.15) -- (\x,0.15);
+        \node[font=\scriptsize] at (\x,-0.5) {\year};
+    }
+
+    % Events
+    \node[fill=otdanger!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (1,0.3) {Initial\\compromise};
+    \node[fill=otwarning!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (4,0.3) {Lateral\\movement};
+    \node[fill=otwarning!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (7,0.3) {SIS access\\gained};
+    \node[fill=otdanger!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (10,0.3) {TRITON\\deployed};
+    \node[fill=otsuccess!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (13,0.3) {Attack\\discovered};
+
+\end{tikzpicture}
+\caption{TRITON Attack Timeline}
+\end{figure}
 
 \begin{itemize}
     \item \textbf{2014 (estimated):} Initial compromise of corporate network
@@ -131,6 +165,35 @@ The SIS is the last automated barrier before physical protection devices (relief
     \item \textbf{Failure:} Code error triggered SIS safe shutdown
 \end{enumerate}
 \end{conceptbox}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=2cm, minimum height=1cm, align=center, font=\small},
+    arrow/.style={->, very thick, >=stealth}
+]
+
+% Attack path
+\node[box, fill=otdanger!20] (corp) at (0,0) {Corporate\\Network};
+\node[box, fill=otwarning!20] (ot) at (3.2,0) {OT\\Network};
+\node[box, fill=otwarning!20] (eng) at (6.4,0) {SIS Eng.\\Workstation};
+\node[box, fill=otdanger!20] (sis) at (9.6,0) {Triconex\\SIS};
+\node[box, fill=otsuccess!20] (fail) at (12.8,0) {Safe\\Shutdown};
+
+\draw[arrow, otdanger] (corp) -- (ot);
+\draw[arrow, otdanger] (ot) -- (eng);
+\draw[arrow, otdanger] (eng) -- (sis);
+\draw[arrow, otsuccess] (sis) -- (fail);
+
+% Labels
+\node[font=\tiny, below] at (1.6,-0.7) {Pivot};
+\node[font=\tiny, below] at (4.8,-0.7) {Access};
+\node[font=\tiny, below] at (8,-0.7) {TRITON upload};
+\node[font=\tiny, below] at (11.2,-0.7) {Bug detected};
+
+\end{tikzpicture}
+\caption{TRITON Attack Path -- Attack Failed Due to Code Bug}
+\end{figure}
 
 \subsection{Technical Details}
 
@@ -180,6 +243,22 @@ The SIS performed its designed function---when it detected something wrong, it f
 \subsection{Potential Consequences}
 
 Had the attack succeeded, potential outcomes could have included:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    impact/.style={rectangle, draw, thick, fill=otdanger!15, minimum width=5.5cm, minimum height=0.7cm, rounded corners=3pt, font=\small, align=left}
+]
+
+\node[impact] at (0,2.5) {\faIcon{shield-alt} Safety functions disabled};
+\node[impact] at (0,1.5) {\faIcon{eye-slash} Hazards hidden from operators};
+\node[impact] at (0,0.5) {\faIcon{fire} Explosions or fires};
+\node[impact] at (0,-0.5) {\faIcon{biohazard} Toxic chemical releases};
+\node[impact] at (0,-1.5) {\faIcon{skull-crossbones} Potential loss of life};
+
+\end{tikzpicture}
+\caption{Potential Impact Had TRITON Succeeded}
+\end{figure}
 
 \begin{itemize}
     \item \textbf{Disabled safety functions:} Process could exceed safe limits

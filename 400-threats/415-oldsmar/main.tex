@@ -1,0 +1,368 @@
+% ============================================================================
+%  Oldsmar Water Treatment Attack - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {Oldsmar Water Treatment Attack}
+    {Remote access intrusion targeting public water supply}
+    {OT Security Learning Series}
+    {Document 415 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+\tableofcontents
+\newpage
+
+% ============================================================================
+\section{Introduction}
+% ============================================================================
+
+In February 2021, an attacker remotely accessed the water treatment plant in Oldsmar, Florida, and attempted to increase sodium hydroxide (lye) levels from 100 parts per million to 11,100 ppm---a potentially lethal concentration. An alert operator observed the intrusion in real-time and immediately reversed the changes.
+
+\begin{dangerbox}
+This attack demonstrated that small water utilities are vulnerable targets. The attacker used legitimate remote access software (TeamViewer) to directly manipulate chemical dosing---a direct threat to public health.
+\end{dangerbox}
+
+\subsection{Key Facts}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Attribute} & \textcolor{white}{\bfseries Details} \\
+\midrule
+Date & February 5, 2021 \\
+Target & Oldsmar Water Treatment Plant, Florida \\
+Population Served & Approximately 15,000 residents \\
+Attack Vector & TeamViewer remote access software \\
+Attack Method & Increased sodium hydroxide (NaOH) setpoint \\
+Change Attempted & 100 ppm to 11,100 ppm (111x increase) \\
+Detection & Operator observed cursor movement in real-time \\
+Impact & None---attack reversed immediately \\
+Attribution & Initially unknown; later linked to former employee \\
+\end{tabular}
+\end{center}
+
+% ============================================================================
+\section{Attack Details}
+% ============================================================================
+
+\subsection{Attack Timeline}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[scale=0.9]
+    % Timeline
+    \draw[->, line width=1pt] (0,0) -- (13,0);
+
+    % Time markers
+    \foreach \x/\time in {1/8:00am, 4/1:30pm, 7/1:35pm, 10/3:00pm} {
+        \draw[line width=0.5pt] (\x,-0.15) -- (\x,0.15);
+        \node[font=\scriptsize] at (\x,-0.5) {\time};
+    }
+
+    % Events
+    \node[fill=otwarning!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (1,0.3) {First remote\\access};
+    \node[fill=otdanger!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (4,0.3) {Attacker\\returns};
+    \node[fill=otdanger!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (7,0.3) {NaOH level\\changed};
+    \node[fill=otsuccess!30, rounded corners, font=\scriptsize, align=center, anchor=south, text width=2cm] at (10,0.3) {Operator\\reverses};
+
+    % Date label
+    \node[font=\small\bfseries] at (6.5,-1.2) {February 5, 2021};
+
+\end{tikzpicture}
+\caption{Oldsmar Attack Timeline}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{8:00 AM:} First brief remote access---operator noticed but assumed supervisor checking in
+    \item \textbf{1:30 PM:} Attacker returns via TeamViewer
+    \item \textbf{1:30--1:35 PM:} Attacker navigates SCADA interface, changes NaOH from 100 to 11,100 ppm
+    \item \textbf{1:35 PM:} Operator observes changes and immediately reverses them
+    \item \textbf{3:00 PM:} Plant supervisor notified, law enforcement contacted
+\end{itemize}
+
+\subsection{Attack Method}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=2.5cm, minimum height=1cm, align=center, font=\small},
+    arrow/.style={->, very thick, >=stealth}
+]
+
+% Attack path
+\node[box, fill=otdanger!20] (internet) at (0,0) {Internet};
+\node[box, fill=otwarning!20] (tv) at (4,0) {TeamViewer\\Connection};
+\node[box, fill=otwarning!20] (hmi) at (8,0) {HMI/SCADA\\Workstation};
+\node[box, fill=otdanger!20] (chem) at (12,0) {Chemical\\Dosing};
+
+\draw[arrow, otdanger] (internet) -- (tv);
+\draw[arrow, otdanger] (tv) -- (hmi);
+\draw[arrow, otdanger] (hmi) -- (chem);
+
+% Labels
+\node[font=\tiny, below] at (2,-0.7) {Remote access};
+\node[font=\tiny, below] at (6,-0.7) {Shared password};
+\node[font=\tiny, below] at (10,-0.7) {Direct control};
+
+\end{tikzpicture}
+\caption{Oldsmar Attack Path}
+\end{figure}
+
+\begin{warningbox}
+\textbf{Critical Security Failures:}
+\begin{itemize}
+    \item TeamViewer installed directly on SCADA workstation
+    \item Shared password among all plant staff
+    \item No multi-factor authentication
+    \item Windows 7 (end-of-life operating system)
+    \item No network segmentation between IT and OT
+\end{itemize}
+\end{warningbox}
+
+% ============================================================================
+\section{Sodium Hydroxide Danger}
+% ============================================================================
+
+\begin{dangerbox}
+\textbf{Sodium Hydroxide (Lye/Caustic Soda):}
+\begin{itemize}
+    \item Normal use in water treatment: pH adjustment, corrosion control
+    \item Safe level: 25--100 ppm for treatment purposes
+    \item Attempted level: 11,100 ppm (extremely dangerous)
+    \item Effects: Chemical burns, tissue damage, potentially fatal if ingested
+\end{itemize}
+\end{dangerbox}
+
+\subsection{Safety Barriers}
+
+While the attack was caught immediately, multiple safety barriers would have prevented harm:
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Barrier} & \textcolor{white}{\bfseries Protection} \\
+\midrule
+Operator monitoring & Real-time observation caught the change \\
+pH sensors & Would detect abnormal levels \\
+Time delay & Changes take 24+ hours to reach customers \\
+Residual monitoring & Downstream sensors check water quality \\
+Manual sampling & Regular testing would detect anomalies \\
+\end{tabular}
+\caption{Defense-in-Depth Safety Barriers}
+\end{table}
+
+\begin{infobox}
+Defense-in-depth means no single failure causes harm. Even if the cyber attack succeeded, multiple process and safety controls would likely have prevented contaminated water from reaching customers.
+\end{infobox}
+
+% ============================================================================
+\section{Security Failures Analysis}
+% ============================================================================
+
+\subsection{Remote Access Issues}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    issue/.style={rectangle, draw, thick, fill=otdanger!15, minimum width=6cm, minimum height=0.7cm, rounded corners=3pt, font=\small, align=left}
+]
+
+\node[issue] at (0,3) {\faIcon{desktop} TeamViewer on SCADA workstation};
+\node[issue] at (0,2) {\faIcon{key} Shared password for all operators};
+\node[issue] at (0,1) {\faIcon{unlock} No multi-factor authentication};
+\node[issue] at (0,0) {\faIcon{network-wired} Direct internet connectivity};
+\node[issue] at (0,-1) {\faIcon{times-circle} TeamViewer left running unused};
+
+\end{tikzpicture}
+\caption{Remote Access Security Failures}
+\end{figure}
+
+\subsection{System Configuration Issues}
+
+\begin{itemize}
+    \item \textbf{Outdated OS:} Windows 7 past end-of-life (no security updates)
+    \item \textbf{Flat network:} No segmentation between business and OT systems
+    \item \textbf{No firewall:} Direct internet access to SCADA
+    \item \textbf{Shared credentials:} No individual accountability
+    \item \textbf{No logging/alerting:} Remote access not monitored
+\end{itemize}
+
+% ============================================================================
+\section{Investigation Findings}
+% ============================================================================
+
+\subsection{Initial Response}
+
+Investigations involved:
+\begin{itemize}
+    \item FBI (federal investigation)
+    \item Pinellas County Sheriff's Office
+    \item CISA (technical assistance)
+    \item Secret Service (critical infrastructure)
+\end{itemize}
+
+\subsection{Attribution Challenges}
+
+Initial attribution was difficult because:
+\begin{itemize}
+    \item Shared credentials meant no individual identification
+    \item TeamViewer logs insufficient for definitive attribution
+    \item Remote access could originate from anywhere
+    \item Multiple parties knew the shared password
+\end{itemize}
+
+\begin{infobox}
+In late 2023, a former Oldsmar employee was charged in connection with the attack. The case highlights how insider threats and weak access controls combine to create serious risks.
+\end{infobox}
+
+% ============================================================================
+\section{Lessons Learned}
+% ============================================================================
+
+\subsection{Immediate Recommendations}
+
+\begin{successbox}
+\textbf{Critical actions for water utilities:}
+\begin{enumerate}
+    \item \textbf{Remove or secure remote access:} No direct internet-to-SCADA connections
+    \item \textbf{Implement MFA:} Required for all remote access
+    \item \textbf{Individual accounts:} No shared passwords
+    \item \textbf{Update operating systems:} Replace Windows 7 and other EOL systems
+    \item \textbf{Network segmentation:} Separate IT, OT, and internet
+    \item \textbf{Monitor remote access:} Log and alert on connections
+\end{enumerate}
+\end{successbox}
+
+\subsection{Secure Remote Access Architecture}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=2cm, minimum height=1cm, align=center, font=\small},
+    arrow/.style={->, thick, >=stealth}
+]
+
+% Correct architecture
+\node[box, fill=otinfo!20] (internet2) at (0,0) {Internet};
+\node[box, fill=otsuccess!20] (vpn) at (3,0) {VPN with\\MFA};
+\node[box, fill=otsuccess!20] (jump) at (6,0) {Jump\\Server};
+\node[box, fill=otsuccess!20] (fw) at (9,0) {OT\\Firewall};
+\node[box, fill=otaccent!20] (scada2) at (12,0) {SCADA};
+
+\draw[arrow, otsuccess] (internet2) -- (vpn);
+\draw[arrow, otsuccess] (vpn) -- (jump);
+\draw[arrow, otsuccess] (jump) -- (fw);
+\draw[arrow, otsuccess] (fw) -- (scada2);
+
+% Labels
+\node[font=\tiny, below] at (1.5,-0.7) {Encrypted};
+\node[font=\tiny, below] at (4.5,-0.7) {Logged};
+\node[font=\tiny, below] at (7.5,-0.7) {Filtered};
+\node[font=\tiny, below] at (10.5,-0.7) {Monitored};
+
+% Title
+\node[font=\small\bfseries, otsuccess] at (6,-1.5) {Secure Remote Access Architecture};
+
+\end{tikzpicture}
+\caption{Recommended Secure Remote Access}
+\end{figure}
+
+\subsection{Water Sector Specific Guidance}
+
+\begin{itemize}
+    \item Review CISA/EPA water sector guidance
+    \item Participate in WaterISAC threat sharing
+    \item Conduct regular security assessments
+    \item Train operators on security awareness
+    \item Develop incident response procedures
+\end{itemize}
+
+% ============================================================================
+\section{Broader Implications}
+% ============================================================================
+
+\subsection{Small Utility Challenges}
+
+\begin{warningbox}
+Small water utilities face unique challenges:
+\begin{itemize}
+    \item Limited IT/security staff and expertise
+    \item Budget constraints for security improvements
+    \item Legacy systems difficult to upgrade
+    \item Remote operations require remote access
+    \item Thousands of potential targets nationwide
+\end{itemize}
+\end{warningbox}
+
+\subsection{Regulatory Response}
+
+The Oldsmar incident prompted:
+\begin{itemize}
+    \item \textbf{CISA alerts:} Guidance for water and wastewater utilities
+    \item \textbf{EPA focus:} Increased attention on water sector cybersecurity
+    \item \textbf{State actions:} Florida increased water utility oversight
+    \item \textbf{WaterISAC:} Enhanced threat sharing and resources
+\end{itemize}
+
+% ============================================================================
+\section{Summary}
+% ============================================================================
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Direct OT manipulation:} Attacker changed chemical dosing in real-time
+    \item \textbf{Remote access risk:} TeamViewer on SCADA without MFA
+    \item \textbf{Shared credentials:} No accountability or traceability
+    \item \textbf{Operator saved the day:} Human vigilance caught the attack
+    \item \textbf{Defense-in-depth works:} Multiple barriers would have prevented harm
+    \item \textbf{Small utilities at risk:} Limited resources, high vulnerability
+\end{itemize}
+\end{definitionbox}
+
+% ============================================================================
+\section{Further Reading}
+% ============================================================================
+
+\subsection*{Official Advisories}
+\begin{itemize}
+    \item \textbf{CISA} -- Compromise of U.S. Water Treatment Facility\\
+          \url{https://www.cisa.gov/news-events/cybersecurity-advisories/aa21-042a}
+    \item \textbf{FBI/CISA/EPA} -- Water Sector Cybersecurity Brief\\
+          \url{https://www.cisa.gov/resources-tools/resources/water-and-wastewater-cybersecurity}
+\end{itemize}
+
+\subsection*{Resources}
+\begin{itemize}
+    \item \textbf{WaterISAC} -- Water Information Sharing and Analysis Center\\
+          \url{https://www.waterisac.org/}
+    \item \textbf{EPA} -- Water Sector Cybersecurity Resources\\
+          \url{https://www.epa.gov/waterresilience/epa-cybersecurity-water-sector}
+    \item \textbf{AWWA} -- Cybersecurity Guidance\\
+          \url{https://www.awwa.org/Resources-Tools/Resource-Topics/Risk-Resilience/Cybersecurity-Guidance}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textcolor{mediumgray}{\rule{0.5\textwidth}{0.5pt}}\\[1em]
+\textcolor{mediumgray}{\small Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}
