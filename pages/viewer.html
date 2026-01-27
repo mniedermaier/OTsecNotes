@@ -237,14 +237,15 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     const pdfFile = urlParams.get('file');
+    const startPage = parseInt(urlParams.get('page')) || 1;
 
     if (!pdfFile) {
       showError('No PDF specified', 'Please select a document from the main page.');
     } else {
-      initViewer(pdfFile);
+      initViewer(pdfFile, startPage);
     }
 
-    async function initViewer(pdfUrl) {
+    async function initViewer(pdfUrl, startPage) {
       // Set title
       const docName = pdfUrl.replace('.pdf', '').replace(/-/g, ' ');
       document.getElementById('docTitle').textContent = docName;
@@ -256,6 +257,10 @@
         document.getElementById('totalPages').textContent = pdfDoc.numPages;
         document.getElementById('pageInput').max = pdfDoc.numPages;
         document.getElementById('loadingState').style.display = 'none';
+
+        // Validate startPage
+        startPage = Math.max(1, Math.min(startPage, pdfDoc.numPages));
+        currentPage = startPage;
 
         // Calculate fit-to-page scale before rendering
         const firstPage = await pdfDoc.getPage(1);
@@ -276,6 +281,11 @@
         }
 
         setupControls();
+
+        // Scroll to the requested start page after rendering
+        if (startPage > 1) {
+          setTimeout(() => scrollToPage(startPage), 100);
+        }
       } catch (error) {
         console.error('Error:', error);
         showError('Failed to load PDF', error.message);

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Generate search index from PDF files
+# Generate search index from PDF files with page-level text extraction
 # Usage: ./generate-search-index.sh <pdf-directory> <output-file>
 
 PDF_DIR="${1:-pdf-output}"
@@ -52,18 +52,13 @@ for pdf in "$PDF_DIR"/*.pdf; do
         category="Solutions & Tools"
     fi
 
-    # Extract text content using pdftotext
-    # -layout preserves layout, -nopgbrk removes page breaks
-    content=$(pdftotext -layout -nopgbrk "$pdf" - 2>/dev/null | \
-        # Remove control characters and normalize whitespace
-        tr -d '\000-\010\013\014\016-\037' | \
-        tr '\n\r\t' '   ' | \
-        sed 's/  */ /g' | \
-        # Escape special JSON characters (backslash first, then quotes)
-        sed 's/\\/\\\\/g' | \
-        sed 's/"/\\"/g' | \
-        # Limit content length to avoid huge index (keep first ~15000 chars)
-        cut -c1-15000)
+    # Get total page count
+    total_pages=$(pdfinfo "$pdf" 2>/dev/null | grep "^Pages:" | awk '{print $2}')
+
+    if [ -z "$total_pages" ] || [ "$total_pages" -eq 0 ]; then
+        echo "  Skipping $filename (could not determine page count)"
+        continue
+    fi
 
     # Add comma before all but first entry
     if [ "$first" = true ]; then
@@ -72,18 +67,56 @@ for pdf in "$PDF_DIR"/*.pdf; do
         echo ',' >> "$OUTPUT"
     fi
 
-    # Write JSON object
+    # Start document object
     cat >> "$OUTPUT" << JSONEOF
   {
     "id": "$filename",
     "num": "$doc_num",
     "title": "$title",
     "category": "$category",
-    "content": "$content"
-  }
+    "totalPages": $total_pages,
+    "pages": [
 JSONEOF
 
-    echo "  Indexed: $filename"
+    # Extract text page by page
+    first_page=true
+    for ((page=1; page<=total_pages; page++)); do
+        # Extract text for this specific page
+        page_content=$(pdftotext -f $page -l $page -layout "$pdf" - 2>/dev/null | \
+            # Remove control characters and normalize whitespace
+            tr -d '\000-\010\013\014\016-\037' | \
+            tr '\n\r\t' '   ' | \
+            sed 's/  */ /g' | \
+            # Escape special JSON characters (backslash first, then quotes)
+            sed 's/\\/\\\\/g' | \
+            sed 's/"/\\"/g' | \
+            # Limit content per page (keep first ~5000 chars per page)
+            cut -c1-5000)
+
+        # Skip empty pages
+        if [ -z "$(echo "$page_content" | tr -d ' ')" ]; then
+            continue
+        fi
+
+        # Add comma before all but first page
+        if [ "$first_page" = true ]; then
+            first_page=false
+        else
+            echo ',' >> "$OUTPUT"
+        fi
+
+        # Write page object
+        cat >> "$OUTPUT" << JSONEOF
+      {"page": $page, "text": "$page_content"}
+JSONEOF
+    done
+
+    # Close pages array and document object
+    echo '' >> "$OUTPUT"
+    echo '    ]' >> "$OUTPUT"
+    echo -n '  }' >> "$OUTPUT"
+
+    echo "  Indexed: $filename ($total_pages pages)"
 done
 
 # Close JSON array

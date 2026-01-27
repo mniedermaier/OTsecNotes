@@ -437,6 +437,14 @@ jobs:
                 color: var(--text-muted);
                 margin-left: auto;
               }
+              .content-result-page {
+                font-size: 0.7rem;
+                color: #10b981;
+                background: rgba(16, 185, 129, 0.15);
+                padding: 0.2rem 0.5rem;
+                border-radius: 4px;
+                font-weight: 600;
+              }
               .content-result-snippet {
                 font-size: 0.85rem;
                 color: var(--text-muted);
@@ -886,6 +894,7 @@ jobs:
               // Search functionality
               let searchMode = 'title';
               let searchIndex = null;
+              let flattenedIndex = null;
               let fuse = null;
 
               const search = document.getElementById('search');
@@ -899,15 +908,30 @@ jobs:
                 try {
                   const response = await fetch('search-index.json');
                   searchIndex = await response.json();
-                  // Initialize Fuse.js for fuzzy search
-                  fuse = new Fuse(searchIndex, {
-                    keys: ['title', 'content'],
+                  // Flatten the index: one entry per page for searching
+                  flattenedIndex = [];
+                  searchIndex.forEach(doc => {
+                    doc.pages.forEach(pageData => {
+                      flattenedIndex.push({
+                        id: doc.id,
+                        num: doc.num,
+                        title: doc.title,
+                        category: doc.category,
+                        totalPages: doc.totalPages,
+                        page: pageData.page,
+                        text: pageData.text
+                      });
+                    });
+                  });
+                  // Initialize Fuse.js for fuzzy search on flattened index
+                  fuse = new Fuse(flattenedIndex, {
+                    keys: ['title', 'text'],
                     threshold: 0.3,
                     includeMatches: true,
                     minMatchCharLength: 3,
                     ignoreLocation: true
                   });
-                  console.log('Search index loaded:', searchIndex.length, 'documents');
+                  console.log('Search index loaded:', searchIndex.length, 'documents,', flattenedIndex.length, 'pages');
                 } catch (e) {
                   console.error('Failed to load search index:', e);
                 }
@@ -977,7 +1001,7 @@ jobs:
                     });
                     return;
                   }
-                  const results = fuse.search(query, { limit: 20 });
+                  const results = fuse.search(query, { limit: 30 });
                   contentResults.innerHTML = '';
                   if (results.length === 0) {
                     contentResults.classList.remove('visible');
@@ -986,19 +1010,33 @@ jobs:
                   }
                   noResults.classList.add('hidden');
                   contentResults.classList.add('visible');
+                  // Group by document to avoid too many results from same doc
+                  const seen = new Map();
                   results.forEach(result => {
                     const doc = result.item;
-                    const snippet = getSnippet(doc.content, query);
-                    const item = document.createElement('div');
-                    item.className = 'content-result-item';
-                    item.onclick = () => window.location.href = 'viewer.html?file=' + doc.id + '.pdf';
-                    item.innerHTML = '<div class="content-result-header">' +
-                      '<span class="content-result-num">' + doc.num + '</span>' +
-                      '<span class="content-result-title">' + doc.title + '</span>' +
-                      '<span class="content-result-category">' + doc.category + '</span>' +
-                      '</div>' +
-                      '<div class="content-result-snippet">' + snippet + '</div>';
-                    contentResults.appendChild(item);
+                    const key = doc.id;
+                    if (!seen.has(key)) {
+                      seen.set(key, []);
+                    }
+                    if (seen.get(key).length < 3) { // Max 3 pages per document
+                      seen.get(key).push(doc);
+                    }
+                  });
+                  seen.forEach((pages, docId) => {
+                    pages.forEach(doc => {
+                      const snippet = getSnippet(doc.text, query);
+                      const item = document.createElement('div');
+                      item.className = 'content-result-item';
+                      item.onclick = () => window.location.href = 'viewer.html?file=' + doc.id + '.pdf&page=' + doc.page;
+                      item.innerHTML = '<div class="content-result-header">' +
+                        '<span class="content-result-num">' + doc.num + '</span>' +
+                        '<span class="content-result-title">' + doc.title + '</span>' +
+                        '<span class="content-result-page">Page ' + doc.page + '/' + doc.totalPages + '</span>' +
+                        '<span class="content-result-category">' + doc.category + '</span>' +
+                        '</div>' +
+                        '<div class="content-result-snippet">' + snippet + '</div>';
+                      contentResults.appendChild(item);
+                    });
                   });
                 }
               }
