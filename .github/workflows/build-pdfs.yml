@@ -769,8 +769,8 @@ jobs:
               <div class="search-container">
                 <div class="search-header">
                   <div class="search-tabs">
-                    <button class="search-tab active" data-mode="title">📑 Titles</button>
-                    <button class="search-tab" data-mode="content">📄 Content</button>
+                    <button class="search-tab" data-mode="title">📑 Titles</button>
+                    <button class="search-tab active" data-mode="content">📄 Content</button>
                   </div>
                   <button class="expand-toggle" id="toggle-all" onclick="toggleAll()">Expand All</button>
                 </div>
@@ -1014,7 +1014,7 @@ jobs:
               const searchTabs = document.querySelectorAll('.search-tab');
               const contentResults = document.getElementById('content-results');
               const searchLoading = document.getElementById('search-loading');
-              let searchMode = 'title';
+              let searchMode = 'content';
               let searchIndex = null;
               let contentFuse = null;
 
