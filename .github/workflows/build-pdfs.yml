@@ -46,6 +46,10 @@ jobs:
             mv "pdf-output/thumbnails/${filename}-01.png" "pdf-output/thumbnails/${filename}.png" 2>/dev/null || true
           done
 
+          # Generate search index from PDF text content
+          chmod +x scripts/generate-search-index.sh
+          ./scripts/generate-search-index.sh pdf-output pdf-output/search-index.json
+
           # Create ZIP of all PDFs for "Download All" button
           cd pdf-output
           zip -r OTsecNotes-all-documents.zip *.pdf
@@ -55,6 +59,8 @@ jobs:
           ls -la pdf-output/*.pdf
           echo "Thumbnails:"
           ls -la pdf-output/thumbnails/
+          echo "Search index:"
+          ls -la pdf-output/search-index.json
           echo "ZIP:"
           ls -la pdf-output/*.zip
 
@@ -130,6 +136,7 @@ jobs:
             <title>OT Security Notes - ICS/SCADA Security Learning Resources</title>
             <meta name="description" content="Comprehensive learning documents for ICS/SCADA security professionals covering OT fundamentals, standards, protocols, and incident response.">
             <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+            <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
             <style>
               :root {
                 --primary: #0f172a;
@@ -311,11 +318,12 @@ jobs:
               .controls {
                 display: flex;
                 gap: 1rem;
-                margin-bottom: 2.5rem;
+                margin-bottom: 1rem;
                 align-items: center;
               }
               .search-box {
                 flex: 1;
+                position: relative;
               }
               .search-box input {
                 width: 100%;
@@ -356,6 +364,98 @@ jobs:
                 background: rgba(14, 165, 233, 0.2);
                 transform: translateY(-2px);
                 box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+              }
+              .toggle-btn.active {
+                background: rgba(14, 165, 233, 0.3);
+                border-color: var(--accent);
+              }
+              .search-mode-toggle {
+                display: flex;
+                gap: 0.5rem;
+                margin-bottom: 1.5rem;
+              }
+              .search-mode-btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.85rem;
+                font-weight: 500;
+                border: 1px solid var(--border);
+                border-radius: 10px;
+                background: rgba(30, 41, 59, 0.5);
+                color: var(--text-muted);
+                cursor: pointer;
+                transition: all 0.2s ease;
+              }
+              .search-mode-btn:hover {
+                background: rgba(30, 41, 59, 0.8);
+                color: var(--text);
+              }
+              .search-mode-btn.active {
+                background: linear-gradient(135deg, rgba(14, 165, 233, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%);
+                border-color: var(--accent);
+                color: var(--text);
+              }
+              .content-results {
+                margin-bottom: 2rem;
+                display: none;
+              }
+              .content-results.visible {
+                display: block;
+              }
+              .content-result-item {
+                background: var(--card-bg);
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                padding: 1rem 1.25rem;
+                margin-bottom: 0.75rem;
+                transition: all 0.2s ease;
+                cursor: pointer;
+              }
+              .content-result-item:hover {
+                border-color: var(--accent);
+                transform: translateX(4px);
+              }
+              .content-result-header {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                margin-bottom: 0.5rem;
+              }
+              .content-result-num {
+                font-family: monospace;
+                font-size: 0.75rem;
+                color: var(--accent);
+                background: rgba(14, 165, 233, 0.1);
+                padding: 0.2rem 0.5rem;
+                border-radius: 4px;
+              }
+              .content-result-title {
+                font-weight: 600;
+                color: var(--text);
+              }
+              .content-result-category {
+                font-size: 0.75rem;
+                color: var(--text-muted);
+                margin-left: auto;
+              }
+              .content-result-snippet {
+                font-size: 0.85rem;
+                color: var(--text-muted);
+                line-height: 1.5;
+              }
+              .content-result-snippet mark {
+                background: rgba(14, 165, 233, 0.3);
+                color: var(--text);
+                padding: 0 2px;
+                border-radius: 2px;
+              }
+              .search-loading {
+                text-align: center;
+                padding: 2rem;
+                color: var(--text-muted);
+                display: none;
+              }
+              .search-loading.visible {
+                display: block;
               }
               .categories { display: grid; gap: 1.75rem; }
               .category {
@@ -577,6 +677,12 @@ jobs:
                 </div>
                 <button class="toggle-btn" id="toggle-all" onclick="toggleAll()">Expand All</button>
               </div>
+              <div class="search-mode-toggle">
+                <button class="search-mode-btn active" id="mode-title" onclick="setSearchMode('title')">📄 Title Search</button>
+                <button class="search-mode-btn" id="mode-content" onclick="setSearchMode('content')">📖 Content Search</button>
+              </div>
+              <div class="search-loading" id="search-loading">Loading search index...</div>
+              <div class="content-results" id="content-results"></div>
               <div class="categories" id="categories">
           HTMLEOF
 
@@ -777,27 +883,135 @@ jobs:
               }
               animate();
 
+              // Search functionality
+              let searchMode = 'title';
+              let searchIndex = null;
+              let fuse = null;
+
               const search = document.getElementById('search');
               const categories = document.querySelectorAll('.category');
               const noResults = document.getElementById('no-results');
-              search.addEventListener('input', (e) => {
-                const query = e.target.value.toLowerCase().trim();
-                let hasResults = false;
-                categories.forEach(cat => {
-                  const items = cat.querySelectorAll('.doc-item');
-                  let match = false;
-                  items.forEach(item => {
-                    const title = item.dataset.title.toLowerCase();
-                    const num = item.querySelector('.doc-num').textContent;
-                    const m = title.includes(query) || num.includes(query);
-                    item.classList.toggle('hidden', !m && query !== '');
-                    if (m || query === '') match = true;
+              const contentResults = document.getElementById('content-results');
+              const searchLoading = document.getElementById('search-loading');
+
+              // Load search index for content search
+              async function loadSearchIndex() {
+                try {
+                  const response = await fetch('search-index.json');
+                  searchIndex = await response.json();
+                  // Initialize Fuse.js for fuzzy search
+                  fuse = new Fuse(searchIndex, {
+                    keys: ['title', 'content'],
+                    threshold: 0.3,
+                    includeMatches: true,
+                    minMatchCharLength: 3,
+                    ignoreLocation: true
                   });
-                  cat.classList.toggle('hidden', !match);
-                  if (match) hasResults = true;
-                });
-                noResults.classList.toggle('hidden', hasResults || query === '');
+                  console.log('Search index loaded:', searchIndex.length, 'documents');
+                } catch (e) {
+                  console.error('Failed to load search index:', e);
+                }
+              }
+
+              // Set search mode
+              function setSearchMode(mode) {
+                searchMode = mode;
+                document.getElementById('mode-title').classList.toggle('active', mode === 'title');
+                document.getElementById('mode-content').classList.toggle('active', mode === 'content');
+                // Re-run search with current query
+                performSearch(search.value);
+              }
+
+              // Extract snippet around match
+              function getSnippet(text, query, maxLen = 200) {
+                const lowerText = text.toLowerCase();
+                const lowerQuery = query.toLowerCase();
+                const idx = lowerText.indexOf(lowerQuery);
+                if (idx === -1) return text.slice(0, maxLen) + '...';
+                const start = Math.max(0, idx - 60);
+                const end = Math.min(text.length, idx + query.length + 140);
+                let snippet = (start > 0 ? '...' : '') + text.slice(start, end) + (end < text.length ? '...' : '');
+                // Highlight matches
+                const regex = new RegExp('(' + query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+                snippet = snippet.replace(regex, '<mark>$1</mark>');
+                return snippet;
+              }
+
+              // Perform search based on mode
+              function performSearch(query) {
+                query = query.trim();
+                if (searchMode === 'title') {
+                  // Title search - show categories
+                  contentResults.classList.remove('visible');
+                  document.getElementById('categories').style.display = '';
+                  const lowerQuery = query.toLowerCase();
+                  let hasResults = false;
+                  categories.forEach(cat => {
+                    const items = cat.querySelectorAll('.doc-item');
+                    let match = false;
+                    items.forEach(item => {
+                      const title = item.dataset.title.toLowerCase();
+                      const num = item.querySelector('.doc-num').textContent;
+                      const m = title.includes(lowerQuery) || num.includes(lowerQuery);
+                      item.classList.toggle('hidden', !m && query !== '');
+                      if (m || query === '') match = true;
+                    });
+                    cat.classList.toggle('hidden', !match);
+                    if (match) hasResults = true;
+                  });
+                  noResults.classList.toggle('hidden', hasResults || query === '');
+                } else {
+                  // Content search - show results list
+                  document.getElementById('categories').style.display = 'none';
+                  if (!query || query.length < 2) {
+                    contentResults.classList.remove('visible');
+                    document.getElementById('categories').style.display = '';
+                    noResults.classList.add('hidden');
+                    return;
+                  }
+                  if (!fuse) {
+                    searchLoading.classList.add('visible');
+                    loadSearchIndex().then(() => {
+                      searchLoading.classList.remove('visible');
+                      performSearch(query);
+                    });
+                    return;
+                  }
+                  const results = fuse.search(query, { limit: 20 });
+                  contentResults.innerHTML = '';
+                  if (results.length === 0) {
+                    contentResults.classList.remove('visible');
+                    noResults.classList.remove('hidden');
+                    return;
+                  }
+                  noResults.classList.add('hidden');
+                  contentResults.classList.add('visible');
+                  results.forEach(result => {
+                    const doc = result.item;
+                    const snippet = getSnippet(doc.content, query);
+                    const item = document.createElement('div');
+                    item.className = 'content-result-item';
+                    item.onclick = () => window.location.href = 'viewer.html?file=' + doc.id + '.pdf';
+                    item.innerHTML = '<div class="content-result-header">' +
+                      '<span class="content-result-num">' + doc.num + '</span>' +
+                      '<span class="content-result-title">' + doc.title + '</span>' +
+                      '<span class="content-result-category">' + doc.category + '</span>' +
+                      '</div>' +
+                      '<div class="content-result-snippet">' + snippet + '</div>';
+                    contentResults.appendChild(item);
+                  });
+                }
+              }
+
+              // Debounce search input
+              let searchTimeout;
+              search.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => performSearch(e.target.value), 150);
               });
+
+              // Preload search index
+              loadSearchIndex();
             </script>
           </body>
           </html>
