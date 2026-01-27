@@ -2,63 +2,104 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
   <title>PDF Viewer - OT Security Notes</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary: #0f172a;
+      --primary-light: #1e293b;
       --accent: #0ea5e9;
-      --card-bg: rgba(30, 41, 59, 0.95);
-      --text: #e2e8f0;
-      --text-muted: #94a3b8;
-      --border: rgba(71, 85, 105, 0.5);
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; overflow: hidden; }
-    a, button { touch-action: manipulation; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--primary);
-      color: var(--text);
+      --success: #10b981;
+      --text: #f1f5f9;
+      --text-secondary: #cbd5e1;
+      --text-muted: #64748b;
+      --border: rgba(148, 163, 184, 0.15);
+      --glass: rgba(15, 23, 42, 0.95);
     }
 
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--primary);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Toolbar */
     .toolbar {
       position: fixed;
-      top: 0; left: 0; right: 0;
+      top: 0;
+      left: 0;
+      right: 0;
       height: 56px;
-      background: var(--card-bg);
+      background: var(--glass);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border);
       display: flex;
       align-items: center;
       padding: 0 1rem;
-      gap: 1rem;
+      gap: 0.75rem;
       z-index: 100;
     }
 
-    .back-btn {
-      display: flex;
+    .btn {
+      display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      background: rgba(14, 165, 233, 0.1);
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.5rem 0.875rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      font-family: inherit;
       border: 1px solid var(--border);
       border-radius: 8px;
-      color: var(--accent);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s ease;
       text-decoration: none;
-      font-weight: 500;
-      font-size: 0.9rem;
+      white-space: nowrap;
     }
-    .back-btn:hover { background: rgba(14, 165, 233, 0.2); }
+
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+      color: var(--text);
+    }
+
+    .btn-icon {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      font-size: 1rem;
+    }
+
+    .btn-primary {
+      background: var(--success);
+      border-color: var(--success);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #059669;
+      border-color: #059669;
+    }
 
     .doc-title {
-      font-size: 1rem;
+      font-size: 0.9rem;
       font-weight: 600;
       color: var(--text);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 300px;
+      max-width: 200px;
     }
 
     .toolbar-center {
@@ -69,78 +110,79 @@
       gap: 0.5rem;
     }
 
-    .nav-btn {
-      width: 36px; height: 36px;
+    .page-nav {
       display: flex;
       align-items: center;
-      justify-content: center;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text);
-      cursor: pointer;
-      font-size: 1.2rem;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 0.25rem;
+      border-radius: 10px;
     }
-    .nav-btn:hover:not(:disabled) { background: rgba(14, 165, 233, 0.2); border-color: var(--accent); }
-    .nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-    .nav-btn.active { background: var(--accent); color: white; }
 
     .page-info {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      font-size: 0.9rem;
-      color: var(--text-muted);
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      padding: 0 0.5rem;
     }
 
     .page-input {
-      width: 50px;
+      width: 48px;
       padding: 0.4rem;
-      background: rgba(0,0,0,0.3);
+      background: rgba(255, 255, 255, 0.08);
       border: 1px solid var(--border);
       border-radius: 6px;
       color: var(--text);
       text-align: center;
-      font-size: 0.9rem;
-    }
-    .page-input:focus { outline: none; border-color: var(--accent); }
-
-    .zoom-level {
-      min-width: 50px;
-      text-align: center;
       font-size: 0.85rem;
-      color: var(--text-muted);
+      font-family: inherit;
     }
 
-    .download-btn {
+    .page-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .zoom-controls {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-      padding: 0.5rem 1rem;
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      border: none;
-      border-radius: 8px;
-      color: white;
-      font-weight: 600;
-      font-size: 0.85rem;
-      text-decoration: none;
+      gap: 0.25rem;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 0.25rem;
+      border-radius: 10px;
+      margin-left: 0.5rem;
     }
-    .download-btn:hover { box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4); }
 
+    .zoom-level {
+      min-width: 48px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      padding: 0 0.25rem;
+    }
+
+    /* PDF Container */
     .pdf-container {
       position: fixed;
-      top: 56px; left: 0; right: 0; bottom: 0;
+      top: 56px;
+      left: 0;
+      right: 0;
+      bottom: 0;
       overflow: auto;
-      background: #1a1a2e;
-      padding: 2rem;
+      background: #0c1222;
+      padding: 1.5rem;
       -webkit-overflow-scrolling: touch;
-      overscroll-behavior: contain;
     }
 
     .page-wrapper {
-      margin: 0 auto 1.5rem;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      margin: 0 auto 1rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
       background: white;
+      border-radius: 4px;
+      overflow: hidden;
     }
 
     .page-wrapper canvas {
@@ -148,87 +190,94 @@
       margin: 0 auto;
     }
 
+    /* States */
     .loading, .error {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 50vh;
+      min-height: 60vh;
       gap: 1rem;
       text-align: center;
       padding: 2rem;
     }
 
     .loading-spinner {
-      width: 48px; height: 48px;
+      width: 40px;
+      height: 40px;
       border: 3px solid var(--border);
       border-top-color: var(--accent);
       border-radius: 50%;
-      animation: spin 1s linear infinite;
+      animation: spin 0.8s linear infinite;
     }
+
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .error-icon { font-size: 4rem; }
-    .error-message { color: #ef4444; font-size: 1.2rem; font-weight: 600; }
+    .error-icon { font-size: 3rem; opacity: 0.5; }
+    .error-title { font-size: 1.1rem; font-weight: 600; color: #ef4444; }
+    .error-message { color: var(--text-muted); }
 
+    /* Responsive */
     @media (max-width: 768px) {
-      .doc-title { display: none; }
-      .zoom-level { display: none; }
-      .toolbar { height: 48px; padding: 0 0.75rem; gap: 0.5rem; }
-      .pdf-container { top: 48px; padding: 1rem; }
-      .nav-btn { width: 32px; height: 32px; font-size: 1rem; }
-      .back-btn { padding: 0.4rem 0.75rem; font-size: 0.85rem; }
-      .download-btn { padding: 0.4rem 0.75rem; font-size: 0.8rem; }
-      #fitPage { display: none; }
+      .toolbar { height: 52px; padding: 0 0.75rem; gap: 0.5rem; }
+      .pdf-container { top: 52px; padding: 0.75rem; }
+      .doc-title { max-width: 120px; font-size: 0.8rem; }
+      .btn { padding: 0.4rem 0.6rem; font-size: 0.8rem; }
+      .btn-icon { width: 32px; height: 32px; font-size: 0.9rem; }
+      .zoom-controls { display: none; }
+      .page-input { width: 40px; font-size: 0.8rem; }
     }
+
     @media (max-width: 480px) {
-      .download-btn span:last-child { display: none; }
-      .toolbar { height: 44px; }
-      .pdf-container { top: 44px; padding: 0.25rem; }
-      .back-btn span { display: none; }
-      .back-btn::before { content: '←'; }
-      .toolbar-center { gap: 0.25rem; }
-      .page-info { font-size: 0.8rem; }
-      .page-input { width: 40px; padding: 0.3rem; font-size: 16px; }
-      .page-wrapper { margin-bottom: 0.5rem; }
+      .toolbar { height: 48px; }
+      .pdf-container { top: 48px; padding: 0.5rem; }
+      .doc-title { display: none; }
+      .page-nav { gap: 0.25rem; }
+      .page-info { font-size: 0.8rem; padding: 0 0.25rem; }
     }
   </style>
 </head>
 <body>
-  <div class="toolbar">
-    <a href="index.html" class="back-btn"><span>&#8592;</span> <span>Back</span></a>
+  <header class="toolbar">
+    <a href="index.html" class="btn">
+      <span>←</span>
+      <span class="btn-text">Back</span>
+    </a>
     <span class="doc-title" id="docTitle">Loading...</span>
 
     <div class="toolbar-center">
-      <button class="nav-btn" id="prevPage">&#8249;</button>
-      <div class="page-info">
-        <input type="number" class="page-input" id="pageInput" min="1" value="1">
-        <span>of <span id="totalPages">-</span></span>
+      <div class="page-nav">
+        <button class="btn btn-icon" id="prevPage" title="Previous page">‹</button>
+        <div class="page-info">
+          <input type="number" class="page-input" id="pageInput" min="1" value="1">
+          <span>/ <span id="totalPages">-</span></span>
+        </div>
+        <button class="btn btn-icon" id="nextPage" title="Next page">›</button>
       </div>
-      <button class="nav-btn" id="nextPage">&#8250;</button>
-      <span style="width: 1rem;"></span>
-      <button class="nav-btn" id="zoomOut" title="Zoom out (-)">-</button>
-      <span class="zoom-level" id="zoomLevel">100%</span>
-      <button class="nav-btn" id="zoomIn" title="Zoom in (+)">+</button>
-      <button class="nav-btn" id="fitPage" title="Fit page to screen (F)" style="font-size: 0.8rem; width: auto; padding: 0 8px;">Fit</button>
+
+      <div class="zoom-controls">
+        <button class="btn btn-icon" id="zoomOut" title="Zoom out">−</button>
+        <span class="zoom-level" id="zoomLevel">100%</span>
+        <button class="btn btn-icon" id="zoomIn" title="Zoom in">+</button>
+        <button class="btn btn-icon" id="fitPage" title="Fit to screen">⊡</button>
+      </div>
     </div>
 
-    <a class="download-btn" id="downloadBtn" download>
-      <span>&#8595;</span>
-      <span>Download</span>
+    <a class="btn btn-primary" id="downloadBtn" download>
+      <span>⬇</span>
+      <span class="btn-text">Download</span>
     </a>
-  </div>
+  </header>
 
-  <div class="pdf-container" id="pdfContainer">
+  <main class="pdf-container" id="pdfContainer">
     <div class="loading" id="loadingState">
       <div class="loading-spinner"></div>
-      <div>Loading PDF...</div>
+      <div>Loading document...</div>
     </div>
-  </div>
+  </main>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script>
-    // Use older stable version of pdf.js with simpler API
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
     let pdfDoc = null;
@@ -246,10 +295,10 @@
     }
 
     async function initViewer(pdfUrl, startPage) {
-      // Set title
-      const docName = pdfUrl.replace('.pdf', '').replace(/-/g, ' ');
-      document.getElementById('docTitle').textContent = docName;
-      document.title = docName + ' - OT Security Notes';
+      const docName = pdfUrl.replace('.pdf', '').split('-').slice(1).join(' ');
+      const formattedName = docName.replace(/\b\w/g, l => l.toUpperCase());
+      document.getElementById('docTitle').textContent = formattedName;
+      document.title = formattedName + ' - OT Security Notes';
       document.getElementById('downloadBtn').href = pdfUrl;
 
       try {
@@ -258,15 +307,13 @@
         document.getElementById('pageInput').max = pdfDoc.numPages;
         document.getElementById('loadingState').style.display = 'none';
 
-        // Validate startPage
         startPage = Math.max(1, Math.min(startPage, pdfDoc.numPages));
         currentPage = startPage;
 
-        // Calculate fit-to-page scale before rendering
         const firstPage = await pdfDoc.getPage(1);
         const viewport = firstPage.getViewport({ scale: 1 });
         const container = document.getElementById('pdfContainer');
-        const padding = window.innerWidth <= 480 ? 10 : 40;
+        const padding = window.innerWidth <= 480 ? 20 : 48;
         const containerWidth = container.clientWidth - padding;
         const containerHeight = container.clientHeight - padding;
         const scaleX = containerWidth / viewport.width;
@@ -275,14 +322,12 @@
         scale = Math.max(0.5, Math.min(scale, 3));
         updateZoomDisplay();
 
-        // Render all pages
         for (let i = 1; i <= pdfDoc.numPages; i++) {
           await renderPage(i);
         }
 
         setupControls();
 
-        // Scroll to the requested start page after rendering
         if (startPage > 1) {
           setTimeout(() => scrollToPage(startPage), 100);
         }
@@ -294,7 +339,7 @@
 
     async function renderPage(pageNum) {
       const page = await pdfDoc.getPage(pageNum);
-      const viewport = page.getViewport({ scale: scale });
+      const viewport = page.getViewport({ scale });
 
       const wrapper = document.createElement('div');
       wrapper.className = 'page-wrapper';
@@ -304,9 +349,8 @@
 
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d');
-
-      // Handle high DPI displays
       const outputScale = window.devicePixelRatio || 1;
+
       canvas.width = Math.floor(viewport.width * outputScale);
       canvas.height = Math.floor(viewport.height * outputScale);
       canvas.style.width = Math.floor(viewport.width) + 'px';
@@ -319,15 +363,14 @@
 
       await page.render({
         canvasContext: context,
-        viewport: viewport,
-        transform: transform
+        viewport,
+        transform
       }).promise;
     }
 
     async function rerender() {
       const container = document.getElementById('pdfContainer');
       container.querySelectorAll('.page-wrapper').forEach(el => el.remove());
-
       for (let i = 1; i <= pdfDoc.numPages; i++) {
         await renderPage(i);
       }
@@ -337,39 +380,17 @@
       const page = await pdfDoc.getPage(1);
       const viewport = page.getViewport({ scale: 1 });
       const container = document.getElementById('pdfContainer');
-
-      // Calculate scale to fit page in viewport (less padding on mobile)
-      const padding = window.innerWidth <= 480 ? 10 : 40;
+      const padding = window.innerWidth <= 480 ? 20 : 48;
       const containerWidth = container.clientWidth - padding;
       const containerHeight = container.clientHeight - padding;
-
-      const scaleX = containerWidth / viewport.width;
-      const scaleY = containerHeight / viewport.height;
-
-      // Use the smaller scale to ensure the whole page fits
-      scale = Math.min(scaleX, scaleY);
-      scale = Math.max(0.5, Math.min(scale, 3)); // Clamp between 0.5 and 3
-
+      scale = Math.min(containerWidth / viewport.width, containerHeight / viewport.height);
+      scale = Math.max(0.5, Math.min(scale, 3));
       updateZoomDisplay();
       await rerender();
     }
 
     function updateZoomDisplay() {
       document.getElementById('zoomLevel').textContent = Math.round(scale * 100) + '%';
-    }
-
-    function goToPrevPage() {
-      if (currentPage > 1) {
-        currentPage--;
-        scrollToPage(currentPage);
-      }
-    }
-
-    function goToNextPage() {
-      if (currentPage < pdfDoc.numPages) {
-        currentPage++;
-        scrollToPage(currentPage);
-      }
     }
 
     function setupControls() {
@@ -387,8 +408,19 @@
 
       document.getElementById('fitPage').onclick = fitToPage;
 
-      document.getElementById('prevPage').onclick = goToPrevPage;
-      document.getElementById('nextPage').onclick = goToNextPage;
+      document.getElementById('prevPage').onclick = () => {
+        if (currentPage > 1) {
+          currentPage--;
+          scrollToPage(currentPage);
+        }
+      };
+
+      document.getElementById('nextPage').onclick = () => {
+        if (currentPage < pdfDoc.numPages) {
+          currentPage++;
+          scrollToPage(currentPage);
+        }
+      };
 
       document.getElementById('pageInput').onchange = (e) => {
         const p = parseInt(e.target.value);
@@ -398,24 +430,21 @@
         }
       };
 
-      // Keyboard navigation
       document.addEventListener('keydown', (e) => {
-        // Don't handle if typing in input
         if (e.target.tagName === 'INPUT') return;
-
         switch(e.key) {
           case 'ArrowLeft':
           case 'ArrowUp':
           case 'PageUp':
             e.preventDefault();
-            goToPrevPage();
+            document.getElementById('prevPage').click();
             break;
           case 'ArrowRight':
           case 'ArrowDown':
           case 'PageDown':
-          case ' ': // Space
+          case ' ':
             e.preventDefault();
-            goToNextPage();
+            document.getElementById('nextPage').click();
             break;
           case '+':
           case '=':
@@ -444,7 +473,6 @@
         }
       });
 
-      // Track scroll
       document.getElementById('pdfContainer').onscroll = function() {
         const pages = this.querySelectorAll('.page-wrapper');
         const scrollTop = this.scrollTop + 100;
@@ -457,7 +485,6 @@
         }
       };
 
-      // Handle orientation change on mobile
       let resizeTimeout;
       window.addEventListener('resize', () => {
         clearTimeout(resizeTimeout);
@@ -473,10 +500,12 @@
 
     function showError(title, msg) {
       document.getElementById('pdfContainer').innerHTML =
-        '<div class="error"><div class="error-icon">&#9888;</div>' +
-        '<div class="error-message">' + title + '</div>' +
-        '<div>' + msg + '</div>' +
-        '<a href="index.html" class="back-btn" style="margin-top:1rem">&#8592; Back</a></div>';
+        '<div class="error">' +
+        '<div class="error-icon">⚠️</div>' +
+        '<div class="error-title">' + title + '</div>' +
+        '<div class="error-message">' + msg + '</div>' +
+        '<a href="index.html" class="btn" style="margin-top:1rem">← Back to documents</a>' +
+        '</div>';
     }
   </script>
 </body>

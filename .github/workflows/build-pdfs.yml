@@ -136,562 +136,679 @@ jobs:
             <title>OT Security Notes - ICS/SCADA Security Learning Resources</title>
             <meta name="description" content="Comprehensive learning documents for ICS/SCADA security professionals covering OT fundamentals, standards, protocols, and incident response.">
             <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+            <link rel="preconnect" href="https://fonts.googleapis.com">
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
             <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0/dist/fuse.min.js"></script>
             <style>
               :root {
                 --primary: #0f172a;
+                --primary-light: #1e293b;
                 --accent: #0ea5e9;
-                --bg: #0f172a;
-                --card-bg: rgba(30, 41, 59, 0.85);
-                --text: #e2e8f0;
-                --text-muted: #94a3b8;
-                --border: rgba(71, 85, 105, 0.5);
+                --accent-purple: #8b5cf6;
+                --success: #10b981;
+                --warning: #f59e0b;
+                --danger: #ef4444;
+                --text: #f1f5f9;
+                --text-secondary: #cbd5e1;
+                --text-muted: #64748b;
+                --border: rgba(148, 163, 184, 0.1);
+                --card-bg: rgba(30, 41, 59, 0.6);
+                --glass: rgba(15, 23, 42, 0.8);
+                --radius: 16px;
+                --radius-sm: 10px;
+                --shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+                --shadow-lg: 0 12px 48px rgba(0, 0, 0, 0.35);
               }
+
               * { box-sizing: border-box; margin: 0; padding: 0; }
+
+              html { scroll-behavior: smooth; }
+
               body {
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+                font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                background: var(--primary);
                 color: var(--text);
                 line-height: 1.6;
                 min-height: 100vh;
+                -webkit-font-smoothing: antialiased;
               }
-              #particles-canvas {
+
+              /* Subtle background gradient */
+              .bg-gradient {
                 position: fixed;
+                inset: 0;
+                background:
+                  radial-gradient(ellipse 80% 50% at 50% -20%, rgba(14, 165, 233, 0.15), transparent),
+                  radial-gradient(ellipse 60% 40% at 100% 100%, rgba(139, 92, 246, 0.1), transparent),
+                  var(--primary);
+                z-index: -1;
+              }
+
+              /* Header */
+              .header {
+                position: sticky;
                 top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                z-index: 0;
-                pointer-events: none;
-              }
-              .glow-orb {
-                position: fixed;
-                border-radius: 50%;
-                filter: blur(100px);
-                opacity: 0.4;
-                z-index: 0;
-                pointer-events: none;
-              }
-              .glow-orb-1 {
-                width: 500px;
-                height: 500px;
-                background: radial-gradient(circle, #0ea5e9 0%, transparent 70%);
-                top: -150px;
-                left: -150px;
-                animation: orbFloat1 25s ease-in-out infinite;
-              }
-              .glow-orb-2 {
-                width: 400px;
-                height: 400px;
-                background: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
-                bottom: -100px;
-                right: -100px;
-                animation: orbFloat2 30s ease-in-out infinite;
-              }
-              .glow-orb-3 {
-                width: 350px;
-                height: 350px;
-                background: radial-gradient(circle, #10b981 0%, transparent 70%);
-                top: 40%;
-                right: 20%;
-                animation: orbFloat3 20s ease-in-out infinite;
-              }
-              .glow-orb-4 {
-                width: 300px;
-                height: 300px;
-                background: radial-gradient(circle, #f59e0b 0%, transparent 70%);
-                bottom: 30%;
-                left: 10%;
-                animation: orbFloat4 22s ease-in-out infinite;
-              }
-              @keyframes orbFloat1 {
-                0%, 100% { transform: translate(0, 0) scale(1); }
-                33% { transform: translate(100px, 50px) scale(1.2); }
-                66% { transform: translate(50px, 100px) scale(0.9); }
-              }
-              @keyframes orbFloat2 {
-                0%, 100% { transform: translate(0, 0) scale(1); }
-                33% { transform: translate(-80px, -40px) scale(1.1); }
-                66% { transform: translate(-40px, -80px) scale(0.95); }
-              }
-              @keyframes orbFloat3 {
-                0%, 100% { transform: translate(0, 0) scale(1); }
-                50% { transform: translate(-60px, 60px) scale(1.15); }
-              }
-              @keyframes orbFloat4 {
-                0%, 100% { transform: translate(0, 0) scale(1); }
-                50% { transform: translate(70px, -50px) scale(1.1); }
-              }
-              .hero {
-                position: relative;
-                z-index: 1;
-                color: white;
-                padding: 5rem 1.5rem;
-                text-align: center;
-                min-height: 450px;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-              }
-              .hero-icon {
-                font-size: 5rem;
-                margin-bottom: 1.5rem;
-                animation: pulse-glow 2s ease-in-out infinite;
-                filter: drop-shadow(0 0 40px rgba(14, 165, 233, 0.6));
-              }
-              @keyframes pulse-glow {
-                0%, 100% { transform: scale(1); filter: drop-shadow(0 0 40px rgba(14, 165, 233, 0.6)); }
-                50% { transform: scale(1.1); filter: drop-shadow(0 0 60px rgba(14, 165, 233, 0.9)); }
-              }
-              .hero h1 {
-                font-size: 3.5rem;
-                font-weight: 800;
-                margin-bottom: 1rem;
-                background: linear-gradient(135deg, #ffffff 0%, #0ea5e9 40%, #8b5cf6 60%, #ffffff 100%);
-                background-size: 300% auto;
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                background-clip: text;
-                animation: shine 4s linear infinite;
-              }
-              @keyframes shine {
-                to { background-position: 300% center; }
-              }
-              .hero-subtitle {
-                font-size: 1.25rem;
-                opacity: 0.9;
-                max-width: 650px;
-                margin: 0 auto 2rem;
-                line-height: 1.8;
-              }
-              .badges {
-                display: flex;
-                gap: 1rem;
-                justify-content: center;
-                flex-wrap: wrap;
-              }
-              .badge {
-                display: inline-flex;
-                align-items: center;
-                gap: 0.5rem;
-                background: rgba(255,255,255,0.08);
-                border: 1px solid rgba(255,255,255,0.15);
-                padding: 0.6rem 1.2rem;
-                border-radius: 9999px;
-                font-size: 0.95rem;
+                z-index: 100;
+                background: var(--glass);
                 backdrop-filter: blur(20px);
-                transition: all 0.3s ease;
+                -webkit-backdrop-filter: blur(20px);
+                border-bottom: 1px solid var(--border);
               }
-              .badge:hover {
-                background: rgba(255,255,255,0.15);
-                transform: translateY(-3px);
-                box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-              }
-              .download-all-btn {
-                display: inline-flex;
-                align-items: center;
-                gap: 0.6rem;
-                margin-top: 2rem;
-                padding: 1rem 2rem;
-                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-                border: none;
-                border-radius: 12px;
-                color: white;
-                font-size: 1.1rem;
-                font-weight: 700;
-                text-decoration: none;
-                transition: all 0.3s ease;
-                box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
-              }
-              .download-all-btn:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 8px 30px rgba(16, 185, 129, 0.5);
-              }
-              .container {
-                position: relative;
-                z-index: 1;
-                max-width: 1000px;
+
+              .header-inner {
+                max-width: 1200px;
                 margin: 0 auto;
-                padding: 2rem 1.5rem 4rem;
-              }
-              .controls {
+                padding: 0.75rem 1.5rem;
                 display: flex;
-                gap: 1rem;
-                margin-bottom: 1rem;
                 align-items: center;
+                gap: 1rem;
               }
-              .search-box {
-                flex: 1;
-                position: relative;
-              }
-              .search-box input {
-                width: 100%;
-                padding: 1.1rem 1.5rem;
-                font-size: 1.05rem;
-                border: 1px solid var(--border);
-                border-radius: 16px;
-                background: rgba(30, 41, 59, 0.7);
-                color: var(--text);
-                transition: all 0.3s ease;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-                backdrop-filter: blur(20px);
-              }
-              .search-box input:focus {
-                outline: none;
-                border-color: var(--accent);
-                box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.2), 0 15px 50px rgba(0,0,0,0.3);
-                transform: translateY(-2px);
-                background: rgba(30, 41, 59, 0.9);
-              }
-              .search-box input::placeholder { color: var(--text-muted); }
-              .toggle-btn {
-                padding: 1.1rem 1.5rem;
-                font-size: 0.95rem;
-                font-weight: 600;
-                border: 1px solid var(--border);
-                border-radius: 16px;
-                background: rgba(30, 41, 59, 0.7);
-                color: var(--text);
-                cursor: pointer;
-                transition: all 0.3s ease;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.2);
-                backdrop-filter: blur(20px);
-                white-space: nowrap;
-              }
-              .toggle-btn:hover {
-                border-color: var(--accent);
-                background: rgba(14, 165, 233, 0.2);
-                transform: translateY(-2px);
-                box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-              }
-              .toggle-btn.active {
-                background: rgba(14, 165, 233, 0.3);
-                border-color: var(--accent);
-              }
-              .search-mode-toggle {
-                display: flex;
-                gap: 0.5rem;
-                margin-bottom: 1.5rem;
-              }
-              .search-mode-btn {
-                padding: 0.6rem 1rem;
-                font-size: 0.85rem;
-                font-weight: 500;
-                border: 1px solid var(--border);
-                border-radius: 10px;
-                background: rgba(30, 41, 59, 0.5);
-                color: var(--text-muted);
-                cursor: pointer;
-                transition: all 0.2s ease;
-              }
-              .search-mode-btn:hover {
-                background: rgba(30, 41, 59, 0.8);
-                color: var(--text);
-              }
-              .search-mode-btn.active {
-                background: linear-gradient(135deg, rgba(14, 165, 233, 0.3) 0%, rgba(139, 92, 246, 0.3) 100%);
-                border-color: var(--accent);
-                color: var(--text);
-              }
-              .content-results {
-                margin-bottom: 2rem;
-                display: none;
-              }
-              .content-results.visible {
-                display: block;
-              }
-              .content-result-item {
-                background: var(--card-bg);
-                border: 1px solid var(--border);
-                border-radius: 12px;
-                padding: 1rem 1.25rem;
-                margin-bottom: 0.75rem;
-                transition: all 0.2s ease;
-                cursor: pointer;
-              }
-              .content-result-item:hover {
-                border-color: var(--accent);
-                transform: translateX(4px);
-              }
-              .content-result-header {
+
+              .logo {
                 display: flex;
                 align-items: center;
                 gap: 0.75rem;
-                margin-bottom: 0.5rem;
-              }
-              .content-result-num {
-                font-family: monospace;
-                font-size: 0.75rem;
-                color: var(--accent);
-                background: rgba(14, 165, 233, 0.1);
-                padding: 0.2rem 0.5rem;
-                border-radius: 4px;
-              }
-              .content-result-title {
-                font-weight: 600;
+                text-decoration: none;
                 color: var(--text);
+                font-weight: 700;
+                font-size: 1.1rem;
+                white-space: nowrap;
               }
-              .content-result-category {
-                font-size: 0.75rem;
-                color: var(--text-muted);
-                margin-left: auto;
+
+              .logo-icon {
+                font-size: 1.5rem;
               }
-              .content-result-page {
-                font-size: 0.7rem;
-                color: #10b981;
-                background: rgba(16, 185, 129, 0.15);
-                padding: 0.2rem 0.5rem;
-                border-radius: 4px;
-                font-weight: 600;
-              }
-              .content-result-snippet {
-                font-size: 0.85rem;
-                color: var(--text-muted);
-                line-height: 1.5;
-              }
-              .content-result-snippet mark {
-                background: rgba(14, 165, 233, 0.3);
-                color: var(--text);
-                padding: 0 2px;
-                border-radius: 2px;
-              }
-              .search-loading {
-                text-align: center;
-                padding: 2rem;
-                color: var(--text-muted);
-                display: none;
-              }
-              .search-loading.visible {
-                display: block;
-              }
-              .categories { display: grid; gap: 1.75rem; }
-              .category {
-                background: var(--card-bg);
-                border-radius: 20px;
-                overflow: hidden;
-                box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-                border: 1px solid var(--border);
-                transition: all 0.3s ease;
-                backdrop-filter: blur(20px);
-              }
-              .category:hover {
-                transform: translateY(-6px);
-                box-shadow: 0 25px 60px rgba(0,0,0,0.4);
-                border-color: rgba(14, 165, 233, 0.3);
-              }
-              .category-header {
-                display: flex;
-                align-items: center;
-                gap: 1rem;
-                padding: 1.25rem 1.5rem;
-                background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.5) 100%);
-                border-bottom: 1px solid var(--border);
-                cursor: pointer;
-                user-select: none;
-                transition: background 0.2s ease;
-              }
-              .category-header:hover {
-                background: linear-gradient(135deg, rgba(40, 51, 69, 0.6) 0%, rgba(25, 33, 52, 0.6) 100%);
-              }
-              .category.collapsed .category-header {
-                border-bottom: none;
-              }
-              .category-icon {
-                font-size: 1.75rem;
-                width: 55px;
-                height: 55px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: linear-gradient(135deg, rgba(14, 165, 233, 0.2) 0%, rgba(139, 92, 246, 0.2) 100%);
-                border-radius: 14px;
-                border: 1px solid rgba(255,255,255,0.1);
-              }
-              .category-title { font-size: 1.2rem; font-weight: 600; color: var(--text); }
-              .category-toggle {
-                margin-left: auto;
-                font-size: 1.2rem;
-                color: var(--text-muted);
-                transition: transform 0.3s ease;
-              }
-              .category.collapsed .category-toggle {
-                transform: rotate(-90deg);
-              }
-              .category-range {
-                font-size: 0.8rem;
-                color: var(--text-muted);
-                font-family: monospace;
-                background: rgba(0,0,0,0.3);
-                padding: 0.4rem 0.8rem;
-                border-radius: 8px;
-                border: 1px solid var(--border);
-              }
-              .doc-list {
-                list-style: none;
-                max-height: 2000px;
-                overflow: hidden;
-                transition: max-height 0.4s ease, opacity 0.3s ease;
-                opacity: 1;
-              }
-              .category.collapsed .doc-list {
-                max-height: 0;
-                opacity: 0;
-              }
-              .doc-item {
-                display: flex;
-                align-items: center;
-                padding: 1rem 1.5rem;
-                border-bottom: 1px solid var(--border);
-                transition: all 0.25s ease;
-                gap: 1rem;
+
+              .logo span { display: none; }
+              @media (min-width: 640px) { .logo span { display: inline; } }
+
+              /* Search */
+              .search-container {
+                flex: 1;
+                max-width: 500px;
                 position: relative;
               }
-              .doc-item:last-child { border-bottom: none; }
-              .doc-item:hover {
-                background: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+
+              .search-input {
+                width: 100%;
+                padding: 0.65rem 1rem 0.65rem 2.5rem;
+                font-size: 0.9rem;
+                font-family: inherit;
+                border: 1px solid var(--border);
+                border-radius: var(--radius-sm);
+                background: rgba(255, 255, 255, 0.05);
+                color: var(--text);
+                transition: all 0.2s ease;
               }
+
+              .search-input:focus {
+                outline: none;
+                border-color: var(--accent);
+                background: rgba(255, 255, 255, 0.08);
+                box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+              }
+
+              .search-input::placeholder { color: var(--text-muted); }
+
+              .search-icon {
+                position: absolute;
+                left: 0.85rem;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--text-muted);
+                font-size: 0.85rem;
+                pointer-events: none;
+              }
+
+              .header-actions {
+                display: flex;
+                gap: 0.5rem;
+                align-items: center;
+              }
+
+              .btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.4rem;
+                padding: 0.5rem 1rem;
+                font-size: 0.85rem;
+                font-weight: 500;
+                font-family: inherit;
+                border: 1px solid var(--border);
+                border-radius: var(--radius-sm);
+                background: rgba(255, 255, 255, 0.05);
+                color: var(--text-secondary);
+                cursor: pointer;
+                transition: all 0.2s ease;
+                text-decoration: none;
+                white-space: nowrap;
+              }
+
+              .btn:hover {
+                background: rgba(255, 255, 255, 0.1);
+                border-color: rgba(255, 255, 255, 0.2);
+                color: var(--text);
+              }
+
+              .btn-primary {
+                background: var(--success);
+                border-color: var(--success);
+                color: white;
+              }
+
+              .btn-primary:hover {
+                background: #059669;
+                border-color: #059669;
+                color: white;
+              }
+
+              .btn-icon { font-size: 1rem; }
+
+              /* Hero */
+              .hero {
+                text-align: center;
+                padding: 4rem 1.5rem 3rem;
+                max-width: 800px;
+                margin: 0 auto;
+              }
+
+              .hero-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: 0.4rem 1rem;
+                font-size: 0.8rem;
+                font-weight: 500;
+                background: rgba(14, 165, 233, 0.15);
+                border: 1px solid rgba(14, 165, 233, 0.3);
+                border-radius: 50px;
+                color: var(--accent);
+                margin-bottom: 1.5rem;
+              }
+
+              .hero h1 {
+                font-size: clamp(2rem, 5vw, 3rem);
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                margin-bottom: 1rem;
+                background: linear-gradient(135deg, var(--text) 0%, var(--accent) 50%, var(--accent-purple) 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+              }
+
+              .hero p {
+                font-size: 1.1rem;
+                color: var(--text-secondary);
+                max-width: 600px;
+                margin: 0 auto 2rem;
+              }
+
+              .hero-stats {
+                display: flex;
+                justify-content: center;
+                gap: 2rem;
+                flex-wrap: wrap;
+              }
+
+              .stat {
+                text-align: center;
+              }
+
+              .stat-value {
+                font-size: 1.75rem;
+                font-weight: 700;
+                color: var(--text);
+              }
+
+              .stat-label {
+                font-size: 0.8rem;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+              }
+
+              /* Main content */
+              .main {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 0 1.5rem 4rem;
+              }
+
+              /* Search mode tabs */
+              .search-tabs {
+                display: flex;
+                gap: 0.25rem;
+                padding: 0.25rem;
+                background: rgba(255, 255, 255, 0.03);
+                border-radius: var(--radius-sm);
+                margin-bottom: 1.5rem;
+                width: fit-content;
+              }
+
+              .search-tab {
+                padding: 0.5rem 1rem;
+                font-size: 0.85rem;
+                font-weight: 500;
+                font-family: inherit;
+                border: none;
+                border-radius: 8px;
+                background: transparent;
+                color: var(--text-muted);
+                cursor: pointer;
+                transition: all 0.2s ease;
+              }
+
+              .search-tab:hover {
+                color: var(--text-secondary);
+              }
+
+              .search-tab.active {
+                background: var(--accent);
+                color: white;
+              }
+
+              /* Category filters */
+              .category-filters {
+                display: flex;
+                gap: 0.5rem;
+                flex-wrap: wrap;
+                margin-bottom: 1.5rem;
+                padding-bottom: 1rem;
+                border-bottom: 1px solid var(--border);
+              }
+
+              .filter-chip {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4rem;
+                padding: 0.4rem 0.9rem;
+                font-size: 0.8rem;
+                font-weight: 500;
+                font-family: inherit;
+                border: 1px solid var(--border);
+                border-radius: 50px;
+                background: transparent;
+                color: var(--text-secondary);
+                cursor: pointer;
+                transition: all 0.2s ease;
+              }
+
+              .filter-chip:hover {
+                border-color: var(--accent);
+                color: var(--accent);
+              }
+
+              .filter-chip.active {
+                background: var(--accent);
+                border-color: var(--accent);
+                color: white;
+              }
+
+              .filter-chip .chip-icon { font-size: 0.9rem; }
+
+              /* Document grid */
+              .doc-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+                gap: 1rem;
+              }
+
+              .doc-card {
+                background: var(--card-bg);
+                border: 1px solid var(--border);
+                border-radius: var(--radius);
+                overflow: hidden;
+                transition: all 0.25s ease;
+                cursor: pointer;
+              }
+
+              .doc-card:hover {
+                border-color: rgba(14, 165, 233, 0.4);
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-lg);
+              }
+
+              .doc-card-inner {
+                display: flex;
+                gap: 1rem;
+                padding: 1rem;
+              }
+
               .doc-thumb {
-                width: 60px;
-                height: 80px;
-                background: #1e293b;
-                border-radius: 6px;
+                width: 70px;
+                height: 90px;
+                background: var(--primary-light);
+                border-radius: 8px;
                 overflow: hidden;
                 flex-shrink: 0;
-                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
                 border: 1px solid var(--border);
               }
+
               .doc-thumb img {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
-                transition: transform 0.3s ease;
               }
-              .doc-item:hover .doc-thumb img {
-                transform: scale(1.05);
-              }
-              .doc-info {
+
+              .doc-content {
                 flex: 1;
                 min-width: 0;
+                display: flex;
+                flex-direction: column;
               }
-              .doc-num {
-                font-family: monospace;
-                font-size: 0.75rem;
-                color: var(--accent);
+
+              .doc-category {
+                font-size: 0.7rem;
                 font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: var(--accent);
                 margin-bottom: 0.25rem;
               }
-              .doc-title-text {
+
+              .doc-title {
+                font-size: 0.95rem;
+                font-weight: 600;
                 color: var(--text);
-                font-weight: 500;
-                font-size: 1rem;
-                margin-bottom: 0.25rem;
+                margin-bottom: 0.5rem;
+                line-height: 1.3;
               }
+
+              .doc-meta {
+                margin-top: auto;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+              }
+
+              .doc-number {
+                font-size: 0.75rem;
+                font-family: monospace;
+                color: var(--text-muted);
+                background: rgba(255, 255, 255, 0.05);
+                padding: 0.2rem 0.5rem;
+                border-radius: 4px;
+              }
+
               .doc-actions {
                 display: flex;
                 gap: 0.5rem;
-                flex-shrink: 0;
+                margin-left: auto;
               }
-              .doc-btn {
-                padding: 0.5rem 1rem;
-                border-radius: 8px;
-                font-size: 0.8rem;
-                font-weight: 600;
-                text-decoration: none;
-                transition: all 0.2s;
+
+              .doc-action {
+                width: 32px;
+                height: 32px;
                 display: flex;
                 align-items: center;
-                gap: 0.4rem;
+                justify-content: center;
+                border-radius: 8px;
+                font-size: 0.9rem;
+                text-decoration: none;
+                transition: all 0.2s ease;
+                border: 1px solid var(--border);
+                background: rgba(255, 255, 255, 0.03);
+                color: var(--text-secondary);
               }
-              .doc-btn-view {
-                background: linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 100%);
+
+              .doc-action:hover {
+                background: var(--accent);
+                border-color: var(--accent);
                 color: white;
               }
-              .doc-btn-view:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 4px 15px rgba(14, 165, 233, 0.4);
+
+              .doc-action-download:hover {
+                background: var(--success);
+                border-color: var(--success);
               }
-              .doc-btn-download {
-                background: rgba(255,255,255,0.05);
+
+              /* Content search results */
+              .content-results {
+                display: none;
+              }
+
+              .content-results.visible {
+                display: block;
+              }
+
+              .result-item {
+                background: var(--card-bg);
                 border: 1px solid var(--border);
+                border-radius: var(--radius);
+                padding: 1rem 1.25rem;
+                margin-bottom: 0.75rem;
+                cursor: pointer;
+                transition: all 0.2s ease;
+              }
+
+              .result-item:hover {
+                border-color: var(--accent);
+                background: rgba(14, 165, 233, 0.05);
+              }
+
+              .result-header {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                margin-bottom: 0.5rem;
+                flex-wrap: wrap;
+              }
+
+              .result-num {
+                font-size: 0.75rem;
+                font-family: monospace;
+                color: var(--accent);
+                background: rgba(14, 165, 233, 0.1);
+                padding: 0.15rem 0.5rem;
+                border-radius: 4px;
+              }
+
+              .result-title {
+                font-weight: 600;
+                color: var(--text);
+              }
+
+              .result-page {
+                font-size: 0.7rem;
+                font-weight: 600;
+                color: var(--success);
+                background: rgba(16, 185, 129, 0.15);
+                padding: 0.15rem 0.5rem;
+                border-radius: 4px;
+              }
+
+              .result-category {
+                font-size: 0.75rem;
                 color: var(--text-muted);
+                margin-left: auto;
               }
-              .doc-btn-download:hover {
-                background: rgba(16, 185, 129, 0.2);
-                border-color: #10b981;
-                color: #10b981;
+
+              .result-snippet {
+                font-size: 0.85rem;
+                color: var(--text-secondary);
+                line-height: 1.6;
               }
-              .footer {
-                position: relative;
-                z-index: 1;
+
+              .result-snippet mark {
+                background: rgba(14, 165, 233, 0.3);
+                color: var(--text);
+                padding: 0.1rem 0.2rem;
+                border-radius: 3px;
+              }
+
+              /* Category sections */
+              .category-section {
+                margin-bottom: 2.5rem;
+              }
+
+              .category-header {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                margin-bottom: 1rem;
+                padding-bottom: 0.75rem;
+                border-bottom: 1px solid var(--border);
+              }
+
+              .category-icon {
+                font-size: 1.5rem;
+              }
+
+              .category-title {
+                font-size: 1.25rem;
+                font-weight: 600;
+                color: var(--text);
+              }
+
+              .category-count {
+                font-size: 0.8rem;
+                color: var(--text-muted);
+                background: rgba(255, 255, 255, 0.05);
+                padding: 0.2rem 0.6rem;
+                border-radius: 50px;
+                margin-left: auto;
+              }
+
+              /* Loading & Empty states */
+              .loading-state, .empty-state {
                 text-align: center;
-                padding: 4rem 1.5rem;
+                padding: 3rem 1.5rem;
                 color: var(--text-muted);
-                font-size: 0.95rem;
               }
-              .footer a { color: var(--accent); text-decoration: none; font-weight: 500; }
-              .footer a:hover { text-decoration: underline; }
-              .footer-links { display: flex; justify-content: center; gap: 2.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+
+              .empty-state-icon {
+                font-size: 3rem;
+                margin-bottom: 1rem;
+                opacity: 0.5;
+              }
+
+              /* Footer */
+              .footer {
+                text-align: center;
+                padding: 3rem 1.5rem;
+                border-top: 1px solid var(--border);
+                color: var(--text-muted);
+                font-size: 0.85rem;
+              }
+
+              .footer-links {
+                display: flex;
+                justify-content: center;
+                gap: 1.5rem;
+                margin-bottom: 1rem;
+                flex-wrap: wrap;
+              }
+
+              .footer a {
+                color: var(--text-secondary);
+                text-decoration: none;
+                transition: color 0.2s;
+              }
+
+              .footer a:hover { color: var(--accent); }
+
+              /* Utilities */
               .hidden { display: none !important; }
-              .no-results { text-align: center; padding: 3rem; color: var(--text-muted); }
+
+              /* Responsive */
               @media (max-width: 768px) {
-                .doc-thumb { width: 50px; height: 65px; }
-                .doc-btn span:not(:first-child) { display: none; }
-                .doc-btn { padding: 0.5rem 0.75rem; }
+                .header-inner { padding: 0.5rem 1rem; }
+                .hero { padding: 2.5rem 1rem 2rem; }
+                .hero h1 { font-size: 1.75rem; }
+                .hero p { font-size: 1rem; }
+                .hero-stats { gap: 1.5rem; }
+                .stat-value { font-size: 1.5rem; }
+                .main { padding: 0 1rem 3rem; }
+                .doc-grid { grid-template-columns: 1fr; }
+                .doc-card-inner { padding: 0.875rem; }
+                .doc-thumb { width: 60px; height: 78px; }
+                .btn span:not(.btn-icon) { display: none; }
+                .btn { padding: 0.5rem; }
+                .category-filters { gap: 0.4rem; }
+                .filter-chip { padding: 0.35rem 0.7rem; font-size: 0.75rem; }
+                .result-header { gap: 0.5rem; }
+                .result-category { display: none; }
               }
-              @media (max-width: 640px) {
-                .hero h1 { font-size: 2.2rem; }
-                .hero-icon { font-size: 3.5rem; }
-                .hero { padding: 3rem 1rem; min-height: 350px; }
-                .hero-subtitle { font-size: 1rem; }
-                .doc-item { flex-wrap: wrap; gap: 0.75rem; padding: 0.75rem 1rem; }
-                .doc-thumb { width: 45px; height: 58px; }
-                .doc-info { flex: 1; min-width: 0; }
-                .doc-title-text { font-size: 0.9rem; }
-                .doc-actions { margin-left: auto; }
-                .footer-links { gap: 1.5rem; }
-                .badges { gap: 0.5rem; }
-                .badge { padding: 0.4rem 0.8rem; font-size: 0.85rem; }
-                .download-all-btn { padding: 0.75rem 1.5rem; font-size: 1rem; }
+
+              @media (max-width: 480px) {
+                .hero-stats { gap: 1rem; }
+                .stat { min-width: 80px; }
+                .search-tabs { width: 100%; }
+                .search-tab { flex: 1; text-align: center; }
+                .doc-title { font-size: 0.9rem; }
+              }
+
+              /* Reduce motion for accessibility */
+              @media (prefers-reduced-motion: reduce) {
+                *, *::before, *::after {
+                  animation-duration: 0.01ms !important;
+                  transition-duration: 0.01ms !important;
+                }
               }
             </style>
           </head>
           <body>
-            <div class="glow-orb glow-orb-1"></div>
-            <div class="glow-orb glow-orb-2"></div>
-            <div class="glow-orb glow-orb-3"></div>
-            <div class="glow-orb glow-orb-4"></div>
-            <canvas id="particles-canvas"></canvas>
-            <header class="hero">
-              <div class="hero-icon">🛡️</div>
-              <h1>OT Security Notes</h1>
-              <p class="hero-subtitle">
-                Comprehensive learning documents for ICS/SCADA security professionals.
-                Vendor-neutral, standards-based, and focused on practical knowledge.
-              </p>
-              <div class="badges">
-                <span class="badge">📄 PDF_COUNT Documents</span>
-                <span class="badge">📖 Under 10 pages each</span>
-                <span class="badge">⚖️ CC BY-SA 4.0</span>
-              </div>
-              <a href="OTsecNotes-all-documents.zip" class="download-all-btn" download>
-                📦 Download All PDFs
-              </a>
-            </header>
-            <main class="container">
-              <div class="controls">
-                <div class="search-box">
-                  <input type="text" id="search" placeholder="🔍 Search documents..." autocomplete="off">
+            <div class="bg-gradient"></div>
+
+            <!-- Sticky Header -->
+            <header class="header">
+              <div class="header-inner">
+                <a href="#" class="logo">
+                  <span class="logo-icon">🛡️</span>
+                  <span>OT Security Notes</span>
+                </a>
+                <div class="search-container">
+                  <span class="search-icon">🔍</span>
+                  <input type="text" class="search-input" id="search" placeholder="Search documents or content..." autocomplete="off">
                 </div>
-                <button class="toggle-btn" id="toggle-all" onclick="toggleAll()">Expand All</button>
+                <div class="header-actions">
+                  <a href="https://github.com/mniedermaier/OTsecNotes" class="btn" target="_blank" rel="noopener">
+                    <span class="btn-icon">📦</span>
+                    <span>GitHub</span>
+                  </a>
+                  <a href="OTsecNotes-all-documents.zip" class="btn btn-primary" download>
+                    <span class="btn-icon">⬇️</span>
+                    <span>Download All</span>
+                  </a>
+                </div>
               </div>
-              <div class="search-mode-toggle">
-                <button class="search-mode-btn active" id="mode-title" onclick="setSearchMode('title')">📄 Title Search</button>
-                <button class="search-mode-btn" id="mode-content" onclick="setSearchMode('content')">📖 Content Search</button>
+            </header>
+
+            <!-- Hero Section -->
+            <section class="hero">
+              <div class="hero-badge">📚 Free Learning Resources</div>
+              <h1>OT Security Notes</h1>
+              <p>Comprehensive learning documents for ICS/SCADA security professionals. Vendor-neutral, standards-based, and focused on practical knowledge.</p>
+              <div class="hero-stats">
+                <div class="stat">
+                  <div class="stat-value">PDF_COUNT</div>
+                  <div class="stat-label">Documents</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-value">&lt;10</div>
+                  <div class="stat-label">Pages Each</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-value">CC BY-SA</div>
+                  <div class="stat-label">License</div>
+                </div>
               </div>
-              <div class="search-loading" id="search-loading">Loading search index...</div>
-              <div class="content-results" id="content-results"></div>
-              <div class="categories" id="categories">
+            </section>
+
+            <!-- Main Content -->
+            <main class="main">
+              <!-- Search Mode Toggle -->
+              <div class="search-tabs">
+                <button class="search-tab active" id="mode-title" onclick="setSearchMode('title')">📄 Titles</button>
+                <button class="search-tab" id="mode-content" onclick="setSearchMode('content')">📖 Full Text</button>
+              </div>
+
+              <!-- Category Filters -->
+              <div class="category-filters" id="category-filters">
+                <button class="filter-chip active" data-filter="all" onclick="filterCategory('all')">All</button>
           HTMLEOF
 
           # Define categories with icons
@@ -717,6 +834,43 @@ jobs:
           ICONS["700-799"]="📋"
           ICONS["800-899"]="🔧"
 
+          # Generate category filter chips directly in the HTML
+          for range in "001-099" "100-199" "200-299" "300-399" "400-499" "500-599" "600-699" "700-799" "800-899"; do
+            category_name="${CATEGORIES[$range]}"
+            category_icon="${ICONS[$range]}"
+            start=${range%-*}
+            end=${range#*-}
+            has_docs=$(ls public/*.pdf 2>/dev/null | xargs -I {} basename {} .pdf | grep -E "^[0-9]{3}-" | while read name; do
+              num=${name%%-*}
+              if [ "$num" -ge "$start" ] && [ "$num" -le "$end" ]; then
+                echo "yes"
+                break
+              fi
+            done)
+            if [ -n "$has_docs" ]; then
+              echo "                <button class=\"filter-chip\" data-filter=\"$category_name\" onclick=\"filterCategory('$category_name')\"><span class=\"chip-icon\">$category_icon</span> $category_name</button>" >> public/index.html
+            fi
+          done
+
+          # Close the category-filters div and continue
+          echo "              </div>" >> public/index.html
+          echo "" >> public/index.html
+          echo "              <!-- Loading State -->" >> public/index.html
+          echo "              <div class=\"loading-state hidden\" id=\"loading-state\">Loading search index...</div>" >> public/index.html
+          echo "" >> public/index.html
+          echo "              <!-- Content Search Results -->" >> public/index.html
+          echo "              <div class=\"content-results\" id=\"content-results\"></div>" >> public/index.html
+          echo "" >> public/index.html
+          echo "              <!-- Empty State -->" >> public/index.html
+          echo "              <div class=\"empty-state hidden\" id=\"empty-state\">" >> public/index.html
+          echo "                <div class=\"empty-state-icon\">🔍</div>" >> public/index.html
+          echo "                <p>No documents found matching your search.</p>" >> public/index.html
+          echo "              </div>" >> public/index.html
+          echo "" >> public/index.html
+          echo "              <!-- Document Categories -->" >> public/index.html
+          echo "              <div id=\"categories\">" >> public/index.html
+
+          # Generate document cards by category
           for range in "001-099" "100-199" "200-299" "300-399" "400-499" "500-599" "600-699" "700-799" "800-899"; do
             start=${range%-*}
             end=${range#*-}
@@ -731,14 +885,14 @@ jobs:
             done | sort)
 
             if [ -n "$pdfs" ]; then
-              echo "            <div class=\"category collapsed\" data-category=\"$category_name\">" >> public/index.html
-              echo "              <div class=\"category-header\" onclick=\"this.parentElement.classList.toggle('collapsed')\">" >> public/index.html
-              echo "                <span class=\"category-icon\">$category_icon</span>" >> public/index.html
-              echo "                <span class=\"category-title\">$category_name</span>" >> public/index.html
-              echo "                <span class=\"category-range\">$range</span>" >> public/index.html
-              echo "                <span class=\"category-toggle\">▼</span>" >> public/index.html
-              echo "              </div>" >> public/index.html
-              echo "              <ul class=\"doc-list\">" >> public/index.html
+              doc_count=$(echo "$pdfs" | wc -l)
+              echo "              <section class=\"category-section\" data-category=\"$category_name\">" >> public/index.html
+              echo "                <div class=\"category-header\">" >> public/index.html
+              echo "                  <span class=\"category-icon\">$category_icon</span>" >> public/index.html
+              echo "                  <h2 class=\"category-title\">$category_name</h2>" >> public/index.html
+              echo "                  <span class=\"category-count\">$doc_count docs</span>" >> public/index.html
+              echo "                </div>" >> public/index.html
+              echo "                <div class=\"doc-grid\">" >> public/index.html
 
               echo "$pdfs" | while read pdf_name; do
                 doc_num=${pdf_name%%-*}
@@ -747,168 +901,67 @@ jobs:
                   sed 's/\bIt\b/IT/g; s/\bOt\b/OT/g; s/\bPlc\b/PLC/g; s/\bIec\b/IEC/g; s/\bNist\b/NIST/g' | \
                   sed 's/\bDmz\b/DMZ/g; s/\bOpc\b/OPC/g; s/\bUa\b/UA/g; s/\bDnp3\b/DNP3/g; s/\bIds\b/IDS/g' | \
                   sed 's/\bNerc\b/NERC/g; s/\bCip\b/CIP/g; s/\bSp\b/SP/g; s/\bIr\b/IR/g; s/\bTrisis\b/TRISIS/g' | \
-                  sed 's/ Vs / vs /g; s/ And / and /g; s/ Or / or /g; s/ The / the /g; s/ A / a /g; s/ An / an /g')
-                echo "                <li class=\"doc-item\" data-title=\"$title\">" >> public/index.html
-                echo "                  <div class=\"doc-thumb\"><img src=\"thumbnails/${pdf_name}.png\" alt=\"\" loading=\"lazy\"></div>" >> public/index.html
-                echo "                  <div class=\"doc-info\">" >> public/index.html
-                echo "                    <div class=\"doc-num\">Document $doc_num</div>" >> public/index.html
-                echo "                    <div class=\"doc-title-text\">$title</div>" >> public/index.html
-                echo "                  </div>" >> public/index.html
-                echo "                  <div class=\"doc-actions\">" >> public/index.html
-                echo "                    <a href=\"viewer.html?file=${pdf_name}.pdf\" class=\"doc-btn doc-btn-view\">&#128065; View</a>" >> public/index.html
-                echo "                    <a href=\"${pdf_name}.pdf\" class=\"doc-btn doc-btn-download\" download>&#8595; PDF</a>" >> public/index.html
-                echo "                  </div>" >> public/index.html
-                echo "                </li>" >> public/index.html
+                  sed 's/\bIps\b/IPS/g; s/\bSiem\b/SIEM/g; s/\bHmi\b/HMI/g; s/\bScada\b/SCADA/g' | \
+                  sed 's/\bSis\b/SIS/g; s/\bBacnet\b/BACnet/g' | \
+                  sed 's/ Vs / vs /g; s/ And / and /g; s/ Or / or /g; s/ The / the /g; s/ A / a /g; s/ An / an /g; s/ In / in /g; s/ For / for /g')
+                echo "                  <article class=\"doc-card\" data-title=\"$title\" data-category=\"$category_name\" onclick=\"window.location='viewer.html?file=${pdf_name}.pdf'\">" >> public/index.html
+                echo "                    <div class=\"doc-card-inner\">" >> public/index.html
+                echo "                      <div class=\"doc-thumb\"><img src=\"thumbnails/${pdf_name}.png\" alt=\"\" loading=\"lazy\"></div>" >> public/index.html
+                echo "                      <div class=\"doc-content\">" >> public/index.html
+                echo "                        <div class=\"doc-category\">$category_name</div>" >> public/index.html
+                echo "                        <h3 class=\"doc-title\">$title</h3>" >> public/index.html
+                echo "                        <div class=\"doc-meta\">" >> public/index.html
+                echo "                          <span class=\"doc-number\">#$doc_num</span>" >> public/index.html
+                echo "                          <div class=\"doc-actions\">" >> public/index.html
+                echo "                            <a href=\"viewer.html?file=${pdf_name}.pdf\" class=\"doc-action\" title=\"View\" onclick=\"event.stopPropagation()\">👁️</a>" >> public/index.html
+                echo "                            <a href=\"${pdf_name}.pdf\" class=\"doc-action doc-action-download\" title=\"Download\" download onclick=\"event.stopPropagation()\">⬇️</a>" >> public/index.html
+                echo "                          </div>" >> public/index.html
+                echo "                        </div>" >> public/index.html
+                echo "                      </div>" >> public/index.html
+                echo "                    </div>" >> public/index.html
+                echo "                  </article>" >> public/index.html
               done
 
-              echo "              </ul>" >> public/index.html
-              echo "            </div>" >> public/index.html
+              echo "                </div>" >> public/index.html
+              echo "              </section>" >> public/index.html
             fi
           done
 
           cat >> public/index.html << 'HTMLEOF'
               </div>
-              <div class="no-results hidden" id="no-results">No documents found matching your search.</div>
             </main>
+
+            <!-- Footer -->
             <footer class="footer">
               <div class="footer-links">
-                <a href="https://github.com/mniedermaier/OTsecNotes">📦 GitHub Repository</a>
-                <a href="https://github.com/mniedermaier/OTsecNotes/issues/new?template=new-document-request.yml">📝 Request Document</a>
-                <a href="https://github.com/mniedermaier/OTsecNotes/issues">🐛 Report Issue</a>
+                <a href="https://github.com/mniedermaier/OTsecNotes">GitHub Repository</a>
+                <a href="https://github.com/mniedermaier/OTsecNotes/issues/new?template=new-document-request.yml">Request Document</a>
+                <a href="https://github.com/mniedermaier/OTsecNotes/issues">Report Issue</a>
               </div>
-              <p>Last updated: TIMESTAMP</p>
-              <p style="margin-top: 0.5rem;">🤖 Created with AI assistance · Licensed under CC BY-SA 4.0</p>
+              <p>Last updated: TIMESTAMP · Created with AI assistance · Licensed under CC BY-SA 4.0</p>
             </footer>
+
             <script>
-              // Toggle all categories expand/collapse
-              function toggleAll() {
-                const categories = document.querySelectorAll('.category');
-                const btn = document.getElementById('toggle-all');
-                const allCollapsed = Array.from(categories).every(c => c.classList.contains('collapsed'));
-
-                categories.forEach(cat => {
-                  if (allCollapsed) {
-                    cat.classList.remove('collapsed');
-                  } else {
-                    cat.classList.add('collapsed');
-                  }
-                });
-
-                btn.textContent = allCollapsed ? 'Collapse All' : 'Expand All';
-              }
-
-              const canvas = document.getElementById('particles-canvas');
-              const ctx = canvas.getContext('2d');
-              let particles = [];
-              let mouse = { x: null, y: null, radius: 180 };
-
-              function resizeCanvas() {
-                canvas.width = window.innerWidth;
-                canvas.height = document.documentElement.scrollHeight;
-              }
-              resizeCanvas();
-              window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
-
-              let lastHeight = 0;
-              setInterval(() => {
-                const newHeight = document.documentElement.scrollHeight;
-                if (newHeight !== lastHeight) { canvas.height = newHeight; lastHeight = newHeight; }
-              }, 1000);
-
-              document.addEventListener('mousemove', (e) => {
-                mouse.x = e.clientX;
-                mouse.y = e.clientY + window.scrollY;
-              });
-              document.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
-
-              class Particle {
-                constructor() {
-                  this.x = Math.random() * canvas.width;
-                  this.y = Math.random() * canvas.height;
-                  this.size = Math.random() * 2.5 + 0.5;
-                  this.speedX = (Math.random() - 0.5) * 0.8;
-                  this.speedY = (Math.random() - 0.5) * 0.8;
-                  this.opacity = Math.random() * 0.5 + 0.2;
-                  const hue = 190 + Math.random() * 50;
-                  this.color = 'hsla(' + hue + ', 80%, 65%, ' + this.opacity + ')';
-                }
-                draw() {
-                  ctx.fillStyle = this.color;
-                  ctx.beginPath();
-                  ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                  ctx.fill();
-                }
-                update() {
-                  if (mouse.x != null && mouse.y != null) {
-                    let dx = mouse.x - this.x;
-                    let dy = mouse.y - this.y;
-                    let distance = Math.sqrt(dx * dx + dy * dy);
-                    if (distance < mouse.radius) {
-                      let force = (mouse.radius - distance) / mouse.radius;
-                      this.x -= (dx / distance) * force * 3;
-                      this.y -= (dy / distance) * force * 3;
-                    }
-                  }
-                  this.x += this.speedX;
-                  this.y += this.speedY;
-                  if (this.x < 0) this.x = canvas.width;
-                  if (this.x > canvas.width) this.x = 0;
-                  if (this.y < 0) this.y = canvas.height;
-                  if (this.y > canvas.height) this.y = 0;
-                }
-              }
-
-              function initParticles() {
-                particles = [];
-                const num = Math.min((canvas.width * canvas.height) / 8000, 300);
-                for (let i = 0; i < num; i++) particles.push(new Particle());
-              }
-              initParticles();
-
-              function connectParticles() {
-                for (let a = 0; a < particles.length; a++) {
-                  for (let b = a + 1; b < particles.length; b++) {
-                    let dx = particles[a].x - particles[b].x;
-                    let dy = particles[a].y - particles[b].y;
-                    let distance = Math.sqrt(dx * dx + dy * dy);
-                    if (distance < 150) {
-                      ctx.strokeStyle = 'rgba(14, 165, 233, ' + ((1 - distance / 150) * 0.15) + ')';
-                      ctx.lineWidth = 1;
-                      ctx.beginPath();
-                      ctx.moveTo(particles[a].x, particles[a].y);
-                      ctx.lineTo(particles[b].x, particles[b].y);
-                      ctx.stroke();
-                    }
-                  }
-                }
-              }
-
-              function animate() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                particles.forEach(p => { p.update(); p.draw(); });
-                connectParticles();
-                requestAnimationFrame(animate);
-              }
-              animate();
-
-              // Search functionality
+              // State
               let searchMode = 'title';
+              let activeFilter = 'all';
               let searchIndex = null;
               let flattenedIndex = null;
               let fuse = null;
 
-              const search = document.getElementById('search');
-              const categories = document.querySelectorAll('.category');
-              const noResults = document.getElementById('no-results');
+              // DOM elements
+              const searchInput = document.getElementById('search');
+              const categorySections = document.querySelectorAll('.category-section');
+              const docCards = document.querySelectorAll('.doc-card');
               const contentResults = document.getElementById('content-results');
-              const searchLoading = document.getElementById('search-loading');
+              const emptyState = document.getElementById('empty-state');
+              const loadingState = document.getElementById('loading-state');
 
-              // Load search index for content search
+              // Load search index
               async function loadSearchIndex() {
                 try {
                   const response = await fetch('search-index.json');
                   searchIndex = await response.json();
-                  // Flatten the index: one entry per page for searching
                   flattenedIndex = [];
                   searchIndex.forEach(doc => {
                     doc.pages.forEach(pageData => {
@@ -923,7 +976,6 @@ jobs:
                       });
                     });
                   });
-                  // Initialize Fuse.js for fuzzy search on flattened index
                   fuse = new Fuse(flattenedIndex, {
                     keys: ['title', 'text'],
                     threshold: 0.3,
@@ -931,7 +983,7 @@ jobs:
                     minMatchCharLength: 3,
                     ignoreLocation: true
                   });
-                  console.log('Search index loaded:', searchIndex.length, 'documents,', flattenedIndex.length, 'pages');
+                  console.log('Search index loaded:', searchIndex.length, 'docs,', flattenedIndex.length, 'pages');
                 } catch (e) {
                   console.error('Failed to load search index:', e);
                 }
@@ -942,119 +994,147 @@ jobs:
                 searchMode = mode;
                 document.getElementById('mode-title').classList.toggle('active', mode === 'title');
                 document.getElementById('mode-content').classList.toggle('active', mode === 'content');
-                // Re-run search with current query
-                performSearch(search.value);
+                performSearch(searchInput.value);
               }
 
-              // Extract snippet around match
-              function getSnippet(text, query, maxLen = 200) {
+              // Filter by category
+              function filterCategory(category) {
+                activeFilter = category;
+                document.querySelectorAll('.filter-chip').forEach(chip => {
+                  chip.classList.toggle('active', chip.dataset.filter === category);
+                });
+                performSearch(searchInput.value);
+              }
+
+              // Get snippet with highlighting
+              function getSnippet(text, query) {
                 const lowerText = text.toLowerCase();
                 const lowerQuery = query.toLowerCase();
                 const idx = lowerText.indexOf(lowerQuery);
-                if (idx === -1) return text.slice(0, maxLen) + '...';
-                const start = Math.max(0, idx - 60);
-                const end = Math.min(text.length, idx + query.length + 140);
+                if (idx === -1) return text.slice(0, 180) + '...';
+                const start = Math.max(0, idx - 50);
+                const end = Math.min(text.length, idx + query.length + 130);
                 let snippet = (start > 0 ? '...' : '') + text.slice(start, end) + (end < text.length ? '...' : '');
-                // Highlight matches
                 const regex = new RegExp('(' + query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
-                snippet = snippet.replace(regex, '<mark>$1</mark>');
-                return snippet;
+                return snippet.replace(regex, '<mark>$1</mark>');
               }
 
-              // Perform search based on mode
+              // Perform search
               function performSearch(query) {
                 query = query.trim();
+                const lowerQuery = query.toLowerCase();
+
                 if (searchMode === 'title') {
-                  // Title search - show categories
                   contentResults.classList.remove('visible');
                   document.getElementById('categories').style.display = '';
-                  const lowerQuery = query.toLowerCase();
+
                   let hasResults = false;
-                  categories.forEach(cat => {
-                    const items = cat.querySelectorAll('.doc-item');
-                    let match = false;
-                    items.forEach(item => {
-                      const title = item.dataset.title.toLowerCase();
-                      const num = item.querySelector('.doc-num').textContent;
-                      const m = title.includes(lowerQuery) || num.includes(lowerQuery);
-                      item.classList.toggle('hidden', !m && query !== '');
-                      if (m || query === '') match = true;
+                  categorySections.forEach(section => {
+                    const sectionCategory = section.dataset.category;
+                    const matchesFilter = activeFilter === 'all' || sectionCategory === activeFilter;
+
+                    if (!matchesFilter) {
+                      section.classList.add('hidden');
+                      return;
+                    }
+
+                    const cards = section.querySelectorAll('.doc-card');
+                    let sectionHasMatch = false;
+
+                    cards.forEach(card => {
+                      const title = card.dataset.title.toLowerCase();
+                      const matchesSearch = !query || title.includes(lowerQuery);
+                      card.classList.toggle('hidden', !matchesSearch);
+                      if (matchesSearch) sectionHasMatch = true;
                     });
-                    cat.classList.toggle('hidden', !match);
-                    if (match) hasResults = true;
+
+                    section.classList.toggle('hidden', !sectionHasMatch);
+                    if (sectionHasMatch) hasResults = true;
                   });
-                  noResults.classList.toggle('hidden', hasResults || query === '');
+
+                  emptyState.classList.toggle('hidden', hasResults || !query);
+
                 } else {
-                  // Content search - show results list
+                  // Content search
                   document.getElementById('categories').style.display = 'none';
+
                   if (!query || query.length < 2) {
                     contentResults.classList.remove('visible');
                     document.getElementById('categories').style.display = '';
-                    noResults.classList.add('hidden');
+                    emptyState.classList.add('hidden');
+                    filterCategory(activeFilter);
                     return;
                   }
+
                   if (!fuse) {
-                    searchLoading.classList.add('visible');
+                    loadingState.classList.remove('hidden');
                     loadSearchIndex().then(() => {
-                      searchLoading.classList.remove('visible');
+                      loadingState.classList.add('hidden');
                       performSearch(query);
                     });
                     return;
                   }
-                  const results = fuse.search(query, { limit: 30 });
+
+                  let results = fuse.search(query, { limit: 50 });
+
+                  // Filter by category if active
+                  if (activeFilter !== 'all') {
+                    results = results.filter(r => r.item.category === activeFilter);
+                  }
+
                   contentResults.innerHTML = '';
+
                   if (results.length === 0) {
                     contentResults.classList.remove('visible');
-                    noResults.classList.remove('hidden');
+                    emptyState.classList.remove('hidden');
                     return;
                   }
-                  noResults.classList.add('hidden');
+
+                  emptyState.classList.add('hidden');
                   contentResults.classList.add('visible');
-                  // Group by document to avoid too many results from same doc
+
+                  // Group by document
                   const seen = new Map();
                   results.forEach(result => {
                     const doc = result.item;
-                    const key = doc.id;
-                    if (!seen.has(key)) {
-                      seen.set(key, []);
-                    }
-                    if (seen.get(key).length < 3) { // Max 3 pages per document
-                      seen.get(key).push(doc);
-                    }
+                    if (!seen.has(doc.id)) seen.set(doc.id, []);
+                    if (seen.get(doc.id).length < 3) seen.get(doc.id).push(doc);
                   });
-                  seen.forEach((pages, docId) => {
+
+                  seen.forEach((pages) => {
                     pages.forEach(doc => {
-                      const snippet = getSnippet(doc.text, query);
                       const item = document.createElement('div');
-                      item.className = 'content-result-item';
+                      item.className = 'result-item';
                       item.onclick = () => window.location.href = 'viewer.html?file=' + doc.id + '.pdf&page=' + doc.page;
-                      item.innerHTML = '<div class="content-result-header">' +
-                        '<span class="content-result-num">' + doc.num + '</span>' +
-                        '<span class="content-result-title">' + doc.title + '</span>' +
-                        '<span class="content-result-page">Page ' + doc.page + '/' + doc.totalPages + '</span>' +
-                        '<span class="content-result-category">' + doc.category + '</span>' +
+                      item.innerHTML =
+                        '<div class="result-header">' +
+                          '<span class="result-num">#' + doc.num + '</span>' +
+                          '<span class="result-title">' + doc.title + '</span>' +
+                          '<span class="result-page">Page ' + doc.page + '/' + doc.totalPages + '</span>' +
+                          '<span class="result-category">' + doc.category + '</span>' +
                         '</div>' +
-                        '<div class="content-result-snippet">' + snippet + '</div>';
+                        '<div class="result-snippet">' + getSnippet(doc.text, query) + '</div>';
                       contentResults.appendChild(item);
                     });
                   });
                 }
               }
 
-              // Debounce search input
+              // Debounced search
               let searchTimeout;
-              search.addEventListener('input', (e) => {
+              searchInput.addEventListener('input', (e) => {
                 clearTimeout(searchTimeout);
                 searchTimeout = setTimeout(() => performSearch(e.target.value), 150);
               });
 
-              // Preload search index
+              // Initialize
               loadSearchIndex();
             </script>
           </body>
           </html>
           HTMLEOF
 
+          # Replace placeholders
           sed -i "s/TIMESTAMP/$(date -u +'%Y-%m-%d %H:%M UTC')/g" public/index.html
           sed -i "s/PDF_COUNT/$PDF_COUNT/g" public/index.html
 
