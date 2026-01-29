@@ -1,0 +1,340 @@
+% ============================================================================
+%  306-ot-cloud-connectivity - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {OT Cloud Connectivity}
+    {Securely Connecting Industrial Systems to Cloud Services}
+    {OT Security Learning Series}
+    {Document 306 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+\begin{warningbox}
+Cloud connectivity for OT environments should be \textbf{highly avoided}. When business requirements make it unavoidable, connectivity must be strictly limited to \textbf{outbound data flows for monitoring only}. The traditional air-gap model exists for good reason---every cloud connection introduces attack surface.
+\end{warningbox}
+
+Before implementing any cloud connectivity, organizations must establish compelling business justification. The default position is \textbf{no cloud connectivity}. When absolutely necessary, connectivity must be architected for read-only monitoring and data egress only.
+
+\begin{dangerbox}
+\textbf{Absolute Rule:} Remote control, command execution, or \textbf{any data flow from cloud into OT control systems is unacceptable} and creates critical safety and security risks. There are no exceptions. If a use case requires cloud-to-OT control, the use case must be rejected or redesigned.
+\end{dangerbox}
+
+\section{Use Cases}
+
+\subsection{Common Cloud Integration Scenarios}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Use Case} & \textcolor{white}{\bfseries Description} \\
+\midrule
+Remote Monitoring & View OT data from anywhere without VPN to OT network \\
+Predictive Maintenance & ML models analyzing equipment data for failure prediction \\
+Cloud Historian & Scalable storage for long-term process data \\
+Multi-Site Aggregation & Centralized view across geographically distributed facilities \\
+Digital Twin & Cloud-based simulation models fed by real-time OT data \\
+Supply Chain Integration & Sharing production data with partners/customers \\
+\end{tabular}
+\caption{Common OT-to-cloud use cases}
+\end{table}
+
+\subsection{Data Types}
+
+Not all OT data carries the same risk when exposed to cloud:
+
+\begin{itemize}
+    \item \textbf{Low Risk} -- Aggregated metrics, historical trends, equipment health
+    \item \textbf{Medium Risk} -- Real-time process values, production rates
+    \item \textbf{High Risk} -- Control commands, setpoints, configuration data
+\end{itemize}
+
+\begin{dangerbox}
+Control commands, setpoints, and configuration data must \textbf{never} flow from cloud to OT. Cloud connectivity is for \textbf{monitoring and analytics only}. Any architecture that allows cloud-initiated control of OT systems fundamentally violates safe OT security principles.
+\end{dangerbox}
+
+\section{Architecture Patterns}
+
+\subsection{Pattern 1: Edge Gateway}
+
+The most common and recommended pattern uses an edge gateway as intermediary:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    zone/.style={rectangle, draw=otprimary, thick, fill=otprimary!5,
+                 rounded corners=5pt, minimum width=3cm, minimum height=1cm,
+                 align=center, font=\small},
+    device/.style={rectangle, draw=otaccent, thick, fill=otaccent!10,
+                   rounded corners=3pt, minimum width=2.5cm, minimum height=0.8cm,
+                   align=center, font=\scriptsize},
+    arrow/.style={->, thick, >=stealth}
+]
+    % Cloud
+    \node[zone, fill=otinfo!10, draw=otinfo] (cloud) at (0,4) {Cloud Platform};
+
+    % DMZ
+    \node[zone, fill=otwarning!10, draw=otwarning] (dmz) at (0,2) {Industrial DMZ};
+    \node[device] (edge) at (0,2) {Edge Gateway};
+
+    % OT Network
+    \node[zone, fill=otsuccess!10, draw=otsuccess, minimum width=8cm] (ot) at (0,0) {OT Network};
+    \node[device] at (-2.5,0) {Historian};
+    \node[device] at (2.5,0) {SCADA};
+
+    % Arrows
+    \draw[arrow] (0,0.6) -- (0,1.5);
+    \draw[arrow] (0,2.5) -- (0,3.5);
+
+    % Labels
+    \node[font=\scriptsize, right] at (0.2,1) {Data pull};
+    \node[font=\scriptsize, right] at (0.2,3) {Outbound only};
+\end{tikzpicture}
+\caption{Edge gateway architecture pattern}
+\end{figure}
+
+\textbf{Key characteristics:}
+\begin{itemize}
+    \item Edge gateway initiates all connections (outbound only)
+    \item Data aggregation and filtering at the edge
+    \item No direct cloud-to-OT connectivity
+    \item Gateway placed in DMZ, not OT network
+\end{itemize}
+
+\subsection{Pattern 2: Data Diode with Cloud Relay}
+
+For higher security requirements, combine data diodes with cloud connectivity:
+
+\begin{itemize}
+    \item Hardware-enforced unidirectional flow from OT
+    \item Relay server in DMZ receives diode output
+    \item Relay forwards to cloud over encrypted connection
+    \item Physically impossible for cloud to send commands to OT
+\end{itemize}
+
+\subsection{Pattern 3: Store-and-Forward}
+
+Batch transfer pattern for non-real-time requirements:
+
+\begin{itemize}
+    \item Data collected and stored locally
+    \item Periodic uploads during maintenance windows
+    \item Manual approval option for sensitive data
+    \item Air gap maintained except during transfers
+\end{itemize}
+
+\section{Security Challenges}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    challenge/.style={rectangle, draw=otdanger, thick, fill=otdanger!10,
+                      rounded corners=3pt, minimum width=6cm, minimum height=0.7cm,
+                      align=left, text width=5.8cm, font=\small},
+    num/.style={circle, fill=otprimary, text=white, font=\small\bfseries,
+                minimum size=0.6cm}
+]
+    \node[num] at (0,0) {1};
+    \node[challenge, anchor=west] at (0.8,0) {Expanded attack surface};
+    \node[num] at (0,-1.0) {2};
+    \node[challenge, anchor=west] at (0.8,-1.0) {Cloud provider as trusted third party};
+    \node[num] at (0,-2.0) {3};
+    \node[challenge, anchor=west] at (0.8,-2.0) {Data sovereignty and compliance};
+    \node[num] at (0,-3.0) {4};
+    \node[challenge, anchor=west] at (0.8,-3.0) {Credential management complexity};
+    \node[num] at (0,-4.0) {5};
+    \node[challenge, anchor=west] at (0.8,-4.0) {Visibility gaps in encrypted traffic};
+    \node[num] at (0,-5.0) {6};
+    \node[challenge, anchor=west] at (0.8,-5.0) {Dependency on internet availability};
+\end{tikzpicture}
+\caption{Key security challenges for OT cloud connectivity}
+\end{figure}
+
+\subsection{Attack Surface Expansion}
+
+Cloud connectivity creates new attack vectors:
+
+\begin{itemize}
+    \item Compromised cloud credentials provide path to OT data
+    \item Vulnerable edge gateways become pivot points
+    \item Cloud misconfigurations expose industrial data
+    \item Supply chain attacks through cloud services
+\end{itemize}
+
+\subsection{Shared Responsibility}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{4.5cm}p{4.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Layer} & \textcolor{white}{\bfseries Cloud Provider} & \textcolor{white}{\bfseries Customer} \\
+\midrule
+Physical infrastructure & Provider & -- \\
+Network controls & Shared & Shared \\
+Identity \& access & Provider (platform) & Customer (config) \\
+Data protection & -- & Customer \\
+Application security & -- & Customer \\
+OT integration & -- & Customer \\
+\end{tabular}
+\caption{Shared responsibility model for OT cloud}
+\end{table}
+
+\section{Security Controls}
+
+\subsection{Network Security}
+
+\begin{itemize}
+    \item \textbf{Outbound-Only Connections} -- OT/edge initiates all cloud connections
+    \item \textbf{Firewall Rules} -- Whitelist specific cloud endpoints only
+    \item \textbf{TLS 1.3} -- Encrypt all data in transit
+    \item \textbf{Certificate Pinning} -- Prevent MITM attacks
+    \item \textbf{Network Monitoring} -- Alert on unexpected destinations
+\end{itemize}
+
+\subsection{Identity and Access}
+
+\begin{itemize}
+    \item \textbf{Device Identity} -- Unique certificates per edge gateway
+    \item \textbf{Managed Identities} -- Avoid storing credentials on devices
+    \item \textbf{Least Privilege} -- Minimal cloud permissions for OT connections
+    \item \textbf{MFA} -- For all human access to cloud OT data
+    \item \textbf{Regular Rotation} -- Automated credential rotation
+\end{itemize}
+
+\subsection{Data Protection}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{9.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Control} & \textcolor{white}{\bfseries Implementation} \\
+\midrule
+Data Classification & Tag OT data by sensitivity before cloud upload \\
+Filtering at Edge & Remove sensitive data before transmission \\
+Encryption at Rest & Customer-managed keys for cloud storage \\
+Access Logging & Audit all access to OT data in cloud \\
+Retention Policies & Automated deletion per compliance requirements \\
+\end{tabular}
+\caption{Data protection controls}
+\end{table}
+
+\begin{successbox}
+Apply the principle of data minimization: only send data to the cloud that is actually needed for the use case. Filter, aggregate, and anonymize at the edge wherever possible.
+\end{successbox}
+
+\subsection{Edge Gateway Hardening}
+
+The edge gateway is a critical security boundary:
+
+\begin{itemize}
+    \item Harden OS, disable unnecessary services
+    \item Apply security patches promptly
+    \item Enable secure boot and firmware validation
+    \item Implement local logging and monitoring
+    \item Physical security at installation location
+\end{itemize}
+
+\section{Compliance Considerations}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3cm}p{10cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Regulation} & \textcolor{white}{\bfseries Cloud Connectivity Impact} \\
+\midrule
+NERC CIP & Electronic Security Perimeter extends to cloud connections \\
+NIS2 & Supply chain risk includes cloud providers \\
+IEC 62443 & Zone/conduit model must account for cloud boundary \\
+GDPR & OT data containing personal info subject to data residency \\
+\end{tabular}
+\caption{Compliance implications of OT cloud connectivity}
+\end{table}
+
+\begin{dangerbox}
+Some regulations may prohibit or restrict cloud connectivity for certain OT systems. Verify compliance requirements before implementing cloud integration for critical infrastructure.
+\end{dangerbox}
+
+\section{Implementation Checklist}
+
+\begin{enumerate}
+    \item \textbf{Document business justification}---why is cloud connectivity needed?
+    \item Verify no requirement for cloud-to-OT control (reject if required)
+    \item Classify data sensitivity---what goes to cloud?
+    \item Select architecture pattern appropriate to risk
+    \item Implement \textbf{outbound-only} connectivity (block all inbound)
+    \item Deploy edge gateway in DMZ (never in OT network)
+    \item Configure firewalls with minimal cloud endpoints
+    \item Establish device identity and credential management
+    \item Enable encryption in transit and at rest
+    \item Implement monitoring and alerting
+    \item Document in security architecture and compliance evidence
+\end{enumerate}
+
+\section{Summary}
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Highly Avoid:} Cloud connectivity to OT should be avoided; default position is no connectivity
+    \item \textbf{No Cloud-to-OT Control:} Remote control, commands, or any inbound data flow is unacceptable
+    \item \textbf{Monitoring Only:} If connectivity is unavoidable, limit strictly to read-only data egress
+    \item \textbf{Outbound Only:} All connections initiated from OT side; block all inbound from cloud
+    \item \textbf{Architecture:} Edge gateway in DMZ with strict outbound-only firewall rules
+    \item \textbf{Data Minimization:} Filter at edge; send only what is absolutely necessary
+\end{itemize}
+\end{definitionbox}
+
+\section{Further Reading}
+
+\subsection*{Industry Resources}
+\begin{itemize}
+    \item \textbf{ICS-CERT Recommended Practices} -- Defense in depth for ICS\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+    \item \textbf{NIST Cybersecurity for IoT} -- Considerations for connected devices\\
+          \url{https://www.nist.gov/programs-projects/nist-cybersecurity-iot-program}
+\end{itemize}
+
+\subsection*{Standards}
+\begin{itemize}
+    \item \textbf{IEC 62443-3-3} -- System security requirements including remote access\\
+          \url{https://webstore.iec.ch/publication/7033}
+\end{itemize}
+
+\subsection*{Books}
+\begin{itemize}
+    \item Knapp \& Langill -- \textit{Industrial Network Security} (Syngress)
+    \item Ackerman -- \textit{Industrial Cybersecurity} (Packt)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

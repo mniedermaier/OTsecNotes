@@ -1,0 +1,431 @@
+% ============================================================================
+%  890-device-management - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {Device Management in OT}
+    {Centralized Management, Directory Services, and Software Deployment}
+    {OT Security Learning Series}
+    {Document 890 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+Device management in Operational Technology (OT) environments presents unique challenges that differ significantly from traditional IT infrastructure. While enterprise environments benefit from mature centralized management solutions, OT networks must balance operational requirements, safety considerations, and security constraints when implementing device management strategies.
+
+\begin{infobox}
+This document explores device management concepts for OT environments, including directory service integration, software deployment strategies, and configuration management. It addresses the challenges of managing diverse industrial assets while maintaining system availability and security.
+\end{infobox}
+
+\subsection{Scope of Device Management}
+
+OT device management encompasses several key areas:
+
+\begin{itemize}
+    \item \textbf{Asset Inventory:} Maintaining accurate records of all devices
+    \item \textbf{Configuration Management:} Tracking and controlling device settings
+    \item \textbf{Software Deployment:} Distributing updates and applications
+    \item \textbf{Identity Management:} Centralized authentication and authorization
+    \item \textbf{Monitoring:} Health and compliance status tracking
+\end{itemize}
+
+\section{OT Device Management Challenges}
+
+\subsection{Heterogeneous Device Landscape}
+
+OT environments contain diverse device types with varying management capabilities:
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{4cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Device Type} & \textcolor{white}{\bfseries Management Capability} & \textcolor{white}{\bfseries Typical Approach} \\
+\midrule
+Windows-based HMI/SCADA & Full domain integration & Directory services, centralized updates \\
+Linux-based servers & SSH, configuration management & Ansible, Puppet, or manual \\
+PLCs/RTUs & Proprietary protocols & Vendor-specific tools only \\
+Network equipment & SNMP, SSH, web interface & Network management systems \\
+Embedded devices & Limited or none & Firmware updates via USB \\
+Safety systems (SIS) & Restricted access & Isolated, manual management \\
+\end{tabular}
+\caption{Device types and management approaches in OT}
+\end{table}
+
+\subsection{Availability Requirements}
+
+\begin{warningbox}
+OT systems often operate 24/7 with minimal maintenance windows. Device management activities must be carefully planned to avoid disrupting critical processes. Forced reboots or automatic updates can cause production outages or safety incidents.
+\end{warningbox}
+
+\subsection{Network Segmentation Constraints}
+
+Management traffic must respect zone boundaries defined by network segmentation. Direct connections from IT management systems to deep OT networks violate security principles and create attack paths.
+
+\section{Directory Services in OT}
+
+\subsection{Architecture Considerations}
+
+Directory services provide centralized authentication and authorization. In OT environments, the architecture must address:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=3cm, minimum height=1cm, align=center, font=\small},
+    zone/.style={rectangle, draw, dashed, thick, rounded corners=5pt, minimum width=7cm, fill=#1!10},
+    arrow/.style={->, thick, >=stealth}
+]
+% Zone 4 - Enterprise
+\node[zone=otdanger, minimum height=2cm] (z4) at (0,4) {};
+\node[left, font=\small\bfseries] at (-3.7,4) {Zone 4/5};
+\node[box, fill=otdanger!20] (entdc) at (0,4) {Enterprise\\Domain Controller};
+
+% Zone 3.5 - DMZ
+\node[zone=otwarning, minimum height=2cm] (z35) at (0,1.5) {};
+\node[left, font=\small\bfseries] at (-3.7,1.5) {Zone 3.5};
+\node[box, fill=otwarning!20] (rodc) at (-2,1.5) {Read-Only\\Domain Controller};
+\node[box, fill=otwarning!20] (jump) at (2,1.5) {Jump\\Server};
+
+% Zone 3 - Manufacturing
+\node[zone=otsuccess, minimum height=2cm] (z3) at (0,-1) {};
+\node[left, font=\small\bfseries] at (-3.7,-1) {Zone 3};
+\node[box, fill=otsuccess!20] (hmi) at (-2,-1) {HMI\\Stations};
+\node[box, fill=otsuccess!20] (scada) at (2,-1) {SCADA\\Servers};
+
+% Arrows
+\draw[arrow, otwarning] (entdc) -- (rodc) node[midway, left, font=\scriptsize] {Replication};
+\draw[arrow, otsuccess] (rodc) -- (hmi) node[midway, left, font=\scriptsize] {Auth};
+\draw[arrow, otsuccess] (rodc) -- (scada);
+\end{tikzpicture}
+\caption{Directory services architecture with DMZ placement}
+\end{figure}
+
+\subsection{Deployment Options}
+
+\subsubsection{Dedicated OT Domain}
+
+A separate domain for OT systems provides isolation from enterprise threats:
+
+\begin{itemize}
+    \item \textbf{Advantages:} Complete isolation, independent policies, no trust dependencies
+    \item \textbf{Disadvantages:} Duplicate administration, separate credentials for users
+\end{itemize}
+
+\subsubsection{Extended Enterprise Domain}
+
+OT systems join the enterprise domain with dedicated organizational units (OUs):
+
+\begin{itemize}
+    \item \textbf{Advantages:} Single sign-on, unified management, existing infrastructure
+    \item \textbf{Disadvantages:} Attack path from IT to OT, shared vulnerability exposure
+\end{itemize}
+
+\subsubsection{One-Way Trust Relationship}
+
+OT domain trusts enterprise domain for authentication, but not vice versa:
+
+\begin{itemize}
+    \item \textbf{Advantages:} Users authenticate with enterprise credentials, OT remains isolated
+    \item \textbf{Disadvantages:} Complex setup, trust relationship management
+\end{itemize}
+
+\begin{successbox}
+\textbf{Recommendation:} Use dedicated OT domains or one-way trusts. Place Read-Only Domain Controllers (RODCs) in the DMZ to service OT authentication without exposing writable directory services.
+\end{successbox}
+
+\subsection{Group Policy Considerations}
+
+Group policies for OT systems require different settings than enterprise IT:
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{4cm}p{4.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Policy Area} & \textcolor{white}{\bfseries IT Approach} & \textcolor{white}{\bfseries OT Consideration} \\
+\midrule
+Automatic updates & Enabled, auto-install & Disabled or controlled \\
+Screen lock timeout & 5-15 minutes & Extended or disabled for operators \\
+Password expiration & 60-90 days & Longer periods or certificates \\
+USB device control & Often blocked & May need access for maintenance \\
+Software restriction & AppLocker/SRP & Application whitelisting \\
+\end{tabular}
+\caption{Group policy differences between IT and OT}
+\end{table}
+
+\section{Software Deployment Strategies}
+
+\subsection{Centralized Update Management}
+
+Centralized update management systems distribute patches and software across the network:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=2.5cm, minimum height=0.8cm, align=center, font=\small},
+    server/.style={box, fill=otaccent!20},
+    client/.style={box, fill=otinfo!20},
+    arrow/.style={->, thick, >=stealth}
+]
+% Upstream
+\node[server] (upstream) at (0,3) {Upstream\\Update Server};
+
+% DMZ Server
+\node[server] (dmz) at (0,1.5) {DMZ Update\\Server};
+
+% OT Servers
+\node[server] (ot1) at (-3,0) {Zone 3\\Update Server};
+\node[server] (ot2) at (3,0) {Zone 2\\Update Server};
+
+% Clients
+\node[client] (c1) at (-4.5,-1.5) {HMI 1};
+\node[client] (c2) at (-1.5,-1.5) {HMI 2};
+\node[client] (c3) at (1.5,-1.5) {Historian};
+\node[client] (c4) at (4.5,-1.5) {Eng WS};
+
+% Arrows
+\draw[arrow] (upstream) -- (dmz);
+\draw[arrow] (dmz) -- (ot1);
+\draw[arrow] (dmz) -- (ot2);
+\draw[arrow] (ot1) -- (c1);
+\draw[arrow] (ot1) -- (c2);
+\draw[arrow] (ot2) -- (c3);
+\draw[arrow] (ot2) -- (c4);
+
+% Labels
+\node[font=\scriptsize, right] at (0.2,2.25) {Pull updates};
+\node[font=\scriptsize, left] at (-3.3,0.75) {Distribute};
+\end{tikzpicture}
+\caption{Hierarchical update distribution architecture}
+\end{figure}
+
+\subsection{Update Server Placement}
+
+\begin{itemize}
+    \item \textbf{Enterprise Zone:} Primary server syncs with external sources
+    \item \textbf{DMZ:} Downstream server receives approved updates
+    \item \textbf{Manufacturing Zone:} Local servers distribute to OT clients
+\end{itemize}
+
+\begin{warningbox}
+Never configure OT systems to pull updates directly from internet sources. All updates should flow through controlled internal servers after testing and approval.
+\end{warningbox}
+
+\subsection{Configuration Management Tools}
+
+Configuration management automates system state enforcement:
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3cm}p{2.5cm}p{7cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Approach} & \textcolor{white}{\bfseries Model} & \textcolor{white}{\bfseries OT Suitability} \\
+\midrule
+Agentless (SSH/WinRM) & Pull or Push & Good -- no software installation on endpoints \\
+Agent-based & Pull & Requires agent installation and connectivity \\
+Image-based & Push & Suitable for standardized HMI deployments \\
+Manual scripts & Push & Limited scalability, prone to errors \\
+\end{tabular}
+\caption{Configuration management approaches}
+\end{table}
+
+\subsection{Software Distribution Best Practices}
+
+\begin{enumerate}
+    \item \textbf{Testing Environment:} Validate all updates in a test environment that mirrors production
+    \item \textbf{Staged Rollout:} Deploy to pilot systems before full deployment
+    \item \textbf{Rollback Plan:} Maintain ability to restore previous state
+    \item \textbf{Change Windows:} Schedule deployments during planned maintenance
+    \item \textbf{Vendor Approval:} Confirm updates are approved by OT system vendors
+\end{enumerate}
+
+\section{Asset Management Integration}
+
+\subsection{OT Asset Inventory Requirements}
+
+Effective device management requires comprehensive asset tracking:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=3.5cm, minimum height=0.7cm, align=center, font=\small, fill=otinfo!15},
+    center/.style={rectangle, draw, thick, rounded corners=5pt, minimum width=3cm, minimum height=1cm, align=center, font=\small\bfseries, fill=otaccent!30}
+]
+% Center
+\node[center] (cmdb) at (0,0) {Asset\\Database};
+
+% Surrounding elements
+\node[box] (hw) at (-4,2) {Hardware Inventory};
+\node[box] (sw) at (4,2) {Software Inventory};
+\node[box] (net) at (-4,-2.2) {Network Configuration};
+\node[box] (sec) at (4,-2.2) {Security Posture};
+\node[box] (fw) at (0,2.5) {Firmware Versions};
+\node[box] (conf) at (0,-3) {Configuration Backups};
+
+% Connections
+\draw[thick, otaccent] (cmdb) -- (hw);
+\draw[thick, otaccent] (cmdb) -- (sw);
+\draw[thick, otaccent] (cmdb) -- (net);
+\draw[thick, otaccent] (cmdb) -- (sec);
+\draw[thick, otaccent] (cmdb) -- (fw);
+\draw[thick, otaccent] (cmdb) -- (conf);
+\end{tikzpicture}
+\caption{Asset management data elements}
+\end{figure}
+
+\subsection{Discovery Methods}
+
+\begin{itemize}
+    \item \textbf{Passive Monitoring:} Network traffic analysis to identify devices
+    \item \textbf{Active Scanning:} Controlled queries using safe OT protocols
+    \item \textbf{Agent-based:} Software agents report device information
+    \item \textbf{Integration:} Data from existing management systems
+\end{itemize}
+
+\begin{dangerbox}
+Active scanning can disrupt sensitive OT devices. Always use OT-aware discovery tools and schedule scans during appropriate maintenance windows. Never scan safety systems or process control networks without explicit approval.
+\end{dangerbox}
+
+\section{Management Network Design}
+
+\subsection{Dedicated Management Plane}
+
+Separating management traffic from operational traffic enhances security:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=2cm, minimum height=1.2cm, align=center, font=\small},
+    netbox/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=2.5cm, minimum height=0.7cm, align=center, font=\small}
+]
+% Devices in center
+\node[box, fill=otinfo!15] (hmi) at (-3,0) {HMI};
+\node[box, fill=otinfo!15] (scada) at (0,0) {SCADA};
+\node[box, fill=otinfo!15] (hist) at (3,0) {Historian};
+
+% Management network on top
+\node[netbox, fill=otaccent!20] (mgmt) at (0,2.2) {Management Network};
+
+% Process network on bottom
+\node[netbox, fill=otsuccess!20] (proc) at (0,-2.2) {Process Network};
+
+% NIC indicators on devices
+\foreach \dev in {hmi, scada, hist} {
+    \fill[otaccent] ($(\dev.north) + (-0.3,0)$) rectangle ($(\dev.north) + (0.3,0.15)$);
+    \fill[otsuccess] ($(\dev.south) + (-0.3,0)$) rectangle ($(\dev.south) + (0.3,-0.15)$);
+}
+
+% Connections to management (top)
+\draw[thick, otaccent] (hmi.north) ++(0,0.15) -- ++(0,0.45) -| (mgmt.south);
+\draw[thick, otaccent] (scada.north) ++(0,0.15) -- (mgmt.south);
+\draw[thick, otaccent] (hist.north) ++(0,0.15) -- ++(0,0.45) -| (mgmt.south);
+
+% Connections to process (bottom)
+\draw[thick, otsuccess] (hmi.south) ++(0,-0.15) -- ++(0,-0.45) -| (proc.north);
+\draw[thick, otsuccess] (scada.south) ++(0,-0.15) -- (proc.north);
+\draw[thick, otsuccess] (hist.south) ++(0,-0.15) -- ++(0,-0.45) -| (proc.north);
+
+% Labels
+\node[font=\scriptsize, right] at (2,2.2) {Updates, Auth, Config};
+\node[font=\scriptsize, right] at (2,-2.2) {Process Data};
+\end{tikzpicture}
+\caption{Dual-homed devices with separate management and process networks}
+\end{figure}
+
+\subsection{Access Control for Management}
+
+\begin{itemize}
+    \item \textbf{Jump Servers:} All management access through hardened bastion hosts
+    \item \textbf{Multi-Factor Authentication:} Required for all administrative access
+    \item \textbf{Session Recording:} Log and record administrative sessions
+    \item \textbf{Time-based Access:} Limit management access to defined windows
+\end{itemize}
+
+\section{Compliance and Monitoring}
+
+\subsection{Configuration Compliance}
+
+Device management systems should verify systems meet security baselines:
+
+\begin{itemize}
+    \item Operating system hardening standards
+    \item Required security software presence
+    \item Prohibited software detection
+    \item Account and permission compliance
+    \item Patch level verification
+\end{itemize}
+
+\subsection{Alerting and Reporting}
+
+\begin{tipbox}
+Integrate device management status into OT security monitoring. Alert on unauthorized changes, missing patches on critical systems, and configuration drift from approved baselines.
+\end{tipbox}
+
+\section{Summary}
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Segmented Architecture:} Place management infrastructure according to zone boundaries; use DMZ servers and one-way trusts to limit attack paths
+    \item \textbf{OT-Specific Policies:} Device management policies must accommodate operational requirements including extended maintenance windows and availability needs
+    \item \textbf{Hierarchical Distribution:} Use tiered update servers to control software flow from enterprise to OT zones
+    \item \textbf{Testing Before Deployment:} All updates and configuration changes require validation in test environments before production rollout
+    \item \textbf{Comprehensive Inventory:} Maintain accurate asset records including firmware, configuration, and security posture for all managed devices
+\end{itemize}
+\end{definitionbox}
+
+\section{Further Reading}
+
+\subsection*{Standards and Guidelines}
+
+\begin{itemize}
+    \item \textbf{IEC 62443-2-1} -- Security Program Requirements for IACS Asset Owners\\
+          \url{https://webstore.iec.ch/publication/7030}
+    \item \textbf{NIST SP 800-82 Rev. 3} -- Guide to OT Security\\
+          \url{https://csrc.nist.gov/pubs/sp/800/82/r3/final}
+    \item \textbf{CISA} -- Securing Industrial Control Systems\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{SANS ICS} -- Industrial Control Systems Security Resources\\
+          \url{https://www.sans.org/cyber-security-courses/ics-scada-cyber-security-essentials}
+    \item \textbf{CIS Controls} -- Center for Internet Security Controls\\
+          \url{https://www.cisecurity.org/controls}
+\end{itemize}
+
+\subsection*{Books}
+
+\begin{itemize}
+    \item Knapp, Eric D. -- \textit{Industrial Network Security} (Syngress)
+    \item Stouffer, Keith et al. -- \textit{Guide to Industrial Control Systems Security} (NIST)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

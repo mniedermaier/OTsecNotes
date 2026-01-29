@@ -1,0 +1,420 @@
+% ============================================================================
+%  880-privileged-access - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {Privileged Access Management}
+    {Controlling Administrative Access in OT Environments}
+    {OT Security Learning Series}
+    {Document 880 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+\begin{infobox}
+Privileged Access Management (PAM) controls and monitors access by users with elevated permissions to critical systems. In OT environments, privileged accounts include not only administrative credentials but also vendor remote access, engineering workstation logins, and service accounts that can modify industrial control system configurations.
+\end{infobox}
+
+Privileged accounts represent the keys to the kingdom in any environment, but in OT they carry additional weight. A compromised privileged account can modify PLC logic, disable safety systems, or disrupt physical processes. Unlike IT environments where privileged access primarily affects data, OT privileged access can affect safety and operations.
+
+\section{Privileged Access in OT}
+
+\subsection{Types of Privileged Accounts}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Account Type} & \textcolor{white}{\bfseries Description and Risk} \\
+\midrule
+System Administrator & Full access to servers, workstations, network devices \\
+OT Engineer & Can modify PLC/DCS logic, HMI configurations \\
+Vendor/Integrator & Remote access for maintenance, often with broad permissions \\
+Service Accounts & Automated processes with elevated privileges \\
+Emergency/Break-Glass & High-privilege accounts for disaster recovery \\
+Shared Accounts & Generic logins used by multiple operators \\
+\end{tabular}
+\caption{Types of privileged accounts in OT environments}
+\end{table}
+
+\subsection{OT-Specific Challenges}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    challenge/.style={rectangle, draw=otwarning, thick, fill=otwarning!10,
+                      rounded corners=5pt, minimum width=6.5cm, minimum height=0.7cm,
+                      align=left, text width=6.3cm, font=\small},
+    num/.style={circle, fill=otprimary, text=white, font=\small\bfseries,
+                minimum size=0.6cm}
+]
+    \node[num] at (0,0) {1};
+    \node[challenge, anchor=west] at (0.8,0) {Legacy systems lack modern authentication};
+    \node[num] at (0,-1.0) {2};
+    \node[challenge, anchor=west] at (0.8,-1.0) {Shared accounts on HMIs and consoles};
+    \node[num] at (0,-2.0) {3};
+    \node[challenge, anchor=west] at (0.8,-2.0) {Vendor access often poorly controlled};
+    \node[num] at (0,-3.0) {4};
+    \node[challenge, anchor=west] at (0.8,-3.0) {24/7 operations require always-on access};
+    \node[num] at (0,-4.0) {5};
+    \node[challenge, anchor=west] at (0.8,-4.0) {Safety systems may require rapid access};
+    \node[num] at (0,-5.0) {6};
+    \node[challenge, anchor=west] at (0.8,-5.0) {Air-gapped systems complicate central PAM};
+\end{tikzpicture}
+\caption{OT-specific PAM challenges}
+\end{figure}
+
+\begin{warningbox}
+Many OT systems were designed before cybersecurity was a concern. PLCs may have no authentication, HMIs may use shared local accounts, and vendor access may rely on static VPN credentials. PAM strategies must account for these limitations.
+\end{warningbox}
+
+\section{PAM Architecture for OT}
+
+\subsection{Core Components}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw=otprimary, thick, fill=otprimary!10,
+                rounded corners=5pt, minimum width=3.5cm, minimum height=1cm,
+                align=center, font=\small},
+    central/.style={rectangle, draw=otaccent, thick, fill=otaccent!20,
+                    rounded corners=5pt, minimum width=4cm, minimum height=1.5cm,
+                    align=center, font=\small\bfseries},
+    arrow/.style={->, thick, >=stealth}
+]
+    % Central PAM
+    \node[central] (pam) at (0,0) {PAM Solution\\(Vault + Gateway)};
+
+    % Users
+    \node[box] (admin) at (-5,2) {Administrators};
+    \node[box] (vendor) at (-5,0) {Vendors};
+    \node[box] (eng) at (-5,-2) {Engineers};
+
+    % Targets
+    \node[box] (server) at (5,2) {Servers};
+    \node[box] (network) at (5,0) {Network Devices};
+    \node[box] (ot) at (5,-2) {OT Systems};
+
+    % Arrows
+    \draw[arrow] (admin) -- (pam);
+    \draw[arrow] (vendor) -- (pam);
+    \draw[arrow] (eng) -- (pam);
+    \draw[arrow] (pam) -- (server);
+    \draw[arrow] (pam) -- (network);
+    \draw[arrow] (pam) -- (ot);
+\end{tikzpicture}
+\caption{PAM architecture overview}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{Credential Vault} -- Securely stores and rotates privileged credentials
+    \item \textbf{Session Gateway} -- Proxies and records privileged sessions
+    \item \textbf{Access Request Workflow} -- Manages approval for privileged access
+    \item \textbf{Just-in-Time Access} -- Grants temporary elevated permissions
+    \item \textbf{Session Recording} -- Captures keystrokes, screens, commands
+\end{itemize}
+
+\subsection{Jump Server Architecture}
+
+Jump servers (or bastion hosts) provide controlled access points into OT networks:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    zone/.style={rectangle, draw=otprimary, thick, fill=otprimary!5,
+                 rounded corners=5pt, minimum width=3cm, minimum height=2.5cm,
+                 align=center},
+    box/.style={rectangle, draw=otaccent, thick, fill=otaccent!10,
+                rounded corners=3pt, minimum width=2.5cm, minimum height=0.7cm,
+                align=center, font=\scriptsize},
+    jump/.style={rectangle, draw=otwarning, thick, fill=otwarning!20,
+                 rounded corners=3pt, minimum width=2.5cm, minimum height=0.8cm,
+                 align=center, font=\scriptsize\bfseries},
+    arrow/.style={->, thick, >=stealth}
+]
+    % IT Zone
+    \node[zone, label=above:{\small IT Network}] (it) at (0,0) {};
+    \node[box] at (0,0.3) {Admin Workstation};
+    \node[box] at (0,-0.5) {PAM Server};
+
+    % DMZ
+    \node[zone, label=above:{\small DMZ}] (dmz) at (5,0) {};
+    \node[jump] at (5,0) {Jump Server};
+
+    % OT Zone
+    \node[zone, label=above:{\small OT Network}] (ot) at (10,0) {};
+    \node[box] at (10,0.5) {Engineering WS};
+    \node[box] at (10,-0.5) {HMI / SCADA};
+
+    % Arrows
+    \draw[arrow] (2,0) -- (3.2,0);
+    \draw[arrow] (6.8,0) -- (8,0);
+\end{tikzpicture}
+\caption{Jump server placement in OT architecture}
+\end{figure}
+
+\begin{tipbox}
+Jump servers should be hardened systems with minimal software, full session logging, and multi-factor authentication. All administrative access to OT systems should traverse the jump server---direct connections must be blocked.
+\end{tipbox}
+
+\section{Vendor Access Management}
+
+\subsection{The Vendor Access Problem}
+
+OT environments often depend heavily on vendor support:
+
+\begin{itemize}
+    \item Equipment vendors for PLC/DCS troubleshooting
+    \item System integrators for configuration changes
+    \item Software vendors for updates and patches
+    \item Managed service providers for ongoing support
+\end{itemize}
+
+\begin{dangerbox}
+Vendor remote access is one of the most common attack vectors in OT incidents. Attackers compromise vendor credentials or infrastructure, then use trusted connections to reach multiple customer sites. The 2021 Kaseya attack demonstrated this at scale.
+\end{dangerbox}
+
+\subsection{Vendor Access Controls}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Control} & \textcolor{white}{\bfseries Implementation} \\
+\midrule
+No Persistent Access & Disable vendor connections when not in use \\
+Explicit Approval & Require customer approval before each session \\
+Time-Limited Sessions & Auto-terminate access after defined period \\
+Least Privilege & Limit access to specific systems needed \\
+Multi-Factor Auth & Require MFA for all vendor connections \\
+Session Recording & Record all vendor activity for audit \\
+Real-Time Monitoring & Alert on unusual vendor behavior \\
+\end{tabular}
+\caption{Essential vendor access controls}
+\end{table}
+
+\subsection{Vendor Access Workflow}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    stepbox/.style={rectangle, draw=otaccent, thick, fill=otaccent!10,
+                    rounded corners=3pt, minimum width=2.2cm, minimum height=0.9cm,
+                    align=center, font=\scriptsize},
+    arrow/.style={->, thick, >=stealth, otprimary}
+]
+    \node[stepbox] (req) at (0,0) {Vendor\\Requests};
+    \node[stepbox] (approve) at (3,0) {Customer\\Approves};
+    \node[stepbox] (cred) at (6,0) {Credentials\\Issued};
+    \node[stepbox] (session) at (9,0) {Monitored\\Session};
+    \node[stepbox] (revoke) at (12,0) {Access\\Revoked};
+
+    \draw[arrow] (req) -- (approve);
+    \draw[arrow] (approve) -- (cred);
+    \draw[arrow] (cred) -- (session);
+    \draw[arrow] (session) -- (revoke);
+\end{tikzpicture}
+\caption{Controlled vendor access workflow}
+\end{figure}
+
+\section{Credential Management}
+
+\subsection{Password Vaulting}
+
+Centralized password vaults eliminate password sharing and enable rotation:
+
+\begin{itemize}
+    \item Store all privileged credentials in encrypted vault
+    \item Users check out credentials through PAM system
+    \item Automatic rotation after each use or on schedule
+    \item Eliminate local copies of privileged passwords
+    \item Audit trail for all credential access
+\end{itemize}
+
+\subsection{Rotation Challenges in OT}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Challenge} & \textcolor{white}{\bfseries Mitigation} \\
+\midrule
+Hardcoded credentials & Document, plan remediation in maintenance windows \\
+Service account dependencies & Map dependencies before rotation \\
+Offline/air-gapped systems & Manual rotation procedures with verification \\
+Legacy systems without APIs & Agent-based or manual rotation with scripts \\
+24/7 operations & Schedule rotation during planned maintenance \\
+\end{tabular}
+\caption{OT password rotation challenges and mitigations}
+\end{table}
+
+\subsection{Service Account Management}
+
+Service accounts require special attention:
+
+\begin{itemize}
+    \item \textbf{Inventory} -- Document all service accounts and their purposes
+    \item \textbf{Ownership} -- Assign responsible owner for each account
+    \item \textbf{Least Privilege} -- Limit permissions to minimum required
+    \item \textbf{Monitoring} -- Alert on interactive logins to service accounts
+    \item \textbf{Rotation} -- Rotate credentials on defined schedule
+\end{itemize}
+
+\section{Session Management}
+
+\subsection{Session Recording}
+
+Recording privileged sessions provides forensic capability and deters misuse:
+
+\begin{itemize}
+    \item \textbf{Video Recording} -- Capture screen activity for GUI sessions
+    \item \textbf{Keystroke Logging} -- Record all commands entered
+    \item \textbf{Command Filtering} -- Block or alert on dangerous commands
+    \item \textbf{Metadata Capture} -- Log session duration, systems accessed
+\end{itemize}
+
+\begin{successbox}
+Session recordings are invaluable for incident investigation. When a configuration change causes a process upset, recorded sessions show exactly what was modified and by whom.
+\end{successbox}
+
+\subsection{Real-Time Monitoring}
+
+Beyond recording, active monitoring can prevent damage:
+
+\begin{itemize}
+    \item Alert on sensitive command execution
+    \item Terminate sessions on policy violations
+    \item Notify supervisors of high-risk activities
+    \item Integrate with SIEM for correlation
+\end{itemize}
+
+\section{Emergency Access}
+
+\subsection{Break-Glass Procedures}
+
+Emergency situations may require bypassing normal PAM controls:
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Element} & \textcolor{white}{\bfseries Description} \\
+\midrule
+Emergency Accounts & Pre-created high-privilege accounts in sealed storage \\
+Access Criteria & Defined conditions that justify emergency access \\
+Notification & Automatic alerts when emergency access is used \\
+Time Limits & Auto-disable after defined emergency period \\
+Post-Incident Review & Mandatory review of all emergency access use \\
+\end{tabular}
+\caption{Break-glass procedure elements}
+\end{table}
+
+\begin{warningbox}
+Emergency access procedures must balance security with operational reality. Overly restrictive procedures that delay response to safety events are unacceptable. Test emergency procedures regularly to ensure they work when needed.
+\end{warningbox}
+
+\section{Implementation Approach}
+
+\subsection{Phased Deployment}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    phase/.style={rectangle, draw=otprimary, thick, fill=otprimary!10,
+                  rounded corners=5pt, minimum width=2.8cm, minimum height=1.8cm,
+                  align=center, font=\small},
+    arrow/.style={->, thick, >=stealth, otaccent}
+]
+    \node[phase] (p1) at (0,0) {Phase 1\\[3pt]\scriptsize Discovery\\Account inventory};
+    \node[phase] (p2) at (4,0) {Phase 2\\[3pt]\scriptsize Vault\\Credential storage};
+    \node[phase] (p3) at (8,0) {Phase 3\\[3pt]\scriptsize Gateway\\Session proxy};
+    \node[phase] (p4) at (12,0) {Phase 4\\[3pt]\scriptsize Automation\\JIT access};
+
+    \draw[arrow] (p1) -- (p2);
+    \draw[arrow] (p2) -- (p3);
+    \draw[arrow] (p3) -- (p4);
+\end{tikzpicture}
+\caption{Phased PAM implementation approach}
+\end{figure}
+
+\subsection{Priority Systems}
+
+Focus initial PAM deployment on highest-risk access:
+
+\begin{enumerate}
+    \item Vendor and third-party remote access
+    \item Domain administrator and root accounts
+    \item Engineering workstations with OT access
+    \item Service accounts for critical applications
+    \item Local administrator accounts on OT systems
+\end{enumerate}
+
+\section{Summary}
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{OT Privileged Access:} Includes not just admin accounts but vendor access, engineering workstations, and service accounts that can modify industrial systems
+    \item \textbf{Vendor Risk:} Third-party remote access is a primary attack vector; implement approval workflows, time limits, and session recording
+    \item \textbf{Jump Servers:} Force all administrative access through monitored bastion hosts in the DMZ
+    \item \textbf{Credential Vaulting:} Centralize privileged credentials with automatic rotation; eliminate shared passwords
+    \item \textbf{Session Recording:} Record all privileged sessions for audit and forensic capability
+    \item \textbf{Emergency Access:} Maintain break-glass procedures that balance security with operational needs
+\end{itemize}
+\end{definitionbox}
+
+\section{Further Reading}
+
+\subsection*{Standards}
+\begin{itemize}
+    \item \textbf{IEC 62443-2-1} -- Security program requirements for IACS asset owners\\
+          \url{https://webstore.iec.ch/publication/7030}
+    \item \textbf{NIST SP 800-53} -- Security and Privacy Controls (Access Control family)\\
+          \url{https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final}
+\end{itemize}
+
+\subsection*{Resources}
+\begin{itemize}
+    \item \textbf{CISA Remote Access Guidance} -- Securing remote access to OT\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+    \item \textbf{NIST SP 800-82} -- Guide to ICS Security\\
+          \url{https://csrc.nist.gov/pubs/sp/800/82/r3/final}
+\end{itemize}
+
+\subsection*{Books}
+\begin{itemize}
+    \item Bejtlich -- \textit{The Practice of Network Security Monitoring} (No Starch Press)
+    \item Knapp \& Langill -- \textit{Industrial Network Security} (Syngress)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

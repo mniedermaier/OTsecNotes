@@ -1,0 +1,355 @@
+% ============================================================================
+%  870-encryption-in-ot - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {Encryption in OT Environments}
+    {Challenges and Implementation Strategies for Industrial Systems}
+    {OT Security Learning Series}
+    {Document 870 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+\begin{infobox}
+Encryption protects data confidentiality and integrity, but implementing it in OT environments presents unique challenges. Real-time requirements, legacy systems, resource-constrained devices, and the need for deterministic communication create obstacles that don't exist in typical IT environments. This document examines these challenges and practical approaches to deploying encryption in industrial settings.
+\end{infobox}
+
+While encryption is standard practice in IT networks, OT environments have historically operated without it. Many industrial protocols were designed decades ago when networks were isolated and security was not a concern. Today, increased connectivity and evolving threats make encryption necessary, but implementation requires careful consideration of OT-specific constraints.
+
+\section{OT-Specific Challenges}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    challenge/.style={rectangle, draw=otwarning, thick, fill=otwarning!10,
+                      rounded corners=5pt, minimum width=5.5cm, minimum height=0.8cm,
+                      align=left, text width=5.3cm, font=\small},
+    num/.style={circle, fill=otprimary, text=white, font=\small\bfseries,
+                minimum size=0.6cm}
+]
+    \node[num] at (0,0) {1};
+    \node[challenge, anchor=west] at (0.6,0) {Real-time and latency requirements};
+    \node[num] at (0,-1.1) {2};
+    \node[challenge, anchor=west] at (0.6,-1.1) {Resource-constrained devices};
+    \node[num] at (0,-2.2) {3};
+    \node[challenge, anchor=west] at (0.6,-2.2) {Legacy protocol compatibility};
+    \node[num] at (0,-3.3) {4};
+    \node[challenge, anchor=west] at (0.6,-3.3) {Deterministic communication needs};
+    \node[num] at (0,-4.4) {5};
+    \node[challenge, anchor=west] at (0.6,-4.4) {Key management complexity};
+    \node[num] at (0,-5.5) {6};
+    \node[challenge, anchor=west] at (0.6,-5.5) {Network inspection requirements};
+    \node[num] at (0,-6.6) {7};
+    \node[challenge, anchor=west] at (0.6,-6.6) {Long device lifecycles};
+\end{tikzpicture}
+\caption{Key challenges for encryption in OT environments}
+\end{figure}
+
+\subsection{Real-Time Requirements}
+
+Industrial processes often require deterministic, low-latency communication:
+
+\begin{itemize}
+    \item \textbf{Safety Systems} -- Response times measured in milliseconds
+    \item \textbf{Motion Control} -- Microsecond-level synchronization
+    \item \textbf{Process Control} -- Consistent cycle times for stability
+\end{itemize}
+
+\begin{warningbox}
+Encryption adds processing overhead and can introduce variable latency. For safety-critical systems, the additional delay from cryptographic operations may be unacceptable or require careful engineering.
+\end{warningbox}
+
+\subsection{Resource Constraints}
+
+Many OT devices have limited computational resources:
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{9.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Constraint} & \textcolor{white}{\bfseries Impact on Encryption} \\
+\midrule
+Limited CPU & Cannot perform complex cryptographic operations quickly \\
+Small memory & Cannot store large certificates or key material \\
+No hardware acceleration & Software-only crypto is slow and power-intensive \\
+Fixed firmware & May not support modern cipher suites \\
+\end{tabular}
+\caption{Resource constraints affecting encryption capability}
+\end{table}
+
+\subsection{Legacy Protocol Limitations}
+
+Many industrial protocols lack native encryption support:
+
+\begin{itemize}
+    \item \textbf{Modbus} -- No built-in security; Modbus/TCP transmits in cleartext
+    \item \textbf{DNP3} -- DNP3 Secure Authentication adds integrity, not encryption
+    \item \textbf{EtherNet/IP} -- CIP Security is relatively recent addition
+    \item \textbf{PROFINET} -- Security extensions still maturing
+    \item \textbf{OPC Classic} -- DCOM-based, limited encryption options
+\end{itemize}
+
+\section{Encryption Approaches by Layer}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    layer/.style={rectangle, draw=otprimary, thick, fill=otprimary!10,
+                  rounded corners=3pt, minimum width=3cm, minimum height=1cm,
+                  align=center, font=\small\bfseries},
+    tech/.style={rectangle, draw=otaccent, thick, fill=otaccent!5,
+                 rounded corners=3pt, minimum width=2.8cm, minimum height=0.6cm,
+                 align=center, font=\scriptsize}
+]
+    % Application Layer
+    \node[layer] (app) at (0,0) {Application\\Layer};
+    \node[tech] at (4,0.3) {OPC UA Security};
+    \node[tech] at (4,-0.3) {CIP Security};
+
+    % Transport Layer
+    \node[layer] (trans) at (0,-2) {Transport\\Layer};
+    \node[tech] at (4,-1.7) {TLS 1.3};
+    \node[tech] at (4,-2.3) {DTLS};
+
+    % Network Layer
+    \node[layer] (net) at (0,-4) {Network\\Layer};
+    \node[tech] at (4,-3.7) {IPsec};
+    \node[tech] at (4,-4.3) {WireGuard};
+
+    % Link Layer
+    \node[layer] (link) at (0,-6) {Link\\Layer};
+    \node[tech] at (4,-5.7) {MACsec (802.1AE)};
+    \node[tech] at (4,-6.3) {WPA3};
+\end{tikzpicture}
+\caption{Encryption technologies by OSI layer}
+\end{figure}
+
+\subsection{Link Layer Encryption}
+
+\textbf{MACsec (IEEE 802.1AE)} provides encryption at Layer 2:
+
+\begin{itemize}
+    \item Encrypts all traffic between switches
+    \item Minimal latency impact (hardware-based)
+    \item Requires MACsec-capable network equipment
+    \item Does not protect traffic end-to-end through Layer 3 boundaries
+\end{itemize}
+
+\begin{successbox}
+MACsec is well-suited for OT environments where low latency is critical and traffic stays within a Layer 2 domain. Industrial Ethernet switches increasingly support MACsec.
+\end{successbox}
+
+\subsection{Network Layer Encryption}
+
+\textbf{IPsec} encrypts at Layer 3:
+
+\begin{itemize}
+    \item \textbf{Transport Mode} -- Encrypts payload, preserves original IP headers
+    \item \textbf{Tunnel Mode} -- Encrypts entire packet, used for VPNs
+    \item Supported by most modern operating systems
+    \item Can add 10--20\% overhead; hardware acceleration helps
+\end{itemize}
+
+\subsection{Transport Layer Encryption}
+
+\textbf{TLS/DTLS} encrypts at Layer 4:
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.5cm}p{5cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Protocol} & \textcolor{white}{\bfseries Use Case} & \textcolor{white}{\bfseries OT Considerations} \\
+\midrule
+TLS 1.3 & TCP-based protocols & Reduced handshake latency \\
+DTLS 1.2/1.3 & UDP-based protocols & Handles packet loss, reordering \\
+Modbus/TCP + TLS & Securing Modbus & Requires TLS-capable devices \\
+\end{tabular}
+\caption{Transport layer encryption options}
+\end{table}
+
+\subsection{Application Layer Encryption}
+
+Some modern industrial protocols include native security:
+
+\begin{itemize}
+    \item \textbf{OPC UA} -- Built-in security with signing and encryption profiles
+    \item \textbf{CIP Security} -- EtherNet/IP security extension with TLS and DTLS
+    \item \textbf{MQTT} -- Supports TLS for broker connections
+    \item \textbf{IEC 62351} -- Security standard for power system protocols
+\end{itemize}
+
+\section{Protocol-Specific Solutions}
+
+\subsection{OPC UA Security}
+
+OPC UA was designed with security from the start:
+
+\begin{itemize}
+    \item Multiple security policies (None, Sign, SignAndEncrypt)
+    \item X.509 certificate-based authentication
+    \item Support for AES-128/256 encryption
+    \item User authentication via certificates, username/password, or tokens
+\end{itemize}
+
+\begin{tipbox}
+OPC UA is the preferred protocol for new OT deployments requiring encryption. Its security model aligns with IEC 62443 requirements and supports defense-in-depth strategies.
+\end{tipbox}
+
+\subsection{Securing Legacy Protocols}
+
+For protocols without native encryption:
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3cm}p{10cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Approach} & \textcolor{white}{\bfseries Description} \\
+\midrule
+TLS Wrapper & Encapsulate protocol in TLS tunnel (e.g., stunnel) \\
+VPN Tunnel & Route traffic through IPsec or WireGuard VPN \\
+Bump-in-the-Wire & Hardware device that encrypts/decrypts transparently \\
+Protocol Gateway & Convert to secure protocol at zone boundary \\
+MACsec & Encrypt at switch level within network segment \\
+\end{tabular}
+\caption{Approaches for securing legacy protocols}
+\end{table}
+
+\section{Key Management}
+
+\begin{dangerbox}
+Key management is often the most challenging aspect of OT encryption. Poor key management undermines even the strongest encryption algorithms. Many OT breaches exploit weak or default keys rather than breaking encryption itself.
+\end{dangerbox}
+
+\subsection{Key Management Challenges}
+
+\begin{itemize}
+    \item \textbf{Scale} -- Large deployments may have thousands of devices
+    \item \textbf{Accessibility} -- Devices in remote or hazardous locations
+    \item \textbf{Lifecycle} -- 15--25 year device lifecycles exceed typical key validity
+    \item \textbf{Availability} -- Key renewal must not disrupt operations
+    \item \textbf{Recovery} -- Lost keys can render devices inaccessible
+\end{itemize}
+
+\subsection{Key Management Strategies}
+
+\begin{itemize}
+    \item \textbf{Centralized PKI} -- Certificate authority for OT environment
+    \item \textbf{Hardware Security Modules} -- Secure key storage and operations
+    \item \textbf{Automated Renewal} -- Protocols like EST, CMP, or SCEP
+    \item \textbf{Offline Procedures} -- Manual key distribution for air-gapped systems
+    \item \textbf{Key Escrow} -- Backup keys for recovery scenarios
+\end{itemize}
+
+\section{Implementation Considerations}
+
+\subsection{Where to Encrypt}
+
+Not all OT traffic requires encryption. Prioritize based on risk:
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{3cm}p{6cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Traffic Type} & \textcolor{white}{\bfseries Priority} & \textcolor{white}{\bfseries Rationale} \\
+\midrule
+Zone boundary crossings & \riskhigh & Highest exposure to threats \\
+Remote access sessions & \riskcritical & Traverses untrusted networks \\
+Engineering workstations & \riskhigh & Sensitive configuration data \\
+Historian data transfer & \riskmedium & Business-sensitive information \\
+Intra-zone Level 0/1 & \risklow & May impact real-time performance \\
+\end{tabular}
+\caption{Encryption prioritization by traffic type}
+\end{table}
+
+\subsection{Performance Testing}
+
+Before deploying encryption in production:
+
+\begin{enumerate}
+    \item Measure baseline latency and throughput
+    \item Test encryption overhead in lab environment
+    \item Verify timing requirements are still met
+    \item Test failover and key renewal procedures
+    \item Validate with actual process conditions
+\end{enumerate}
+
+\subsection{Monitoring Encrypted Traffic}
+
+Encryption can blind security monitoring tools:
+
+\begin{itemize}
+    \item Deploy decryption points at zone boundaries
+    \item Use endpoint detection on encrypted endpoints
+    \item Monitor metadata (connection patterns, volumes)
+    \item Consider TLS inspection where appropriate
+\end{itemize}
+
+\section{Summary}
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{OT Constraints:} Real-time requirements, legacy protocols, and resource limitations make encryption more challenging than in IT environments
+    \item \textbf{Layer Selection:} Choose encryption layer based on requirements---MACsec for low-latency Layer 2, IPsec/TLS for flexibility, application-layer for protocol-native security
+    \item \textbf{Modern Protocols:} OPC UA and CIP Security provide built-in encryption; prefer these for new deployments
+    \item \textbf{Legacy Approaches:} Use TLS wrappers, VPNs, or bump-in-the-wire devices to secure protocols without native encryption
+    \item \textbf{Key Management:} Plan for the full device lifecycle; poor key management undermines encryption effectiveness
+    \item \textbf{Prioritize:} Focus encryption on zone boundaries and remote access; assess real-time impact before encrypting control traffic
+\end{itemize}
+\end{definitionbox}
+
+\section{Further Reading}
+
+\subsection*{Standards}
+\begin{itemize}
+    \item \textbf{IEC 62351} -- Security for power system communication protocols\\
+          \url{https://webstore.iec.ch/publication/6912}
+    \item \textbf{IEEE 802.1AE} -- MACsec standard\\
+          \url{https://standards.ieee.org/standard/802_1AE-2018.html}
+\end{itemize}
+
+\subsection*{Resources}
+\begin{itemize}
+    \item \textbf{OPC UA Security Model} -- OPC Foundation\\
+          \url{https://opcfoundation.org/about/opc-technologies/opc-ua/}
+    \item \textbf{NIST SP 800-82} -- Guide to ICS Security\\
+          \url{https://csrc.nist.gov/pubs/sp/800/82/r3/final}
+\end{itemize}
+
+\subsection*{Books}
+\begin{itemize}
+    \item Knapp \& Langill -- \textit{Industrial Network Security} (Syngress)
+    \item Ferguson, Schneier \& Kohno -- \textit{Cryptography Engineering} (Wiley)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

@@ -1,0 +1,386 @@
+% ============================================================================
+%  308-zero-trust-ot - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {Zero Trust for OT}
+    {Applying Zero Trust Principles to Industrial Environments}
+    {OT Security Learning Series}
+    {Document 308 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+\begin{infobox}
+Zero Trust is a security model based on the principle of ``never trust, always verify.'' Rather than assuming that everything inside a network perimeter is safe, Zero Trust requires continuous verification of every user, device, and connection. Applying these principles to OT environments requires careful adaptation to address real-time requirements, legacy systems, and safety constraints.
+\end{infobox}
+
+Traditional OT security relied heavily on air gaps and perimeter defenses. Once inside the OT network, devices and users were implicitly trusted. This model has proven inadequate as IT/OT convergence, remote access, and sophisticated attacks have eroded the effectiveness of perimeter-based security.
+
+Zero Trust offers a path forward, but OT environments cannot simply adopt IT Zero Trust architectures. The principles must be adapted to work within the constraints of industrial control systems.
+
+\section{Zero Trust Principles}
+
+\subsection{Core Tenets}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    tenet/.style={rectangle, draw=otprimary, thick, fill=otprimary!10,
+                  rounded corners=5pt, minimum width=6cm, minimum height=0.8cm,
+                  align=left, text width=5.8cm, font=\small},
+    num/.style={circle, fill=otaccent, text=white, font=\small\bfseries,
+                minimum size=0.6cm}
+]
+    \node[num] at (0,0) {1};
+    \node[tenet, anchor=west] at (0.8,0) {Never trust, always verify};
+    \node[num] at (0,-1.1) {2};
+    \node[tenet, anchor=west] at (0.8,-1.1) {Assume breach};
+    \node[num] at (0,-2.2) {3};
+    \node[tenet, anchor=west] at (0.8,-2.2) {Verify explicitly};
+    \node[num] at (0,-3.3) {4};
+    \node[tenet, anchor=west] at (0.8,-3.3) {Use least privilege access};
+    \node[num] at (0,-4.4) {5};
+    \node[tenet, anchor=west] at (0.8,-4.4) {Micro-segment the network};
+    \node[num] at (0,-5.5) {6};
+    \node[tenet, anchor=west] at (0.8,-5.5) {Monitor and log everything};
+\end{tikzpicture}
+\caption{Core Zero Trust principles}
+\end{figure}
+
+\subsection{Traditional vs Zero Trust}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{4.5cm}p{4.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Aspect} & \textcolor{white}{\bfseries Traditional Model} & \textcolor{white}{\bfseries Zero Trust Model} \\
+\midrule
+Trust Boundary & Network perimeter & No implicit trust boundary \\
+Internal Traffic & Trusted by default & Verified for each request \\
+Access Control & Network location-based & Identity and context-based \\
+Segmentation & Flat or minimal zones & Micro-segmentation \\
+Verification & One-time at perimeter & Continuous verification \\
+Breach Assumption & Prevent perimeter breach & Assume breach occurred \\
+\end{tabular}
+\caption{Traditional perimeter security vs Zero Trust}
+\end{table}
+
+\section{OT-Specific Challenges}
+
+\begin{warningbox}
+Zero Trust was developed for IT environments with modern devices, frequent updates, and tolerance for latency. OT environments have fundamentally different constraints that require adapted approaches rather than direct implementation of IT Zero Trust solutions.
+\end{warningbox}
+
+\subsection{Technical Constraints}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Constraint} & \textcolor{white}{\bfseries Impact on Zero Trust} \\
+\midrule
+Legacy Devices & Cannot support modern authentication or agents \\
+Real-Time Requirements & Verification latency may be unacceptable \\
+Proprietary Protocols & May not support encryption or authentication \\
+Safety Systems & Cannot tolerate disruption from security controls \\
+Long Lifecycles & Devices may be in service for 15--25 years \\
+Limited Compute & PLCs/RTUs cannot run security software \\
+\end{tabular}
+\caption{OT constraints affecting Zero Trust implementation}
+\end{table}
+
+\subsection{Operational Constraints}
+
+\begin{itemize}
+    \item \textbf{Availability Priority} -- Safety and uptime take precedence over security
+    \item \textbf{Change Resistance} -- Production systems resist frequent modifications
+    \item \textbf{Testing Limitations} -- Cannot easily test security changes on live systems
+    \item \textbf{Skill Gaps} -- OT staff may lack cybersecurity expertise
+    \item \textbf{Vendor Dependencies} -- Changes may void warranties or support
+\end{itemize}
+
+\section{Zero Trust Architecture for OT}
+
+\subsection{Adapted Model}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    zone/.style={rectangle, draw=otprimary, thick, fill=otprimary!5,
+                 rounded corners=5pt, minimum width=3.5cm, minimum height=3cm,
+                 align=center},
+    device/.style={rectangle, draw=otaccent, thick, fill=otaccent!10,
+                   rounded corners=3pt, minimum width=2.8cm, minimum height=0.6cm,
+                   align=center, font=\scriptsize},
+    pep/.style={rectangle, draw=otwarning, thick, fill=otwarning!20,
+                rounded corners=3pt, minimum width=0.8cm, minimum height=2.5cm,
+                align=center, font=\scriptsize\bfseries, rotate=90},
+    arrow/.style={->, thick, >=stealth}
+]
+    % IT Zone
+    \node[zone, label=above:{\small Enterprise}] (it) at (0,0) {};
+    \node[device] at (0,0.6) {Users};
+    \node[device] at (0,-0.3) {Applications};
+
+    % Policy Enforcement Point
+    \node[pep] at (3,0) {PEP};
+
+    % OT DMZ
+    \node[zone, label=above:{\small OT DMZ}] (dmz) at (6,0) {};
+    \node[device] at (6,0.6) {Jump Server};
+    \node[device] at (6,-0.3) {Historian};
+
+    % Policy Enforcement Point
+    \node[pep] at (9,0) {PEP};
+
+    % OT Zone
+    \node[zone, label=above:{\small OT Network}] (ot) at (12,0) {};
+    \node[device] at (12,0.6) {HMI/SCADA};
+    \node[device] at (12,-0.3) {PLCs/RTUs};
+
+    % Policy Decision Point (above)
+    \node[rectangle, draw=otsuccess, thick, fill=otsuccess!15,
+          rounded corners=5pt, minimum width=4cm, minimum height=1cm,
+          align=center, font=\small] (pdp) at (6,3) {Policy Decision Point\\(Identity, Context, Risk)};
+
+    % Arrows
+    \draw[arrow] (1.8,0) -- (2.4,0);
+    \draw[arrow] (3.6,0) -- (4.2,0);
+    \draw[arrow] (7.8,0) -- (8.4,0);
+    \draw[arrow] (9.6,0) -- (10.2,0);
+    \draw[arrow, dashed, otsuccess] (pdp) -- (3,1.5);
+    \draw[arrow, dashed, otsuccess] (pdp) -- (9,1.5);
+\end{tikzpicture}
+\caption{Zero Trust architecture adapted for OT}
+\end{figure}
+
+\subsection{Key Components}
+
+\begin{itemize}
+    \item \textbf{Policy Decision Point (PDP)} -- Evaluates access requests against policies
+    \item \textbf{Policy Enforcement Point (PEP)} -- Enforces decisions at zone boundaries
+    \item \textbf{Identity Provider} -- Authenticates users and devices
+    \item \textbf{Device Inventory} -- Maintains authoritative asset database
+    \item \textbf{Monitoring System} -- Provides context for access decisions
+\end{itemize}
+
+\section{Implementation Strategies}
+
+\subsection{Start at the Boundaries}
+
+For OT environments, implement Zero Trust progressively from outside in:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    phase/.style={rectangle, draw=otaccent, thick, fill=otaccent!10,
+                  rounded corners=5pt, minimum width=3cm, minimum height=1.5cm,
+                  align=center, font=\small},
+    arrow/.style={->, thick, >=stealth, otprimary}
+]
+    \node[phase] (p1) at (0,0) {Phase 1\\[3pt]\scriptsize Remote Access\\IT/OT Boundary};
+    \node[phase] (p2) at (4.5,0) {Phase 2\\[3pt]\scriptsize Zone Boundaries\\DMZ Controls};
+    \node[phase] (p3) at (9,0) {Phase 3\\[3pt]\scriptsize Internal OT\\Micro-segments};
+    \node[phase] (p4) at (13.5,0) {Phase 4\\[3pt]\scriptsize Device-Level\\Where Possible};
+
+    \draw[arrow] (p1) -- (p2);
+    \draw[arrow] (p2) -- (p3);
+    \draw[arrow] (p3) -- (p4);
+\end{tikzpicture}
+\caption{Phased Zero Trust implementation for OT}
+\end{figure}
+
+\subsection{Identity and Access}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Control} & \textcolor{white}{\bfseries OT Implementation} \\
+\midrule
+User Authentication & MFA for all remote and administrative access \\
+Device Authentication & 802.1X where supported; MAC-based for legacy \\
+Service Accounts & Vaulted credentials with just-in-time access \\
+Vendor Access & Explicit approval, time-limited, fully monitored \\
+Local Accounts & Minimize; use centralized identity where possible \\
+\end{tabular}
+\caption{Identity controls for OT Zero Trust}
+\end{table}
+
+\subsection{Network Micro-Segmentation}
+
+Divide the OT network into small, controlled segments:
+
+\begin{itemize}
+    \item \textbf{By Function} -- Separate control, safety, and monitoring systems
+    \item \textbf{By Criticality} -- Isolate high-impact systems more strictly
+    \item \textbf{By Process} -- Segment different production lines or units
+    \item \textbf{By Vendor} -- Contain vendor-specific systems
+\end{itemize}
+
+\begin{tipbox}
+Use industrial firewalls or VLANs with ACLs to create micro-segments. Allow only the specific protocols and connections required for each system to function. Default deny all other traffic.
+\end{tipbox}
+
+\subsection{Continuous Monitoring}
+
+Zero Trust requires visibility to make informed access decisions:
+
+\begin{itemize}
+    \item \textbf{Network Traffic} -- Baseline normal communications, detect anomalies
+    \item \textbf{Device Behavior} -- Monitor for unexpected process changes
+    \item \textbf{User Activity} -- Log all actions, especially privileged operations
+    \item \textbf{Asset State} -- Track configuration changes and patch status
+\end{itemize}
+
+\section{Handling Legacy Systems}
+
+\begin{dangerbox}
+Many OT devices cannot participate directly in Zero Trust verification. They lack the capability for modern authentication, encryption, or agent installation. These devices require compensating controls rather than direct Zero Trust implementation.
+\end{dangerbox}
+
+\subsection{Compensating Controls}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Legacy Limitation} & \textcolor{white}{\bfseries Compensating Control} \\
+\midrule
+No authentication & Network isolation, strict firewall rules \\
+No encryption & Encrypt at network layer (IPsec, MACsec) \\
+No agent support & Network-based monitoring and detection \\
+Static credentials & Segment tightly, monitor all access \\
+No logging & Capture traffic at network level \\
+\end{tabular}
+\caption{Compensating controls for legacy OT devices}
+\end{table}
+
+\subsection{Protect the Path}
+
+When devices cannot verify themselves, protect access to them:
+
+\begin{itemize}
+    \item Authenticate users/devices that \textit{access} the legacy system
+    \item Encrypt the \textit{network path} to the legacy system
+    \item Monitor all \textit{traffic} to and from the legacy system
+    \item Restrict which systems can \textit{communicate} with it
+\end{itemize}
+
+\section{Safety Considerations}
+
+\subsection{Safety System Exemptions}
+
+\begin{warningbox}
+Safety instrumented systems (SIS) may require exemptions from certain Zero Trust controls. A security measure that could delay or prevent a safety shutdown is unacceptable. Document these exemptions and implement alternative protections.
+\end{warningbox}
+
+\begin{itemize}
+    \item Do not place inline security controls that could fail-closed on safety paths
+    \item Use passive monitoring rather than active blocking for safety traffic
+    \item Ensure security failures do not cascade to safety systems
+    \item Test thoroughly in non-production environments
+\end{itemize}
+
+\subsection{Fail-Safe Design}
+
+Zero Trust controls in OT must fail safely:
+
+\begin{itemize}
+    \item \textbf{Fail-Open for Safety} -- Safety-critical communications continue if controls fail
+    \item \textbf{Graceful Degradation} -- Loss of verification reduces access, doesn't halt operations
+    \item \textbf{Manual Override} -- Operators can bypass controls in emergencies (with logging)
+\end{itemize}
+
+\section{Maturity Progression}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.5cm}p{5cm}p{5.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Level} & \textcolor{white}{\bfseries Characteristics} & \textcolor{white}{\bfseries OT Focus Areas} \\
+\midrule
+Initial & Perimeter-focused, implicit trust & Asset inventory, network visibility \\
+Developing & Zone segmentation, some verification & IT/OT boundary controls, MFA \\
+Defined & Micro-segmentation, explicit policies & Internal OT segmentation, PAM \\
+Managed & Continuous verification, automation & Behavioral monitoring, SOAR \\
+Optimized & Adaptive, risk-based decisions & AI/ML anomaly detection \\
+\end{tabular}
+\caption{Zero Trust maturity levels for OT}
+\end{table}
+
+\begin{successbox}
+Most OT environments should target the ``Defined'' level as a realistic goal. Full Zero Trust implementation at Level 0/1 (field devices) is often impractical with current technology. Focus verification efforts at zone boundaries and human access points.
+\end{successbox}
+
+\section{Summary}
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Adapted Approach:} Zero Trust principles apply to OT, but implementation must account for legacy systems, real-time requirements, and safety constraints
+    \item \textbf{Never Trust:} Eliminate implicit trust based on network location; verify every access request
+    \item \textbf{Start at Boundaries:} Implement Zero Trust progressively from remote access inward; IT/OT boundary first
+    \item \textbf{Micro-Segment:} Divide OT networks into small, controlled zones with explicit allow rules
+    \item \textbf{Compensating Controls:} Protect legacy devices that cannot participate in verification by controlling access paths
+    \item \textbf{Safety First:} Never compromise safety system availability; use fail-safe designs and document exemptions
+\end{itemize}
+\end{definitionbox}
+
+\section{Further Reading}
+
+\subsection*{Standards and Guidelines}
+\begin{itemize}
+    \item \textbf{NIST SP 800-207} -- Zero Trust Architecture\\
+          \url{https://csrc.nist.gov/pubs/sp/800/207/final}
+    \item \textbf{CISA Zero Trust Maturity Model} -- Implementation guidance\\
+          \url{https://www.cisa.gov/zero-trust-maturity-model}
+\end{itemize}
+
+\subsection*{Resources}
+\begin{itemize}
+    \item \textbf{NIST SP 800-82} -- Guide to ICS Security\\
+          \url{https://csrc.nist.gov/pubs/sp/800/82/r3/final}
+    \item \textbf{IEC 62443} -- Industrial automation security standards\\
+          \url{https://webstore.iec.ch/publication/7029}
+\end{itemize}
+
+\subsection*{Books}
+\begin{itemize}
+    \item Kindervag -- \textit{Build a Zero Trust Network} (O'Reilly)
+    \item Knapp \& Langill -- \textit{Industrial Network Security} (Syngress)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

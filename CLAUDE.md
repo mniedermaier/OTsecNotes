@@ -1,4 +1,6 @@
-# Claude Project Context - OT Security Learning Notes
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Overview
 A collection of LaTeX documents covering Operational Technology (OT) and Industrial Control System (ICS) security topics. Documents use a shared template for consistent styling.
@@ -22,7 +24,7 @@ Documents are organized by category using three-digit numbers:
 
 Documents are auto-detected by the Makefile. Run `make list` to see all available documents.
 
-**000-fundamentals/** (8 documents)
+**000-fundamentals/** (9 documents)
 - `001-it-vs-ot` - IT vs OT
 - `010-purdue-model` - The Purdue Model
 - `020-plc-basics` - PLC Basics
@@ -31,12 +33,16 @@ Documents are auto-detected by the Makefile. Run `make list` to see all availabl
 - `050-ot-terminology` - OT Terminology
 - `060-ot-lifecycle` - OT System Lifecycle
 - `070-industrial-networks` - Industrial Networks
+- `080-rtu-basics` - RTU Basics
 
-**100-standards/** (4 documents)
+**100-standards/** (7 documents)
 - `100-standards-overview` - Global OT Security Standards Overview
 - `110-iec-62443-intro` - Introduction to IEC 62443
 - `111-nist-800-82` - NIST SP 800-82
 - `120-iec-62443-sl-mapping` - IEC 62443 Security Level Mapping
+- `130-nerc-cip` - NERC CIP Standards
+- `140-nis2-directive` - EU NIS2 Directive
+- `145-cyber-resilience-act` - EU Cyber Resilience Act
 
 **200-protocols/** (8 documents)
 - `200-modbus` - Modbus Protocol
@@ -48,15 +54,18 @@ Documents are auto-detected by the Makefile. Run `make list` to see all availabl
 - `206-iec-61850` - IEC 61850
 - `207-s7comm` - S7comm Protocol
 
-**300-architecture/** (6 documents)
+**300-architecture/** (9 documents)
 - `300-network-segmentation` - OT Network Segmentation
 - `301-secure-remote-access` - Secure Remote Access
 - `302-dmz-design` - Industrial DMZ Design
 - `303-zone-conduit-model` - Zone and Conduit Model
 - `304-data-diodes` - Data Diodes
 - `305-wireless-in-ot` - Wireless in OT Environments
+- `306-ot-cloud-connectivity` - OT Cloud Connectivity
+- `308-zero-trust-ot` - Zero Trust for OT
+- `309-purdue-model-limitations` - Purdue Model Limitations
 
-**400-threats/** (9 documents)
+**400-threats/** (10 documents)
 - `400-ot-incidents-overview` - OT Security Incidents Overview
 - `410-stuxnet` - Stuxnet
 - `411-ukraine-power-grid` - Ukraine Power Grid Attacks
@@ -66,19 +75,22 @@ Documents are auto-detected by the Makefile. Run `make list` to see all availabl
 - `415-oldsmar` - Oldsmar Water Treatment Attack
 - `420-ot-attack-vectors` - OT Attack Vectors
 - `421-cyber-kill-chain` - ICS Cyber Kill Chain
+- `422-supply-chain-attacks` - OT Supply Chain Attacks
 
-**500-monitoring/** (5 documents)
+**500-monitoring/** (6 documents)
 - `500-ot-monitoring` - OT Network Monitoring
 - `510-asset-discovery` - OT Asset Discovery
 - `520-ids-ips-ot` - Intrusion Detection for OT
 - `530-siem-for-ot` - SIEM for OT Environments
 - `540-anomaly-detection` - Anomaly Detection in OT
+- `560-ot-soc-design` - OT Security Operations Center
 
-**600-incident-response/** (4 documents)
+**600-incident-response/** (5 documents)
 - `600-ot-incident-response` - OT Incident Response
 - `610-ot-forensics` - OT Forensics
 - `620-containment-strategies` - Containment Strategies
 - `630-recovery-procedures` - Recovery Procedures
+- `650-tabletop-exercises` - OT Tabletop Exercises
 
 **700-assessments/** (4 documents)
 - `700-ot-risk-assessment` - OT Risk Assessment
@@ -86,14 +98,18 @@ Documents are auto-detected by the Makefile. Run `make list` to see all availabl
 - `720-vulnerability-management` - OT Vulnerability Management
 - `730-security-audits` - OT Security Audits
 
-**800-solutions/** (7 documents)
+**800-solutions/** (11 documents)
 - `810-application-whitelisting` - Application Whitelisting & System Lockdown
 - `820-network-access-control` - Network Access Control
 - `830-endpoint-protection` - Endpoint Protection
+- `835-epp-edr` - Endpoint Protection Platforms
 - `840-secure-media-handling` - Secure Media Handling
 - `841-it-ot-file-transfer` - IT/OT File Transfer
 - `850-backup-recovery` - Backup and Recovery
 - `860-patch-management` - Patch Management
+- `870-encryption-in-ot` - Encryption in OT Environments
+- `880-privileged-access` - Privileged Access Management
+- `890-device-management` - Device Management in OT
 
 ## Project Structure
 ```
@@ -139,7 +155,7 @@ When using TikZ figures with `[H]` placement, add at the document preamble:
     {Matthias Niedermaier}
 ```
 
-**Note:** Use "Matthias Niedermaier" as the contributor for consistency. For AI-assisted documents, add "AI Assistant" as a second contributor.
+**Note:** Use "Matthias Niedermaier" as the contributor for consistency.
 
 ### Available Boxes
 - `\begin{infobox}` - Blue info box (use in Introduction)

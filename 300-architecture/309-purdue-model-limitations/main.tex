@@ -1,0 +1,381 @@
+% ============================================================================
+%  309-purdue-model-limitations - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {Purdue Model Limitations}
+    {When Traditional Segmentation Meets Modern Connectivity}
+    {OT Security Learning Series}
+    {Document 309 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+The Purdue Enterprise Reference Architecture, developed in the 1990s, has guided OT network segmentation for decades. It assumes clear physical boundaries between hierarchical levels, with traffic flowing predictably between adjacent zones. However, modern technologies---cloud connectivity, software-defined networking, virtualization, and IIoT---challenge these fundamental assumptions.
+
+\begin{infobox}
+This document examines why the traditional Purdue Model is increasingly difficult to enforce in modern OT environments. It explores the technical and business drivers that break zone boundaries, and presents complementary security approaches for environments where strict hierarchical segmentation is not achievable.
+\end{infobox}
+
+\section{Original Purdue Assumptions}
+
+\subsection{Design Principles}
+
+The Purdue Model was built on assumptions that no longer hold true:
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{8.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Assumption} & \textcolor{white}{\bfseries Modern Reality} \\
+\midrule
+Physical network separation & Virtualized, software-defined networks \\
+Air-gapped OT networks & Cloud connectivity, remote access requirements \\
+Traffic flows between adjacent levels & Direct cloud connections bypass hierarchy \\
+Static, well-defined boundaries & Dynamic workloads, containerization \\
+On-premise systems only & Hybrid cloud, edge computing, SaaS \\
+Predictable communication patterns & API-driven, event-based architectures \\
+\end{tabular}
+\caption{Purdue assumptions vs. modern reality}
+\end{table}
+
+\subsection{The Hierarchical Model}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    level/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=8cm, minimum height=0.8cm, align=center, font=\small},
+    arrow/.style={<->, thick, >=stealth}
+]
+% Traditional levels
+\node[level, fill=otdanger!20] (l5) at (0,4) {Level 5: Enterprise Network};
+\node[level, fill=otdanger!15] (l4) at (0,3) {Level 4: Business Planning};
+\node[level, fill=otwarning!20] (l35) at (0,2) {Level 3.5: DMZ};
+\node[level, fill=otsuccess!20] (l3) at (0,1) {Level 3: Site Operations};
+\node[level, fill=otaccent!20] (l2) at (0,0) {Level 2: Area Control};
+\node[level, fill=otaccent!15] (l1) at (0,-1) {Level 1: Basic Control};
+\node[level, fill=otinfo!20] (l0) at (0,-2) {Level 0: Physical Process};
+
+% Traditional flow arrows
+\draw[arrow, gray] (l5) -- (l4);
+\draw[arrow, gray] (l4) -- (l35);
+\draw[arrow, gray] (l35) -- (l3);
+\draw[arrow, gray] (l3) -- (l2);
+\draw[arrow, gray] (l2) -- (l1);
+\draw[arrow, gray] (l1) -- (l0);
+
+% Label
+\node[font=\scriptsize, right, align=left] at (4.5,1) {Traditional model:\\Traffic flows only\\between adjacent\\levels};
+\end{tikzpicture}
+\caption{Traditional Purdue hierarchical traffic flow}
+\end{figure}
+
+\section{Why Boundaries Break Down}
+
+\subsection{Cloud Connectivity}
+
+Modern OT increasingly connects directly to cloud services:
+
+\begin{itemize}
+    \item \textbf{Predictive maintenance} -- Sensor data sent to cloud analytics
+    \item \textbf{Remote monitoring} -- Vendor dashboards and alerting
+    \item \textbf{Edge-to-cloud} -- IIoT gateways bypassing traditional hierarchy
+    \item \textbf{Digital twins} -- Real-time process simulation in cloud
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=2cm, minimum height=0.8cm, align=center, font=\small},
+    cloud/.style={ellipse, draw, thick, minimum width=2.5cm, minimum height=1cm, align=center, font=\small, fill=otinfo!20},
+    arrow/.style={->, thick, >=stealth, otdanger}
+]
+% Cloud
+\node[cloud] (cloud) at (6,2) {Cloud\\Services};
+
+% OT Levels
+\node[box, fill=otsuccess!20] (l3) at (0,2) {Level 3};
+\node[box, fill=otaccent!20] (l2) at (0,0.5) {Level 2};
+\node[box, fill=otaccent!15] (l1) at (0,-1) {Level 1};
+\node[box, fill=otinfo!20] (iiot) at (3,-1) {IIoT Gateway};
+
+% Bypassing arrows
+\draw[arrow, dashed] (l3) -- (cloud) node[midway, above, font=\scriptsize] {Historian sync};
+\draw[arrow, dashed] (l2) -- (cloud) node[midway, above, font=\scriptsize, sloped] {Remote HMI};
+\draw[arrow, dashed] (iiot) -- (cloud) node[midway, below, font=\scriptsize, sloped] {Sensor data};
+\draw[thick] (l1) -- (iiot);
+\end{tikzpicture}
+\caption{Cloud connections bypass Purdue hierarchy}
+\end{figure}
+
+\begin{warningbox}
+Cloud connectivity creates direct paths from lower Purdue levels to the internet, bypassing the DMZ and enterprise layers entirely. Traditional perimeter controls cannot inspect or control this traffic.
+\end{warningbox}
+
+\subsection{Software-Defined Networking}
+
+SDN and virtualization abstract physical network boundaries:
+
+\begin{itemize}
+    \item \textbf{Virtual switches} -- Traffic between VMs may not traverse physical firewalls
+    \item \textbf{Overlay networks} -- Logical networks span physical infrastructure
+    \item \textbf{Micro-services} -- Workloads communicate across traditional boundaries
+    \item \textbf{Container orchestration} -- Dynamic IP assignments break static rules
+\end{itemize}
+
+\subsection{Converged Infrastructure}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{8.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Technology} & \textcolor{white}{\bfseries Boundary Challenge} \\
+\midrule
+Hyperconverged systems & Multiple Purdue levels on single physical host \\
+Virtualized PLCs & Control logic runs alongside IT workloads \\
+Edge computing & Processing at Level 1 communicates directly with cloud \\
+Unified namespaces & Data accessible across all levels simultaneously \\
+API gateways & RESTful interfaces expose OT data to any consumer \\
+\end{tabular}
+\caption{Converged technologies that blur boundaries}
+\end{table}
+
+\subsection{Remote Access Requirements}
+
+Business drivers demand connectivity that breaks isolation:
+
+\begin{itemize}
+    \item \textbf{Vendor support} -- Remote troubleshooting and maintenance
+    \item \textbf{Distributed operations} -- Central control rooms for multiple sites
+    \item \textbf{Mobile workforce} -- Engineers need access from anywhere
+    \item \textbf{Third-party integration} -- Supply chain and customer systems
+\end{itemize}
+
+\section{Security Implications}
+
+\subsection{Attack Surface Expansion}
+
+When boundaries blur, attack surfaces expand:
+
+\begin{itemize}
+    \item Cloud credentials compromise can reach OT directly
+    \item Lateral movement paths bypass zone firewalls
+    \item Supply chain attacks through connected vendors
+    \item Internet-exposed OT components become targets
+\end{itemize}
+
+\begin{dangerbox}
+A compromised cloud account or vendor VPN can provide direct access to Level 1-2 systems, bypassing all intermediate controls that the Purdue Model assumes exist.
+\end{dangerbox}
+
+\subsection{Visibility Gaps}
+
+Traditional monitoring assumes traffic passes through chokepoints:
+
+\begin{itemize}
+    \item East-west traffic within virtualized environments is invisible
+    \item Encrypted cloud connections hide content from inspection
+    \item API calls don't match traditional firewall rule patterns
+    \item Dynamic workloads evade static monitoring rules
+\end{itemize}
+
+\section{Complementary Security Approaches}
+
+\subsection{Defense in Depth}
+
+When perimeter controls weaken, layer additional defenses:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    layer/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=9cm, minimum height=0.7cm, align=center, font=\small}
+]
+\node[layer, fill=otdanger!15] at (0,3) {Identity and Access Management};
+\node[layer, fill=otwarning!15] at (0,2.1) {Network Segmentation (where possible)};
+\node[layer, fill=otaccent!15] at (0,1.2) {Endpoint Protection};
+\node[layer, fill=otsuccess!15] at (0,0.3) {Application Security};
+\node[layer, fill=otinfo!15] at (0,-0.6) {Data Protection and Encryption};
+\node[layer, fill=otprimary!10] at (0,-1.5) {Monitoring and Detection};
+\end{tikzpicture}
+\caption{Defense in depth layers}
+\end{figure}
+
+\subsection{Zero Trust Principles}
+
+Apply Zero Trust concepts to OT where boundaries are weak:
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Principle} & \textcolor{white}{\bfseries OT Application} \\
+\midrule
+Verify explicitly & Authenticate every connection, even within zones \\
+Least privilege & Limit access to specific assets and functions \\
+Assume breach & Monitor for lateral movement within OT networks \\
+Micro-segmentation & Isolate critical assets regardless of zone \\
+\end{tabular}
+\caption{Zero Trust principles for OT}
+\end{table}
+
+\subsection{Identity-Centric Security}
+
+When network location is unreliable, focus on identity:
+
+\begin{itemize}
+    \item \textbf{Strong authentication} -- MFA for all remote and privileged access
+    \item \textbf{Service accounts} -- Managed identities for machine-to-machine
+    \item \textbf{Just-in-time access} -- Temporary privileges for maintenance
+    \item \textbf{Certificate-based auth} -- Device identity for OT endpoints
+\end{itemize}
+
+\subsection{Micro-Segmentation}
+
+Segment within zones, not just between them:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    asset/.style={rectangle, draw, thick, rounded corners=2pt, minimum width=1.5cm, minimum height=0.8cm, align=center, font=\scriptsize},
+    zone/.style={rectangle, draw, dashed, thick, rounded corners=5pt, minimum width=5cm, minimum height=2.5cm, fill=#1!10}
+]
+% Traditional zone - flat network bus
+\node[zone=otsuccess] at (-3.5,0) {};
+\node[font=\small\bfseries] at (-3.5,1.6) {Traditional Zone};
+\node[asset, fill=white] (t1) at (-4.5,0.5) {HMI 1};
+\node[asset, fill=white] (t2) at (-2.5,0.5) {HMI 2};
+\node[asset, fill=white] (t3) at (-4.5,-0.7) {Server};
+\node[asset, fill=white] (t4) at (-2.5,-0.7) {PLC};
+% Network bus line
+\draw[thick, gray] (-5.2,-0.1) -- (-1.8,-0.1);
+\draw[thick, gray] (t1.south) -- (-4.5,-0.1);
+\draw[thick, gray] (t2.south) -- (-2.5,-0.1);
+\draw[thick, gray] (t3.north) -- (-4.5,-0.1);
+\draw[thick, gray] (t4.north) -- (-2.5,-0.1);
+
+% Micro-segmented
+\node[zone=otaccent] at (3.5,0) {};
+\node[font=\small\bfseries] at (3.5,1.6) {Micro-Segmented};
+\node[asset, fill=otaccent!30, draw=otaccent] (m1) at (2.5,0.5) {HMI 1};
+\node[asset, fill=otsuccess!30, draw=otsuccess] (m2) at (4.5,0.5) {HMI 2};
+\node[asset, fill=otwarning!30, draw=otwarning] (m3) at (2.5,-0.7) {Server};
+\node[asset, fill=otdanger!30, draw=otdanger] (m4) at (4.5,-0.7) {PLC};
+\draw[thick, otprimary, ->] (m3.east) -- (m4.west);
+\node[font=\tiny] at (3.5,-1.4) {Only allowed flows};
+\end{tikzpicture}
+\caption{Traditional zone vs. micro-segmentation}
+\end{figure}
+
+\begin{successbox}
+\textbf{Recommendation:} Identify crown jewel assets (safety systems, critical PLCs) and apply strict micro-segmentation regardless of their Purdue level. Protect what matters most, not just zone boundaries.
+\end{successbox}
+
+\subsection{Enhanced Monitoring}
+
+Compensate for boundary weakness with detection:
+
+\begin{itemize}
+    \item \textbf{Behavioral analytics} -- Detect anomalies within zones
+    \item \textbf{API monitoring} -- Track cloud and integration traffic
+    \item \textbf{Identity analytics} -- Unusual access patterns
+    \item \textbf{Encrypted traffic analysis} -- Metadata-based detection
+\end{itemize}
+
+\section{Practical Recommendations}
+
+\subsection{Assessment First}
+
+Before implementing controls, understand your reality:
+
+\begin{enumerate}
+    \item Map actual traffic flows, not assumed architecture
+    \item Identify all cloud connections and remote access paths
+    \item Document where virtualization spans zones
+    \item Inventory API integrations and data flows
+\end{enumerate}
+
+\subsection{Pragmatic Segmentation}
+
+Accept that perfect Purdue compliance may be impossible:
+
+\begin{itemize}
+    \item Enforce strict segmentation where feasible (safety systems)
+    \item Use compensating controls where boundaries are weak
+    \item Prioritize protection of critical assets over zone purity
+    \item Document exceptions and accepted risks
+\end{itemize}
+
+\begin{tipbox}
+The goal is risk reduction, not architectural purity. A well-monitored, identity-controlled cloud connection may be more secure than an unmonitored ``compliant'' architecture with unknown shadow IT.
+\end{tipbox}
+
+\section{Summary}
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Model Limitations:} The Purdue Model assumes physical separation and adjacent-level traffic that modern technologies violate
+    \item \textbf{Cloud and SDN:} Direct cloud connectivity, virtualization, and software-defined networking bypass traditional zone boundaries
+    \item \textbf{Defense in Depth:} Layer multiple controls rather than relying solely on network segmentation
+    \item \textbf{Zero Trust:} Apply identity verification and least privilege when network location is unreliable
+    \item \textbf{Micro-Segmentation:} Protect critical assets individually, regardless of their Purdue level
+    \item \textbf{Enhanced Monitoring:} Compensate for boundary weakness with behavioral detection and analytics
+    \item \textbf{Pragmatic Approach:} Focus on risk reduction and asset protection rather than architectural compliance
+\end{itemize}
+\end{definitionbox}
+
+\section{Further Reading}
+
+\subsection*{Standards and Guidelines}
+
+\begin{itemize}
+    \item \textbf{NIST SP 800-207} -- Zero Trust Architecture\\
+          \url{https://csrc.nist.gov/pubs/sp/800/207/final}
+    \item \textbf{IEC 62443-3-3} -- System Security Requirements and Levels\\
+          \url{https://webstore.iec.ch/publication/7033}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{CISA} -- Industrial Control Systems Security\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+    \item \textbf{SANS ICS} -- Industrial Control Systems Security\\
+          \url{https://www.sans.org/cyber-security-courses/ics-scada-cyber-security-essentials}
+\end{itemize}
+
+\subsection*{Books}
+
+\begin{itemize}
+    \item Knapp, Eric D. -- \textit{Industrial Network Security} (Syngress)
+    \item Gilman \& Barth -- \textit{Zero Trust Networks} (O'Reilly)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

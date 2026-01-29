@@ -1,0 +1,321 @@
+% ============================================================================
+%  140-nis2-directive - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {EU NIS2 Directive}
+    {Network and Information Security Requirements for Critical Infrastructure}
+    {OT Security Learning Series}
+    {Document 140 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+\begin{infobox}
+The NIS2 Directive (Directive (EU) 2022/2555) is the European Union's updated cybersecurity legislation that significantly expands requirements for operators of critical infrastructure, including industrial and OT environments. It replaces the original NIS Directive from 2016 and introduces stricter security obligations, broader scope, and substantial penalties for non-compliance.
+\end{infobox}
+
+The Network and Information Security Directive 2 (NIS2) represents a major evolution in EU cybersecurity regulation. As cyber threats to critical infrastructure have increased in sophistication and frequency, the EU recognized the need to strengthen and harmonize cybersecurity requirements across member states.
+
+For organizations operating OT and industrial control systems, NIS2 introduces specific obligations that directly impact how these environments must be secured, monitored, and reported upon.
+
+\section{Evolution from NIS1}
+
+The original NIS Directive (2016) was the EU's first comprehensive cybersecurity legislation. However, implementation varied significantly across member states, creating an uneven security landscape.
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{4.5cm}p{4.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Aspect} & \textcolor{white}{\bfseries NIS1 (2016)} & \textcolor{white}{\bfseries NIS2 (2022)} \\
+\midrule
+Scope & 7 sectors & 18 sectors \\
+Entity classification & OES and DSP & Essential and Important \\
+Incident reporting & 72 hours (varied) & 24h early warning, 72h notification \\
+Penalties & Member state discretion & Up to \texteuro10M or 2\% turnover \\
+Supply chain & Limited coverage & Explicit requirements \\
+Management liability & Not specified & Personal accountability \\
+\end{tabular}
+\caption{Key differences between NIS1 and NIS2}
+\end{table}
+
+\section{Scope and Covered Sectors}
+
+NIS2 significantly expands the sectors and entities covered by cybersecurity requirements. Organizations are classified as either \textbf{Essential} or \textbf{Important} entities based on their sector and size.
+
+\subsection{Essential Entities (Annex I)}
+
+These sectors face the strictest requirements and supervision:
+
+\begin{itemize}
+    \item \textbf{Energy} -- Electricity, oil, gas, hydrogen, district heating
+    \item \textbf{Transport} -- Air, rail, water, road
+    \item \textbf{Banking and Financial Market Infrastructure}
+    \item \textbf{Health} -- Healthcare providers, laboratories, pharmaceuticals
+    \item \textbf{Drinking Water and Wastewater}
+    \item \textbf{Digital Infrastructure} -- IXPs, DNS, TLD registries, cloud, data centers
+    \item \textbf{Public Administration}
+    \item \textbf{Space}
+\end{itemize}
+
+\subsection{Important Entities (Annex II)}
+
+These sectors have slightly reduced oversight but similar security obligations:
+
+\begin{itemize}
+    \item \textbf{Postal and Courier Services}
+    \item \textbf{Waste Management}
+    \item \textbf{Chemical Manufacturing and Distribution}
+    \item \textbf{Food Production and Distribution}
+    \item \textbf{Manufacturing} -- Medical devices, machinery, motor vehicles, electrical equipment
+    \item \textbf{Digital Providers} -- Online marketplaces, search engines, social networks
+    \item \textbf{Research Organizations}
+\end{itemize}
+
+\begin{warningbox}
+Size thresholds apply: Generally, medium-sized enterprises (50+ employees or \texteuro10M+ turnover) and large enterprises are in scope. However, some entities are covered regardless of size, including critical infrastructure operators and those providing essential services.
+\end{warningbox}
+
+\section{Key Security Requirements}
+
+NIS2 Article 21 mandates specific cybersecurity risk management measures. These requirements apply directly to OT environments.
+
+\subsection{Risk Management Measures}
+
+Organizations must implement measures that are \textbf{appropriate and proportionate} to the risks, considering:
+
+\begin{itemize}
+    \item State of the art technologies
+    \item Relevant standards (ISO 27001, IEC 62443)
+    \item Cost of implementation
+    \item Likelihood and severity of incidents
+\end{itemize}
+
+\subsection{Minimum Security Elements}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw=otaccent, thick, fill=otaccent!10,
+                rounded corners=5pt, minimum width=11cm, minimum height=0.7cm,
+                align=left, text width=10cm, font=\small},
+    num/.style={circle, fill=otprimary, text=white, font=\small\bfseries,
+                minimum size=0.6cm}
+]
+    \node[num] (n1) at (0,0) {1};
+    \node[box, anchor=west] at (0.6,0) {Risk analysis and information system security policies};
+    \node[num] (n2) at (0,-1.0) {2};
+    \node[box, anchor=west] at (0.6,-1.0) {Incident handling procedures};
+    \node[num] (n3) at (0,-2.0) {3};
+    \node[box, anchor=west] at (0.6,-2.0) {Business continuity and crisis management};
+    \node[num] (n4) at (0,-3.0) {4};
+    \node[box, anchor=west] at (0.6,-3.0) {Supply chain security};
+    \node[num] (n5) at (0,-4.0) {5};
+    \node[box, anchor=west] at (0.6,-4.0) {Security in network and system acquisition};
+    \node[num] (n6) at (0,-5.0) {6};
+    \node[box, anchor=west] at (0.6,-5.0) {Vulnerability handling and disclosure};
+    \node[num] (n7) at (0,-6.0) {7};
+    \node[box, anchor=west] at (0.6,-6.0) {Cybersecurity training and basic cyber hygiene};
+    \node[num] (n8) at (0,-7.0) {8};
+    \node[box, anchor=west] at (0.6,-7.0) {Cryptography and encryption policies};
+    \node[num] (n9) at (0,-8.0) {9};
+    \node[box, anchor=west] at (0.6,-8.0) {Access control and asset management};
+    \node[num] (n10) at (0,-9.0) {10};
+    \node[box, anchor=west] at (0.6,-9.0) {Multi-factor authentication and secure communications};
+\end{tikzpicture}
+\caption{NIS2 Article 21 minimum security measures}
+\end{figure}
+
+\section{Incident Reporting Requirements}
+
+NIS2 establishes a structured incident reporting framework with strict timelines.
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3cm}p{2cm}p{7.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Report Type} & \textcolor{white}{\bfseries Deadline} & \textcolor{white}{\bfseries Content} \\
+\midrule
+Early Warning & 24 hours & Initial notification of significant incident \\
+Incident Notification & 72 hours & Assessment of severity, impact, and indicators of compromise \\
+Intermediate Report & On request & Status update if requested by authority \\
+Final Report & 1 month & Root cause, mitigation measures, cross-border impact \\
+\end{tabular}
+\caption{NIS2 incident reporting timeline}
+\end{table}
+
+\begin{dangerbox}
+A \textbf{significant incident} is one that has caused or could cause severe operational disruption or financial loss, or has affected or could affect other entities by causing considerable damage. OT incidents affecting safety or physical processes typically meet this threshold.
+\end{dangerbox}
+
+\section{OT and ICS Implications}
+
+NIS2 has direct implications for operational technology environments across covered sectors.
+
+\subsection{Specific OT Considerations}
+
+\begin{itemize}
+    \item \textbf{Asset Inventory} -- Complete inventory of OT assets is required for risk management
+    \item \textbf{Network Segmentation} -- Separation between IT and OT networks is implicitly required
+    \item \textbf{Access Control} -- MFA requirements may need adaptation for OT constraints
+    \item \textbf{Patch Management} -- Vulnerability handling must account for OT patching challenges
+    \item \textbf{Monitoring} -- Detection capabilities must extend to OT networks
+    \item \textbf{Incident Response} -- Plans must cover OT-specific scenarios
+\end{itemize}
+
+\subsection{Supply Chain Security}
+
+NIS2 explicitly addresses supply chain risks, particularly relevant for OT environments:
+
+\begin{itemize}
+    \item Security requirements for suppliers and service providers
+    \item Assessment of supplier cybersecurity practices
+    \item Contractual security obligations
+    \item Monitoring of third-party access to OT systems
+\end{itemize}
+
+\begin{tipbox}
+IEC 62443 alignment is valuable for NIS2 compliance in OT environments. The standard's security levels and zone/conduit model provide a framework that supports NIS2's risk-based approach.
+\end{tipbox}
+
+\section{Management Accountability}
+
+NIS2 introduces personal accountability for management bodies, a significant change from NIS1.
+
+\subsection{Management Obligations}
+
+\begin{itemize}
+    \item \textbf{Approve} cybersecurity risk management measures
+    \item \textbf{Oversee} implementation of security measures
+    \item \textbf{Undertake} cybersecurity training
+    \item \textbf{Be held liable} for infringements
+\end{itemize}
+
+\begin{warningbox}
+Member states may hold natural persons (executives, board members) personally liable for failures to comply with NIS2 obligations. This extends accountability beyond the organization to individual decision-makers.
+\end{warningbox}
+
+\section{Enforcement and Penalties}
+
+NIS2 establishes harmonized penalty frameworks across the EU.
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{4.5cm}p{4.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Aspect} & \textcolor{white}{\bfseries Essential Entities} & \textcolor{white}{\bfseries Important Entities} \\
+\midrule
+Maximum fine & \texteuro10M or 2\% global turnover & \texteuro7M or 1.4\% global turnover \\
+Supervision & Proactive (ex-ante) & Reactive (ex-post) \\
+Audits & Regular mandatory audits & Audits after incidents \\
+\end{tabular}
+\caption{NIS2 penalty framework}
+\end{table}
+
+Additional enforcement measures include:
+
+\begin{itemize}
+    \item Binding instructions and compliance orders
+    \item Public disclosure of non-compliance
+    \item Temporary suspension of certifications
+    \item Temporary management bans for essential entities
+\end{itemize}
+
+\section{Implementation Timeline}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    milestone/.style={rectangle, draw=otprimary, thick, fill=otprimary!10,
+                     rounded corners=3pt, minimum width=2.5cm, minimum height=1.2cm,
+                     align=center, font=\small},
+    arrow/.style={->, thick, >=stealth, otaccent}
+]
+    \node[milestone] (a) at (0,0) {Dec 2022\\Directive\\Adopted};
+    \node[milestone] (b) at (3.8,0) {Oct 2024\\Transposition\\Deadline};
+    \node[milestone] (c) at (7.6,0) {Apr 2025\\Entity\\Registration};
+    \node[milestone] (d) at (11.4,0) {2025+\\Enforcement\\Begins};
+
+    \draw[arrow] (a) -- (b);
+    \draw[arrow] (b) -- (c);
+    \draw[arrow] (c) -- (d);
+\end{tikzpicture}
+\caption{NIS2 implementation timeline}
+\end{figure}
+
+Member states must transpose NIS2 into national law. Organizations should:
+
+\begin{enumerate}
+    \item Determine if they fall within scope
+    \item Assess current security posture against NIS2 requirements
+    \item Identify gaps, particularly in OT environments
+    \item Implement necessary measures before enforcement begins
+    \item Register with national authorities as required
+\end{enumerate}
+
+\section{Summary}
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Expanded Scope:} NIS2 covers 18 sectors with Essential and Important entity classifications, significantly broadening coverage of industrial operations
+    \item \textbf{Stricter Requirements:} Minimum security measures explicitly include risk management, incident handling, supply chain security, and access control
+    \item \textbf{Fast Reporting:} 24-hour early warning and 72-hour notification requirements demand prepared incident response capabilities
+    \item \textbf{OT Relevance:} Requirements directly impact OT environments including asset management, network security, and vulnerability handling
+    \item \textbf{Management Liability:} Personal accountability for executives creates board-level attention to cybersecurity
+    \item \textbf{Significant Penalties:} Fines up to \texteuro10M or 2\% of global turnover, plus potential management bans
+\end{itemize}
+\end{definitionbox}
+
+\section{Further Reading}
+
+\subsection*{Official Sources}
+\begin{itemize}
+    \item \textbf{NIS2 Directive Full Text} -- Official Journal of the European Union\\
+          \url{https://eur-lex.europa.eu/eli/dir/2022/2555}
+    \item \textbf{ENISA NIS2 Resources} -- European Union Agency for Cybersecurity\\
+          \url{https://www.enisa.europa.eu/topics/cybersecurity-policy/nis-directive-new}
+\end{itemize}
+
+\subsection*{Related Standards}
+\begin{itemize}
+    \item \textbf{IEC 62443} -- Industrial Automation and Control Systems Security\\
+          \url{https://www.isa.org/standards-and-publications/isa-standards}
+    \item \textbf{ISO/IEC 27001} -- Information Security Management Systems\\
+          \url{https://www.iso.org/standard/27001}
+\end{itemize}
+
+\subsection*{Books}
+\begin{itemize}
+    \item Boehmer -- \textit{EU Cybersecurity Regulation and Directive} (Springer)
+    \item Markopoulou et al. -- \textit{The New European Cybersecurity Framework} (Kluwer)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

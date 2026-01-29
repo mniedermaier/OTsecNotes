@@ -1,0 +1,318 @@
+% ============================================================================
+%  080-rtu-basics - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {RTU Basics}
+    {Remote Terminal Units in Industrial Control Systems}
+    {OT Security Learning Series}
+    {Document 080 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+\begin{infobox}
+A Remote Terminal Unit (RTU) is a microprocessor-controlled device that interfaces with physical equipment at remote locations and communicates with a central SCADA system. RTUs are essential components in utilities, oil and gas, water treatment, and other industries where monitoring and control must occur across geographically distributed sites.
+\end{infobox}
+
+RTUs serve as the eyes and ears of SCADA systems in remote locations. They collect data from sensors, execute control commands from the central system, and often operate autonomously when communication is lost. Understanding RTU architecture and operation is fundamental to securing distributed industrial infrastructure.
+
+\section{What is an RTU?}
+
+An RTU is a ruggedized, standalone device designed to:
+
+\begin{itemize}
+    \item \textbf{Acquire Data} -- Read values from sensors, meters, and field instruments
+    \item \textbf{Execute Control} -- Operate switches, valves, and other actuators
+    \item \textbf{Communicate} -- Transmit data to and receive commands from SCADA masters
+    \item \textbf{Store Data} -- Buffer readings when communication is unavailable
+    \item \textbf{Process Locally} -- Perform basic logic and calculations at the remote site
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw=otprimary, thick, fill=otprimary!10,
+                rounded corners=5pt, minimum width=3cm, minimum height=1.2cm,
+                align=center, font=\small},
+    rtu/.style={rectangle, draw=otaccent, thick, fill=otaccent!20,
+                rounded corners=5pt, minimum width=4cm, minimum height=2cm,
+                align=center, font=\small\bfseries},
+    io/.style={rectangle, draw=otwarning, thick, fill=otwarning!10,
+               rounded corners=3pt, minimum width=2cm, minimum height=0.7cm,
+               align=center, font=\scriptsize},
+    arrow/.style={->, thick, >=stealth}
+]
+    % RTU
+    \node[rtu] (rtu) at (0,0) {RTU};
+
+    % SCADA Master
+    \node[box] (scada) at (0,4) {SCADA Master};
+
+    % Field Devices
+    \node[io] (sensor1) at (-4,-1.5) {Sensors};
+    \node[io] (sensor2) at (-4,0) {Meters};
+    \node[io] (sensor3) at (-4,1.5) {Switches};
+
+    \node[io] (act1) at (4,-1.5) {Valves};
+    \node[io] (act2) at (4,0) {Pumps};
+    \node[io] (act3) at (4,1.5) {Breakers};
+
+    % Communication
+    \node[io, fill=otinfo!20, draw=otinfo] (comm) at (0,2.2) {Radio/Cellular/Serial};
+
+    % Arrows - inputs (sensors to RTU)
+    \draw[arrow] (sensor1) -- (rtu);
+    \draw[arrow] (sensor2) -- (rtu);
+    \draw[arrow] (sensor3) -- (rtu);
+    % Arrows - outputs (RTU to actuators)
+    \draw[arrow] (rtu) -- (act1);
+    \draw[arrow] (rtu) -- (act2);
+    \draw[arrow] (rtu) -- (act3);
+    % Communication (bidirectional)
+    \draw[arrow, <->] (rtu) -- (comm);
+    \draw[arrow, <->] (comm) -- (scada);
+\end{tikzpicture}
+\caption{RTU in a typical SCADA architecture}
+\end{figure}
+
+\section{RTU vs PLC}
+
+While RTUs and PLCs both interface with industrial processes, they serve different purposes:
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{5cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Characteristic} & \textcolor{white}{\bfseries RTU} & \textcolor{white}{\bfseries PLC} \\
+\midrule
+Primary Purpose & Remote monitoring and telemetry & Local process control \\
+Location & Geographically distributed sites & Within a plant or facility \\
+Communication & Long-distance (radio, cellular, satellite) & Local networks (Ethernet, serial) \\
+Autonomy & High -- operates during comm loss & Moderate -- usually networked \\
+I/O Density & Lower, distributed I/O & Higher, concentrated I/O \\
+Environment & Extreme outdoor conditions & Typically indoor, controlled \\
+Scan Rate & Slower (seconds to minutes) & Fast (milliseconds) \\
+Programming & Often simpler logic & Complex ladder/function block \\
+\end{tabular}
+\caption{Key differences between RTUs and PLCs}
+\end{table}
+
+\begin{tipbox}
+Modern devices increasingly blur the RTU/PLC distinction. Many contemporary RTUs include PLC-like programming capabilities, while some PLCs support remote telemetry protocols. The term "RTU" often indicates the device's role in a distributed SCADA architecture rather than strict hardware differences.
+\end{tipbox}
+
+\section{RTU Architecture}
+
+\subsection{Hardware Components}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    component/.style={rectangle, draw=otaccent, thick, fill=otaccent!10,
+                      rounded corners=3pt, minimum width=3.5cm, minimum height=0.8cm,
+                      align=center, font=\small},
+    num/.style={circle, fill=otprimary, text=white, font=\small\bfseries,
+                minimum size=0.6cm}
+]
+    \node[num] at (0,0) {1};
+    \node[component, anchor=west] at (0.6,0) {CPU / Processor};
+    \node[num] at (0,-1.1) {2};
+    \node[component, anchor=west] at (0.6,-1.1) {Memory (RAM/Flash)};
+    \node[num] at (0,-2.2) {3};
+    \node[component, anchor=west] at (0.6,-2.2) {Digital I/O Modules};
+    \node[num] at (0,-3.3) {4};
+    \node[component, anchor=west] at (0.6,-3.3) {Analog I/O Modules};
+    \node[num] at (0,-4.4) {5};
+    \node[component, anchor=west] at (0.6,-4.4) {Communication Ports};
+    \node[num] at (0,-5.5) {6};
+    \node[component, anchor=west] at (0.6,-5.5) {Power Supply};
+    \node[num] at (0,-6.6) {7};
+    \node[component, anchor=west] at (0.6,-6.6) {Battery Backup};
+\end{tikzpicture}
+\caption{Core RTU hardware components}
+\end{figure}
+
+\subsection{Input/Output Types}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3cm}p{4cm}p{6cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries I/O Type} & \textcolor{white}{\bfseries Signal} & \textcolor{white}{\bfseries Examples} \\
+\midrule
+Digital Input & On/Off status & Valve position, pump running, alarm state \\
+Digital Output & On/Off control & Start/stop pump, open/close valve \\
+Analog Input & 4-20mA, 0-10V & Temperature, pressure, flow, level \\
+Analog Output & 4-20mA, 0-10V & Setpoint adjustment, variable speed \\
+Pulse/Counter & Pulse counting & Flow totalizer, energy meter \\
+\end{tabular}
+\caption{Common RTU I/O types and applications}
+\end{table}
+
+\section{Communication Protocols}
+
+RTUs communicate using protocols designed for reliable telemetry over various media:
+
+\subsection{Common Protocols}
+
+\begin{itemize}
+    \item \textbf{DNP3} -- Distributed Network Protocol, dominant in utilities
+    \item \textbf{Modbus} -- Simple, widely supported, RTU and TCP variants
+    \item \textbf{IEC 60870-5-101/104} -- International standard for telecontrol
+    \item \textbf{IEC 61850} -- Modern standard for substation automation
+\end{itemize}
+
+\subsection{Communication Media}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3cm}p{4cm}p{6cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Medium} & \textcolor{white}{\bfseries Typical Use} & \textcolor{white}{\bfseries Considerations} \\
+\midrule
+Licensed Radio & Utilities, critical infrastructure & Reliable, dedicated spectrum \\
+Cellular (4G/5G) & Wide-area, mobile sites & Coverage dependent, carrier costs \\
+Satellite & Remote/offshore locations & High latency, expensive \\
+Serial Leased Line & Legacy installations & Being phased out \\
+Ethernet/IP & Modern installations & Requires network infrastructure \\
+\end{tabular}
+\caption{RTU communication media options}
+\end{table}
+
+\section{Typical Applications}
+
+\subsection{Electric Utilities}
+
+\begin{itemize}
+    \item Substation monitoring and control
+    \item Distribution automation
+    \item Capacitor bank switching
+    \item Fault detection and isolation
+\end{itemize}
+
+\subsection{Oil and Gas}
+
+\begin{itemize}
+    \item Pipeline monitoring (pressure, flow, leak detection)
+    \item Well site automation
+    \item Tank farm level monitoring
+    \item Compressor station control
+\end{itemize}
+
+\subsection{Water and Wastewater}
+
+\begin{itemize}
+    \item Pump station control
+    \item Reservoir level monitoring
+    \item Treatment plant remote I/O
+    \item Distribution system pressure monitoring
+\end{itemize}
+
+\section{Security Considerations}
+
+\begin{dangerbox}
+RTUs present significant security challenges due to their remote locations, legacy protocols, and often limited computational resources. Many RTUs were deployed before cybersecurity was a concern and lack basic security features.
+\end{dangerbox}
+
+\subsection{Common Vulnerabilities}
+
+\begin{itemize}
+    \item \textbf{No Authentication} -- Many protocols (Modbus, older DNP3) lack authentication
+    \item \textbf{Cleartext Communication} -- Data transmitted without encryption
+    \item \textbf{Physical Access} -- Remote sites may have weak physical security
+    \item \textbf{Default Credentials} -- Factory passwords often unchanged
+    \item \textbf{Legacy Firmware} -- Difficult or impossible to update
+    \item \textbf{Insecure Remote Access} -- Dial-up modems, unsecured cellular connections
+\end{itemize}
+
+\subsection{Security Measures}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Measure} & \textcolor{white}{\bfseries Implementation} \\
+\midrule
+Protocol Security & DNP3 Secure Authentication, IEC 62351 \\
+Encryption & VPN tunnels, TLS for IP-based communication \\
+Access Control & Strong passwords, disable unused ports \\
+Physical Security & Locked enclosures, tamper detection \\
+Monitoring & Log communications, detect anomalies \\
+Network Segmentation & Separate RTU network from corporate IT \\
+\end{tabular}
+\caption{RTU security measures}
+\end{table}
+
+\begin{successbox}
+When deploying new RTUs, select devices that support modern security features like DNP3 Secure Authentication, TLS, and role-based access control. For legacy devices, implement compensating controls such as VPN tunnels and network monitoring.
+\end{successbox}
+
+\section{Summary}
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Definition:} RTUs are ruggedized devices that interface with field equipment at remote locations and communicate with central SCADA systems
+    \item \textbf{vs PLCs:} RTUs emphasize remote telemetry and autonomous operation; PLCs emphasize local process control with fast scan rates
+    \item \textbf{Components:} CPU, memory, digital/analog I/O, communication ports, power supply with battery backup
+    \item \textbf{Protocols:} DNP3, Modbus, IEC 60870-5 are common; communication via radio, cellular, satellite, or IP networks
+    \item \textbf{Applications:} Widely used in utilities, oil and gas, water/wastewater for distributed monitoring and control
+    \item \textbf{Security:} Legacy RTUs often lack security features; implement protocol security, encryption, access control, and monitoring
+\end{itemize}
+\end{definitionbox}
+
+\section{Further Reading}
+
+\subsection*{Standards}
+\begin{itemize}
+    \item \textbf{IEEE 1815 (DNP3)} -- Standard for electric power systems communications\\
+          \url{https://standards.ieee.org/standard/1815-2012.html}
+    \item \textbf{IEC 60870-5} -- Telecontrol equipment and systems\\
+          \url{https://webstore.iec.ch/publication/3750}
+\end{itemize}
+
+\subsection*{Resources}
+\begin{itemize}
+    \item \textbf{CISA ICS Security} -- Industrial Control Systems resources\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+    \item \textbf{NIST SP 800-82} -- Guide to ICS Security\\
+          \url{https://csrc.nist.gov/pubs/sp/800/82/r3/final}
+\end{itemize}
+
+\subsection*{Books}
+\begin{itemize}
+    \item Bailey \& Wright -- \textit{Practical SCADA for Industry} (Newnes)
+    \item Boyer -- \textit{SCADA: Supervisory Control and Data Acquisition} (ISA)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

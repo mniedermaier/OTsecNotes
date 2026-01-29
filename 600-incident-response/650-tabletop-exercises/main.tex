@@ -1,0 +1,357 @@
+% ============================================================================
+%  650-tabletop-exercises - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {OT Tabletop Exercises}
+    {Testing Incident Response Through Scenario-Based Discussion}
+    {OT Security Learning Series}
+    {Document 650 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+\begin{infobox}
+Tabletop exercises are discussion-based sessions where participants walk through simulated incident scenarios to test response plans, identify gaps, and improve coordination. For OT environments, these exercises are essential because real-world testing of incident response on production systems is often impossible without risking safety or operations.
+\end{infobox}
+
+Unlike IT environments where systems can often be taken offline for testing, OT systems typically run continuously. Tabletop exercises provide a safe way to validate that teams can respond effectively to cyber incidents affecting industrial processes, without disrupting operations or creating safety hazards.
+
+\section{Exercise Types}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw=otprimary, thick, fill=otprimary!10,
+                rounded corners=5pt, minimum width=5cm, minimum height=1.2cm,
+                align=center, font=\small\bfseries},
+    desc/.style={rectangle, draw=otaccent, thick, fill=otaccent!5,
+                 rounded corners=3pt, minimum width=5cm, minimum height=2cm,
+                 align=left, text width=4.8cm, font=\scriptsize}
+]
+    % Discussion-based
+    \node[box] (disc) at (0,0) {Discussion-Based};
+    \node[desc, below=0.3cm of disc] {
+        \textbullet\ Tabletop exercises\\
+        \textbullet\ Workshops\\
+        \textbullet\ Seminars\\
+        \textbullet\ Low cost, low risk\\
+        \textbullet\ Focus on plans/procedures
+    };
+
+    % Operations-based
+    \node[box] (ops) at (7,0) {Operations-Based};
+    \node[desc, below=0.3cm of ops] {
+        \textbullet\ Drills\\
+        \textbullet\ Functional exercises\\
+        \textbullet\ Full-scale exercises\\
+        \textbullet\ Higher cost/complexity\\
+        \textbullet\ Tests actual capabilities
+    };
+\end{tikzpicture}
+\caption{Exercise types by complexity}
+\end{figure}
+
+\subsection{Tabletop Exercise Characteristics}
+
+\begin{itemize}
+    \item \textbf{Format} -- Facilitated group discussion around a scenario
+    \item \textbf{Duration} -- Typically 2--4 hours
+    \item \textbf{Resources} -- Minimal; requires facilitator and participants
+    \item \textbf{Risk} -- None to operations; purely discussion-based
+    \item \textbf{Output} -- Identified gaps, action items, improved awareness
+\end{itemize}
+
+\section{Planning and Preparation}
+
+\subsection{Define Objectives}
+
+Before designing an exercise, establish clear goals:
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Objective Type} & \textcolor{white}{\bfseries Example} \\
+\midrule
+Test procedures & Validate OT incident response plan steps \\
+Identify gaps & Find missing playbooks for specific attack types \\
+Train personnel & Familiarize operators with security escalation \\
+Test communication & Verify notification chains work as documented \\
+Assess decisions & Evaluate criteria for OT system isolation \\
+\end{tabular}
+\caption{Example exercise objectives}
+\end{table}
+
+\subsection{Develop the Scenario}
+
+Effective OT scenarios should be:
+
+\begin{itemize}
+    \item \textbf{Realistic} -- Based on actual threats to your industry
+    \item \textbf{Relevant} -- Target systems participants actually manage
+    \item \textbf{Challenging} -- Force difficult decisions, not obvious answers
+    \item \textbf{Scoped} -- Achievable within the exercise timeframe
+\end{itemize}
+
+\begin{tipbox}
+Base scenarios on real incidents from your sector. Adapt published case studies (Stuxnet, TRITON, Colonial Pipeline) to your specific environment and systems.
+\end{tipbox}
+
+\subsection{Prepare Materials}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    item/.style={rectangle, draw=otaccent, thick, fill=otaccent!10,
+                 rounded corners=3pt, minimum width=5cm, minimum height=0.7cm,
+                 align=center, font=\small},
+    num/.style={circle, fill=otprimary, text=white, font=\small\bfseries,
+                minimum size=0.6cm}
+]
+    \node[num] at (0,0) {1};
+    \node[item, anchor=west] at (0.6,0) {Scenario narrative and injects};
+    \node[num] at (0,-1.0) {2};
+    \node[item, anchor=west] at (0.6,-1.0) {Network diagrams and system info};
+    \node[num] at (0,-2.0) {3};
+    \node[item, anchor=west] at (0.6,-2.0) {Discussion questions per phase};
+    \node[num] at (0,-3.0) {4};
+    \node[item, anchor=west] at (0.6,-3.0) {Reference documents (IR plans)};
+    \node[num] at (0,-4.0) {5};
+    \node[item, anchor=west] at (0.6,-4.0) {Participant roles and ground rules};
+    \node[num] at (0,-5.0) {6};
+    \node[item, anchor=west] at (0.6,-5.0) {Evaluation forms};
+\end{tikzpicture}
+\caption{Exercise preparation checklist}
+\end{figure}
+
+\section{Key Participants}
+
+\subsection{Required Roles}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{9.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Role} & \textcolor{white}{\bfseries Responsibility} \\
+\midrule
+Facilitator & Guides discussion, presents injects, keeps time \\
+OT Operations & Represents control room, field operations \\
+OT Engineering & Provides technical system knowledge \\
+IT Security & Brings cybersecurity detection/response expertise \\
+Management & Makes escalation and business decisions \\
+Safety & Ensures safety implications are considered \\
+Communications & Handles internal/external messaging \\
+\end{tabular}
+\caption{Key exercise participants}
+\end{table}
+
+\begin{warningbox}
+OT tabletop exercises must include operations and engineering staff, not just IT security. Decisions about isolating control systems or shutting down processes require input from those who understand operational consequences.
+\end{warningbox}
+
+\section{OT-Specific Scenarios}
+
+\subsection{Scenario Categories}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Category} & \textcolor{white}{\bfseries Scenario Examples} \\
+\midrule
+Ransomware & Ransomware spreads from IT to historian, threatens HMI \\
+Targeted Attack & APT compromises engineering workstation, modifies PLC logic \\
+Insider Threat & Disgruntled employee with OT access sabotages process \\
+Supply Chain & Vendor's compromised update deployed to RTUs \\
+Safety System & Attacker attempts to disable safety instrumented system \\
+Data Integrity & Process values manipulated to cause unsafe conditions \\
+\end{tabular}
+\caption{OT-specific scenario categories}
+\end{table}
+
+\subsection{Sample Scenario Structure}
+
+A typical tabletop scenario progresses through phases:
+
+\begin{enumerate}
+    \item \textbf{Initial Detection} -- SOC alerts on suspicious activity
+    \item \textbf{Investigation} -- Determine scope, affected systems
+    \item \textbf{Escalation} -- IT/OT coordination, management notification
+    \item \textbf{Containment} -- Decisions on isolation, operational impact
+    \item \textbf{Eradication} -- Remove threat while maintaining operations
+    \item \textbf{Recovery} -- Restore systems, verify integrity
+    \item \textbf{Post-Incident} -- Lessons learned, improvements
+\end{enumerate}
+
+\section{Conducting the Exercise}
+
+\subsection{Exercise Flow}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    phase/.style={rectangle, draw=otprimary, thick, fill=otprimary!10,
+                  rounded corners=3pt, minimum width=2.2cm, minimum height=1cm,
+                  align=center, font=\scriptsize\bfseries},
+    arrow/.style={->, thick, >=stealth, otaccent}
+]
+    \node[phase] (intro) at (0,0) {Introduction\\(15 min)};
+    \node[phase] (p1) at (3,0) {Phase 1\\Inject};
+    \node[phase] (d1) at (5.5,0) {Discussion};
+    \node[phase] (p2) at (8,0) {Phase 2\\Inject};
+    \node[phase] (d2) at (10.5,0) {Discussion};
+    \node[phase] (hot) at (13,0) {Hot Wash\\(30 min)};
+
+    \draw[arrow] (intro) -- (p1);
+    \draw[arrow] (p1) -- (d1);
+    \draw[arrow] (d1) -- (p2);
+    \draw[arrow] (p2) -- (d2);
+    \draw[arrow] (d2) -- (hot);
+\end{tikzpicture}
+\caption{Typical tabletop exercise flow}
+\end{figure}
+
+\subsection{Facilitation Tips}
+
+\begin{itemize}
+    \item \textbf{Stay neutral} -- Don't lead participants to "correct" answers
+    \item \textbf{Encourage participation} -- Draw out quieter team members
+    \item \textbf{Manage time} -- Keep discussions focused, use parking lot for tangents
+    \item \textbf{Capture insights} -- Assign a note-taker for key decisions and gaps
+    \item \textbf{No blame} -- Focus on process improvement, not individual criticism
+\end{itemize}
+
+\subsection{Key Discussion Questions}
+
+For each scenario phase, ask:
+
+\begin{itemize}
+    \item Who needs to be notified? When?
+    \item What information do we need to make decisions?
+    \item What are our options? Trade-offs of each?
+    \item At what point do we isolate OT systems?
+    \item How do we maintain safe operations during response?
+    \item What if this happens during a critical production period?
+\end{itemize}
+
+\section{After-Action Review}
+
+\subsection{Hot Wash}
+
+Immediately after the exercise, conduct a brief debrief:
+
+\begin{itemize}
+    \item What went well?
+    \item What was confusing or unclear?
+    \item What gaps did we identify?
+    \item What needs immediate attention?
+\end{itemize}
+
+\subsection{After-Action Report}
+
+Document findings formally:
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{9.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Section} & \textcolor{white}{\bfseries Content} \\
+\midrule
+Executive Summary & Key findings and recommendations \\
+Exercise Overview & Objectives, scenario, participants \\
+Strengths & What worked well, validated capabilities \\
+Areas for Improvement & Gaps identified, with specific examples \\
+Recommendations & Prioritized action items with owners \\
+\end{tabular}
+\caption{After-action report structure}
+\end{table}
+
+\begin{successbox}
+The value of a tabletop exercise is in the improvements that follow. Track action items to completion and incorporate lessons learned into updated plans and procedures.
+\end{successbox}
+
+\section{Exercise Frequency}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{4cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Exercise Type} & \textcolor{white}{\bfseries Frequency} & \textcolor{white}{\bfseries Purpose} \\
+\midrule
+Basic tabletop & Quarterly & Maintain awareness, test updates \\
+Cross-functional & Semi-annually & IT/OT coordination \\
+Executive-level & Annually & Strategic decisions, resource allocation \\
+Full-scale (if feasible) & Every 2--3 years & Validate end-to-end capabilities \\
+\end{tabular}
+\caption{Recommended exercise frequency}
+\end{table}
+
+\section{Summary}
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Safe Testing:} Tabletop exercises allow testing OT incident response without operational risk
+    \item \textbf{Include OT Staff:} Operations and engineering must participate; decisions affect physical processes
+    \item \textbf{Realistic Scenarios:} Base exercises on actual threats to your industry and systems
+    \item \textbf{Structured Approach:} Progress through detection, containment, eradication, and recovery phases
+    \item \textbf{Document Outcomes:} Capture gaps and improvements in after-action reports
+    \item \textbf{Follow Through:} Track action items to completion; exercises without follow-up waste effort
+\end{itemize}
+\end{definitionbox}
+
+\section{Further Reading}
+
+\subsection*{Government Resources}
+\begin{itemize}
+    \item \textbf{CISA Tabletop Exercise Packages} -- Ready-made exercises for critical infrastructure\\
+          \url{https://www.cisa.gov/resources-tools/services/cisa-tabletop-exercise-packages}
+    \item \textbf{FEMA Homeland Security Exercise and Evaluation Program} -- Exercise design guidance\\
+          \url{https://www.fema.gov/emergency-managers/national-preparedness/exercises/hseep}
+\end{itemize}
+
+\subsection*{Standards}
+\begin{itemize}
+    \item \textbf{NIST SP 800-84} -- Guide to Test, Training, and Exercise Programs\\
+          \url{https://csrc.nist.gov/pubs/sp/800/84/final}
+\end{itemize}
+
+\subsection*{Books}
+\begin{itemize}
+    \item Bodeau \& Graubart -- \textit{Cyber Resiliency Engineering Framework} (MITRE)
+    \item Cichonski et al. -- \textit{Computer Security Incident Handling Guide} (NIST)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

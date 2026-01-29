@@ -1,0 +1,391 @@
+% ============================================================================
+%  130-nerc-cip - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {NERC CIP Standards}
+    {Critical Infrastructure Protection for the Bulk Electric System}
+    {OT Security Learning Series}
+    {Document 130 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+\begin{infobox}
+The North American Electric Reliability Corporation (NERC) Critical Infrastructure Protection (CIP) standards are mandatory cybersecurity requirements for the bulk electric system (BES) in North America. Unlike voluntary frameworks, NERC CIP carries significant financial penalties for non-compliance, making it one of the most consequential OT security regulations in the world.
+\end{infobox}
+
+NERC CIP establishes baseline cybersecurity requirements for entities that own, operate, or use critical assets of the bulk power system. The standards cover everything from asset identification and access control to incident response and recovery planning.
+
+\section{Background and Authority}
+
+\subsection{Regulatory Structure}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw=otprimary, thick, fill=otprimary!10,
+                rounded corners=5pt, minimum width=4cm, minimum height=1cm,
+                align=center, font=\small},
+    arrow/.style={->, thick, >=stealth}
+]
+    \node[box] (ferc) at (0,0) {FERC\\Federal Energy Regulatory\\Commission};
+    \node[box] (nerc) at (0,-2.5) {NERC\\Electric Reliability\\Organization};
+    \node[box] (region) at (0,-5) {Regional Entities\\(e.g., RF, WECC, SERC)};
+    \node[box] (entity) at (0,-7.5) {Registered Entities\\(Utilities, Generators, etc.)};
+
+    \draw[arrow] (ferc) -- node[right, font=\scriptsize] {Approves standards} (nerc);
+    \draw[arrow] (nerc) -- node[right, font=\scriptsize] {Delegates enforcement} (region);
+    \draw[arrow] (region) -- node[right, font=\scriptsize] {Audits \& enforces} (entity);
+\end{tikzpicture}
+\caption{NERC CIP regulatory hierarchy}
+\end{figure}
+
+\subsection{History}
+
+\begin{itemize}
+    \item \textbf{2003} -- Northeast blackout highlights grid vulnerabilities
+    \item \textbf{2006} -- FERC approves first mandatory CIP standards
+    \item \textbf{2013} -- CIP Version 5 introduces risk-based approach
+    \item \textbf{2016} -- Supply chain requirements added (CIP-013)
+    \item \textbf{Ongoing} -- Continuous updates to address emerging threats
+\end{itemize}
+
+\section{Applicability}
+
+\subsection{BES Cyber Systems}
+
+NERC CIP applies to Bulk Electric System (BES) Cyber Systems---cyber assets that, if compromised, could affect reliable operation of the grid.
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{9.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Term} & \textcolor{white}{\bfseries Definition} \\
+\midrule
+BES Cyber Asset & Programmable device essential to reliable BES operation \\
+BES Cyber System & One or more BES Cyber Assets logically grouped \\
+Electronic Access Point & Interface controlling routable communication \\
+Physical Security Perimeter & Physical border around BES Cyber Systems \\
+Electronic Security Perimeter & Logical border around BES Cyber Systems \\
+\end{tabular}
+\caption{Key NERC CIP terminology}
+\end{table}
+
+\subsection{Impact Rating Categories}
+
+Systems are categorized by their potential impact on the BES:
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.5cm}p{5cm}p{5.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Category} & \textcolor{white}{\bfseries Criteria Examples} & \textcolor{white}{\bfseries Requirements} \\
+\midrule
+High Impact & Control centers $\geq$3000 MW & Most stringent requirements \\
+Medium Impact & Generation 1500+ MW, transmission substations & Substantial requirements \\
+Low Impact & Remaining BES assets & Baseline requirements \\
+\end{tabular}
+\caption{BES Cyber System impact categories}
+\end{table}
+
+\begin{warningbox}
+Impact categorization directly determines which CIP requirements apply. Incorrect categorization---whether too low or too high---can result in compliance violations or unnecessary costs.
+\end{warningbox}
+
+\section{CIP Standards Overview}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    standard/.style={rectangle, draw=otaccent, thick, fill=otaccent!10,
+                     rounded corners=3pt, minimum width=6cm, minimum height=0.7cm,
+                     align=left, text width=5.8cm, font=\small},
+    num/.style={rectangle, fill=otprimary, text=white, font=\small\bfseries,
+                minimum width=1.2cm, minimum height=0.7cm}
+]
+    \node[num] at (0,0) {CIP-002};
+    \node[standard, anchor=west] at (1.0,0) {BES Cyber System Categorization};
+    \node[num] at (0,-0.9) {CIP-003};
+    \node[standard, anchor=west] at (1.0,-0.9) {Security Management Controls};
+    \node[num] at (0,-1.8) {CIP-004};
+    \node[standard, anchor=west] at (1.0,-1.8) {Personnel \& Training};
+    \node[num] at (0,-2.7) {CIP-005};
+    \node[standard, anchor=west] at (1.0,-2.7) {Electronic Security Perimeters};
+    \node[num] at (0,-3.6) {CIP-006};
+    \node[standard, anchor=west] at (1.0,-3.6) {Physical Security};
+    \node[num] at (0,-4.5) {CIP-007};
+    \node[standard, anchor=west] at (1.0,-4.5) {System Security Management};
+    \node[num] at (0,-5.4) {CIP-008};
+    \node[standard, anchor=west] at (1.0,-5.4) {Incident Reporting \& Response};
+    \node[num] at (0,-6.3) {CIP-009};
+    \node[standard, anchor=west] at (1.0,-6.3) {Recovery Plans};
+    \node[num] at (0,-7.2) {CIP-010};
+    \node[standard, anchor=west] at (1.0,-7.2) {Configuration Management};
+    \node[num] at (0,-8.1) {CIP-011};
+    \node[standard, anchor=west] at (1.0,-8.1) {Information Protection};
+    \node[num] at (0,-9.0) {CIP-012};
+    \node[standard, anchor=west] at (1.0,-9.0) {Communications Between Control Centers};
+    \node[num] at (0,-9.9) {CIP-013};
+    \node[standard, anchor=west] at (1.0,-9.9) {Supply Chain Risk Management};
+    \node[num] at (0,-10.8) {CIP-014};
+    \node[standard, anchor=west] at (1.0,-10.8) {Physical Security (Transmission)};
+\end{tikzpicture}
+\caption{NERC CIP standards family (CIP-001 retired)}
+\end{figure}
+
+\section{Key Requirements by Standard}
+
+\subsection{CIP-002: Categorization}
+
+Requires identification and categorization of all BES Cyber Systems:
+
+\begin{itemize}
+    \item Identify BES Cyber Systems at each asset
+    \item Assign High, Medium, or Low impact rating
+    \item Review and update annually
+    \item Senior manager approval required
+\end{itemize}
+
+\subsection{CIP-005: Electronic Security}
+
+Establishes network security requirements:
+
+\begin{itemize}
+    \item Define Electronic Security Perimeters (ESP)
+    \item Control all inbound/outbound access at Electronic Access Points
+    \item Implement malicious communications detection
+    \item Encrypt remote access sessions
+\end{itemize}
+
+\subsection{CIP-004: Personnel \& Training}
+
+Addresses the human element of security:
+
+\begin{itemize}
+    \item \textbf{Security Awareness} -- Annual training for all personnel with access
+    \item \textbf{Role-Based Training} -- Specific training for BES Cyber System access
+    \item \textbf{Background Checks} -- Personnel Risk Assessments every 7 years
+    \item \textbf{Access Management} -- Authorize, review quarterly, revoke within 24 hours
+\end{itemize}
+
+\subsection{CIP-006: Physical Security}
+
+Protects the physical environment around BES Cyber Systems:
+
+\begin{itemize}
+    \item \textbf{Physical Security Perimeter} -- Defined boundary with access controls
+    \item \textbf{Visitor Management} -- Continuous escort, logging of visitors
+    \item \textbf{Physical Access Monitoring} -- Alerts for unauthorized access attempts
+    \item \textbf{Access Log Retention} -- 90 days minimum
+\end{itemize}
+
+\subsection{CIP-007: System Security}
+
+Covers technical security controls:
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Requirement} & \textcolor{white}{\bfseries Description} \\
+\midrule
+Ports and Services & Disable unnecessary ports, document enabled services \\
+Patch Management & Evaluate and apply security patches within 35 days \\
+Malware Prevention & Deploy anti-malware or document mitigations \\
+Security Events & Log and alert on security-relevant events \\
+Access Control & Unique credentials, password complexity, failed login lockout \\
+\end{tabular}
+\caption{CIP-007 system security requirements}
+\end{table}
+
+\subsection{CIP-008: Incident Response}
+
+Mandates incident response capabilities:
+
+\begin{itemize}
+    \item Documented Cyber Security Incident Response Plan
+    \item Defined roles and responsibilities
+    \item Incident reporting to E-ISAC within specified timeframes
+    \item Annual plan testing and updates
+\end{itemize}
+
+\subsection{CIP-009: Recovery Plans}
+
+Ensures ability to restore BES Cyber Systems:
+
+\begin{itemize}
+    \item \textbf{Backup Media} -- Protect and test backup media
+    \item \textbf{Recovery Plans} -- Document procedures for each High/Medium impact system
+    \item \textbf{Testing} -- Test recovery plans every 15 months
+    \item \textbf{Data Preservation} -- Retain data for analysis after incidents
+\end{itemize}
+
+\subsection{CIP-010: Configuration \& Vulnerability Management}
+
+Maintains system integrity through change control:
+
+\begin{itemize}
+    \item \textbf{Baseline Configuration} -- Document OS, firmware, ports, patches
+    \item \textbf{Change Management} -- Authorize and document all changes
+    \item \textbf{Vulnerability Assessment} -- Every 15 months minimum
+    \item \textbf{Transient Devices} -- Control laptops, USB drives in OT environment
+\end{itemize}
+
+\subsection{CIP-013: Supply Chain}
+
+Addresses third-party risks:
+
+\begin{itemize}
+    \item Develop supply chain risk management plan
+    \item Include security requirements in procurement
+    \item Verify vendor security practices
+    \item Address risks from vendor remote access
+\end{itemize}
+
+\begin{tipbox}
+CIP-013 was added after the 2020 SolarWinds incident highlighted supply chain vulnerabilities. It requires entities to assess risks from vendors providing BES Cyber System components.
+\end{tipbox}
+
+\section{Compliance and Enforcement}
+
+\subsection{Violation Severity Levels}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.5cm}p{4cm}p{6.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Level} & \textcolor{white}{\bfseries Severity} & \textcolor{white}{\bfseries Penalty Range (per day)} \\
+\midrule
+Lower & Minor documentation gaps & Up to \$10,000 \\
+Moderate & Moderate risk exposure & \$10,000 -- \$100,000 \\
+High & Significant risk & \$100,000 -- \$500,000 \\
+Severe & Critical security failure & \$500,000 -- \$1,000,000+ \\
+\end{tabular}
+\caption{NERC CIP violation penalty ranges}
+\end{table}
+
+\begin{dangerbox}
+NERC CIP violations can result in penalties up to \$1 million per violation per day. In 2019, a single utility was fined \$10 million for 127 violations spanning multiple CIP standards.
+\end{dangerbox}
+
+\subsection{Audit Process}
+
+\begin{itemize}
+    \item \textbf{Self-Certification} -- Annual attestation of compliance
+    \item \textbf{Spot Checks} -- Regional entity verification audits
+    \item \textbf{On-Site Audits} -- Comprehensive multi-day reviews (every 3 years)
+    \item \textbf{Self-Reports} -- Entity-initiated violation disclosure
+\end{itemize}
+
+\section{Implementation Challenges}
+
+\subsection{Common Compliance Gaps}
+
+\begin{itemize}
+    \item \textbf{Asset Inventory} -- Incomplete identification of BES Cyber Assets
+    \item \textbf{Documentation} -- Insufficient evidence of control implementation
+    \item \textbf{Change Management} -- Unauthorized baseline changes
+    \item \textbf{Access Control} -- Shared accounts, excessive permissions
+    \item \textbf{Patch Management} -- Missed 35-day evaluation windows
+\end{itemize}
+
+\subsection{OT-Specific Considerations}
+
+\begin{itemize}
+    \item Legacy systems may not support required security controls
+    \item Patching must be balanced against operational stability
+    \item Network segmentation can be complex in existing facilities
+    \item Real-time systems have limited logging capabilities
+\end{itemize}
+
+\begin{successbox}
+Successful CIP compliance requires close collaboration between OT operations, IT security, and compliance teams. Technical controls must be implemented in ways that don't compromise grid reliability.
+\end{successbox}
+
+\section{Comparison with Other Standards}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3cm}p{3cm}p{3.5cm}p{3.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Aspect} & \textcolor{white}{\bfseries NERC CIP} & \textcolor{white}{\bfseries IEC 62443} & \textcolor{white}{\bfseries NIS2} \\
+\midrule
+Scope & North American BES & Global industrial & EU critical infra \\
+Enforcement & Mandatory, penalties & Voluntary/contractual & Mandatory, penalties \\
+Focus & Prescriptive controls & Risk-based levels & Risk-based measures \\
+Applicability & Electric utilities & All industries & 18 sectors \\
+\end{tabular}
+\caption{Comparison of OT security standards}
+\end{table}
+
+\section{Summary}
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Mandatory Standard:} NERC CIP is legally enforceable in North America with significant financial penalties for non-compliance
+    \item \textbf{Impact-Based:} Requirements scale based on High, Medium, or Low impact categorization of BES Cyber Systems
+    \item \textbf{Comprehensive Coverage:} 13 active standards (CIP-002 through CIP-014, CIP-001 retired) address asset identification, access control, security management, incident response, and supply chain
+    \item \textbf{Evidence Required:} Compliance requires documented policies, procedures, and evidence of implementation
+    \item \textbf{Supply Chain Focus:} CIP-013 specifically addresses third-party and vendor risks
+    \item \textbf{Continuous Process:} Annual self-certifications, regular audits, and ongoing updates require sustained compliance effort
+\end{itemize}
+\end{definitionbox}
+
+\section{Further Reading}
+
+\subsection*{Official Sources}
+\begin{itemize}
+    \item \textbf{NERC CIP Standards} -- Complete standards library\\
+          \url{https://www.nerc.com/pa/Stand/Pages/CIPStandards.aspx}
+    \item \textbf{NERC Compliance Guidance} -- Implementation references\\
+          \url{https://www.nerc.com/pa/comp/guidance/Pages/default.aspx}
+\end{itemize}
+
+\subsection*{Resources}
+\begin{itemize}
+    \item \textbf{E-ISAC} -- Electricity Information Sharing and Analysis Center\\
+          \url{https://www.nerc.com/pa/CI/ESISAC/Pages/default.aspx}
+    \item \textbf{FERC} -- Federal Energy Regulatory Commission\\
+          \url{https://www.ferc.gov/industries-data/electric/industry-activities/cyber-and-grid-security}
+\end{itemize}
+
+\subsection*{Books}
+\begin{itemize}
+    \item Ginter -- \textit{SCADA Security} (Abterra Technologies)
+    \item Knapp \& Langill -- \textit{Industrial Network Security} (Syngress)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

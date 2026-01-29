@@ -1,0 +1,382 @@
+% ============================================================================
+%  560-ot-soc-design - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {OT Security Operations Center}
+    {Designing and Operating a SOC for Industrial Environments}
+    {OT Security Learning Series}
+    {Document 560 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+A Security Operations Center (SOC) provides centralized monitoring, detection, and response capabilities. While IT SOCs are well-established, extending security operations to Operational Technology environments requires different approaches, skills, and tools.
+
+\begin{infobox}
+This document covers the design and operation of SOC capabilities for OT environments. It addresses organizational models, staffing requirements, technology considerations, and the unique challenges of monitoring industrial control systems while maintaining operational safety and availability.
+\end{infobox}
+
+\section{SOC Models for OT}
+
+\subsection{Organizational Approaches}
+
+Organizations can structure OT security operations in several ways:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=3.2cm, minimum height=1.8cm, align=center, font=\small},
+    label/.style={font=\scriptsize, align=center, text width=3.2cm}
+]
+% Three models
+\node[box, fill=otaccent!20] (dedicated) at (0,0) {\textbf{Dedicated}\\\textbf{OT SOC}};
+\node[box, fill=otsuccess!20] (converged) at (5,0) {\textbf{Converged}\\\textbf{IT/OT SOC}};
+\node[box, fill=otwarning!20] (hybrid) at (10,0) {\textbf{Hybrid}\\\textbf{Model}};
+
+% Descriptions below
+\node[label] at (0,-1.8) {Separate team\\dedicated to OT\\Full OT expertise};
+\node[label] at (5,-1.8) {Single SOC covers\\both IT and OT\\Shared resources};
+\node[label] at (10,-1.8) {IT SOC with OT\\specialists embedded\\Tiered escalation};
+\end{tikzpicture}
+\caption{SOC organizational models for OT}
+\end{figure}
+
+\subsection{Model Comparison}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.5cm}p{3.5cm}p{3.5cm}p{3.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Aspect} & \textcolor{white}{\bfseries Dedicated OT} & \textcolor{white}{\bfseries Converged} & \textcolor{white}{\bfseries Hybrid} \\
+\midrule
+OT expertise & Deep & Limited & Tiered \\
+Cost & High & Lower & Medium \\
+Coverage & 24/7 challenging & 24/7 easier & 24/7 possible \\
+Coordination & Separate processes & Unified & Defined handoffs \\
+Best for & Large OT footprint & Small OT presence & Most organizations \\
+\end{tabular}
+\caption{Comparison of SOC organizational models}
+\end{table}
+
+\begin{successbox}
+\textbf{Recommendation:} Most organizations benefit from a hybrid model---IT SOC provides 24/7 monitoring with OT-trained analysts who escalate to OT specialists for investigation and response.
+\end{successbox}
+
+\section{Staffing and Skills}
+
+\subsection{Required Competencies}
+
+OT SOC analysts need skills beyond traditional IT security:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    skill/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=4.5cm, minimum height=0.7cm, align=center, font=\small, fill=otinfo!15}
+]
+% IT Skills column
+\node[font=\small\bfseries] at (-2.5,2.5) {IT Security Skills};
+\node[skill] at (-2.5,1.8) {Network analysis};
+\node[skill] at (-2.5,1) {Malware analysis};
+\node[skill] at (-2.5,0.2) {SIEM operations};
+\node[skill] at (-2.5,-0.6) {Incident response};
+
+% OT Skills column
+\node[font=\small\bfseries] at (2.5,2.5) {OT-Specific Skills};
+\node[skill, fill=otaccent!15] at (2.5,1.8) {Industrial protocols};
+\node[skill, fill=otaccent!15] at (2.5,1) {Control system architecture};
+\node[skill, fill=otaccent!15] at (2.5,0.2) {Process understanding};
+\node[skill, fill=otaccent!15] at (2.5,-0.6) {Safety awareness};
+\end{tikzpicture}
+\caption{Required skill sets for OT SOC analysts}
+\end{figure}
+
+\subsection{Staffing Tiers}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{4cm}p{6.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Tier} & \textcolor{white}{\bfseries Role} & \textcolor{white}{\bfseries OT Requirements} \\
+\midrule
+Tier 1 & Alert triage & Basic OT awareness, protocol recognition \\
+Tier 2 & Investigation & OT network analysis, ICS malware knowledge \\
+Tier 3 & Advanced response & Deep OT expertise, vendor coordination \\
+OT SME & Subject matter expert & Control system engineering background \\
+\end{tabular}
+\caption{SOC tier structure with OT requirements}
+\end{table}
+
+\begin{warningbox}
+OT security talent is scarce. Consider cross-training IT analysts in OT fundamentals and partnering with OT engineering teams for deep expertise during incidents.
+\end{warningbox}
+
+\section{Technology Stack}
+
+\subsection{Core Components}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    comp/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=2.8cm, minimum height=1cm, align=center, font=\small},
+    arrow/.style={->, thick, >=stealth}
+]
+% Data sources on left
+\node[comp, fill=otinfo!20] (ids) at (0,2) {OT IDS/NTA};
+\node[comp, fill=otinfo!20] (logs) at (0,0.5) {Log Sources};
+\node[comp, fill=otinfo!20] (edr) at (0,-1) {EDR/EPP};
+
+% Central SIEM
+\node[comp, fill=otaccent!30, minimum width=3.2cm, minimum height=2cm] (siem) at (5,0.5) {\textbf{SIEM/SOAR}\\Correlation\\Automation};
+
+% Outputs on right
+\node[comp, fill=otsuccess!20] (dash) at (10,2) {Dashboards};
+\node[comp, fill=otsuccess!20] (alert) at (10,0.5) {Alerting};
+\node[comp, fill=otsuccess!20] (ticket) at (10,-1) {Ticketing};
+
+% Arrows
+\draw[arrow] (ids) -- (siem);
+\draw[arrow] (logs) -- (siem);
+\draw[arrow] (edr) -- (siem);
+\draw[arrow] (siem) -- (dash);
+\draw[arrow] (siem) -- (alert);
+\draw[arrow] (siem) -- (ticket);
+\end{tikzpicture}
+\caption{OT SOC technology stack overview}
+\end{figure}
+
+\subsection{OT-Specific Tools}
+
+\begin{itemize}
+    \item \textbf{OT Network Monitoring} -- Deep packet inspection for industrial protocols
+    \item \textbf{Asset Inventory} -- Automated discovery and tracking of OT devices
+    \item \textbf{Vulnerability Management} -- OT-aware scanning and assessment
+    \item \textbf{Threat Intelligence} -- ICS-specific threat feeds and IOCs
+    \item \textbf{Secure Remote Access} -- Monitored vendor and engineer access
+\end{itemize}
+
+\subsection{Integration Considerations}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Challenge} & \textcolor{white}{\bfseries Approach} \\
+\midrule
+Protocol support & Ensure SIEM can parse industrial protocols (Modbus, DNP3, etc.) \\
+Data volume & Filter and aggregate at source; prioritize security-relevant events \\
+Network isolation & Use data diodes or secure forwarders from OT to SOC \\
+Real-time correlation & Tune for OT-relevant use cases, not IT patterns \\
+\end{tabular}
+\caption{Technology integration challenges}
+\end{table}
+
+\section{Data Sources and Visibility}
+
+\subsection{Critical Log Sources}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    zone/.style={rectangle, draw, dashed, thick, rounded corners=5pt, fill=#1!10, minimum width=11cm},
+    source/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=2.2cm, minimum height=0.6cm, align=center, font=\scriptsize, fill=white}
+]
+% Zone 3.5 DMZ
+\node[zone=otwarning, minimum height=1.5cm] at (0,2.5) {};
+\node[font=\small\bfseries, left] at (-6,2.5) {DMZ};
+\node[source] at (-3,2.5) {Jump Servers};
+\node[source] at (0,2.5) {Firewalls};
+\node[source] at (3,2.5) {Historians};
+
+% Zone 3
+\node[zone=otsuccess, minimum height=1.5cm] at (0,0.5) {};
+\node[font=\small\bfseries, left] at (-6,0.5) {Zone 3};
+\node[source] at (-3,0.5) {SCADA Servers};
+\node[source] at (0,0.5) {HMI Stations};
+\node[source] at (3,0.5) {Eng Workstations};
+
+% Zone 1-2
+\node[zone=otaccent, minimum height=1.5cm] at (0,-1.5) {};
+\node[font=\small\bfseries, left] at (-6,-1.5) {Zone 1-2};
+\node[source] at (-3,-1.5) {Network TAPs};
+\node[source] at (0,-1.5) {Managed Switches};
+\node[source] at (3,-1.5) {RTUs/PLCs*};
+
+\node[font=\scriptsize] at (0,-2.8) {*Limited logging capability on most controllers};
+\end{tikzpicture}
+\caption{Log sources by Purdue zone}
+\end{figure}
+
+\subsection{Network Traffic Analysis}
+
+Network monitoring provides visibility where endpoint logging is limited:
+
+\begin{itemize}
+    \item \textbf{Protocol metadata} -- Source, destination, function codes, registers
+    \item \textbf{Baseline deviations} -- New connections, unusual commands
+    \item \textbf{Asset discovery} -- Passive identification of OT devices
+    \item \textbf{Threat detection} -- Known attack signatures and anomalies
+\end{itemize}
+
+\begin{dangerbox}
+Many OT devices cannot run agents or forward logs. Network traffic analysis is often the only visibility into Level 0-1 activity. Deploy monitoring at strategic points to maximize coverage.
+\end{dangerbox}
+
+\section{Detection Use Cases}
+
+\subsection{OT-Specific Detection Rules}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4.5cm}p{8cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Use Case} & \textcolor{white}{\bfseries Detection Logic} \\
+\midrule
+Unauthorized engineering access & PLC programming commands from non-engineering stations \\
+New device on OT network & ARP/DHCP for unknown MAC addresses \\
+Protocol anomaly & Invalid function codes or malformed packets \\
+Lateral movement & IT protocols (SMB, RDP) in control network \\
+Configuration change & Write commands to PLCs outside change windows \\
+Remote access abuse & VPN/jump server access at unusual times \\
+\end{tabular}
+\caption{Example OT detection use cases}
+\end{table}
+
+\subsection{Alert Prioritization}
+
+Not all alerts require immediate response in OT:
+
+\begin{itemize}
+    \item \riskcritical\ Safety system alerts -- Immediate escalation
+    \item \riskhigh\ Control system changes -- Verify with operations
+    \item \riskmedium\ Network anomalies -- Investigate within shift
+    \item \risklow\ Policy violations -- Queue for review
+\end{itemize}
+
+\begin{tipbox}
+Coordinate alert thresholds with OT operations. Some activities that look suspicious (firmware updates, configuration changes) may be planned maintenance. Integrate with change management systems to reduce false positives.
+\end{tipbox}
+
+\section{Operations and Processes}
+
+\subsection{Runbooks and Playbooks}
+
+OT incidents require modified response procedures:
+
+\begin{itemize}
+    \item \textbf{Escalation paths} -- Include OT engineering and operations contacts
+    \item \textbf{Response constraints} -- Document what actions are safe vs. risky
+    \item \textbf{Coordination requirements} -- When to involve plant operations
+    \item \textbf{Communication protocols} -- Who to notify, in what order
+\end{itemize}
+
+\subsection{Shift Handoff}
+
+Critical information for OT SOC shift changes:
+
+\begin{itemize}
+    \item Active incidents and investigation status
+    \item Planned maintenance and change windows
+    \item Known operational anomalies (process upsets)
+    \item Vendor access sessions in progress
+\end{itemize}
+
+\begin{warningbox}
+OT SOC analysts must understand the operational context. A spike in network traffic during a batch process is normal; the same spike at 3 AM is suspicious. Build relationships with operations teams.
+\end{warningbox}
+
+\section{Metrics and Reporting}
+
+\subsection{Key Performance Indicators}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{8.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Metric} & \textcolor{white}{\bfseries Description} \\
+\midrule
+Mean time to detect (MTTD) & Time from event occurrence to SOC awareness \\
+Mean time to respond (MTTR) & Time from detection to initial response action \\
+Alert volume by zone & Distribution of alerts across Purdue levels \\
+False positive rate & Percentage of alerts that are not true incidents \\
+OT asset coverage & Percentage of OT assets with monitoring visibility \\
+Change correlation & Alerts matched to authorized changes \\
+\end{tabular}
+\caption{OT SOC key performance indicators}
+\end{table}
+
+\section{Summary}
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Hybrid Model:} Most organizations benefit from IT SOC with embedded OT expertise and defined escalation paths
+    \item \textbf{Specialized Skills:} OT SOC analysts need industrial protocol knowledge, control system understanding, and safety awareness
+    \item \textbf{Network-Centric Visibility:} Use network traffic analysis where endpoint logging is limited or unavailable
+    \item \textbf{OT-Specific Use Cases:} Detection rules must account for industrial protocols and operational context
+    \item \textbf{Operational Coordination:} Integrate with change management and maintain close relationships with OT operations teams
+    \item \textbf{Modified Response:} Runbooks must include safety considerations and coordination requirements before taking action
+\end{itemize}
+\end{definitionbox}
+
+\section{Further Reading}
+
+\subsection*{Standards and Guidelines}
+
+\begin{itemize}
+    \item \textbf{NIST SP 800-82 Rev. 3} -- Guide to OT Security\\
+          \url{https://csrc.nist.gov/pubs/sp/800/82/r3/final}
+    \item \textbf{IEC 62443-2-1} -- Security Program Requirements for IACS Asset Owners\\
+          \url{https://webstore.iec.ch/publication/7030}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{SANS ICS} -- Industrial Control Systems Security\\
+          \url{https://www.sans.org/cyber-security-courses/ics-scada-cyber-security-essentials}
+    \item \textbf{MITRE ATT\&CK for ICS} -- Adversary Tactics and Techniques\\
+          \url{https://attack.mitre.org/techniques/ics/}
+    \item \textbf{CISA} -- Industrial Control Systems Security\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+\end{itemize}
+
+\subsection*{Books}
+
+\begin{itemize}
+    \item Knapp, Eric D. -- \textit{Industrial Network Security} (Syngress)
+    \item Muniz et al. -- \textit{Security Operations Center} (Cisco Press)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

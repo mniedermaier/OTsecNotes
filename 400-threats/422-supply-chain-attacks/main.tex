@@ -1,0 +1,330 @@
+% ============================================================================
+%  422-supply-chain-attacks - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {OT Supply Chain Attacks}
+    {Threats Through Trusted Vendors and Components}
+    {OT Security Learning Series}
+    {Document 422 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+\begin{infobox}
+Supply chain attacks target organizations indirectly by compromising trusted vendors, software, hardware, or service providers. In OT environments, these attacks are particularly dangerous because industrial systems often rely on specialized vendors with deep access to critical infrastructure, and security updates are applied infrequently due to operational constraints.
+\end{infobox}
+
+Supply chain attacks exploit the trust relationships between organizations and their suppliers. Rather than attacking a hardened target directly, adversaries compromise a weaker link in the supply chain, then leverage that access to reach their ultimate target.
+
+For OT environments, supply chain risks are amplified by:
+\begin{itemize}
+    \item Long equipment lifecycles (15--25 years)
+    \item Vendor remote access for maintenance and support
+    \item Limited visibility into vendor security practices
+    \item Delayed patching due to operational requirements
+    \item Dependence on specialized, sometimes sole-source vendors
+\end{itemize}
+
+\section{Types of Supply Chain Attacks}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    category/.style={rectangle, draw=otprimary, thick, fill=otprimary!10,
+                     rounded corners=5pt, minimum width=3.5cm, minimum height=1cm,
+                     align=center, font=\small\bfseries},
+    item/.style={rectangle, draw=otaccent, thick, fill=otaccent!5,
+                 rounded corners=3pt, minimum width=3.2cm, minimum height=0.6cm,
+                 align=center, font=\scriptsize}
+]
+    % Software
+    \node[category] (sw) at (0,0) {Software};
+    \node[item] at (0,-1.0) {Compromised updates};
+    \node[item] at (0,-1.8) {Malicious dependencies};
+    \node[item] at (0,-2.6) {Trojanized installers};
+
+    % Hardware
+    \node[category] (hw) at (4.5,0) {Hardware};
+    \node[item] at (4.5,-1.0) {Counterfeit components};
+    \node[item] at (4.5,-1.8) {Implanted backdoors};
+    \node[item] at (4.5,-2.6) {Modified firmware};
+
+    % Services
+    \node[category] (svc) at (9,0) {Services};
+    \node[item] at (9,-1.0) {Managed service providers};
+    \node[item] at (9,-1.8) {Cloud service compromise};
+    \node[item] at (9,-2.6) {Contractor access abuse};
+\end{tikzpicture}
+\caption{Categories of supply chain attacks}
+\end{figure}
+
+\subsection{Software Supply Chain}
+
+Software supply chain attacks compromise the development, build, or distribution processes:
+
+\begin{itemize}
+    \item \textbf{Build System Compromise} -- Injecting malware during software compilation
+    \item \textbf{Update Mechanism Hijacking} -- Distributing malware through legitimate update channels
+    \item \textbf{Dependency Confusion} -- Exploiting package managers to install malicious libraries
+    \item \textbf{Code Repository Attacks} -- Compromising source code repositories
+\end{itemize}
+
+\subsection{Hardware Supply Chain}
+
+Hardware attacks introduce malicious modifications during manufacturing or distribution:
+
+\begin{itemize}
+    \item \textbf{Counterfeit Components} -- Substandard or modified parts entering the supply chain
+    \item \textbf{Firmware Implants} -- Malicious code embedded in device firmware
+    \item \textbf{Hardware Trojans} -- Circuits added during manufacturing for later exploitation
+\end{itemize}
+
+\subsection{Service Provider Attacks}
+
+Attackers compromise managed service providers (MSPs) or contractors to reach multiple targets:
+
+\begin{itemize}
+    \item \textbf{MSP Compromise} -- Attacking IT/OT service providers to access client networks
+    \item \textbf{Remote Access Abuse} -- Exploiting vendor VPN or remote support tools
+    \item \textbf{Credential Theft} -- Stealing vendor credentials for customer systems
+\end{itemize}
+
+\section{Notable OT Supply Chain Incidents}
+
+\subsection{Havex / Dragonfly (2013--2014)}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{9.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Attribute} & \textcolor{white}{\bfseries Details} \\
+\midrule
+Attack Vector & Trojanized ICS vendor software installers \\
+Targets & Energy sector, ICS software users \\
+Method & Compromised legitimate download sites of ICS vendors \\
+Malware Capability & OPC server scanning, data exfiltration \\
+Attribution & Energetic Bear / Dragonfly (Russia-linked) \\
+\end{tabular}
+\caption{Havex/Dragonfly campaign summary}
+\end{table}
+
+Attackers compromised the websites of at least three ICS software vendors, replacing legitimate installers with trojanized versions. The Havex malware specifically targeted OPC servers to map industrial networks.
+
+\begin{dangerbox}
+Havex demonstrated that attackers could compromise ICS environments by targeting the vendors that asset owners trust implicitly. Users downloading software from official vendor websites received malware.
+\end{dangerbox}
+
+\subsection{NotPetya (2017)}
+
+While primarily known as ransomware, NotPetya was a supply chain attack that devastated OT operations:
+
+\begin{itemize}
+    \item \textbf{Vector:} Compromised update mechanism of M.E.Doc (Ukrainian accounting software)
+    \item \textbf{OT Impact:} Maersk shipping operations halted, Merck pharmaceutical manufacturing stopped, FedEx TNT logistics disrupted
+    \item \textbf{Damage:} Over \$10 billion in total damages globally
+\end{itemize}
+
+\subsection{SolarWinds / SUNBURST (2020)}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{9.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Attribute} & \textcolor{white}{\bfseries Details} \\
+\midrule
+Attack Vector & Trojanized SolarWinds Orion software updates \\
+Scope & 18,000+ organizations downloaded compromised updates \\
+Duration & March--December 2020 (9 months undetected) \\
+OT Relevance & Orion widely used to monitor OT network infrastructure \\
+Attribution & APT29 / Cozy Bear (Russia-linked) \\
+\end{tabular}
+\caption{SolarWinds/SUNBURST campaign summary}
+\end{table}
+
+\subsection{Kaseya VSA (2021)}
+
+The REvil ransomware group exploited vulnerabilities in Kaseya's VSA remote management software:
+
+\begin{itemize}
+    \item Compromised MSPs using Kaseya to manage client systems
+    \item Ransomware deployed to 1,500+ downstream organizations
+    \item Demonstrated cascading impact through service provider relationships
+\end{itemize}
+
+\subsection{3CX Supply Chain Attack (2023)}
+
+A trojanized version of the 3CX desktop application was distributed through official channels:
+
+\begin{itemize}
+    \item Attackers first compromised Trading Technologies software
+    \item Used that access to compromise 3CX build environment
+    \item Multi-stage supply chain attack (supply chain of a supply chain)
+\end{itemize}
+
+\section{OT-Specific Attack Vectors}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw=otdanger, thick, fill=otdanger!10,
+                rounded corners=5pt, minimum width=5cm, minimum height=0.7cm,
+                align=left, text width=4.8cm, font=\small},
+    num/.style={circle, fill=otprimary, text=white, font=\small\bfseries,
+                minimum size=0.6cm}
+]
+    \node[num] at (0,0) {1};
+    \node[box, anchor=west] at (0.6,0) {PLC/RTU firmware updates};
+    \node[num] at (0,-1.0) {2};
+    \node[box, anchor=west] at (0.6,-1.0) {HMI/SCADA software packages};
+    \node[num] at (0,-2.0) {3};
+    \node[box, anchor=west] at (0.6,-2.0) {Engineering workstation tools};
+    \node[num] at (0,-3.0) {4};
+    \node[box, anchor=west] at (0.6,-3.0) {Historian and OPC software};
+    \node[num] at (0,-4.0) {5};
+    \node[box, anchor=west] at (0.6,-4.0) {Network equipment firmware};
+    \node[num] at (0,-5.0) {6};
+    \node[box, anchor=west] at (0.6,-5.0) {Vendor remote access tools};
+    \node[num] at (0,-6.0) {7};
+    \node[box, anchor=west] at (0.6,-6.0) {Safety system configurations};
+\end{tikzpicture}
+\caption{OT-specific supply chain attack vectors}
+\end{figure}
+
+\subsection{Vendor Remote Access}
+
+Many OT vendors require persistent or on-demand remote access for support:
+
+\begin{warningbox}
+Vendor remote access connections often bypass security controls and provide direct access to OT networks. A compromised vendor can use legitimate credentials and tools to access multiple customer sites.
+\end{warningbox}
+
+\subsection{Embedded Systems and Firmware}
+
+OT devices present unique supply chain risks:
+
+\begin{itemize}
+    \item Firmware updates are infrequent and difficult to verify
+    \item Limited ability to inspect embedded system code
+    \item Long device lifecycles mean vulnerabilities persist
+    \item Counterfeit components may contain backdoors
+\end{itemize}
+
+\section{Defense Strategies}
+
+\subsection{Vendor Risk Management}
+
+\begin{itemize}
+    \item \textbf{Security Assessments} -- Evaluate vendor security practices before procurement
+    \item \textbf{Contractual Requirements} -- Include security obligations in vendor contracts
+    \item \textbf{Continuous Monitoring} -- Track vendor security posture over time
+    \item \textbf{Incident Notification} -- Require vendors to report security incidents
+\end{itemize}
+
+\subsection{Software Integrity Verification}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Control} & \textcolor{white}{\bfseries Implementation} \\
+\midrule
+Hash Verification & Verify checksums before installation \\
+Code Signing & Require and validate digital signatures \\
+SBOM Analysis & Review Software Bill of Materials for dependencies \\
+Staged Deployment & Test updates in isolated environment first \\
+Network Segmentation & Limit blast radius of compromised software \\
+\end{tabular}
+\caption{Software integrity controls}
+\end{table}
+
+\subsection{Remote Access Controls}
+
+\begin{itemize}
+    \item Implement jump servers for all vendor access
+    \item Require multi-factor authentication
+    \item Enable session recording and monitoring
+    \item Use time-limited access with explicit approval
+    \item Segment vendor access from critical systems
+\end{itemize}
+
+\begin{successbox}
+Adopt a zero-trust approach for vendor access: verify identity, limit access scope, monitor all activity, and assume any vendor could be compromised. Never allow persistent, unmonitored vendor connections to OT networks.
+\end{successbox}
+
+\subsection{Hardware Supply Chain Security}
+
+\begin{itemize}
+    \item Purchase from authorized distributors only
+    \item Inspect components for signs of tampering
+    \item Verify firmware integrity before deployment
+    \item Maintain inventory of hardware provenance
+    \item Consider trusted supplier programs
+\end{itemize}
+
+\section{Summary}
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Indirect Attack Path:} Supply chain attacks compromise trusted vendors to bypass direct security controls, making them effective against hardened OT environments
+    \item \textbf{Multiple Vectors:} Attacks can target software updates, hardware components, or service provider relationships
+    \item \textbf{OT Amplification:} Long lifecycles, vendor dependencies, and limited patching make OT especially vulnerable
+    \item \textbf{Historical Impact:} Havex, NotPetya, SolarWinds, and Kaseya demonstrate real-world consequences for industrial operations
+    \item \textbf{Defense in Depth:} Combine vendor risk management, integrity verification, access controls, and network segmentation
+    \item \textbf{Zero Trust for Vendors:} Treat all vendor access as potentially compromised; verify, limit, and monitor continuously
+\end{itemize}
+\end{definitionbox}
+
+\section{Further Reading}
+
+\subsection*{Government Resources}
+\begin{itemize}
+    \item \textbf{CISA Supply Chain Risk Management} -- Guidance for critical infrastructure\\
+          \url{https://www.cisa.gov/supply-chain-compromise}
+    \item \textbf{NIST Cybersecurity Supply Chain Risk Management} -- C-SCRM practices\\
+          \url{https://csrc.nist.gov/projects/cyber-supply-chain-risk-management}
+\end{itemize}
+
+\subsection*{Standards}
+\begin{itemize}
+    \item \textbf{NIST SP 800-161} -- Supply Chain Risk Management Practices\\
+          \url{https://csrc.nist.gov/pubs/sp/800/161/r1/final}
+    \item \textbf{IEC 62443-2-4} -- Security program requirements for IACS service providers\\
+          \url{https://webstore.iec.ch/publication/34421}
+\end{itemize}
+
+\subsection*{Books}
+\begin{itemize}
+    \item Andress \& Winterfeld -- \textit{Cyber Warfare: Techniques, Tactics and Tools} (Auerbach)
+    \item Kouns \& Minoli -- \textit{Information Technology Risk Management in Enterprise Environments} (Wiley)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

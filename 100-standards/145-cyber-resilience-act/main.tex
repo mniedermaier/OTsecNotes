@@ -1,0 +1,386 @@
+% ============================================================================
+%  145-cyber-resilience-act - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {EU Cyber Resilience Act}
+    {Product Security Requirements for Digital Elements}
+    {OT Security Learning Series}
+    {Document 145 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+\begin{infobox}
+The Cyber Resilience Act (CRA) is an EU regulation establishing mandatory cybersecurity requirements for products with digital elements. Unlike NIS2, which regulates operators of essential services, the CRA targets manufacturers, importers, and distributors of hardware and software products. For OT environments, this means PLCs, RTUs, industrial sensors, and control system software must meet security requirements before being placed on the EU market.
+\end{infobox}
+
+The CRA addresses a fundamental gap in EU cybersecurity regulation: while NIS2 requires operators to secure their systems, the products they purchase often lack basic security features. The CRA shifts responsibility to manufacturers to build security into products from design through end-of-life.
+
+For OT asset owners, the CRA will improve the baseline security of industrial products. For OT vendors and integrators, it creates new compliance obligations that affect product development, documentation, and support.
+
+\section{Scope and Applicability}
+
+\subsection{Products with Digital Elements}
+
+The CRA applies to products with digital elements---any software or hardware product and its remote data processing solutions:
+
+\begin{itemize}
+    \item \textbf{Hardware with Software} -- PLCs, RTUs, industrial PCs, network equipment, sensors
+    \item \textbf{Standalone Software} -- SCADA software, HMI applications, engineering tools
+    \item \textbf{Remote Data Processing} -- Cloud components essential to product function
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw=otprimary, thick, fill=otprimary!10,
+                rounded corners=5pt, minimum width=5.5cm, minimum height=0.8cm,
+                align=left, text width=5.3cm, font=\small},
+    num/.style={circle, fill=otaccent, text=white, font=\small\bfseries,
+                minimum size=0.6cm}
+]
+    \node[num] at (0,0) {1};
+    \node[box, anchor=west] at (0.8,0) {PLCs and programmable controllers};
+    \node[num] at (0,-1.1) {2};
+    \node[box, anchor=west] at (0.8,-1.1) {RTUs and edge devices};
+    \node[num] at (0,-2.2) {3};
+    \node[box, anchor=west] at (0.8,-2.2) {Industrial network equipment};
+    \node[num] at (0,-3.3) {4};
+    \node[box, anchor=west] at (0.8,-3.3) {SCADA and HMI software};
+    \node[num] at (0,-4.4) {5};
+    \node[box, anchor=west] at (0.8,-4.4) {Engineering and configuration tools};
+    \node[num] at (0,-5.5) {6};
+    \node[box, anchor=west] at (0.8,-5.5) {Industrial IoT sensors and gateways};
+\end{tikzpicture}
+\caption{OT products covered by the CRA}
+\end{figure}
+
+\subsection{Exclusions}
+
+The CRA does not apply to:
+
+\begin{itemize}
+    \item Products already regulated by sector-specific EU legislation (medical devices, vehicles, aviation)
+    \item Open-source software developed non-commercially
+    \item Cloud services (covered by NIS2 instead)
+    \item Products exclusively for national security or military use
+\end{itemize}
+
+\subsection{Product Categories}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3cm}p{5cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Category} & \textcolor{white}{\bfseries Description} & \textcolor{white}{\bfseries OT Examples} \\
+\midrule
+Default & Standard products & Basic sensors, simple HMIs \\
+Important Class I & Higher risk products & Firewalls, IDS, network management \\
+Important Class II & Critical products & Operating systems, hypervisors \\
+Critical & Highest risk & Industrial automation systems, smart meters \\
+\end{tabular}
+\caption{CRA product risk categories}
+\end{table}
+
+\begin{warningbox}
+Industrial automation and control systems (IACS) are explicitly listed as ``critical'' products in Annex III of the CRA. This means stricter conformity assessment procedures apply to most OT products.
+\end{warningbox}
+
+\section{Essential Requirements}
+
+\subsection{Security by Design}
+
+Manufacturers must ensure products meet essential cybersecurity requirements:
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Requirement} & \textcolor{white}{\bfseries Description} \\
+\midrule
+Risk Assessment & Cybersecurity risks identified and addressed in design \\
+Secure by Default & Delivered in secure configuration; no default passwords \\
+Access Control & Authentication and authorization mechanisms \\
+Data Protection & Confidentiality and integrity of stored/transmitted data \\
+Minimized Attack Surface & Only necessary functions enabled \\
+Incident Mitigation & Security features to limit impact of incidents \\
+\end{tabular}
+\caption{CRA essential security requirements}
+\end{table}
+
+\subsection{Vulnerability Handling}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    req/.style={rectangle, draw=otwarning, thick, fill=otwarning!10,
+                rounded corners=5pt, minimum width=6cm, minimum height=0.8cm,
+                align=left, text width=5.8cm, font=\small},
+    num/.style={circle, fill=otprimary, text=white, font=\small\bfseries,
+                minimum size=0.6cm}
+]
+    \node[num] at (0,0) {1};
+    \node[req, anchor=west] at (0.8,0) {Identify and document vulnerabilities};
+    \node[num] at (0,-1.1) {2};
+    \node[req, anchor=west] at (0.8,-1.1) {Address vulnerabilities without delay};
+    \node[num] at (0,-2.2) {3};
+    \node[req, anchor=west] at (0.8,-2.2) {Provide security updates for support period};
+    \node[num] at (0,-3.3) {4};
+    \node[req, anchor=west] at (0.8,-3.3) {Disclose vulnerabilities after remediation};
+    \node[num] at (0,-4.4) {5};
+    \node[req, anchor=west] at (0.8,-4.4) {Report actively exploited vulnerabilities};
+\end{tikzpicture}
+\caption{CRA vulnerability handling requirements}
+\end{figure}
+
+\subsection{Support Period}
+
+Manufacturers must provide security updates for the entire support period:
+
+\begin{itemize}
+    \item \textbf{Minimum 5 Years} -- Or expected product lifetime, whichever is shorter
+    \item \textbf{Free Security Updates} -- At no additional cost to users
+    \item \textbf{Separate from Features} -- Security updates must be installable independently
+    \item \textbf{Clear Communication} -- End-of-support date must be stated at purchase
+\end{itemize}
+
+\begin{tipbox}
+For OT products with 15--25 year lifecycles, the support period requirement creates significant obligations. Manufacturers must plan long-term support strategies or clearly communicate shorter support windows to buyers.
+\end{tipbox}
+
+\section{Obligations by Role}
+
+\subsection{Manufacturers}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Obligation} & \textcolor{white}{\bfseries Details} \\
+\midrule
+Conformity Assessment & Demonstrate compliance through appropriate procedure \\
+Technical Documentation & Maintain detailed security documentation \\
+CE Marking & Affix CE marking when requirements met \\
+EU Declaration & Issue declaration of conformity \\
+Vulnerability Management & Establish and operate handling processes \\
+Incident Reporting & Report exploited vulnerabilities within 24 hours \\
+Cooperation & Assist market surveillance authorities \\
+\end{tabular}
+\caption{Manufacturer obligations under the CRA}
+\end{table}
+
+\subsection{Importers and Distributors}
+
+\begin{itemize}
+    \item \textbf{Importers} -- Verify manufacturer compliance, ensure documentation available, report non-compliance
+    \item \textbf{Distributors} -- Verify CE marking and documentation, report non-compliance, do not supply non-compliant products
+\end{itemize}
+
+\subsection{Open Source Considerations}
+
+\begin{itemize}
+    \item Non-commercial open source development is excluded
+    \item Commercial use of open source triggers CRA obligations
+    \item ``Open Source Software Stewards'' (foundations) have lighter obligations
+    \item Manufacturers using open source components remain responsible for compliance
+\end{itemize}
+
+\section{Conformity Assessment}
+
+\subsection{Assessment Procedures}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{4cm}p{5.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Category} & \textcolor{white}{\bfseries Procedure} & \textcolor{white}{\bfseries Description} \\
+\midrule
+Default Products & Self-assessment & Internal control by manufacturer \\
+Important Class I & Self or Third-party & Standards-based or notified body \\
+Important Class II & Third-party required & EU-type examination \\
+Critical Products & Third-party required & EU-type examination + certification \\
+\end{tabular}
+\caption{Conformity assessment procedures by category}
+\end{table}
+
+\subsection{Harmonized Standards}
+
+Compliance with harmonized standards provides presumption of conformity:
+
+\begin{itemize}
+    \item \textbf{IEC 62443 Series} -- Expected to be referenced for industrial products
+    \item \textbf{ISO/IEC 27001} -- For organizational security management
+    \item \textbf{Common Criteria} -- For product security evaluation
+\end{itemize}
+
+\begin{successbox}
+Organizations already implementing IEC 62443 for OT products will have a significant head start on CRA compliance. The CRA's essential requirements align closely with IEC 62443's security levels and secure development lifecycle.
+\end{successbox}
+
+\section{Incident and Vulnerability Reporting}
+
+\subsection{Reporting Requirements}
+
+\begin{dangerbox}
+The CRA introduces mandatory vulnerability and incident reporting to ENISA. Actively exploited vulnerabilities must be reported within 24 hours---a significant operational requirement for manufacturers.
+\end{dangerbox}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{4cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Event} & \textcolor{white}{\bfseries Timeline} & \textcolor{white}{\bfseries Content} \\
+\midrule
+Exploited vulnerability & 24 hours (early warning) & Basic information, impact \\
+Exploited vulnerability & 72 hours (notification) & Detailed technical info \\
+Exploited vulnerability & 14 days (final report) & Root cause, remediation \\
+Severe incident & 24 hours & Impact on product security \\
+\end{tabular}
+\caption{CRA reporting timelines}
+\end{table}
+
+\section{Relationship with Other Regulations}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    reg/.style={rectangle, draw=otprimary, thick, fill=otprimary!10,
+                rounded corners=5pt, minimum width=3.5cm, minimum height=1.5cm,
+                align=center, font=\small\bfseries},
+    arrow/.style={<->, thick, >=stealth, otaccent}
+]
+    \node[reg] (cra) at (0,0) {CRA\\[3pt]\scriptsize Products};
+    \node[reg] (nis2) at (6,0) {NIS2\\[3pt]\scriptsize Operators};
+    \node[reg] (gdpr) at (12,0) {GDPR\\[3pt]\scriptsize Personal Data};
+
+    \draw[arrow] (cra) -- node[above, font=\scriptsize] {Complements} (nis2);
+    \draw[arrow] (nis2) -- node[above, font=\scriptsize] {Overlaps} (gdpr);
+\end{tikzpicture}
+\caption{CRA relationship with other EU regulations}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{NIS2} -- CRA covers products; NIS2 covers their operators. Together they create end-to-end security requirements.
+    \item \textbf{GDPR} -- CRA data protection requirements align with GDPR for products processing personal data.
+    \item \textbf{Machinery Regulation} -- CRA applies alongside machinery safety requirements.
+    \item \textbf{Radio Equipment Directive} -- CRA supersedes RED cybersecurity provisions.
+\end{itemize}
+
+\section{Timeline and Enforcement}
+
+\subsection{Implementation Timeline}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Date} & \textcolor{white}{\bfseries Milestone} \\
+\midrule
+December 2024 & CRA entered into force \\
+September 2026 & Reporting obligations apply \\
+December 2027 & Full application of all requirements \\
+\end{tabular}
+\caption{CRA implementation timeline}
+\end{table}
+
+\subsection{Penalties}
+
+\begin{itemize}
+    \item \textbf{Essential Requirements} -- Up to EUR 15 million or 2.5\% of global turnover
+    \item \textbf{Other Obligations} -- Up to EUR 10 million or 2\% of global turnover
+    \item \textbf{False Information} -- Up to EUR 5 million or 1\% of global turnover
+    \item \textbf{Product Recall} -- Authorities can order withdrawal from market
+\end{itemize}
+
+\section{Impact on OT}
+
+\subsection{For Asset Owners}
+
+\begin{itemize}
+    \item Products will have better baseline security
+    \item Security documentation will be available for procurement decisions
+    \item Support periods and end-of-life dates will be clearly stated
+    \item Vulnerability information will be more readily available
+\end{itemize}
+
+\subsection{For Vendors and Integrators}
+
+\begin{itemize}
+    \item Secure development lifecycle becomes mandatory
+    \item Vulnerability management processes required
+    \item Long-term support commitments needed
+    \item Third-party certification may be required
+    \item Documentation requirements increase significantly
+\end{itemize}
+
+\section{Summary}
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Product Focus:} The CRA regulates products with digital elements, complementing NIS2's focus on operators
+    \item \textbf{OT Coverage:} Industrial automation systems are classified as ``critical'' products with stricter requirements
+    \item \textbf{Security by Design:} Products must be designed securely, delivered in secure default configuration, with no default passwords
+    \item \textbf{Vulnerability Handling:} Manufacturers must manage vulnerabilities and report exploited ones within 24 hours
+    \item \textbf{Support Period:} Security updates required for minimum 5 years or product lifetime
+    \item \textbf{Full Application:} December 2027; organizations should begin preparation now
+\end{itemize}
+\end{definitionbox}
+
+\section{Further Reading}
+
+\subsection*{Official Sources}
+\begin{itemize}
+    \item \textbf{EU Cyber Resilience Act} -- Official regulation text\\
+          \url{https://eur-lex.europa.eu/eli/reg/2024/2847}
+    \item \textbf{European Commission CRA Page} -- Overview and guidance\\
+          \url{https://digital-strategy.ec.europa.eu/en/policies/cyber-resilience-act}
+\end{itemize}
+
+\subsection*{Standards}
+\begin{itemize}
+    \item \textbf{IEC 62443} -- Industrial automation security (expected harmonized standard)\\
+          \url{https://webstore.iec.ch/publication/7029}
+\end{itemize}
+
+\subsection*{Resources}
+\begin{itemize}
+    \item \textbf{ENISA} -- EU Agency for Cybersecurity\\
+          \url{https://www.enisa.europa.eu/}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

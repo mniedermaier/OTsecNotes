@@ -251,6 +251,73 @@ For OT, add: at least one copy that is \textbf{offline} and immune to network-ba
     \item \textbf{Version retention} -- Keep multiple generations
 \end{itemize}
 
+\subsection{Backup Encryption}
+
+Encrypting backups protects sensitive control logic and configurations from unauthorized access, even if backup media is lost or stolen.
+
+\subsubsection{What to Encrypt}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{|l|l|l|}
+\hline
+\textbf{Backup Type} & \textbf{Encryption Priority} & \textbf{Rationale} \\
+\hline
+PLC/RTU programs & High & Proprietary control logic \\
+Credentials/certificates & Critical & Direct security impact \\
+Network configurations & High & Reveals architecture \\
+Historian data & Medium & May contain process secrets \\
+System images & Medium & Contains configurations \\
+Documentation & Low & Often less sensitive \\
+\hline
+\end{tabular}
+\caption{Encryption priority by backup type}
+\end{table}
+
+\subsubsection{Encryption Methods}
+
+\begin{itemize}
+    \item \textbf{File-level encryption} -- Encrypt individual backup files (GPG, 7-Zip AES)
+    \item \textbf{Volume encryption} -- Encrypt entire backup volumes (LUKS, BitLocker)
+    \item \textbf{Backup software encryption} -- Built-in encryption in backup tools
+    \item \textbf{Hardware encryption} -- Self-encrypting drives (SEDs) for backup storage
+\end{itemize}
+
+\begin{successbox}
+\textbf{Recommendation:} Use AES-256 encryption for backups. Prefer backup software with built-in encryption to ensure consistent protection across all backup operations.
+\end{successbox}
+
+\subsubsection{Key Management for Backups}
+
+\begin{dangerbox}
+\textbf{Critical:} Encrypted backups are useless without the decryption keys. Key loss equals data loss. Store encryption keys separately from the encrypted backups.
+\end{dangerbox}
+
+Key management best practices:
+
+\begin{itemize}
+    \item \textbf{Key separation} -- Never store keys on the same media as encrypted backups
+    \item \textbf{Key escrow} -- Maintain secure copies of keys in multiple locations
+    \item \textbf{Key rotation} -- Change encryption keys periodically; retain old keys for archived backups
+    \item \textbf{Offline key storage} -- Keep master keys in air-gapped, physical secure storage
+    \item \textbf{Key documentation} -- Document which keys decrypt which backups
+\end{itemize}
+
+\subsubsection{Recovery Considerations}
+
+Encryption adds complexity to recovery procedures:
+
+\begin{itemize}
+    \item \textbf{Key availability} -- Ensure decryption keys are accessible during emergencies
+    \item \textbf{Recovery time impact} -- Decryption adds time to restore operations
+    \item \textbf{Offline recovery} -- Plan for scenarios without network access to key servers
+    \item \textbf{Testing} -- Include decryption in recovery drills
+\end{itemize}
+
+\begin{warningbox}
+During a ransomware incident, key management systems may also be compromised. Maintain offline copies of backup encryption keys that are immune to network-based attacks.
+\end{warningbox}
+
 % ============================================================================
 \section{Recovery Planning}
 % ============================================================================
