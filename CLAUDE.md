@@ -92,11 +92,12 @@ Documents are auto-detected by the Makefile. Run `make list` to see all availabl
 - `630-recovery-procedures` - Recovery Procedures
 - `650-tabletop-exercises` - OT Tabletop Exercises
 
-**700-assessments/** (4 documents)
+**700-assessments/** (5 documents)
 - `700-ot-risk-assessment` - OT Risk Assessment
 - `710-ot-pentesting` - OT Penetration Testing
 - `720-vulnerability-management` - OT Vulnerability Management
 - `730-security-audits` - OT Security Audits
+- `740-security-maturity` - OT Security Maturity Models
 
 **800-solutions/** (11 documents)
 - `810-application-whitelisting` - Application Whitelisting & System Lockdown

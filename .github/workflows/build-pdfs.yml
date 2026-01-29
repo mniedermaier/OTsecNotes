@@ -245,60 +245,59 @@ jobs:
               .glow-orb {
                 position: fixed;
                 border-radius: 50%;
-                filter: blur(100px);
-                opacity: 0.4;
                 z-index: 0;
                 pointer-events: none;
+                will-change: transform;
               }
               .glow-orb-1 {
-                width: 500px;
-                height: 500px;
-                background: radial-gradient(circle, #0ea5e9 0%, transparent 70%);
-                top: -150px;
-                left: -150px;
+                width: 700px;
+                height: 700px;
+                background: radial-gradient(circle, rgba(14, 165, 233, 0.5) 0%, rgba(14, 165, 233, 0.15) 40%, transparent 70%);
+                top: -250px;
+                left: -250px;
                 animation: orbFloat1 25s ease-in-out infinite;
               }
               .glow-orb-2 {
-                width: 400px;
-                height: 400px;
-                background: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
-                bottom: -100px;
-                right: -100px;
+                width: 600px;
+                height: 600px;
+                background: radial-gradient(circle, rgba(139, 92, 246, 0.45) 0%, rgba(139, 92, 246, 0.12) 40%, transparent 70%);
+                bottom: -200px;
+                right: -200px;
                 animation: orbFloat2 30s ease-in-out infinite;
               }
               .glow-orb-3 {
-                width: 350px;
-                height: 350px;
-                background: radial-gradient(circle, #10b981 0%, transparent 70%);
+                width: 450px;
+                height: 450px;
+                background: radial-gradient(circle, rgba(16, 185, 129, 0.4) 0%, rgba(16, 185, 129, 0.1) 40%, transparent 70%);
                 top: 40%;
-                right: 20%;
+                right: 15%;
                 animation: orbFloat3 20s ease-in-out infinite;
               }
               .glow-orb-4 {
-                width: 300px;
-                height: 300px;
-                background: radial-gradient(circle, #f59e0b 0%, transparent 70%);
-                bottom: 30%;
-                left: 10%;
+                width: 400px;
+                height: 400px;
+                background: radial-gradient(circle, rgba(245, 158, 11, 0.35) 0%, rgba(245, 158, 11, 0.08) 40%, transparent 70%);
+                bottom: 25%;
+                left: 5%;
                 animation: orbFloat4 22s ease-in-out infinite;
               }
               @keyframes orbFloat1 {
-                0%, 100% { transform: translate(0, 0) scale(1); }
-                33% { transform: translate(100px, 50px) scale(1.2); }
-                66% { transform: translate(50px, 100px) scale(0.9); }
+                0%, 100% { transform: translate(0, 0); }
+                33% { transform: translate(100px, 50px); }
+                66% { transform: translate(50px, 100px); }
               }
               @keyframes orbFloat2 {
-                0%, 100% { transform: translate(0, 0) scale(1); }
-                33% { transform: translate(-80px, -40px) scale(1.1); }
-                66% { transform: translate(-40px, -80px) scale(0.95); }
+                0%, 100% { transform: translate(0, 0); }
+                33% { transform: translate(-80px, -40px); }
+                66% { transform: translate(-40px, -80px); }
               }
               @keyframes orbFloat3 {
-                0%, 100% { transform: translate(0, 0) scale(1); }
-                50% { transform: translate(-60px, 60px) scale(1.15); }
+                0%, 100% { transform: translate(0, 0); }
+                50% { transform: translate(-60px, 60px); }
               }
               @keyframes orbFloat4 {
-                0%, 100% { transform: translate(0, 0) scale(1); }
-                50% { transform: translate(70px, -50px) scale(1.1); }
+                0%, 100% { transform: translate(0, 0); }
+                50% { transform: translate(70px, -50px); }
               }
               .hero {
                 position: relative;

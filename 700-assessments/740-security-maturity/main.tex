@@ -1,0 +1,356 @@
+% ============================================================================
+%  740-security-maturity - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {OT Security Maturity Models}
+    {Measuring and Improving Industrial Cybersecurity Capability}
+    {OT Security Learning Series}
+    {Document 740 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+Security maturity models provide a structured framework for assessing an organization's cybersecurity capabilities against defined benchmarks. For OT environments, maturity assessments help identify gaps, prioritize investments, and track improvement over time.
+
+\begin{infobox}
+This document introduces security maturity models applicable to OT environments. It covers common frameworks, maturity levels, assessment approaches, and how to use maturity assessments to drive meaningful security improvements in industrial settings.
+\end{infobox}
+
+\section{Why Maturity Models for OT}
+
+\subsection{Benefits of Maturity Assessment}
+
+\begin{itemize}
+    \item \textbf{Baseline Establishment:} Understand current security posture objectively
+    \item \textbf{Gap Identification:} Find weaknesses before adversaries do
+    \item \textbf{Prioritization:} Focus resources on highest-impact improvements
+    \item \textbf{Progress Tracking:} Measure improvement over time
+    \item \textbf{Benchmarking:} Compare against industry peers
+    \item \textbf{Communication:} Translate security status for executives and boards
+\end{itemize}
+
+\subsection{OT-Specific Considerations}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Factor} & \textcolor{white}{\bfseries Impact on Maturity Assessment} \\
+\midrule
+Safety requirements & Security controls must not compromise safety systems \\
+Legacy systems & Older systems may not support modern security practices \\
+Availability focus & Downtime for security improvements is limited \\
+Vendor dependencies & Third-party support affects achievable maturity \\
+Regulatory environment & Compliance requirements set minimum baselines \\
+\end{tabular}
+\caption{OT factors affecting maturity assessment}
+\end{table}
+
+\section{Common Maturity Models}
+
+\subsection{Overview of Frameworks}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    model/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=3.5cm, minimum height=1.4cm, align=center, font=\small}
+]
+% Models
+\node[model, fill=otaccent!20] (c2m2) at (0,0) {\textbf{C2M2}\\Cybersecurity\\Capability Maturity};
+\node[model, fill=otsuccess!20] (iec) at (4.5,0) {\textbf{IEC 62443}\\Security Levels\\and Maturity};
+\node[model, fill=otwarning!20] (nist) at (9,0) {\textbf{NIST CSF}\\Implementation\\Tiers};
+
+% Sector-specific below
+\node[model, fill=otinfo!20] (esc2m2) at (0,-2.5) {\textbf{ES-C2M2}\\Electricity\\Subsector};
+\node[model, fill=otinfo!20] (ongc2m2) at (4.5,-2.5) {\textbf{ONG-C2M2}\\Oil \& Natural\\Gas};
+\node[model, fill=otinfo!20] (cmmc) at (9,-2.5) {\textbf{CMMC}\\Defense\\Industrial Base};
+
+% Labels
+\node[font=\scriptsize\bfseries] at (4.5,1.4) {General Frameworks};
+\node[font=\scriptsize\bfseries] at (4.5,-1.1) {Sector-Specific};
+\end{tikzpicture}
+\caption{Common security maturity models for OT}
+\end{figure}
+
+\subsection{C2M2 -- Cybersecurity Capability Maturity Model}
+
+Developed by the U.S. Department of Energy, C2M2 is widely used in critical infrastructure:
+
+\begin{itemize}
+    \item \textbf{10 Domains:} Risk management, asset management, access control, threat detection, incident response, etc.
+    \item \textbf{4 Maturity Levels:} MIL0 (not performed) through MIL3 (optimized)
+    \item \textbf{Self-Assessment:} Designed for organizations to assess themselves
+    \item \textbf{OT Focus:} Includes IT and OT considerations throughout
+\end{itemize}
+
+\subsection{IEC 62443 Security Levels}
+
+IEC 62443 defines both Security Levels (SL) and maturity concepts:
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.5cm}p{3.5cm}p{6.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Level} & \textcolor{white}{\bfseries Threat} & \textcolor{white}{\bfseries Description} \\
+\midrule
+SL 1 & Casual/coincidental & Protection against unintentional violations \\
+SL 2 & Intentional, low resources & Protection against intentional attack with limited means \\
+SL 3 & Intentional, moderate resources & Protection against sophisticated attack \\
+SL 4 & Intentional, extended resources & Protection against state-sponsored attack \\
+\end{tabular}
+\caption{IEC 62443 Security Levels}
+\end{table}
+
+\subsection{NIST CSF Implementation Tiers}
+
+The NIST Cybersecurity Framework defines four implementation tiers:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    tier/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=2.8cm, minimum height=1.2cm, align=center, font=\small}
+]
+\node[tier, fill=otdanger!20] (t1) at (0,0) {\textbf{Tier 1}\\Partial};
+\node[tier, fill=otwarning!20] (t2) at (3.5,0) {\textbf{Tier 2}\\Risk Informed};
+\node[tier, fill=otaccent!20] (t3) at (7,0) {\textbf{Tier 3}\\Repeatable};
+\node[tier, fill=otsuccess!20] (t4) at (10.5,0) {\textbf{Tier 4}\\Adaptive};
+
+% Arrow
+\draw[very thick, ->, >=stealth] (-1.5,-1) -- (12,-1);
+\node[font=\scriptsize] at (5.25,-1.4) {Increasing Maturity};
+
+% Descriptions
+\node[font=\tiny, text width=2.5cm, align=center] at (0,-2) {Ad-hoc, reactive};
+\node[font=\tiny, text width=2.5cm, align=center] at (3.5,-2) {Approved but not org-wide};
+\node[font=\tiny, text width=2.5cm, align=center] at (7,-2) {Formally established};
+\node[font=\tiny, text width=2.5cm, align=center] at (10.5,-2) {Continuous improvement};
+\end{tikzpicture}
+\caption{NIST CSF Implementation Tiers}
+\end{figure}
+
+\section{Maturity Levels Explained}
+
+\subsection{Generic Maturity Scale}
+
+Most models use similar progression concepts:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    level/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=11cm, minimum height=0.9cm, align=left, font=\small, text width=10.5cm}
+]
+\node[level, fill=otdanger!15] at (0,4) {\textbf{Level 0 -- Not Performed:} Practice not implemented or no evidence};
+\node[level, fill=otwarning!15] at (0,2.8) {\textbf{Level 1 -- Initial:} Ad-hoc, reactive, dependent on individuals};
+\node[level, fill=otaccent!15] at (0,1.6) {\textbf{Level 2 -- Managed:} Documented, practiced, but inconsistent};
+\node[level, fill=otsuccess!15] at (0,0.4) {\textbf{Level 3 -- Defined:} Standardized, organization-wide, measured};
+\node[level, fill=otsuccess!30] at (0,-0.8) {\textbf{Level 4 -- Optimized:} Continuous improvement, adaptive};
+\end{tikzpicture}
+\caption{Generic maturity level progression}
+\end{figure}
+
+\subsection{What Each Level Means in Practice}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{5cm}p{5.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Level} & \textcolor{white}{\bfseries Characteristics} & \textcolor{white}{\bfseries OT Example} \\
+\midrule
+Initial & Reactive, heroic efforts & Firewall exists but rules undocumented \\
+Managed & Documented for specific areas & Patch process defined for SCADA servers \\
+Defined & Consistent across organization & All sites follow same access control policy \\
+Optimized & Metrics-driven improvement & KPIs track and improve detection time \\
+\end{tabular}
+\caption{Maturity levels with OT examples}
+\end{table}
+
+\begin{warningbox}
+Higher maturity is not always better. The target maturity level should align with risk appetite and business requirements. A Level 4 maturity for low-risk systems may waste resources that could protect critical assets.
+\end{warningbox}
+
+\section{Assessment Process}
+
+\subsection{Assessment Approaches}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3cm}p{4.5cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Approach} & \textcolor{white}{\bfseries Advantages} & \textcolor{white}{\bfseries Disadvantages} \\
+\midrule
+Self-assessment & Low cost, internal ownership & May lack objectivity \\
+Facilitated & Expert guidance, consistent & Requires skilled facilitator \\
+Third-party audit & Independent, credible & Higher cost, less context \\
+Continuous monitoring & Real-time, automated & Limited to measurable controls \\
+\end{tabular}
+\caption{Maturity assessment approaches}
+\end{table}
+
+\subsection{Assessment Steps}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    stepbox/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=2cm, minimum height=1cm, align=center, font=\small, fill=otinfo!15},
+    arrow/.style={->, thick, >=stealth}
+]
+\node[stepbox] (s1) at (0,0) {Scope\\Definition};
+\node[stepbox] (s2) at (3,0) {Evidence\\Collection};
+\node[stepbox] (s3) at (6,0) {Gap\\Analysis};
+\node[stepbox] (s4) at (9,0) {Scoring \&\\Reporting};
+\node[stepbox] (s5) at (12,0) {Roadmap\\Development};
+
+\draw[arrow] (s1) -- (s2);
+\draw[arrow] (s2) -- (s3);
+\draw[arrow] (s3) -- (s4);
+\draw[arrow] (s4) -- (s5);
+\end{tikzpicture}
+\caption{Maturity assessment process}
+\end{figure}
+
+\subsection{Evidence Collection}
+
+Gather evidence across multiple sources:
+
+\begin{itemize}
+    \item \textbf{Documentation:} Policies, procedures, standards, network diagrams
+    \item \textbf{Interviews:} Engineers, operators, security staff, management
+    \item \textbf{Technical Review:} Configuration files, logs, tool outputs
+    \item \textbf{Observation:} Site visits, process walkthroughs
+\end{itemize}
+
+\begin{tipbox}
+Include both IT and OT stakeholders in assessments. OT engineers understand operational constraints while IT security brings assessment experience. Joint participation improves accuracy and buy-in.
+\end{tipbox}
+
+\section{Using Assessment Results}
+
+\subsection{Gap Prioritization}
+
+Not all gaps are equal. Prioritize based on:
+
+\begin{itemize}
+    \item \textbf{Risk Impact:} How much does this gap increase risk?
+    \item \textbf{Compliance:} Is this gap a regulatory violation?
+    \item \textbf{Dependency:} Do other improvements depend on this?
+    \item \textbf{Feasibility:} Can this be addressed with available resources?
+    \item \textbf{Quick Wins:} Low effort, high impact improvements
+\end{itemize}
+
+\subsection{Roadmap Development}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    phase/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=3.5cm, minimum height=1.5cm, align=center, font=\small}
+]
+\node[phase, fill=otdanger!15] (p1) at (0,0) {\textbf{Phase 1}\\Critical Gaps\\Quick Wins};
+\node[phase, fill=otwarning!15] (p2) at (4.5,0) {\textbf{Phase 2}\\Foundation\\Building};
+\node[phase, fill=otsuccess!15] (p3) at (9,0) {\textbf{Phase 3}\\Optimization\\Maturation};
+
+\draw[very thick, ->, >=stealth] (p1) -- (p2);
+\draw[very thick, ->, >=stealth] (p2) -- (p3);
+
+\node[font=\tiny, text width=3.3cm, align=center] at (0,-1.3) {0-6 months\\Address highest risks};
+\node[font=\tiny, text width=3.3cm, align=center] at (4.5,-1.3) {6-18 months\\Build core capabilities};
+\node[font=\tiny, text width=3.3cm, align=center] at (9,-1.3) {18+ months\\Continuous improvement};
+\end{tikzpicture}
+\caption{Phased improvement roadmap}
+\end{figure}
+
+\subsection{Target State Definition}
+
+\begin{successbox}
+\textbf{Recommendation:} Define target maturity levels per domain based on asset criticality. Safety-critical systems may require Level 3+ while support systems may only need Level 2. Not everything needs maximum maturity.
+\end{successbox}
+
+\section{Common Pitfalls}
+
+\begin{itemize}
+    \item \textbf{Checkbox Mentality:} Focus on scoring rather than actual security improvement
+    \item \textbf{Ignoring OT Context:} Applying IT maturity expectations to OT environments
+    \item \textbf{One-Time Assessment:} Treating maturity as a project, not ongoing process
+    \item \textbf{Unrealistic Targets:} Setting Level 4 targets for all domains
+    \item \textbf{Siloed Assessment:} Excluding OT operations from the process
+    \item \textbf{Documentation Focus:} Having policies without implementation
+\end{itemize}
+
+\begin{dangerbox}
+A documented policy without implementation scores higher on some assessments but provides no actual security. Verify that documented practices are actually followed in operations.
+\end{dangerbox}
+
+\section{Summary}
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Structured Assessment:} Maturity models provide objective frameworks for measuring OT security capabilities
+    \item \textbf{Framework Selection:} Choose models appropriate for your sector (C2M2 for energy, IEC 62443 for manufacturing)
+    \item \textbf{Right-Sized Targets:} Target maturity should align with risk---not everything needs Level 4
+    \item \textbf{Evidence-Based:} Gather evidence from documentation, interviews, technical review, and observation
+    \item \textbf{Prioritized Improvement:} Focus on high-risk gaps and quick wins before comprehensive maturation
+    \item \textbf{Continuous Process:} Reassess periodically to track progress and identify new gaps
+    \item \textbf{OT Context:} Include operational constraints and OT stakeholders throughout the process
+\end{itemize}
+\end{definitionbox}
+
+\section{Further Reading}
+
+\subsection*{Maturity Models}
+
+\begin{itemize}
+    \item \textbf{C2M2 Version 2.1} -- Cybersecurity Capability Maturity Model\\
+          \url{https://www.energy.gov/ceser/cybersecurity-capability-maturity-model-c2m2}
+    \item \textbf{NIST Cybersecurity Framework 2.0}\\
+          \url{https://www.nist.gov/cyberframework}
+    \item \textbf{IEC 62443-2-1} -- Security Program Requirements\\
+          \url{https://webstore.iec.ch/publication/7030}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{CISA} -- Cross-Sector Cybersecurity Performance Goals\\
+          \url{https://www.cisa.gov/cross-sector-cybersecurity-performance-goals}
+    \item \textbf{SANS ICS} -- Industrial Control Systems Security\\
+          \url{https://www.sans.org/cyber-security-courses/ics-scada-cyber-security-essentials}
+\end{itemize}
+
+\subsection*{Books}
+
+\begin{itemize}
+    \item Caralli et al. -- \textit{CERT Resilience Management Model} (Addison-Wesley)
+    \item Knapp, Eric D. -- \textit{Industrial Network Security} (Syngress)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}
