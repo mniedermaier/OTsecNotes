@@ -888,24 +888,18 @@ jobs:
               const canvas = document.getElementById('particles-canvas');
               const ctx = canvas.getContext('2d');
               let particles = [];
-              let mouse = { x: null, y: null, radius: 180 };
+              let mouse = { x: null, y: null, radius: 150 };
 
               function resizeCanvas() {
                 canvas.width = window.innerWidth;
-                canvas.height = document.documentElement.scrollHeight;
+                canvas.height = window.innerHeight;
               }
               resizeCanvas();
               window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
 
-              let lastHeight = 0;
-              setInterval(() => {
-                const newHeight = document.documentElement.scrollHeight;
-                if (newHeight !== lastHeight) { canvas.height = newHeight; lastHeight = newHeight; }
-              }, 1000);
-
               document.addEventListener('mousemove', (e) => {
                 mouse.x = e.clientX;
-                mouse.y = e.clientY + window.scrollY;
+                mouse.y = e.clientY;
               });
               document.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
 
@@ -948,7 +942,7 @@ jobs:
 
               function initParticles() {
                 particles = [];
-                const num = Math.min((canvas.width * canvas.height) / 8000, 300);
+                const num = Math.min((canvas.width * canvas.height) / 15000, 100);
                 for (let i = 0; i < num; i++) particles.push(new Particle());
               }
               initParticles();
@@ -958,9 +952,10 @@ jobs:
                   for (let b = a + 1; b < particles.length; b++) {
                     let dx = particles[a].x - particles[b].x;
                     let dy = particles[a].y - particles[b].y;
-                    let distance = Math.sqrt(dx * dx + dy * dy);
-                    if (distance < 150) {
-                      ctx.strokeStyle = 'rgba(14, 165, 233, ' + ((1 - distance / 150) * 0.15) + ')';
+                    let distSq = dx * dx + dy * dy;
+                    if (distSq < 12100) {
+                      let distance = Math.sqrt(distSq);
+                      ctx.strokeStyle = 'rgba(14, 165, 233, ' + ((1 - distance / 110) * 0.12) + ')';
                       ctx.lineWidth = 1;
                       ctx.beginPath();
                       ctx.moveTo(particles[a].x, particles[a].y);
