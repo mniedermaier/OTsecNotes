@@ -1,0 +1,381 @@
+% ============================================================================
+%  307-industrial-firewalls - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {Industrial Firewalls}
+    {Network Security Controls for OT Environments}
+    {OT Security Learning Series}
+    {Document 307 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+Firewalls are fundamental security controls that enforce network segmentation by controlling traffic between zones. In OT environments, firewalls must balance security requirements with operational constraints including real-time performance, protocol support, and high availability demands that differ significantly from IT deployments.
+
+\begin{infobox}
+This document covers firewall technologies for OT environments, including types, deployment architectures, OT-specific requirements, and configuration best practices. Understanding industrial firewall capabilities and limitations is essential for effective network segmentation.
+\end{infobox}
+
+\section{Firewall Types}
+
+\subsection{Technology Overview}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=3cm, minimum height=1.2cm, align=center, font=\small}
+]
+\node[box, fill=otinfo!15] (pf) at (0,0) {\textbf{Packet Filter}\\Layer 3-4\\Basic filtering};
+\node[box, fill=otaccent!15] (sf) at (4.5,0) {\textbf{Stateful}\\Connection\\tracking};
+\node[box, fill=otsuccess!15] (dpi) at (9,0) {\textbf{DPI/NGFW}\\Layer 7\\Protocol aware};
+
+\draw[very thick, ->, >=stealth] (0,-1.5) -- (9,-1.5);
+\node[font=\scriptsize] at (4.5,-1.9) {Increasing Capability and Complexity};
+\end{tikzpicture}
+\caption{Firewall technology spectrum}
+\end{figure}
+
+\subsection{Comparison}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.8cm}p{3.5cm}p{3.5cm}p{2.7cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Type} & \textcolor{white}{\bfseries Capabilities} & \textcolor{white}{\bfseries OT Advantage} & \textcolor{white}{\bfseries Limitation} \\
+\midrule
+Packet Filter & IP/port filtering & Low latency, simple & No state tracking \\
+Stateful & Connection tracking & Blocks unsolicited traffic & Limited protocol insight \\
+Application-Aware & Protocol validation & Detects protocol abuse & Requires protocol support \\
+NGFW/DPI & Deep inspection, IPS & Content inspection & Higher latency, complexity \\
+\end{tabular}
+\caption{Firewall type comparison}
+\end{table}
+
+\subsection{Deep Packet Inspection for OT}
+
+DPI-capable firewalls can inspect OT protocol content:
+
+\begin{itemize}
+    \item \textbf{Modbus:} Validate function codes, register addresses
+    \item \textbf{DNP3:} Inspect object types, function codes
+    \item \textbf{OPC UA:} Validate service requests, node access
+    \item \textbf{EtherNet/IP:} Inspect CIP services and objects
+    \item \textbf{S7comm:} Monitor read/write operations to PLCs
+\end{itemize}
+
+\begin{warningbox}
+DPI for OT protocols requires specific protocol support. Not all firewalls support all industrial protocols. Verify protocol coverage before deployment.
+\end{warningbox}
+
+\section{OT-Specific Requirements}
+
+\subsection{Operational Constraints}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Requirement} & \textcolor{white}{\bfseries Description} \\
+\midrule
+Low latency & Control loops require predictable, minimal delay \\
+High availability & Process cannot tolerate firewall failures \\
+Protocol support & Must understand OT protocols for effective filtering \\
+Environmental & May need ruggedized hardware for plant floor \\
+Long lifecycle & Must remain supportable for 10-20 years \\
+Deterministic behavior & Consistent performance under all conditions \\
+\end{tabular}
+\caption{OT firewall requirements}
+\end{table}
+
+\subsection{Performance Considerations}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=3.2cm, minimum height=0.9cm, align=center, font=\small, fill=otwarning!15}
+]
+\node[box] at (0,1.5) {Throughput capacity};
+\node[box] at (5,1.5) {Connections/second};
+\node[box] at (10,1.5) {Concurrent sessions};
+\node[box] at (0,0) {Packet latency};
+\node[box] at (5,0) {Jitter/variance};
+\node[box] at (10,0) {Failover time};
+\end{tikzpicture}
+\caption{Key performance metrics for OT firewalls}
+\end{figure}
+
+\begin{tipbox}
+For time-critical control traffic, measure latency under load conditions, not just rated throughput. A firewall meeting bandwidth requirements may still introduce unacceptable latency for real-time protocols.
+\end{tipbox}
+
+\subsection{High Availability}
+
+OT firewalls typically require redundant deployment:
+
+\begin{itemize}
+    \item \textbf{Active/Passive:} Standby unit takes over on failure
+    \item \textbf{Active/Active:} Load sharing with automatic failover
+    \item \textbf{Bypass mode:} Fail-open option for critical paths (use cautiously)
+    \item \textbf{Stateful failover:} Sessions maintained during switchover
+\end{itemize}
+
+\begin{dangerbox}
+Fail-open bypass modes maintain availability but eliminate security protection. Use only where safety or process requirements absolutely demand it, and implement compensating controls.
+\end{dangerbox}
+
+\section{Deployment Architectures}
+
+\subsection{Zone Boundary Protection}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    zone/.style={rectangle, draw, dashed, thick, rounded corners=5pt, minimum width=3.5cm, minimum height=2.5cm, fill=#1!10},
+    fw/.style={rectangle, draw, thick, fill=otdanger!30, minimum width=0.6cm, minimum height=2cm, font=\scriptsize},
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=2.5cm, minimum height=0.7cm, align=center, font=\small, fill=white}
+]
+% Zones
+\node[zone=otdanger] at (-4,0) {};
+\node[zone=otwarning] at (0,0) {};
+\node[zone=otsuccess] at (4,0) {};
+
+% Zone labels
+\node[font=\scriptsize\bfseries] at (-4,1.6) {Enterprise};
+\node[font=\scriptsize\bfseries] at (0,1.6) {DMZ};
+\node[font=\scriptsize\bfseries] at (4,1.6) {OT Network};
+
+% Firewalls
+\node[fw, rotate=90] at (-2,0) {FW};
+\node[fw, rotate=90] at (2,0) {FW};
+
+% Components
+\node[box] at (-4,0.5) {IT Systems};
+\node[box] at (-4,-0.5) {Users};
+\node[box] at (0,0.5) {Jump Server};
+\node[box] at (0,-0.5) {Historian};
+\node[box] at (4,0.5) {SCADA};
+\node[box] at (4,-0.5) {PLCs};
+\end{tikzpicture}
+\caption{Firewall placement at zone boundaries}
+\end{figure}
+
+\subsection{Cell/Area Protection}
+
+Within OT networks, firewalls can isolate individual cells:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    cell/.style={rectangle, draw, dashed, thick, rounded corners=5pt, minimum width=2.8cm, minimum height=2cm, fill=otsuccess!10},
+    fw/.style={rectangle, draw, thick, fill=otdanger!30, minimum width=0.5cm, minimum height=1.2cm, font=\tiny},
+    box/.style={rectangle, draw, thick, rounded corners=2pt, minimum width=1.8cm, minimum height=0.6cm, align=center, font=\scriptsize, fill=white}
+]
+% Cells
+\node[cell] at (0,0) {};
+\node[cell] at (4,0) {};
+\node[cell] at (8,0) {};
+
+% Cell labels
+\node[font=\scriptsize\bfseries] at (0,1.3) {Cell A};
+\node[font=\scriptsize\bfseries] at (4,1.3) {Cell B};
+\node[font=\scriptsize\bfseries] at (8,1.3) {Cell C};
+
+% Firewalls
+\node[fw, rotate=90] at (2,0) {FW};
+\node[fw, rotate=90] at (6,0) {FW};
+
+% Components
+\node[box] at (0,0.4) {PLC};
+\node[box] at (0,-0.4) {HMI};
+\node[box] at (4,0.4) {PLC};
+\node[box] at (4,-0.4) {HMI};
+\node[box] at (8,0.4) {PLC};
+\node[box] at (8,-0.4) {HMI};
+
+% Network line above
+\draw[thick] (-1.5,1.8) -- (9.5,1.8);
+\node[font=\scriptsize] at (4,2.1) {Plant Network};
+\end{tikzpicture}
+\caption{Cell-level firewall segmentation}
+\end{figure}
+
+\subsection{Deployment Considerations}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3cm}p{4.5cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Location} & \textcolor{white}{\bfseries Purpose} & \textcolor{white}{\bfseries Typical Rules} \\
+\midrule
+IT/OT boundary & Isolate enterprise from OT & Strict allow-list, limited services \\
+DMZ boundaries & Control data exchange & Specific app flows, no direct IT-OT \\
+Cell perimeter & Contain lateral movement & Inter-cell traffic restrictions \\
+Remote access & Secure external connections & VPN termination, MFA enforcement \\
+\end{tabular}
+\caption{Firewall deployment locations and purposes}
+\end{table}
+
+\section{Configuration Best Practices}
+
+\subsection{Rule Design Principles}
+
+\begin{itemize}
+    \item \textbf{Default Deny:} Block all traffic not explicitly permitted
+    \item \textbf{Least Privilege:} Allow only required protocols and ports
+    \item \textbf{Specificity:} Use specific IPs, not broad subnets where possible
+    \item \textbf{Direction Awareness:} Consider which side initiates connections
+    \item \textbf{Documentation:} Document business justification for each rule
+\end{itemize}
+
+\subsection{Rule Structure Example}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.5cm}p{2.5cm}p{2.5cm}p{2cm}p{1.5cm}p{2cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries \#} & \textcolor{white}{\bfseries Source} & \textcolor{white}{\bfseries Dest} & \textcolor{white}{\bfseries Service} & \textcolor{white}{\bfseries Action} & \textcolor{white}{\bfseries Purpose} \\
+\midrule
+1 & Historian & PLCs & Modbus/502 & Allow & Data collection \\
+2 & Eng WS & PLCs & S7/102 & Allow & Programming \\
+3 & Jump Host & HMIs & RDP/3389 & Allow & Remote admin \\
+99 & Any & Any & Any & Deny & Default deny \\
+\end{tabular}
+\caption{Example firewall rule structure}
+\end{table}
+
+\subsection{OT Protocol Rules}
+
+\begin{successbox}
+\textbf{Recommendation:} For OT protocols, define rules at the application level where possible. Instead of just allowing TCP/502, use DPI rules that restrict specific Modbus function codes to authorized operations.
+\end{successbox}
+
+\subsection{Change Management}
+
+Firewall rule changes require careful process:
+
+\begin{enumerate}
+    \item Request with business justification
+    \item Security review and approval
+    \item Test in non-production if possible
+    \item Implement during maintenance window
+    \item Verify functionality and logging
+    \item Document change and update diagrams
+\end{enumerate}
+
+\section{Common Mistakes}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{8.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Mistake} & \textcolor{white}{\bfseries Impact} \\
+\midrule
+Any-to-any rules & Defeats purpose of segmentation \\
+Disabled logging & No visibility into blocked or allowed traffic \\
+Unused rules accumulation & Increases attack surface, complicates audits \\
+No rule review process & Rules become stale, overly permissive \\
+Bypassing for troubleshooting & Temporary bypasses become permanent \\
+Single point of failure & Firewall failure impacts production \\
+Ignoring outbound rules & Misses data exfiltration, C2 traffic \\
+\end{tabular}
+\caption{Common firewall configuration mistakes}
+\end{table}
+
+\section{Monitoring and Maintenance}
+
+\subsection{Logging Requirements}
+
+Essential logs to collect and monitor:
+
+\begin{itemize}
+    \item \textbf{Denied connections:} Potential attacks or misconfigurations
+    \item \textbf{Allowed connections:} Baseline for anomaly detection
+    \item \textbf{Configuration changes:} Audit trail for compliance
+    \item \textbf{Administrative access:} Who accessed the firewall
+    \item \textbf{System health:} CPU, memory, session counts
+\end{itemize}
+
+\subsection{Regular Review}
+
+\begin{itemize}
+    \item \textbf{Rule audit:} Quarterly review for unused or overly broad rules
+    \item \textbf{Firmware updates:} Apply security patches during maintenance windows
+    \item \textbf{Policy compliance:} Verify configuration matches security policy
+    \item \textbf{Performance review:} Ensure capacity meets current demands
+\end{itemize}
+
+\section{Summary}
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Technology Selection:} Choose firewall type based on required protocol visibility---DPI for OT protocol inspection, stateful for basic segmentation
+    \item \textbf{OT Requirements:} Prioritize low latency, high availability, and OT protocol support over IT-centric features
+    \item \textbf{Deployment:} Place firewalls at zone boundaries (IT/OT, DMZ) and consider cell-level segmentation for critical areas
+    \item \textbf{Default Deny:} Start with deny-all and add specific allow rules with documented justification
+    \item \textbf{High Availability:} Deploy redundant firewalls for production environments; avoid fail-open modes where possible
+    \item \textbf{Change Control:} Implement formal change management for all rule modifications
+    \item \textbf{Monitoring:} Enable logging, review regularly, and integrate with security monitoring
+\end{itemize}
+\end{definitionbox}
+
+\section{Further Reading}
+
+\subsection*{Standards and Guidelines}
+
+\begin{itemize}
+    \item \textbf{IEC 62443-3-3} -- System Security Requirements and Levels\\
+          \url{https://webstore.iec.ch/publication/7033}
+    \item \textbf{NIST SP 800-82 Rev 3} -- Guide to OT Security\\
+          \url{https://csrc.nist.gov/pubs/sp/800/82/r3/final}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{CISA} -- Industrial Control Systems Security\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+    \item \textbf{SANS ICS} -- Industrial Control Systems Security\\
+          \url{https://www.sans.org/cyber-security-courses/ics-scada-cyber-security-essentials}
+\end{itemize}
+
+\subsection*{Books}
+
+\begin{itemize}
+    \item Knapp, Eric D. -- \textit{Industrial Network Security} (Syngress)
+    \item Stouffer et al. -- \textit{Guide to ICS Security} (NIST)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

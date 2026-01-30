@@ -24,7 +24,7 @@ Documents are organized by category using three-digit numbers:
 
 Documents are auto-detected by the Makefile. Run `make list` to see all available documents.
 
-**000-fundamentals/** (9 documents)
+**000-fundamentals/** (10 documents)
 - `001-it-vs-ot` - IT vs OT
 - `010-purdue-model` - The Purdue Model
 - `020-plc-basics` - PLC Basics
@@ -33,6 +33,7 @@ Documents are auto-detected by the Makefile. Run `make list` to see all availabl
 - `050-ot-terminology` - OT Terminology
 - `060-ot-lifecycle` - OT System Lifecycle
 - `070-industrial-networks` - Industrial Networks
+- `075-historian-systems` - Historian Systems
 - `080-rtu-basics` - RTU Basics
 
 **100-standards/** (7 documents)
@@ -54,7 +55,7 @@ Documents are auto-detected by the Makefile. Run `make list` to see all availabl
 - `206-iec-61850` - IEC 61850
 - `207-s7comm` - S7comm Protocol
 
-**300-architecture/** (9 documents)
+**300-architecture/** (10 documents)
 - `300-network-segmentation` - OT Network Segmentation
 - `301-secure-remote-access` - Secure Remote Access
 - `302-dmz-design` - Industrial DMZ Design
@@ -62,6 +63,7 @@ Documents are auto-detected by the Makefile. Run `make list` to see all availabl
 - `304-data-diodes` - Data Diodes
 - `305-wireless-in-ot` - Wireless in OT Environments
 - `306-ot-cloud-connectivity` - OT Cloud Connectivity
+- `307-industrial-firewalls` - Industrial Firewalls
 - `308-zero-trust-ot` - Zero Trust for OT
 - `309-purdue-model-limitations` - Purdue Model Limitations
 

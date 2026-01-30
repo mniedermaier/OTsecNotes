@@ -1,0 +1,388 @@
+% ============================================================================
+%  075-historian-systems - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {Historian Systems}
+    {Industrial Data Collection and Time-Series Storage}
+    {OT Security Learning Series}
+    {Document 075 \quad|\quad January 2026}
+    {Matthias Niedermaier}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+Historian systems are specialized databases designed to collect, store, and retrieve time-series data from industrial processes. They serve as the primary repository for operational data, capturing measurements from sensors, PLCs, and SCADA systems at high speeds while maintaining long-term archives for analysis, reporting, and compliance.
+
+\begin{infobox}
+This document introduces Historian systems, their architecture, data collection methods, and security considerations. Understanding Historians is essential because they bridge OT and IT networks, often containing sensitive operational data and providing pathways that attackers can exploit.
+\end{infobox}
+
+\section{What is a Historian}
+
+\subsection{Purpose and Function}
+
+A Historian (also called Process Historian or Data Historian) performs several critical functions:
+
+\begin{itemize}
+    \item \textbf{Data Collection:} Gather process values from PLCs, RTUs, and sensors
+    \item \textbf{Time-Series Storage:} Store data with precise timestamps for trending
+    \item \textbf{Compression:} Reduce storage requirements while preserving data fidelity
+    \item \textbf{Retrieval:} Provide fast access to historical data for analysis
+    \item \textbf{Aggregation:} Calculate averages, min/max, and other statistics
+\end{itemize}
+
+\subsection{Historian vs Traditional Databases}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{4.5cm}p{4.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Aspect} & \textcolor{white}{\bfseries Historian} & \textcolor{white}{\bfseries Relational Database} \\
+\midrule
+Data type & Time-series values & Structured records \\
+Write pattern & Continuous, high-frequency & Transaction-based \\
+Query pattern & Time-range retrieval & SQL queries \\
+Compression & Specialized algorithms & General-purpose \\
+Data volume & Millions of points/second & Moderate throughput \\
+Retention & Years to decades & Varies by application \\
+\end{tabular}
+\caption{Historian vs relational database characteristics}
+\end{table}
+
+\subsection{Common Use Cases}
+
+\begin{itemize}
+    \item \textbf{Process Optimization:} Analyze trends to improve efficiency
+    \item \textbf{Troubleshooting:} Review historical data during incidents
+    \item \textbf{Compliance:} Maintain records for regulatory requirements
+    \item \textbf{Quality Control:} Track batch data and product specifications
+    \item \textbf{Predictive Maintenance:} Identify equipment degradation patterns
+    \item \textbf{Reporting:} Generate operational and management reports
+\end{itemize}
+
+\section{Architecture}
+
+\subsection{Typical Deployment}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=2.2cm, minimum height=0.9cm, align=center, font=\small},
+    db/.style={cylinder, draw, thick, shape border rotate=90, aspect=0.3, minimum width=1.5cm, minimum height=1.2cm, font=\small},
+    arrow/.style={->, thick, >=stealth}
+]
+% Level labels on left
+\node[font=\scriptsize, text=gray] at (-5.5,3) {Level 4};
+\node[font=\scriptsize, text=gray] at (-5.5,1) {Level 3};
+\node[font=\scriptsize, text=gray] at (-5.5,-1.5) {Level 2};
+
+% Enterprise level
+\node[box, fill=otdanger!15] (bi) at (0,3) {BI/Analytics};
+\node[box, fill=otdanger!15] (erp) at (3,3) {ERP System};
+
+% Site level - Historian
+\node[db, fill=otsuccess!20] (hist) at (1.5,1) {Historian};
+\node[box, fill=otsuccess!15] (histsrv) at (1.5,0) {Historian\\Server};
+
+% Control level
+\node[box, fill=otaccent!15] (scada) at (-2,-1.5) {SCADA};
+\node[box, fill=otaccent!15] (hmi) at (1,-1.5) {HMI};
+\node[box, fill=otaccent!15] (plc1) at (4,-1.5) {PLC};
+
+% Connections - upward arrows to Level 4
+\draw[arrow] (histsrv.north west) -- (bi.south);
+\draw[arrow] (histsrv.north east) -- (erp.south);
+% Connections - upward arrows from Level 2 to Historian
+\draw[arrow] (scada.north) -- (histsrv.south west);
+\draw[arrow] (hmi.north) -- (histsrv.south);
+\draw[arrow] (plc1.north) -- (histsrv.south east);
+
+% Dashed zone line
+\draw[dashed, gray] (-4.5,2) -- (5.5,2);
+\draw[dashed, gray] (-4.5,-0.5) -- (5.5,-0.5);
+\end{tikzpicture}
+\caption{Typical Historian deployment in Purdue Model}
+\end{figure}
+
+\subsection{Components}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Component} & \textcolor{white}{\bfseries Function} \\
+\midrule
+Historian Server & Core database engine, manages storage and retrieval \\
+Data Collectors & Interfaces that gather data from various sources \\
+Archive Storage & Long-term data storage (disk, SAN, cloud) \\
+Client Applications & Tools for querying, trending, and reporting \\
+Replication Services & Synchronize data between Historian instances \\
+API/Web Services & Programmatic access for external applications \\
+\end{tabular}
+\caption{Historian system components}
+\end{table}
+
+\subsection{Deployment Patterns}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=2.5cm, minimum height=1.2cm, align=center, font=\small}
+]
+% Single site
+\node[box, fill=otaccent!15] (single) at (0,0) {\textbf{Single Site}\\One Historian\\Local access};
+
+% Distributed
+\node[box, fill=otsuccess!15] (dist) at (4.5,0) {\textbf{Distributed}\\Site Historians\\Central aggregation};
+
+% Cloud hybrid
+\node[box, fill=otwarning!15] (cloud) at (9,0) {\textbf{Cloud Hybrid}\\Edge collection\\Cloud analytics};
+
+% Labels
+\node[font=\tiny, text width=2.3cm, align=center] at (0,-1.3) {Small facilities\\Simple setup};
+\node[font=\tiny, text width=2.3cm, align=center] at (4.5,-1.3) {Multi-site\\Enterprise view};
+\node[font=\tiny, text width=2.3cm, align=center] at (9,-1.3) {Modern IIoT\\Scalable storage};
+\end{tikzpicture}
+\caption{Historian deployment patterns}
+\end{figure}
+
+\section{Data Collection}
+
+\subsection{Collection Methods}
+
+Historians collect data through various mechanisms:
+
+\begin{itemize}
+    \item \textbf{Polling:} Historian requests data from sources at intervals
+    \item \textbf{Exception-Based:} Sources send data only when values change
+    \item \textbf{Unsolicited:} Sources push data continuously
+    \item \textbf{Store and Forward:} Collectors buffer data during network outages
+\end{itemize}
+
+\subsection{Supported Protocols}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3cm}p{9.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Protocol} & \textcolor{white}{\bfseries Usage} \\
+\midrule
+OPC DA/UA & Primary interface for Windows-based systems \\
+Modbus TCP/RTU & Direct PLC communication \\
+DNP3 & Utility and SCADA systems \\
+MQTT & IIoT and edge devices \\
+REST/HTTP & Modern web-based integrations \\
+Native drivers & Vendor-specific PLC protocols \\
+\end{tabular}
+\caption{Common Historian data collection protocols}
+\end{table}
+
+\subsection{Data Compression}
+
+Historians use specialized compression to handle massive data volumes:
+
+\begin{itemize}
+    \item \textbf{Swinging Door:} Records only significant deviations from trend
+    \item \textbf{Deadband:} Ignores changes within defined tolerance
+    \item \textbf{Lossy vs Lossless:} Trade-off between storage and precision
+\end{itemize}
+
+\begin{warningbox}
+Compression settings affect data fidelity. Aggressive compression may hide transient events or subtle anomalies important for security analysis and incident investigation.
+\end{warningbox}
+
+\section{Security Considerations}
+
+\subsection{Why Historians Are Targets}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=3cm, minimum height=0.8cm, align=center, font=\small, fill=otdanger!15}
+]
+\node[box] at (0,2) {Sensitive process data};
+\node[box] at (5,2) {IT/OT boundary position};
+\node[box] at (0,0.8) {Multiple network connections};
+\node[box] at (5,0.8) {Long data retention};
+\node[box] at (0,-0.4) {High-privilege accounts};
+\node[box] at (5,-0.4) {Often legacy systems};
+\end{tikzpicture}
+\caption{Why Historians attract attackers}
+\end{figure}
+
+\subsection{Attack Vectors}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Vector} & \textcolor{white}{\bfseries Description} \\
+\midrule
+SQL injection & Many Historians use SQL backends vulnerable to injection \\
+Default credentials & Factory-default accounts often unchanged \\
+Unpatched software & Legacy systems with known vulnerabilities \\
+API abuse & Unauthenticated or weakly authenticated APIs \\
+Lateral movement & Pivot point between IT and OT networks \\
+Data exfiltration & Extract sensitive operational intelligence \\
+\end{tabular}
+\caption{Common Historian attack vectors}
+\end{table}
+
+\begin{dangerbox}
+Historians often have direct connections to both OT control systems and IT business networks. A compromised Historian can provide attackers access to sensitive process data and a path to reach control systems.
+\end{dangerbox}
+
+\subsection{Security Best Practices}
+
+\begin{itemize}
+    \item \textbf{Network Segmentation:} Place Historians in DMZ, not directly in control network
+    \item \textbf{Authentication:} Enforce strong authentication for all access
+    \item \textbf{Encryption:} Enable TLS for data in transit
+    \item \textbf{Access Control:} Implement role-based access, least privilege
+    \item \textbf{Patching:} Maintain update schedule for Historian software
+    \item \textbf{Monitoring:} Log and alert on unusual queries or access patterns
+    \item \textbf{Backup:} Regular backups with integrity verification
+\end{itemize}
+
+\subsection{Secure Architecture}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=2cm, minimum height=0.8cm, align=center, font=\small},
+    zone/.style={rectangle, draw, dashed, thick, rounded corners=5pt, minimum width=4cm, minimum height=2.8cm, fill=#1!10}
+]
+% Zones
+\node[zone=otdanger] at (-4,0) {};
+\node[zone=otwarning] at (1.5,0) {};
+\node[zone=otsuccess] at (7,0) {};
+
+% Zone labels
+\node[font=\scriptsize\bfseries] at (-4,1.7) {IT Network};
+\node[font=\scriptsize\bfseries] at (1.5,1.7) {DMZ};
+\node[font=\scriptsize\bfseries] at (7,1.7) {OT Network};
+
+% Components
+\node[box, fill=white] (client) at (-4,0) {BI Client};
+\node[box, fill=white] (hist) at (1.5,0.6) {Historian\\Server};
+\node[box, fill=white] (coll) at (1.5,-0.9) {Collector};
+\node[box, fill=white] (plc) at (7,0) {PLCs};
+
+% Arrows
+\draw[->, thick, >=stealth] (client) -- (hist);
+\draw[->, thick, >=stealth] (plc) -- (coll);
+\draw[thick] (coll) -- (hist);
+
+% Firewall symbols
+\node[font=\scriptsize] at (-1.2,1) {FW};
+\node[font=\scriptsize] at (4.2,1) {FW};
+\end{tikzpicture}
+\caption{Historian in DMZ architecture}
+\end{figure}
+
+\begin{successbox}
+\textbf{Recommendation:} Deploy Historian servers in a DMZ between IT and OT networks. Use separate collector services in the OT zone with unidirectional or tightly controlled data flow to the Historian.
+\end{successbox}
+
+\section{Integration Considerations}
+
+\subsection{Common Integrations}
+
+\begin{itemize}
+    \item \textbf{SCADA/HMI:} Primary data source and trending display
+    \item \textbf{MES:} Manufacturing execution and batch tracking
+    \item \textbf{ERP:} Business systems for production reporting
+    \item \textbf{Analytics:} Machine learning and predictive models
+    \item \textbf{SIEM:} Security event correlation
+\end{itemize}
+
+\subsection{Data Flow Security}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3cm}p{4.5cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Flow} & \textcolor{white}{\bfseries Risk} & \textcolor{white}{\bfseries Mitigation} \\
+\midrule
+OT to Historian & Collector compromise & Dedicated service accounts \\
+Historian to IT & Data exfiltration path & Content filtering, DLP \\
+Remote access & Unauthorized queries & VPN, MFA, audit logging \\
+Cloud sync & Exposure of process data & Encryption, data classification \\
+\end{tabular}
+\caption{Data flow security considerations}
+\end{table}
+
+\section{Summary}
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Purpose:} Historians collect and store time-series process data for trending, analysis, and compliance
+    \item \textbf{Architecture:} Typically deployed at Level 3, bridging OT control systems and IT business networks
+    \item \textbf{Data Collection:} Support multiple protocols (OPC, Modbus, DNP3) with compression for efficient storage
+    \item \textbf{Security Risk:} High-value targets due to sensitive data, network position, and often legacy software
+    \item \textbf{Attack Vectors:} SQL injection, default credentials, API abuse, and lateral movement pivot point
+    \item \textbf{Best Practices:} DMZ placement, strong authentication, encryption, access control, and monitoring
+    \item \textbf{Integration:} Secure data flows to SCADA, MES, ERP, and analytics systems with appropriate controls
+\end{itemize}
+\end{definitionbox}
+
+\section{Further Reading}
+
+\subsection*{Standards and Guidelines}
+
+\begin{itemize}
+    \item \textbf{IEC 62443-3-3} -- System Security Requirements and Levels\\
+          \url{https://webstore.iec.ch/publication/7033}
+    \item \textbf{NIST SP 800-82 Rev 3} -- Guide to OT Security\\
+          \url{https://csrc.nist.gov/pubs/sp/800/82/r3/final}
+\end{itemize}
+
+\subsection*{Resources}
+
+\begin{itemize}
+    \item \textbf{CISA} -- Industrial Control Systems Security\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+    \item \textbf{SANS ICS} -- Industrial Control Systems Security\\
+          \url{https://www.sans.org/cyber-security-courses/ics-scada-cyber-security-essentials}
+\end{itemize}
+
+\subsection*{Books}
+
+\begin{itemize}
+    \item Knapp, Eric D. -- \textit{Industrial Network Security} (Syngress)
+    \item Boyer, Stuart A. -- \textit{SCADA: Supervisory Control and Data Acquisition} (ISA)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}
