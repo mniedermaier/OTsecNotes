@@ -374,6 +374,15 @@ jobs:
                 background: rgba(16, 185, 129, 0.25);
                 border-color: rgba(16, 185, 129, 0.5);
               }
+              .badge-github {
+                text-decoration: none;
+                color: inherit;
+                cursor: pointer;
+              }
+              .badge-github:hover {
+                background: rgba(245, 158, 11, 0.25);
+                border-color: rgba(245, 158, 11, 0.5);
+              }
               .container {
                 position: relative;
                 z-index: 1;
@@ -746,7 +755,7 @@ jobs:
                 </div>
                 <div class="sticky-actions">
                   <a href="OTsecNotes-all-documents.zip" class="sticky-btn sticky-btn-primary" download>📦 <span>Download All</span></a>
-                  <a href="https://github.com/mniedermaier/OTsecNotes" class="sticky-btn" target="_blank">⭐ <span>GitHub</span></a>
+                  <a href="https://github.com/mniedermaier/OTsecNotes" class="sticky-btn" target="_blank">⭐ <span id="sticky-star-count">GitHub</span></a>
                 </div>
               </div>
             </div>
@@ -761,6 +770,7 @@ jobs:
                 <span class="badge">📄 PDF_COUNT Documents</span>
                 <span class="badge">📖 Under 10 pages each</span>
                 <span class="badge">⚖️ CC BY-SA 4.0</span>
+                <a href="https://github.com/mniedermaier/OTsecNotes" class="badge badge-github" target="_blank">⭐ <span id="star-count">GitHub</span></a>
                 <a href="OTsecNotes-all-documents.zip" class="badge badge-download" download>📦 Download All</a>
               </div>
             </header>
@@ -1133,6 +1143,21 @@ jobs:
                   contentResults.classList.add('visible');
                 }
               });
+
+              // Fetch GitHub stars
+              fetch('https://api.github.com/repos/mniedermaier/OTsecNotes')
+                .then(res => res.json())
+                .then(data => {
+                  if (data.stargazers_count !== undefined) {
+                    const count = data.stargazers_count;
+                    const starText = count >= 1000 ? (count / 1000).toFixed(1) + 'k' : count;
+                    document.getElementById('star-count').textContent = starText + ' Stars';
+                    // Also update sticky header if it has a star count element
+                    const stickyStars = document.getElementById('sticky-star-count');
+                    if (stickyStars) stickyStars.textContent = starText;
+                  }
+                })
+                .catch(err => console.log('Could not fetch GitHub stars'));
             </script>
           </body>
           </html>
