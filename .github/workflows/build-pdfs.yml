@@ -843,7 +843,9 @@ jobs:
                 # Extract title from main.tex (first argument after \maketitlepage)
                 tex_file=$(find . -path "./[0-9]*-*/${pdf_name}/main.tex" -type f 2>/dev/null | head -1)
                 if [ -n "$tex_file" ]; then
-                  title=$(grep -A1 '\\maketitlepage' "$tex_file" | tail -1 | sed 's/.*{\(.*\)}.*/\1/')
+                  # Extract title and unescape LaTeX special characters
+                  title=$(grep -A1 '\\maketitlepage' "$tex_file" | tail -1 | sed 's/.*{\(.*\)}.*/\1/' | \
+                    sed 's/\\&/\&amp;/g; s/\\_/_/g; s/\\%/%/g; s/\\#/#/g; s/\\$/$/g')
                 else
                   # Fallback: generate from filename
                   title=$(echo "${pdf_name#*-}" | sed 's/-/ /g' | sed 's/\b\(.\)/\u\1/g')
