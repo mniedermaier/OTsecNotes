@@ -1,0 +1,171 @@
+% ============================================================================
+%  Secure IT/OT File Transfer - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {Secure IT/OT File Transfer}
+    {DMZ-Based Architectures for Network File Exchange}
+    {Poster 841}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+Network-based file transfer between IT and OT requires careful architectural design. A DMZ-based system provides \textbf{secure, auditable exchange} while maintaining segmentation and preventing direct connectivity.
+
+\posterinfo{
+\textbf{Common transfer needs:} \textcolor{success}{\faIcon{file-export}}\hspace{0.2em}Software patches/updates from IT to OT, \textcolor{success}{\faIcon{file-export}}\hspace{0.2em}production data export (historians, reports), \textcolor{success}{\faIcon{file-export}}\hspace{0.2em}configuration files, \textcolor{success}{\faIcon{file-export}}\hspace{0.2em}vendor files via email/download, and \textcolor{success}{\faIcon{file-export}}\hspace{0.2em}backup data replication.
+}
+
+\section{\textcolor{accent}{\faIcon{project-diagram}}\hspace{0.4em}Design Principles}
+
+\begin{itemize}
+    \item \faIcon{ban}\hspace{0.2em}\textbf{No direct connectivity} -- IT and OT never communicate directly
+    \item \faIcon{layer-group}\hspace{0.2em}\textbf{Defense in depth} -- Multiple security layers
+    \item \faIcon{arrow-down}\hspace{0.2em}\textbf{Pull model for OT} -- OT retrieves files; nothing pushed in
+    \item \faIcon{shield-alt}\hspace{0.2em}\textbf{Scan everything} -- Multi-engine AV and content inspection
+    \item \faIcon{clipboard-list}\hspace{0.2em}\textbf{Audit trail} -- Complete logging of all transfers
+    \item \faIcon{key}\hspace{0.2em}\textbf{Least privilege} -- Minimal permissions at each stage
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{server}}\hspace{0.4em}DMZ Components}
+
+\subsection{\textcolor{accent}{\faIcon{upload}}\hspace{0.3em}Upload Server (IT-Facing)}
+
+\begin{itemize}
+    \item \faIcon{globe}\hspace{0.2em}Web portal for manual uploads (HTTPS)
+    \item \faIcon{terminal}\hspace{0.2em}SFTP/SCP for automated transfers
+    \item \faIcon{user-check}\hspace{0.2em}User authentication (AD integration optional)
+    \item \faIcon{ruler}\hspace{0.2em}File size and type restrictions
+    \item \faIcon{hourglass-half}\hspace{0.2em}Quarantine storage pending scan
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.3em}Scanning Engine}
+
+\begin{itemize}
+    \item \faIcon{shield-alt}\hspace{0.2em}Multiple AV engines (minimum 2--3 vendors)
+    \item \faIcon{magic}\hspace{0.2em}Content Disarm and Reconstruction (CDR)
+    \item \faIcon{file-code}\hspace{0.2em}File type validation (magic numbers, structure)
+    \item \faIcon{sync-alt}\hspace{0.2em}Signature updates via one-way channel
+    \item \faIcon{flask}\hspace{0.2em}Optional sandboxing for suspicious files
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{download}}\hspace{0.3em}Download Server (OT-Facing)}
+
+\begin{itemize}
+    \item \faIcon{server}\hspace{0.2em}Separate server from upload (defense in depth)
+    \item \faIcon{arrow-down}\hspace{0.2em}Pull-only access from OT network
+    \item \faIcon{fingerprint}\hspace{0.2em}File integrity verification (hashes)
+    \item \faIcon{clock}\hspace{0.2em}Automatic expiration of unclaimed files
+    \item \faIcon{bell}\hspace{0.2em}Notification system for available files
+\end{itemize}
+
+\postersuccess{
+\textbf{Key point:} OT systems initiate connections to the DMZ. The DMZ never initiates connections into OT. This prevents attackers who compromise the DMZ from directly accessing OT systems.
+}
+
+\section{\textcolor{accent}{\faIcon{exchange-alt}}\hspace{0.4em}Transfer Protocols}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.2cm}p{2cm}p{3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{exchange-alt}\hspace{0.2em}\bfseries Protocol} & \textcolor{white}{\faIcon{arrows-alt-h}\hspace{0.2em}\bfseries Direction} & \textcolor{white}{\faIcon{lock}\hspace{0.2em}\bfseries Security} \\
+\midrule
+SFTP & IT$\rightarrow$DMZ & Encrypted, key auth \\
+HTTPS & IT$\rightarrow$DMZ & TLS, cert validation \\
+SCP & DMZ$\rightarrow$OT & Encrypted, key auth \\
+SMB/CIFS & Internal & Requires Kerberos \\
+\end{tabular}
+\end{center}
+
+\posterwarning{
+\textbf{Avoid:} FTP (unencrypted credentials), Telnet, HTTP, and NFS without Kerberos. All transfer protocols must provide encryption and strong authentication.
+}
+
+\section{\textcolor{accent}{\faIcon{file-alt}}\hspace{0.4em}Content Disarm and Reconstruction}
+
+CDR sanitizes files by deconstructing, removing active content, and rebuilding clean versions:
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.8cm}p{4.7cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{file}\hspace{0.2em}\bfseries File Type} & \textcolor{white}{\faIcon{shield-alt}\hspace{0.2em}\bfseries CDR Action} \\
+\midrule
+.exe, .msi, .bat & Block or quarantine; require approval \\
+.pdf, .docx & Strip macros, JS, embedded objects \\
+.csv, .xml, .txt & Allow after scan (low risk) \\
+.zip, .7z & Extract, scan contents, repackage \\
+.bin, .hex & Manual review; high-risk approval \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{tasks}}\hspace{0.4em}Workflow and Approval}
+
+\begin{enumerate}
+    \item \faIcon{upload}\hspace{0.2em}User uploads file via portal or SFTP
+    \item \faIcon{hourglass-half}\hspace{0.2em}File quarantined, scan initiated
+    \item \faIcon{shield-alt}\hspace{0.2em}Multi-AV scan and CDR processing
+    \item \faIcon{check-circle}\hspace{0.2em}Clean files queued for approval
+    \item \faIcon{user-check}\hspace{0.2em}Approver reviews and approves
+    \item \faIcon{arrow-right}\hspace{0.2em}File moved to download area
+    \item \faIcon{bell}\hspace{0.2em}OT user notified, retrieves file
+    \item \faIcon{calendar-times}\hspace{0.2em}Unclaimed files expire after defined period
+\end{enumerate}
+
+\subsection{\textcolor{accent}{\faIcon{clipboard-check}}\hspace{0.3em}Approval Levels}
+
+\begin{itemize}
+    \item \faIcon{robot}\hspace{0.2em}\textbf{Automatic} -- Low-risk types (text, CSV, sanitized docs)
+    \item \faIcon{user-check}\hspace{0.2em}\textbf{Single approval} -- Standard files (patches, configs)
+    \item \faIcon{users}\hspace{0.2em}\textbf{Dual approval} -- High-risk (executables, firmware)
+    \item \faIcon{exclamation-circle}\hspace{0.2em}\textbf{Emergency bypass} -- Documented exception, senior approval
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{eye}}\hspace{0.4em}Logging and Monitoring}
+
+All file transfers must be logged with:
+
+\begin{itemize}
+    \item \faIcon{clock}\hspace{0.2em}Timestamp and unique transfer ID
+    \item \faIcon{user}\hspace{0.2em}Source user/system identity
+    \item \faIcon{file-alt}\hspace{0.2em}File metadata (name, size, hash before/after)
+    \item \faIcon{shield-alt}\hspace{0.2em}Scan results from all engines
+    \item \faIcon{check-circle}\hspace{0.2em}Approval workflow (who, when)
+    \item \faIcon{download}\hspace{0.2em}Destination (who retrieved, when)
+\end{itemize}
+
+\posterinfo{
+\textbf{SIEM integration:} Forward file transfer logs to your monitoring platform. Alert on failed scans, unusual file types, high volumes, or after-hours transfers.
+}
+
+\section{\textcolor{accent}{\faIcon{long-arrow-alt-right}}\hspace{0.4em}Data Diode Integration}
+
+For high-security environments, hardware-enforced one-way transfer:
+
+\begin{itemize}
+    \item \faIcon{arrow-right}\hspace{0.2em}\textbf{Inbound diode} -- IT$\rightarrow$OT for patches and updates
+    \item \faIcon{arrow-left}\hspace{0.2em}\textbf{Outbound diode} -- OT$\rightarrow$IT for historian data, logs
+    \item \faIcon{ban}\hspace{0.2em}Eliminates any reverse channel possibility
+    \item \faIcon{exchange-alt}\hspace{0.2em}Requires protocol proxies for TCP applications
+\end{itemize}
+
+\posterdanger{
+\textbf{Data diodes} require careful protocol handling. TCP acknowledgments cannot traverse the diode, so proxy applications must handle protocol conversion on each side.
+}
+
+\postertip{
+Never allow direct IT/OT file transfer---always use a DMZ architecture with separate upload and download servers. OT pulls files; nothing pushes in. Scan with multiple AV engines plus CDR. Implement approval workflows for sensitive files. Log all transfers for forensics and SIEM integration. Consider data diodes for highest security requirements.
+}
+
+\end{multicols}
+
+\end{document}

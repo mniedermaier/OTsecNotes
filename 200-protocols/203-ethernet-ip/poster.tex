@@ -1,0 +1,193 @@
+% ============================================================================
+%  EtherNet/IP Protocol - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {EtherNet/IP Protocol}
+    {Industrial Ethernet for Rockwell and Allen-Bradley Systems}
+    {Poster 203}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{industry}}\hspace{0.4em}Overview}
+
+EtherNet/IP (Ethernet Industrial Protocol) is one of the most widely deployed industrial Ethernet protocols, \textbf{dominant in North American manufacturing}. Built on the Common Industrial Protocol (CIP), it uses standard Ethernet and TCP/IP. Managed by ODVA.
+
+\subsection{\textcolor{accent}{\faIcon{layer-group}}\hspace{0.3em}Protocol Stack}
+
+\begin{center}
+\begin{tikzpicture}[
+    layer/.style={rectangle, draw=#1!60, thick, fill=#1!15, minimum width=6cm, minimum height=0.5cm, align=center, font=\scriptsize},
+    layer/.default={otaccent}
+]
+    \node[layer=otprimary] (cip) at (0,0) {\faIcon{cubes}\hspace{0.3em}\textbf{CIP (Common Industrial Protocol)}};
+    \node[layer=otinfo, below=1pt of cip] (encap) {\faIcon{box}\hspace{0.3em}Encapsulation Layer};
+    \node[layer=otaccent, below=1pt of encap] (tcpudp) {\faIcon{exchange-alt}\hspace{0.3em}TCP (44818) / UDP (2222, 44818)};
+    \node[layer=otsuccess, below=1pt of tcpudp] (ip) {\faIcon{network-wired}\hspace{0.3em}IP / Ethernet};
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{exchange-alt}}\hspace{0.4em}Communication Types}
+
+\begin{center}
+\begin{tikzpicture}[
+    dev/.style={rectangle, draw=#1, thick, fill=#1!10, rounded corners=2pt,
+                minimum height=0.5cm, minimum width=1.5cm, align=center, font=\scriptsize},
+    dev/.default={otaccent}
+]
+    % Explicit messaging
+    \node[dev=otprimary] (plc) at (0,0.4) {\faIcon{microchip} PLC};
+    \node[dev=otaccent] (hmi) at (4,0.4) {\faIcon{desktop} HMI};
+    \draw[->, thick, >=stealth, otprimary!70] ([yshift=2pt]plc.east) -- ([yshift=2pt]hmi.west) node[midway, above, font=\scriptsize] {\faIcon{cog} Explicit};
+    \draw[<-, thick, >=stealth, otsuccess!70] ([yshift=-2pt]plc.east) -- ([yshift=-2pt]hmi.west) node[midway, below, font=\scriptsize] {TCP:44818};
+
+    % Implicit messaging
+    \node[dev=otwarning] (prod) at (0,-1.0) {\faIcon{broadcast-tower} Producer};
+    \node[dev=otsuccess, minimum width=1.2cm] (c1) at (3.2,-0.5) {\faIcon{satellite-dish} C1};
+    \node[dev=otsuccess, minimum width=1.2cm] (c2) at (3.2,-1.5) {\faIcon{satellite-dish} C2};
+    \draw[->, thick, >=stealth, otwarning!70] (prod.east) -- (c1.west);
+    \draw[->, thick, >=stealth, otwarning!70] (prod.east) -- (c2.west);
+    \node[font=\scriptsize, text=otwarning, above=1pt of c1] {\faIcon{bolt} Implicit};
+    \node[font=\scriptsize, text=mediumgray] at (4.6,-1.0) {UDP:2222};
+\end{tikzpicture}
+\end{center}
+
+\posterinfo{
+\faIcon{info-circle}\hspace{0.2em}\textbf{Explicit} = config/diagnostics (TCP). \textbf{Implicit} = real-time I/O using producer/consumer model (UDP multicast).
+}
+
+\section{\textcolor{accent}{\faIcon{stream}}\hspace{0.4em}CIP Encapsulation}
+
+\begin{center}
+\begin{tikzpicture}[
+    field/.style={rectangle, draw=otaccent, thick, minimum height=0.65cm, align=center, fill=otaccent!10, font=\scriptsize},
+    lbl/.style={font=\scriptsize, text=mediumgray}
+]
+    \node[field, minimum width=1.5cm] (cmd) at (0,0) {Command};
+    \node[field, minimum width=1cm, right=0pt of cmd] (len) {Length};
+    \node[field, minimum width=1.3cm, right=0pt of len] (sess) {Session};
+    \node[field, minimum width=1cm, right=0pt of sess, fill=otwarning!15, draw=otwarning] (ctx) {Context};
+    \node[field, minimum width=1.5cm, right=0pt of ctx, fill=otinfo!15, draw=otinfo] (data) {CIP Data};
+
+    \node[lbl, below=2pt of cmd] {2B};
+    \node[lbl, below=2pt of len] {2B};
+    \node[lbl, below=2pt of sess] {4B};
+    \node[lbl, below=2pt of ctx] {8B};
+    \node[lbl, below=2pt of data] {N bytes};
+
+    \draw[decorate, decoration={brace, amplitude=4pt, mirror}, thick, otaccent]
+        ([yshift=-0.55cm]cmd.south west) -- ([yshift=-0.55cm]ctx.south east)
+        node[midway, below=5pt, font=\scriptsize, text=otaccent] {Encapsulation Header (24B)};
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{cubes}}\hspace{0.4em}Key CIP Objects}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1cm}p{2.2cm}p{3.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries ID} & \textcolor{white}{\bfseries Object} & \textcolor{white}{\bfseries Function} \\
+\midrule
+0x01 & Identity & Device info, vendor, serial \\
+0x02 & Msg Router & Routes requests to objects \\
+0x04 & Assembly & Groups I/O data \\
+0x06 & Conn Manager & Manages connections \\
+0xF5 & TCP/IP & Network configuration \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{cogs}}\hspace{0.3em}CIP Services \& Risk}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1cm}p{2.8cm}p{2.7cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Code} & \textcolor{white}{\bfseries Service} & \textcolor{white}{\faIcon{shield-alt}\hspace{0.2em}\bfseries Risk} \\
+\midrule
+0x01 & Get\_Attribute\_All & \riskmedium \\
+0x0E & Get\_Attr\_Single & \risklow \\
+0x10 & Set\_Attr\_Single & \riskcritical \\
+0x4C & Forward\_Open & \riskhigh \\
+0x52 & Unconnected\_Send & \riskhigh \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{exclamation-triangle}}\hspace{0.4em}Security Vulnerabilities}
+
+\posterdanger{
+EtherNet/IP was designed for reliability, \textbf{not security}. No authentication, no encryption, no integrity protection. Any device on the network can send commands to any other device.
+}
+
+\subsection{\textcolor{accent}{\faIcon{crosshairs}}\hspace{0.3em}Attack Vectors}
+
+\begin{enumerate}
+    \item \textcolor{accent}{\faIcon{search}}\hspace{0.2em}\textbf{Enumeration:} Query Identity objects to map network
+    \item \textcolor{accent}{\faIcon{pen}}\hspace{0.2em}\textbf{Config tampering:} Set\_Attribute changes
+    \item \textcolor{accent}{\faIcon{syringe}}\hspace{0.2em}\textbf{I/O injection:} Modify implicit messages
+    \item \textcolor{accent}{\faIcon{user-secret}}\hspace{0.2em}\textbf{Session hijack:} Take over connections
+    \item \textcolor{accent}{\faIcon{bomb}}\hspace{0.2em}\textbf{DoS:} Flood connection requests
+    \item \textcolor{accent}{\faIcon{upload}}\hspace{0.2em}\textbf{Firmware:} Upload malicious firmware
+\end{enumerate}
+
+\section{\textcolor{accent}{\faIcon{lock}}\hspace{0.4em}CIP Security Extension}
+
+\postersuccess{
+ODVA developed \textbf{CIP Security}: TLS/DTLS for encrypted communications, X.509 certificates for device authentication, and integrity protection. Requires newer devices.
+}
+
+\posterwarning{
+CIP Security adoption is still \textbf{limited}. Most installed EtherNet/IP devices do not support it. Network-based protection remains essential for the installed base.
+}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Security Mitigations}
+
+\begin{itemize}
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Segment} EtherNet/IP in dedicated VLANs
+    \item \faIcon{filter}\hspace{0.2em}\textbf{Firewall} ports 44818 and 2222
+    \item \faIcon{search}\hspace{0.2em}\textbf{DPI firewalls} for CIP-aware inspection
+    \item \faIcon{clipboard-list}\hspace{0.2em}\textbf{ACLs} to restrict device communication
+    \item \faIcon{bell}\hspace{0.2em}\textbf{Alert} on Identity queries (recon indicator)
+    \item \faIcon{chart-line}\hspace{0.2em}\textbf{Baseline} I/O patterns, detect anomalies
+    \item \faIcon{eye}\hspace{0.2em}\textbf{Detect} Set\_Attribute changes
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{door-open}}\hspace{0.4em}Network Ports}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.8cm}p{1.5cm}p{3.2cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Port} & \textcolor{white}{\bfseries Proto} & \textcolor{white}{\bfseries Purpose} \\
+\midrule
+44818 & TCP & CIP explicit messaging \\
+44818 & UDP & Unconnected messages \\
+2222 & UDP & CIP implicit (I/O) \\
+80/443 & TCP & Web interface \\
+67--68 & UDP & DHCP/BootP \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{toolbox}}\hspace{0.3em}Common Tools}
+
+\begin{itemize}
+    \item \faIcon{binoculars}\hspace{0.2em}\textbf{Wireshark} -- CIP/EtherNet/IP dissector
+    \item \faIcon{crosshairs}\hspace{0.2em}\textbf{Nmap} -- \texttt{enip-info} NSE script
+    \item \faIcon{terminal}\hspace{0.2em}\textbf{pycomm3} -- Python CIP library
+    \item \faIcon{shield-alt}\hspace{0.2em}\textbf{Suricata} -- IDS with CIP support
+\end{itemize}
+
+\postertip{
+\faIcon{info-circle}\hspace{0.2em}EtherNet/IP uses the \textbf{producer/consumer model} where one device produces data consumed by multiple devices simultaneously. Common devices: ControlLogix, CompactLogix PLCs, PowerFlex drives, POINT I/O modules.
+}
+
+\end{multicols}
+
+\end{document}

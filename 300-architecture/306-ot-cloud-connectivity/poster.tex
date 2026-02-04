@@ -1,0 +1,202 @@
+% ============================================================================
+%  OT Cloud Connectivity - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {OT Cloud Connectivity}
+    {Securely Connecting Industrial Systems to Cloud Services}
+    {Poster 306}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{cloud}}\hspace{0.4em}Overview}
+
+Cloud connectivity for OT should be \textbf{highly avoided}. When business requirements make it unavoidable, connectivity must be strictly limited to \textbf{outbound data flows for monitoring only}. The default position is no cloud connectivity.
+
+\posterdanger{
+\faIcon{ban}\hspace{0.2em}\textbf{Absolute Rule:} Remote control, command execution, or \textbf{any data flow from cloud into OT control systems is unacceptable}. No exceptions. If a use case requires cloud-to-OT control, it must be rejected or redesigned.
+}
+
+\section{\textcolor{accent}{\faIcon{list-ul}}\hspace{0.4em}Use Cases (If Unavoidable)}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Use Case} & \textcolor{white}{\bfseries Description} \\
+\midrule
+\faIcon{chart-line}\hspace{0.2em}Monitoring & View OT data without VPN to OT \\
+\faIcon{cogs}\hspace{0.2em}Pred. Maint. & ML analyzing equipment data \\
+\faIcon{database}\hspace{0.2em}Cloud Historian & Scalable long-term storage \\
+\faIcon{globe}\hspace{0.2em}Multi-Site & Centralized view across facilities \\
+\faIcon{clone}\hspace{0.2em}Digital Twin & Simulation fed by real-time data \\
+\faIcon{link}\hspace{0.2em}Supply Chain & Production data sharing \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{tags}}\hspace{0.3em}Data Risk Classification}
+
+\begin{itemize}
+    \item \textcolor{success}{\faIcon{circle}}\hspace{0.2em}\textbf{Low Risk:} Aggregated metrics, historical trends
+    \item \textcolor{warning}{\faIcon{circle}}\hspace{0.2em}\textbf{Medium Risk:} Real-time process values, production rates
+    \item \textcolor{danger}{\faIcon{circle}}\hspace{0.2em}\textbf{High Risk:} Control commands, setpoints, configuration
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{project-diagram}}\hspace{0.4em}Architecture Patterns}
+
+\subsection{\textcolor{accent}{\faIcon{microchip}}\hspace{0.3em}Pattern 1: Edge Gateway (Recommended)}
+
+\begin{center}
+\begin{tikzpicture}[
+    archbox/.style={rectangle, draw=#1!70, thick, fill=#1!12,
+        rounded corners=4pt, minimum width=1.8cm, minimum height=1.4cm,
+        align=center, font=\scriptsize},
+    dataarrow/.style={->, thick, >=stealth, #1},
+    blockarrow/.style={thick, otdanger, >=stealth},
+]
+    \node[archbox=otsuccess] (ot) at (0,0) {%
+        \textcolor{otsuccess}{\faIcon{industry}}\\[2pt]
+        \textbf{OT Network}\\
+        {\scriptsize Level 0--3}%
+    };
+    \node[archbox=otwarning] (edge) at (3.0,0) {%
+        \textcolor{otwarning}{\faIcon{server}}\\[2pt]
+        \textbf{Edge GW}\\
+        {\scriptsize DMZ}%
+    };
+    \node[archbox=otaccent] (cloud) at (6.0,0) {%
+        \textcolor{otaccent}{\faIcon{cloud}}\\[2pt]
+        \textbf{Cloud}\\
+        {\scriptsize Platform}%
+    };
+    \draw[dataarrow=otsuccess!70] (ot.east) -- (edge.west)
+        node[midway, above, font=\scriptsize] {\faIcon{database}\hspace{0.1em}data};
+    \draw[dataarrow=otaccent!70] (edge.east) -- (cloud.west)
+        node[midway, above, font=\scriptsize] {\faIcon{lock}\hspace{0.1em}TLS 1.3};
+    \draw[blockarrow, dashed, ->] (cloud.south) -- ++(0,-0.55) -| (ot.south)
+        node[midway, below, font=\scriptsize, text=otdanger] {\textbf{BLOCKED}};
+    \node[font=\normalsize, text=otdanger] at (3.0,-1.15) {\textbf{\texttimes}};
+    \node[font=\scriptsize, text=otsuccess!70, anchor=south] at (0,0.85) {\faIcon{shield-alt}\hspace{0.1em}Firewall};
+    \node[font=\scriptsize, text=otwarning!70, anchor=south] at (3.0,0.85) {\faIcon{shield-alt}\hspace{0.1em}Firewall};
+\end{tikzpicture}
+\end{center}
+
+\vspace{-0.3em}
+
+\subsection{\textcolor{accent}{\faIcon{long-arrow-alt-right}}\hspace{0.3em}Pattern 2: Data Diode + Cloud}
+
+\begin{itemize}
+    \item \faIcon{long-arrow-alt-right}\hspace{0.2em}Hardware-enforced unidirectional from OT
+    \item \faIcon{server}\hspace{0.2em}Relay server in DMZ forwards to cloud
+    \item \faIcon{ban}\hspace{0.2em}Physically impossible for cloud to reach OT
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{database}}\hspace{0.3em}Pattern 3: Store-and-Forward}
+
+\begin{itemize}
+    \item \faIcon{hdd}\hspace{0.2em}Data collected locally, periodic uploads
+    \item \faIcon{check-circle}\hspace{0.2em}Manual approval for sensitive data
+    \item \faIcon{minus-circle}\hspace{0.2em}Air gap maintained except during transfers
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{exclamation-triangle}}\hspace{0.4em}Security Challenges}
+
+\begin{enumerate}
+    \item \faIcon{expand-arrows-alt}\hspace{0.2em}Expanded attack surface
+    \item \faIcon{handshake}\hspace{0.2em}Cloud provider as trusted third party
+    \item \faIcon{flag}\hspace{0.2em}Data sovereignty and compliance
+    \item \faIcon{key}\hspace{0.2em}Credential management complexity
+    \item \faIcon{eye-slash}\hspace{0.2em}Visibility gaps in encrypted traffic
+    \item \faIcon{wifi}\hspace{0.2em}Dependency on internet availability
+\end{enumerate}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Security Controls}
+
+\subsection{\textcolor{accent}{\faIcon{network-wired}}\hspace{0.3em}Network Security}
+
+\begin{itemize}
+    \item \faIcon{long-arrow-alt-right}\hspace{0.2em}\textbf{Outbound-only} -- OT/edge initiates all connections
+    \item \faIcon{list-alt}\hspace{0.2em}\textbf{Whitelist} -- Specific cloud endpoints only
+    \item \faIcon{lock}\hspace{0.2em}\textbf{TLS 1.3} -- Encrypt all data in transit
+    \item \faIcon{certificate}\hspace{0.2em}\textbf{Certificate pinning} -- Prevent MitM attacks
+    \item \faIcon{bell}\hspace{0.2em}\textbf{Monitor} -- Alert on unexpected destinations
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{user-lock}}\hspace{0.3em}Identity and Access}
+
+\begin{itemize}
+    \item \faIcon{certificate}\hspace{0.2em}Unique certificates per edge gateway
+    \item \faIcon{robot}\hspace{0.2em}Managed identities (no stored credentials)
+    \item \faIcon{key}\hspace{0.2em}Least privilege cloud permissions
+    \item \faIcon{fingerprint}\hspace{0.2em}MFA for all human access to cloud OT data
+    \item \faIcon{sync}\hspace{0.2em}Automated credential rotation
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{lock}}\hspace{0.3em}Data Protection}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Control} & \textcolor{white}{\bfseries Implementation} \\
+\midrule
+\faIcon{tags}\hspace{0.2em}Classification & Tag OT data before upload \\
+\faIcon{filter}\hspace{0.2em}Edge filtering & Remove sensitive data first \\
+\faIcon{lock}\hspace{0.2em}Encryption & Customer-managed keys at rest \\
+\faIcon{clipboard-list}\hspace{0.2em}Access logging & Audit all OT data access \\
+\faIcon{clock}\hspace{0.2em}Retention & Auto-delete per compliance \\
+\end{tabular}
+\end{center}
+
+\postersuccess{
+\faIcon{compress-arrows-alt}\hspace{0.2em}Apply \textbf{data minimization}: only send data actually needed. Filter, aggregate, and anonymize at the edge. The edge gateway is a critical security boundary.
+}
+
+\section{\textcolor{accent}{\faIcon{gavel}}\hspace{0.4em}Compliance Impact}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.8cm}p{4.7cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Regulation} & \textcolor{white}{\bfseries Impact} \\
+\midrule
+\faIcon{bolt}\hspace{0.2em}NERC CIP & ESP extends to cloud connections \\
+\faIcon{flag}\hspace{0.2em}NIS2 & Supply chain includes cloud \\
+\faIcon{shield-alt}\hspace{0.2em}IEC 62443 & Zone/conduit must include cloud \\
+\faIcon{user-shield}\hspace{0.2em}GDPR & Data residency for personal data \\
+\end{tabular}
+\end{center}
+
+\posterwarning{
+\faIcon{gavel}\hspace{0.2em}Some regulations may \textbf{prohibit or restrict} cloud connectivity for certain OT systems. Verify compliance \textbf{before} implementing.
+}
+
+\section{\textcolor{accent}{\faIcon{clipboard-check}}\hspace{0.4em}Implementation Checklist}
+
+\begin{enumerate}
+    \item \faIcon{file-alt}\hspace{0.2em}Document business justification
+    \item \faIcon{ban}\hspace{0.2em}Verify no cloud-to-OT control requirement
+    \item \faIcon{tags}\hspace{0.2em}Classify data sensitivity before upload
+    \item \faIcon{sitemap}\hspace{0.2em}Select architecture pattern per risk level
+    \item \faIcon{long-arrow-alt-right}\hspace{0.2em}Implement outbound-only connectivity
+    \item \faIcon{server}\hspace{0.2em}Deploy edge gateway in DMZ
+    \item \faIcon{filter}\hspace{0.2em}Configure firewalls with minimal endpoints
+    \item \faIcon{certificate}\hspace{0.2em}Establish device identity and credential mgmt
+    \item \faIcon{lock}\hspace{0.2em}Enable encryption in transit and at rest
+    \item \faIcon{eye}\hspace{0.2em}Implement monitoring and alerting
+\end{enumerate}
+
+\postertip{
+\faIcon{lightbulb}\hspace{0.2em}Edge gateway in DMZ with \textbf{outbound-only firewall rules} is the recommended pattern. Block all inbound from cloud. OT systems should \textbf{never depend on internet availability} for safe operation.
+}
+
+\end{multicols}
+
+\end{document}

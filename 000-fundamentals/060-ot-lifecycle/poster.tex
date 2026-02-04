@@ -1,0 +1,211 @@
+% ============================================================================
+%  OT System Lifecycle - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {OT System Lifecycle}
+    {Security Across the Industrial Asset Lifecycle}
+    {Poster 060}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{sync-alt}}\hspace{0.4em}Lifecycle Overview}
+
+The OT system lifecycle spans from procurement through decommissioning. Security must be integrated at every phase. Unlike IT systems with 3--5 year lifecycles, OT assets often operate for \textbf{15--30 years}.
+
+\begin{center}
+\begin{tikzpicture}[
+    phs/.style={rectangle, draw=#1!50, thick, fill=#1!10, rounded corners=3pt,
+        minimum height=0.55cm, minimum width=1.9cm, align=center, font=\scriptsize\bfseries},
+    phs/.default={otaccent},
+    arr/.style={->, thick, >=stealth, otaccent!60},
+    loop/.style={->, thick, >=stealth, dashed, otwarning!60},
+]
+    % Circular-ish layout
+    \node[phs=otinfo] (proc) at (90:2) {\faIcon{shopping-cart}\hspace{0.1em}Procure};
+    \node[phs=otsuccess] (depl) at (18:2) {\faIcon{rocket}\hspace{0.1em}Deploy};
+    \node[phs=otaccent] (oper) at (-54:2) {\faIcon{clock}\hspace{0.1em}Operate};
+    \node[phs=otwarning] (maint) at (-126:2) {\faIcon{wrench}\hspace{0.1em}Maintain};
+    \node[phs=otdanger] (decom) at (162:2) {\faIcon{power-off}\hspace{0.1em}Decommission};
+
+    % Center label
+    \node[font=\scriptsize, text=otprimary, align=center] at (0,0) {\textbf{15--30 yr}\\\textbf{Lifecycle}};
+
+    % Arrows
+    \draw[arr] (proc) -- (depl);
+    \draw[arr] (depl) -- (oper);
+    \draw[arr] (oper) -- (maint);
+    \draw[arr] (maint) -- (decom);
+    \draw[arr] (decom) -- (proc);
+
+    % Maintenance loop back
+    \draw[loop] (oper) to[bend right=25] (maint);
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{shopping-cart}}\hspace{0.4em}Procurement Phase}
+
+\postersuccess{
+\textbf{Security starts at procurement.} Specify requirements before purchase -- retrofitting security is expensive and often impossible with OT equipment.
+}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{lock}}\hspace{0.2em}\textbf{Authentication:} Strong auth, no hardcoded credentials
+    \item \textcolor{accent}{\faIcon{key}}\hspace{0.2em}\textbf{Encryption:} TLS/secure protocols for communications
+    \item \textcolor{accent}{\faIcon{clipboard-list}}\hspace{0.2em}\textbf{Logging:} Security event logging capabilities
+    \item \textcolor{accent}{\faIcon{sync}}\hspace{0.2em}\textbf{Patching:} Vendor patch support commitment
+    \item \textcolor{accent}{\faIcon{certificate}}\hspace{0.2em}\textbf{Certifications:} IEC 62443-4-1/4-2 compliance
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{clipboard-check}}\hspace{0.3em}Vendor Assessment}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.8cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Criteria} & \textcolor{white}{\bfseries Key Questions} \\
+\midrule
+Secure SDLC & Follows IEC 62443-4-1? \\
+CVE handling & How are vulnerabilities disclosed/patched? \\
+Support lifecycle & How long are security patches provided? \\
+Supply chain & Where sourced? Firmware integrity? \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{rocket}}\hspace{0.4em}Deployment Phase}
+
+\subsection{\textcolor{accent}{\faIcon{list-ol}}\hspace{0.3em}Secure Configuration}
+
+\begin{enumerate}
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}Change default credentials immediately
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}Disable unnecessary services and ports
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}Configure network segmentation and firewalls
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}Enable logging and connect to monitoring
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}Document baseline and create backup
+\end{enumerate}
+
+\section{\textcolor{accent}{\faIcon{clock}}\hspace{0.4em}Operations Phase}
+
+The longest phase -- often \textbf{15--30 years}. Security must be maintained as threats evolve.
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{3cm}p{1.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Activity} & \textcolor{white}{\bfseries Description} & \textcolor{white}{\bfseries Freq.} \\
+\midrule
+Vuln monitoring & Track CVEs for assets & Continuous \\
+Patch mgmt & Evaluate and apply updates & As released \\
+Access reviews & Verify user access & Quarterly \\
+Config audits & Check baseline drift & Annually \\
+Backup verify & Test config backups & Monthly \\
+Security monitor & Review logs and alerts & Daily \\
+\end{tabular}
+\end{center}
+
+\posterdanger{
+\textbf{End-of-Support Systems:} When vendors stop patching, implement compensating controls: network isolation, application whitelisting, enhanced monitoring, and plan for replacement.
+}
+
+\section{\textcolor{accent}{\faIcon{wrench}}\hspace{0.4em}Maintenance Phase}
+
+\subsection{\textcolor{accent}{\faIcon{exchange-alt}}\hspace{0.3em}Change Management}
+
+\begin{center}
+\begin{tikzpicture}[
+    chg/.style={rectangle, draw=otaccent!50, thick, fill=otaccent!8, rounded corners=2pt,
+        minimum height=0.4cm, minimum width=1.1cm, align=center, font=\scriptsize},
+    num/.style={circle, fill=otprimary, text=white, font=\scriptsize\bfseries,
+        minimum size=0.35cm, inner sep=0pt},
+    arr/.style={->, thick, >=stealth, otaccent!50},
+]
+    % Row 1
+    \node[num] (n1) at (0,0) {1};
+    \node[chg] (s1) at (1.0,0) {Request};
+    \node[num] (n2) at (2.2,0) {2};
+    \node[chg] (s2) at (3.2,0) {Review};
+    \node[num] (n3) at (4.4,0) {3};
+    \node[chg] (s3) at (5.3,0) {Test};
+
+    % Row 2
+    \node[num] (n4) at (0,-1.1) {4};
+    \node[chg] (s4) at (1.1,-1.1) {Implement};
+    \node[num] (n5) at (2.4,-1.1) {5};
+    \node[chg] (s5) at (3.3,-1.1) {Verify};
+
+    % Arrows row 1
+    \draw[arr] (n1) -- (s1);
+    \draw[arr] (s1) -- (n2);
+    \draw[arr] (n2) -- (s2);
+    \draw[arr] (s2) -- (n3);
+    \draw[arr] (n3) -- (s3);
+
+    % Wrap arrow: Test -> down between rows -> left to step 4
+    \draw[arr, rounded corners=4pt] (s3.south) -- ++(0,-0.35) -| (n4.north);
+
+    % Arrows row 2
+    \draw[arr] (n4) -- (s4);
+    \draw[arr] (s4) -- (n5);
+    \draw[arr] (n5) -- (s5);
+\end{tikzpicture}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{user-lock}}\hspace{0.3em}Vendor \& Contractor Access}
+
+\begin{itemize}
+    \item Require documented authorization for each access session
+    \item Escort or monitor vendor activities on-site
+    \item Use time-limited, audited remote access only
+    \item Verify all changes made during maintenance
+    \item Scan vendor media before connecting to OT networks
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{sync}}\hspace{0.3em}Patching Considerations}
+
+\begin{itemize}
+    \item \textbf{Test first:} Validate patches in lab environment
+    \item \textbf{Schedule carefully:} Use planned maintenance windows
+    \item \textbf{Have rollback plan:} Ability to restore if issues occur
+    \item \textbf{Document everything:} Record patch levels and dates
+    \item \textbf{Coordinate with vendor:} Ensure patches don't void support
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{power-off}}\hspace{0.4em}Decommissioning Phase}
+
+\posterdanger{
+\textbf{Security doesn't end at shutdown.} Decommissioned equipment may contain credentials, network info, or process data exploitable if improperly disposed.
+}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.8cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Data Type} & \textcolor{white}{\bfseries Sanitization Method} \\
+\midrule
+Config files & Factory reset, verify deletion \\
+Credentials & Remove all accounts, reset defaults \\
+Process data & Secure deletion or physical destruction \\
+Network settings & Clear IPs, firewall rules \\
+Logs & Export for retention, then delete \\
+Firmware & Reinstall clean firmware \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{clipboard-check}}\hspace{0.3em}Post-Decommission}
+
+Remove from asset inventory, update network diagrams, revoke credentials, archive documentation, update firewall rules to remove references.
+
+\postertip{
+\textbf{Lifecycle thinking:} Security at every phase, not just operations. Procurement sets the foundation; decommissioning closes the loop. Plan for 15--30 year asset lifecycles from day one.
+}
+
+\end{multicols}
+
+\end{document}

@@ -1,0 +1,209 @@
+% ============================================================================
+%  OT Supply Chain Attacks - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\makepostertitle
+    {OT Supply Chain Attacks}
+    {Threats Through Trusted Vendors and Components}
+    {Poster 422}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+Supply chain attacks compromise \textbf{trusted vendors, software, hardware, or service providers} to reach targets indirectly. In OT, these attacks are particularly dangerous because industrial systems rely on specialized vendors with deep access, and security updates are applied infrequently.
+
+OT supply chain risks are amplified by:
+
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{clock}}\hspace{0.2em}Long equipment lifecycles (15--25 years)
+    \item \textcolor{danger}{\faIcon{key}}\hspace{0.2em}Vendor remote access for maintenance/support
+    \item \textcolor{danger}{\faIcon{eye-slash}}\hspace{0.2em}Limited visibility into vendor security practices
+    \item \textcolor{danger}{\faIcon{tools}}\hspace{0.2em}Delayed patching due to operational constraints
+    \item \textcolor{danger}{\faIcon{link}}\hspace{0.2em}Dependence on specialized, sole-source vendors
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{crosshairs}}\hspace{0.4em}Attack Categories}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.5cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{crosshairs}\hspace{0.2em}\bfseries Type} & \textcolor{white}{\faIcon{list}\hspace{0.2em}\bfseries Examples} \\
+\midrule
+Software & Compromised updates, trojanized installers, malicious dependencies \\
+Hardware & Counterfeit components, firmware implants, hardware trojans \\
+Services & MSP compromise, remote access abuse, contractor credential theft \\
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}[
+    stepbox/.style={rectangle, draw=#1!60, thick, fill=#1!10, rounded corners=2pt,
+        minimum height=0.4cm, minimum width=4.8cm, align=center, font=\scriptsize},
+    stepbox/.default={otaccent},
+    num/.style={circle, fill=otprimary, text=white, font=\scriptsize\bfseries,
+        minimum size=0.35cm, inner sep=0pt},
+    arr/.style={->, thick, >=stealth, otaccent!50},
+]
+    \node[num] (n1) at (0,0) {1};
+    \node[stepbox=otwarning, right=3pt of n1] (s1) {Attacker compromises vendor};
+    \node[num, below=4pt of n1] (n2) {2};
+    \node[stepbox=otdanger, right=3pt of n2] (s2) {Malware injected into update};
+    \node[num, below=4pt of n2] (n3) {3};
+    \node[stepbox=otaccent, right=3pt of n3] (s3) {Customer installs trusted update};
+    \node[num, below=4pt of n3] (n4) {4};
+    \node[stepbox=otdanger, right=3pt of n4] (s4) {Backdoor access to OT network};
+    \draw[arr] (n1) -- (n2);
+    \draw[arr] (n2) -- (n3);
+    \draw[arr] (n3) -- (n4);
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{history}}\hspace{0.4em}Notable Incidents}
+
+\subsection{\textcolor{accent}{\faIcon{bug}}\hspace{0.3em}Havex / Dragonfly (2013--2014)}
+
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{code}}\hspace{0.2em}Trojanized ICS vendor software installers
+    \item \textcolor{danger}{\faIcon{globe}}\hspace{0.2em}Compromised legitimate vendor download sites
+    \item \textcolor{danger}{\faIcon{search}}\hspace{0.2em}Havex malware scanned for OPC servers
+    \item \textcolor{danger}{\faIcon{bolt}}\hspace{0.2em}Targeted energy sector organizations
+\end{itemize}
+
+\posterdanger{
+Havex demonstrated that attackers could compromise ICS environments by \textbf{targeting vendors that asset owners trust implicitly}. Users downloading from official vendor websites received malware.
+}
+
+\subsection{\textcolor{accent}{\faIcon{skull-crossbones}}\hspace{0.3em}NotPetya (2017)}
+
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{sync}}\hspace{0.2em}Compromised update mechanism of M.E.Doc software
+    \item \textcolor{danger}{\faIcon{ship}}\hspace{0.2em}Maersk shipping halted, Merck manufacturing stopped
+    \item \textcolor{danger}{\faIcon{dollar-sign}}\hspace{0.2em}\textbf{Over \$10 billion} in total global damages
+    \item \textcolor{danger}{\faIcon{download}}\hspace{0.2em}Spread via trusted software update channel
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{sun}}\hspace{0.3em}SolarWinds / SUNBURST (2020)}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{sun}\hspace{0.2em}\bfseries Attribute} & \textcolor{white}{\faIcon{info-circle}\hspace{0.2em}\bfseries Details} \\
+\midrule
+Vector & Trojanized Orion updates \\
+Scope & 18,000+ orgs downloaded \\
+Duration & 9 months undetected \\
+OT relevance & Orion monitors OT networks \\
+Attribution & APT29 (Russia-linked) \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{server}}\hspace{0.3em}Kaseya VSA (2021)}
+
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{lock}}\hspace{0.2em}REvil ransomware via Kaseya remote management
+    \item \textcolor{danger}{\faIcon{server}}\hspace{0.2em}Compromised MSPs managing client systems
+    \item \textcolor{danger}{\faIcon{users}}\hspace{0.2em}Ransomware deployed to 1,500+ downstream orgs
+    \item \textcolor{danger}{\faIcon{sitemap}}\hspace{0.2em}Cascading impact through service providers
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{phone}}\hspace{0.3em}3CX Attack (2023)}
+
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{phone}}\hspace{0.2em}Trojanized 3CX desktop app via official channels
+    \item \textcolor{danger}{\faIcon{code-branch}}\hspace{0.2em}First compromised Trading Technologies software
+    \item \textcolor{danger}{\faIcon{layer-group}}\hspace{0.2em}Multi-stage: supply chain of a supply chain
+    \item \textcolor{danger}{\faIcon{link}}\hspace{0.2em}Demonstrates cascading trust exploitation
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{truck}}\hspace{0.4em}OT-Specific Vectors}
+
+\begin{enumerate}
+    \item \textcolor{danger}{\faIcon{microchip}}\hspace{0.2em}PLC/RTU firmware updates
+    \item \textcolor{danger}{\faIcon{desktop}}\hspace{0.2em}HMI/SCADA software packages
+    \item \textcolor{danger}{\faIcon{laptop}}\hspace{0.2em}Engineering workstation tools
+    \item \textcolor{danger}{\faIcon{database}}\hspace{0.2em}Historian and OPC software
+    \item \textcolor{danger}{\faIcon{network-wired}}\hspace{0.2em}Network equipment firmware
+    \item \textcolor{danger}{\faIcon{key}}\hspace{0.2em}Vendor remote access tools
+    \item \textcolor{danger}{\faIcon{hard-hat}}\hspace{0.2em}Safety system configurations
+\end{enumerate}
+
+\posterwarning{
+\textbf{Vendor remote access} connections often bypass security controls and provide direct OT access. A compromised vendor uses legitimate credentials to access \textbf{multiple customer sites} simultaneously.
+}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Defense Strategies}
+
+\subsection{\textcolor{accent}{\faIcon{clipboard-check}}\hspace{0.3em}Vendor Risk Management}
+
+\begin{itemize}
+    \item \textcolor{info}{\faIcon{clipboard-check}}\hspace{0.2em}\textbf{Assessments} -- Evaluate vendor security before procurement
+    \item \textcolor{info}{\faIcon{file-signature}}\hspace{0.2em}\textbf{Contracts} -- Include security obligations
+    \item \textcolor{info}{\faIcon{chart-line}}\hspace{0.2em}\textbf{Monitoring} -- Track vendor security posture
+    \item \textcolor{info}{\faIcon{bell}}\hspace{0.2em}\textbf{Notification} -- Require vendors to report incidents
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{lock}}\hspace{0.3em}Software Integrity}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{lock}\hspace{0.2em}\bfseries Control} & \textcolor{white}{\faIcon{cogs}\hspace{0.2em}\bfseries Implementation} \\
+\midrule
+Hash verify & Check checksums before install \\
+Code signing & Validate digital signatures \\
+SBOM & Review Software Bill of Materials \\
+Staged deploy & Test in isolated env. first \\
+Segmentation & Limit blast radius \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{key}}\hspace{0.3em}Remote Access Controls}
+
+\begin{itemize}
+    \item \textcolor{success}{\faIcon{server}}\hspace{0.2em}Jump servers for all vendor access
+    \item \textcolor{success}{\faIcon{fingerprint}}\hspace{0.2em}Multi-factor authentication required
+    \item \textcolor{success}{\faIcon{video}}\hspace{0.2em}Session recording and monitoring
+    \item \textcolor{success}{\faIcon{clock}}\hspace{0.2em}Time-limited access with approval
+    \item \textcolor{success}{\faIcon{project-diagram}}\hspace{0.2em}Segment vendor from critical systems
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{microchip}}\hspace{0.3em}Hardware Security}
+
+\begin{itemize}
+    \item \textcolor{success}{\faIcon{shopping-cart}}\hspace{0.2em}Purchase from authorized distributors only
+    \item \textcolor{success}{\faIcon{search}}\hspace{0.2em}Inspect components for signs of tampering
+    \item \textcolor{success}{\faIcon{check-circle}}\hspace{0.2em}Verify firmware integrity before deployment
+    \item \textcolor{success}{\faIcon{list-alt}}\hspace{0.2em}Maintain inventory of hardware provenance
+    \item \textcolor{success}{\faIcon{handshake}}\hspace{0.2em}Consider trusted supplier programs
+\end{itemize}
+
+\postersuccess{
+\textbf{Zero trust for vendors:} Verify identity, limit access scope, monitor all activity, and assume any vendor could be compromised. Never allow persistent, unmonitored vendor connections to OT networks.
+}
+
+\postertip{
+Supply chain attacks exploit trust relationships. Combine \textbf{vendor risk management, integrity verification, access controls, and segmentation} for defense in depth.
+}
+
+\end{multicols}
+
+\end{document}

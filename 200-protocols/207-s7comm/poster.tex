@@ -1,0 +1,195 @@
+% ============================================================================
+%  S7comm Protocol - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {S7comm Protocol}
+    {Siemens S7 Communication for SIMATIC PLCs}
+    {Poster 207}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{microchip}}\hspace{0.4em}Overview}
+
+S7comm is \textbf{Siemens' proprietary protocol} for communication with SIMATIC S7 PLCs. One of the most widely deployed PLC protocols globally. Runs over ISO-TSAP (\textbf{TCP port 102}). Primary target of the \textbf{Stuxnet} malware.
+
+\subsection{\textcolor{accent}{\faIcon{handshake}}\hspace{0.3em}Connection Establishment}
+
+\begin{center}
+\begin{tikzpicture}[
+    msg/.style={rectangle, draw=#1, thick, fill=#1!10, rounded corners=2pt,
+                minimum height=0.4cm, minimum width=2.8cm, align=center, font=\scriptsize},
+    msg/.default={otaccent},
+    dev/.style={rectangle, draw=#1, thick, fill=#1!10, rounded corners=2pt,
+                minimum height=0.4cm, minimum width=1.5cm, align=center, font=\scriptsize},
+    dev/.default={otaccent}
+]
+    % Endpoints
+    \node[dev=otprimary] (client) at (0,1.8) {\faIcon{desktop} Client};
+    \node[dev=otaccent] (plc) at (4.5,1.8) {\faIcon{microchip} PLC};
+    % Timeline
+    \draw[thick, otprimary!40] (0,1.5) -- (0,-0.6);
+    \draw[thick, otaccent!40] (4.5,1.5) -- (4.5,-0.6);
+    % Messages
+    \draw[->, thick, >=stealth, otinfo] (0.2,1.1) -- (4.3,0.8) node[midway, above, font=\scriptsize, sloped] {\faIcon{plug} COTP CR};
+    \draw[->, thick, >=stealth, otsuccess] (4.3,0.5) -- (0.2,0.2) node[midway, above, font=\scriptsize, sloped] {\faIcon{check} COTP CC};
+    \draw[->, thick, >=stealth, otwarning] (0.2,-0.1) -- (4.3,-0.4) node[midway, above, font=\scriptsize, sloped] {\faIcon{cog} S7 Setup};
+    \draw[->, thick, >=stealth, otsuccess] (4.3,-0.6) -- (0.2,-0.6) node[midway, below, font=\scriptsize, sloped] {\faIcon{check-circle} S7 ACK};
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{code-branch}}\hspace{0.4em}Protocol Versions}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{2.2cm}p{2.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Aspect} & \textcolor{white}{\bfseries S7comm} & \textcolor{white}{\bfseries S7comm-Plus} \\
+\midrule
+PLCs & S7-300/400 & S7-1200/1500 \\
+Security & \textcolor{danger}{\faIcon{unlock}} None & \textcolor{success}{\faIcon{lock}} Optional \\
+Complexity & Simpler & More complex \\
+Documentation & Reverse-eng. & Partially doc. \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{layer-group}}\hspace{0.4em}Protocol Stack}
+
+\begin{center}
+\begin{tikzpicture}[
+    layer/.style={rectangle, draw=#1!60, thick, fill=#1!15, minimum width=6cm, minimum height=0.5cm, align=center, font=\scriptsize},
+    layer/.default={otaccent}
+]
+    \node[layer=otdanger] (s7) at (0,0) {\faIcon{microchip}\hspace{0.3em}\textbf{S7comm / S7comm-Plus}};
+    \node[layer=otwarning, below=1pt of s7] (cotp) {\faIcon{exchange-alt}\hspace{0.3em}COTP (ISO 8073)};
+    \node[layer=otinfo, below=1pt of cotp] (tsap) {\faIcon{sitemap}\hspace{0.3em}ISO-TSAP (Session)};
+    \node[layer=otaccent, below=1pt of tsap] (tcp) {\faIcon{network-wired}\hspace{0.3em}TCP (Port 102)};
+    \node[layer=otsuccess, below=1pt of tcp] (ip) {\faIcon{globe}\hspace{0.3em}IP / Ethernet};
+\end{tikzpicture}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{map-signs}}\hspace{0.3em}TSAP Addressing}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.8cm}p{4.7cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries TSAP} & \textcolor{white}{\bfseries Target} \\
+\midrule
+0x0100 & \faIcon{code}\hspace{0.2em}Programming access \\
+0x0102 & \faIcon{microchip}\hspace{0.2em}Rack 0, Slot 2 (typical CPU) \\
+0x0200 & \faIcon{server}\hspace{0.2em}Rack 1, Slot 0 \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{list-ul}}\hspace{0.4em}Function Codes}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{0.8cm}p{2.5cm}p{3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Code} & \textcolor{white}{\bfseries Function} & \textcolor{white}{\faIcon{shield-alt}\hspace{0.2em}\bfseries Risk} \\
+\midrule
+0x04 & Read Variable & \riskmedium \\
+0x05 & Write Variable & \riskcritical \\
+0x1A & Request Download & \riskcritical \\
+0x1B & Download Block & \riskcritical \\
+0x1D & Start Upload & \riskhigh \\
+0x28 & PLC Control & \riskcritical \\
+0x29 & PLC Stop & \riskcritical \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{memory}}\hspace{0.3em}Memory Areas}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.5cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Area} & \textcolor{white}{\bfseries Description} \\
+\midrule
+\textbf{I} (Inputs) & \faIcon{sign-in-alt}\hspace{0.2em}Physical input states \\
+\textbf{Q} (Outputs) & \faIcon{sign-out-alt}\hspace{0.2em}Physical output states \\
+\textbf{M} (Markers) & \faIcon{flag}\hspace{0.2em}Internal memory bits \\
+\textbf{DB} (Data) & \faIcon{database}\hspace{0.2em}Structured data storage \\
+\textbf{T/C} & \faIcon{clock}\hspace{0.2em}Timers and counters \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{exclamation-triangle}}\hspace{0.4em}Security Vulnerabilities}
+
+\posterdanger{
+Classic S7comm (S7-300/400) has \textbf{no authentication}. Anyone with network access can read memory, write values, upload/download programs, and stop the PLC. CPU passwords are max 8 chars, stored in plaintext.
+}
+
+\subsection{\textcolor{accent}{\faIcon{crosshairs}}\hspace{0.3em}Attack Vectors}
+
+\begin{enumerate}
+    \item \textcolor{accent}{\faIcon{eye}}\hspace{0.2em}\textbf{Memory read:} Extract process data, recipes, IP
+    \item \textcolor{accent}{\faIcon{pen}}\hspace{0.2em}\textbf{Memory write:} Manipulate setpoints, outputs
+    \item \textcolor{accent}{\faIcon{download}}\hspace{0.2em}\textbf{Program theft:} Upload and reverse-engineer
+    \item \textcolor{accent}{\faIcon{syringe}}\hspace{0.2em}\textbf{Logic injection:} Download malicious program
+    \item \textcolor{accent}{\faIcon{stop-circle}}\hspace{0.2em}\textbf{PLC stop:} Halt production (0x29)
+    \item \textcolor{accent}{\faIcon{mask}}\hspace{0.2em}\textbf{Stuxnet-style:} Modify logic while hiding changes
+\end{enumerate}
+
+\posterwarning{
+\faIcon{biohazard}\hspace{0.2em}\textbf{Stuxnet} targeted S7-315 and S7-417 PLCs. It modified OB1 (main block), injected code into OB35 (timed interrupt), hid changes from TIA Portal, and caused centrifuge destruction.
+}
+
+\section{\textcolor{accent}{\faIcon{lock}}\hspace{0.4em}S7comm-Plus Security}
+
+\postersuccess{
+S7-1200/1500 offer security improvements:
+\begin{itemize}
+    \item \faIcon{sliders-h}\hspace{0.2em}\textbf{Access protection levels}
+    \item \faIcon{lock}\hspace{0.2em}\textbf{Know-how protection} -- block encryption
+    \item \faIcon{fingerprint}\hspace{0.2em}\textbf{Copy protection} -- bind to CPU
+    \item \faIcon{shield-alt}\hspace{0.2em}\textbf{TLS option} -- encrypted comm (TIA V17+)
+    \item \faIcon{signature}\hspace{0.2em}\textbf{Integrity protection} -- digital signatures
+\end{itemize}
+}
+
+\subsection{\textcolor{accent}{\faIcon{sliders-h}}\hspace{0.3em}Access Protection Levels}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{4.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Level} & \textcolor{white}{\bfseries Protection} \\
+\midrule
+No protection & \textcolor{danger}{\faIcon{unlock}}\hspace{0.2em}Full access (default!) \\
+Write protect & \textcolor{warning}{\faIcon{pencil-alt}}\hspace{0.2em}Read OK, write needs password \\
+Read/Write & \textcolor{info}{\faIcon{lock}}\hspace{0.2em}Password for both \\
+Full protect & \textcolor{success}{\faIcon{shield-alt}}\hspace{0.2em}Password for everything \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{tools}}\hspace{0.4em}Security Mitigations}
+
+\begin{itemize}
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Firewall port 102} from unauthorized networks
+    \item \faIcon{project-diagram}\hspace{0.2em}\textbf{Segment PLCs} in dedicated VLANs
+    \item \faIcon{clipboard-list}\hspace{0.2em}\textbf{ACLs} to limit connecting IPs
+    \item \faIcon{search}\hspace{0.2em}\textbf{S7-aware DPI} firewalls for inspection
+    \item \faIcon{sliders-h}\hspace{0.2em}\textbf{Enable access protection} on S7-1200/1500
+    \item \faIcon{ban}\hspace{0.2em}\textbf{Restrict PUT/GET} communication
+    \item \faIcon{lock}\hspace{0.2em}\textbf{Enable know-how protection}
+    \item \faIcon{bell}\hspace{0.2em}\textbf{Alert on} download/upload and stop commands
+    \item \faIcon{balance-scale}\hspace{0.2em}\textbf{Compare} running program against baseline
+\end{itemize}
+
+\postertip{
+\faIcon{exclamation-circle}\hspace{0.2em}Many S7-1500 deployments still use \textbf{default settings with no protection}. Always configure access levels. Monitor for COTP CR packets and function codes 0x1A--0x1E (download/upload).
+}
+
+\end{multicols}
+
+\end{document}

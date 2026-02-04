@@ -1,0 +1,183 @@
+% ============================================================================
+%  NIST SP 800-82 - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {NIST SP 800-82}
+    {Guide to Operational Technology Security}
+    {Poster 111}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{file-alt}}\hspace{0.4em}Overview}
+
+NIST SP 800-82 is the primary U.S. government guidance for securing OT systems including ICS, SCADA, DCS, PLCs, RTUs, and SIS. Rev. 3 (2023) expanded scope from ICS to all OT and aligned with NIST CSF and SP 800-53.
+
+\posterinfo{
+\textbf{Authoritative} (primary US federal OT guidance), \textbf{comprehensive} (threats, vulnerabilities, countermeasures), \textbf{practical} (implementation guidance with overlay controls), and \textbf{referenced} by regulators worldwide.
+}
+
+\subsection{\textcolor{accent}{\faIcon{history}}\hspace{0.3em}Document Evolution}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.2cm}p{1cm}p{4.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Version} & \textcolor{white}{\bfseries Year} & \textcolor{white}{\bfseries Key Changes} \\
+\midrule
+Original & 2006 & Initial ICS security guidance \\
+Rev. 1 & 2011 & Updated threats, expanded controls \\
+Rev. 2 & 2015 & Risk mgmt, IEC 62443 alignment \\
+Rev. 3 & 2023 & OT scope, supply chain, cloud, CSF \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{list-ol}}\hspace{0.4em}Document Structure}
+
+\begin{enumerate}
+    \item \textcolor{accent}{\faIcon{info-circle}}\hspace{0.2em}\textbf{Introduction:} Purpose, scope, structure
+    \item \textcolor{accent}{\faIcon{server}}\hspace{0.2em}\textbf{OT Overview:} System types, architectures
+    \item \textcolor{accent}{\faIcon{balance-scale}}\hspace{0.2em}\textbf{Risk Management:} Assessment approaches
+    \item \textcolor{accent}{\faIcon{clipboard-list}}\hspace{0.2em}\textbf{Security Program:} Governance, policies
+    \item \textcolor{accent}{\faIcon{project-diagram}}\hspace{0.2em}\textbf{Architecture:} Network design, segmentation
+    \item \textcolor{accent}{\faIcon{shield-alt}}\hspace{0.2em}\textbf{Controls:} OT-specific recommendations
+\end{enumerate}
+
+\section{\textcolor{accent}{\faIcon{server}}\hspace{0.4em}OT Systems Covered}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.5cm}p{5.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Type} & \textcolor{white}{\bfseries Description} \\
+\midrule
+SCADA & Supervisory control of distributed assets \\
+DCS & Process manufacturing control \\
+PLC/RTU & Local automation controllers \\
+SIS & Emergency shutdown systems \\
+BAS/BMS & Building automation/management \\
+IIoT & Industrial IoT devices and sensors \\
+\end{tabular}
+\end{center}
+
+\posterwarning{
+OT environments have different priorities: \textbf{Availability} is highest, \textbf{safety} may override security, \textbf{legacy systems} can't be patched, \textbf{real-time} limits security options.
+}
+
+\section{\textcolor{accent}{\faIcon{project-diagram}}\hspace{0.4em}Defense-in-Depth}
+
+\begin{center}
+\begin{tikzpicture}[
+    layer/.style={rectangle, draw=#1!50, thick, fill=#1!10, rounded corners=2pt,
+        minimum height=0.38cm, align=center, font=\scriptsize},
+    layer/.default={otaccent},
+]
+    \node[layer=otprimary, minimum width=6.8cm] (l5) at (0,0) {\faIcon{database}\hspace{0.2em}Data -- Encryption, integrity checking};
+    \node[layer=otaccent, minimum width=5.8cm, above=2pt of l5] (l4) {\faIcon{code}\hspace{0.2em}Application -- Secure coding, validation};
+    \node[layer=otsuccess, minimum width=4.8cm, above=2pt of l4] (l3) {\faIcon{desktop}\hspace{0.2em}Host -- Hardening, whitelisting, patching};
+    \node[layer=otinfo, minimum width=3.8cm, above=2pt of l3] (l2) {\faIcon{network-wired}\hspace{0.2em}Network -- Segmentation, firewalls, DMZ};
+    \node[layer=otwarning, minimum width=2.8cm, above=2pt of l2] (l1) {\faIcon{lock}\hspace{0.2em}Physical -- Access, surveillance};
+\end{tikzpicture}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{sitemap}}\hspace{0.3em}Network Zones}
+
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{building}}\hspace{0.2em}\textbf{Enterprise Zone:} Corporate IT network
+    \item \textcolor{warning}{\faIcon{shield-alt}}\hspace{0.2em}\textbf{DMZ:} Buffer zone with shared services
+    \item \textcolor{success}{\faIcon{industry}}\hspace{0.2em}\textbf{Control Zone:} OT network with control systems
+    \item \textcolor{info}{\faIcon{hard-hat}}\hspace{0.2em}\textbf{Safety Zone:} Isolated safety systems
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{balance-scale}}\hspace{0.4em}Risk Assessment}
+
+\begin{center}
+\begin{tikzpicture}[
+    stp/.style={rectangle, draw=otaccent!50, thick, fill=otaccent!8, rounded corners=2pt,
+        minimum height=0.38cm, minimum width=5.2cm, align=left, font=\scriptsize},
+    num/.style={circle, fill=otprimary, text=white, font=\scriptsize\bfseries,
+        minimum size=0.35cm, inner sep=0pt},
+]
+    \node[num] (n1) at (0,0) {1};
+    \node[stp, right=2pt of n1] (s1) {System characterization -- identify assets};
+    \node[num, below=3pt of n1] (n2) {2};
+    \node[stp, right=2pt of n2] (s2) {Threat identification -- determine sources};
+    \node[num, below=3pt of n2] (n3) {3};
+    \node[stp, right=2pt of n3] (s3) {Vulnerability identification -- assess weaknesses};
+    \node[num, below=3pt of n3] (n4) {4};
+    \node[stp, right=2pt of n4] (s4) {Impact analysis -- evaluate consequences};
+    \node[num, below=3pt of n4] (n5) {5};
+    \node[stp, right=2pt of n5] (s5) {Risk determination -- calculate risk levels};
+    \node[num, below=3pt of n5] (n6) {6};
+    \node[stp, right=2pt of n6] (s6) {Control recommendations -- select mitigations};
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Security Controls (OT Overlay)}
+
+NIST 800-82 provides an OT overlay for SP 800-53 controls:
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{0.6cm}p{2cm}p{3.8cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries ID} & \textcolor{white}{\bfseries Family} & \textcolor{white}{\bfseries OT Considerations} \\
+\midrule
+AC & Access Control & Physical + logical, remote access \\
+AU & Audit & Logging without performance impact \\
+CM & Config Mgmt & Change control, baselines \\
+CP & Contingency & Backup, recovery, continuity \\
+IA & Ident/Auth & Account mgmt, strong auth \\
+IR & Incident Resp & OT-specific procedures \\
+MA & Maintenance & Secure remote, vendor access \\
+SC & Sys/Comm Prot & Segmentation, encryption \\
+\end{tabular}
+\end{center}
+
+\posterdanger{
+\textbf{High-priority controls:} Network segmentation, secure remote access with MFA, application whitelisting, comprehensive logging/monitoring, regular vulnerability assessments, IR planning and testing.
+}
+
+\section{\textcolor{accent}{\faIcon{exchange-alt}}\hspace{0.4em}IT vs OT Control Differences}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.8cm}p{2.2cm}p{2.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Control} & \textcolor{white}{\bfseries IT Approach} & \textcolor{white}{\bfseries OT Adaptation} \\
+\midrule
+Patching & Regular cycles & Scheduled outages \\
+Anti-malware & Real-time scan & Whitelisting \\
+Auth timeout & Short (15 min) & Longer (ops need) \\
+Encryption & End-to-end & May break real-time \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{tasks}}\hspace{0.4em}Implementation}
+
+\postersuccess{
+\textbf{Phased approach:}
+\begin{enumerate}
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Assessment:} Inventory assets, assess current state
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Planning:} Develop security plan, prioritize
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Implementation:} Deploy controls incrementally
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Operations:} Monitor, maintain, improve
+\end{enumerate}
+
+\textbf{Aligns with:} NIST CSF, ISA/IEC 62443, NERC CIP, ISO 27001/27002.
+}
+
+\postertip{
+NIST 800-82 recommends the \textbf{Purdue Model} or IEC 62443 zone concepts for network architecture. Use the OT overlay to tailor SP 800-53 controls -- start with gap analysis and prioritize based on risk.
+}
+
+\end{multicols}
+
+\end{document}

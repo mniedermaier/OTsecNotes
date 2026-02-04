@@ -1,0 +1,187 @@
+% ============================================================================
+%  OT Security Incidents Overview - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\makepostertitle
+    {OT Security Incidents}
+    {Overview of Notable Attacks on Industrial Control Systems}
+    {Poster 400}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+Understanding past OT/ICS incidents helps identify vulnerabilities and implement effective defenses. Real-world examples demonstrate the need for OT security investment.
+
+\posterinfo{
+\textbf{Why study incidents?} Learn from mistakes, identify recurring patterns, justify security investments, and improve detection by understanding attacker techniques.
+}
+
+\section{\textcolor{accent}{\faIcon{history}}\hspace{0.4em}Timeline of Major Incidents}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{0.8cm}p{2.2cm}p{3.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{calendar-alt}\hspace{0.2em}\bfseries Year} & \textcolor{white}{\faIcon{exclamation-triangle}\hspace{0.2em}\bfseries Incident} & \textcolor{white}{\faIcon{bolt}\hspace{0.2em}\bfseries Impact} \\
+\midrule
+2010 & Stuxnet & Destroyed centrifuges (Iran) \\
+2014 & German Steel & Physical blast furnace damage \\
+2015 & Ukraine Grid & 225,000 lost power \\
+2016 & Industroyer & Power outage in Kyiv \\
+2017 & TRITON & Targeted safety systems \\
+2017 & NotPetya & Global, \$10B+ damages \\
+2019 & Norsk Hydro & Aluminum production halted \\
+2020 & SolarWinds & Supply chain compromise \\
+2021 & Colonial Pipe. & Fuel supply disruption \\
+2021 & Oldsmar & Water treatment tampered \\
+2021 & JBS Foods & Meat processing shutdown \\
+2022 & Viasat/Ukraine & Satellite comms disrupted \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{crosshairs}}\hspace{0.4em}Attack Categories}
+
+\subsection{\textcolor{accent}{\faIcon{flag}}\hspace{0.3em}Nation-State Attacks}
+
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{skull-crossbones}}\hspace{0.2em}Highly sophisticated and well-resourced
+    \item \textcolor{danger}{\faIcon{flag}}\hspace{0.2em}Target critical infrastructure
+    \item \textcolor{danger}{\faIcon{chess}}\hspace{0.2em}Focus on espionage, sabotage, or pre-positioning
+    \item \textcolor{danger}{\faIcon{fire}}\hspace{0.2em}\textit{Examples:} Stuxnet, Ukraine Grid, TRITON
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{lock}}\hspace{0.3em}Ransomware and Criminal}
+
+\begin{itemize}
+    \item \textcolor{warning}{\faIcon{dollar-sign}}\hspace{0.2em}Financially motivated, often opportunistic
+    \item \textcolor{warning}{\faIcon{desktop}}\hspace{0.2em}IT systems compromised, OT affected indirectly
+    \item \textcolor{warning}{\faIcon{power-off}}\hspace{0.2em}OT shutdown as precaution even if not directly hit
+    \item \textcolor{warning}{\faIcon{fire}}\hspace{0.2em}\textit{Examples:} Colonial Pipeline, JBS, Norsk Hydro
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{user-secret}}\hspace{0.3em}Insider Threats}
+
+\begin{itemize}
+    \item \textcolor{info}{\faIcon{user-lock}}\hspace{0.2em}Authorized access misused (malicious or unintentional)
+    \item \textcolor{info}{\faIcon{eye-slash}}\hspace{0.2em}Difficult to detect with perimeter security alone
+    \item \textcolor{info}{\faIcon{database}}\hspace{0.2em}Significant damage due to deep system knowledge
+    \item \textcolor{info}{\faIcon{water}}\hspace{0.2em}\textit{Example:} Maroochy Shire sewage spill (2000)
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{sitemap}}\hspace{0.4em}Common Attack Vectors}
+
+\posterwarning{
+Most OT incidents do \textbf{not begin with direct OT attacks}. Attackers typically compromise IT networks first, then pivot to OT environments through shared infrastructure and weak segmentation.
+}
+
+\begin{center}
+\begin{tikzpicture}[
+    stepbox/.style={rectangle, draw=#1!60, thick, fill=#1!10, rounded corners=2pt,
+        minimum height=0.4cm, minimum width=4.8cm, align=center, font=\scriptsize},
+    stepbox/.default={otaccent},
+    num/.style={circle, fill=otprimary, text=white, font=\scriptsize\bfseries,
+        minimum size=0.35cm, inner sep=0pt},
+    arr/.style={->, thick, >=stealth, otaccent!50},
+]
+    \node[num] (n1) at (0,0) {1};
+    \node[stepbox=otwarning, right=3pt of n1] (s1) {IT network compromise};
+    \node[num, below=4pt of n1] (n2) {2};
+    \node[stepbox=otaccent, right=3pt of n2] (s2) {Lateral movement in IT};
+    \node[num, below=4pt of n2] (n3) {3};
+    \node[stepbox=otwarning, right=3pt of n3] (s3) {Cross IT/OT boundary};
+    \node[num, below=4pt of n3] (n4) {4};
+    \node[stepbox=otdanger, right=3pt of n4] (s4) {OT access and manipulation};
+    \node[num, below=4pt of n4] (n5) {5};
+    \node[stepbox=otdanger, right=3pt of n5] (s5) {Physical impact or disruption};
+    \draw[arr] (n1) -- (n2);
+    \draw[arr] (n2) -- (n3);
+    \draw[arr] (n3) -- (n4);
+    \draw[arr] (n4) -- (n5);
+\end{tikzpicture}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{sign-in-alt}}\hspace{0.3em}Initial Access Methods}
+
+\begin{enumerate}
+    \item \textcolor{danger}{\faIcon{envelope}}\hspace{0.2em}\textbf{Spear Phishing} -- Targeted emails to OT-connected staff
+    \item \textcolor{danger}{\faIcon{key}}\hspace{0.2em}\textbf{Remote Access} -- Compromised VPNs, RDP, vendor links
+    \item \textcolor{danger}{\faIcon{truck}}\hspace{0.2em}\textbf{Supply Chain} -- Compromised software updates/tools
+    \item \textcolor{danger}{\faIcon{usb}}\hspace{0.2em}\textbf{Removable Media} -- USB drives crossing air gaps
+    \item \textcolor{danger}{\faIcon{globe}}\hspace{0.2em}\textbf{Internet-Exposed} -- Misconfigured devices online
+\end{enumerate}
+
+\subsection{\textcolor{accent}{\faIcon{exchange-alt}}\hspace{0.3em}Lateral Movement to OT}
+
+\begin{enumerate}
+    \item \textcolor{warning}{\faIcon{laptop}}\hspace{0.2em}\textbf{Dual-Homed Systems} -- Eng. workstations on both nets
+    \item \textcolor{warning}{\faIcon{server}}\hspace{0.2em}\textbf{Historian Servers} -- Data replication IT$\leftrightarrow$OT
+    \item \textcolor{warning}{\faIcon{key}}\hspace{0.2em}\textbf{Shared Credentials} -- Same passwords IT and OT
+    \item \textcolor{warning}{\faIcon{project-diagram}}\hspace{0.2em}\textbf{Flat Networks} -- No segmentation, direct access
+\end{enumerate}
+
+\section{\textcolor{accent}{\faIcon{bolt}}\hspace{0.4em}Impact Types}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.8cm}p{1.8cm}p{2.7cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Impact Type} & \textcolor{white}{\bfseries Risk} & \textcolor{white}{\bfseries Examples} \\
+\midrule
+Physical damage & \riskcritical & Stuxnet, German steel \\
+Service disruption & \riskcritical & Ukraine, Colonial \\
+Safety risk & \riskcritical & TRITON (SIS targeted) \\
+Data/IP theft & \riskhigh & SolarWinds supply chain \\
+Financial & \riskhigh & NotPetya (\$10B+) \\
+Environmental & \riskhigh & Oldsmar (chemicals) \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{lightbulb}}\hspace{0.4em}Key Lessons Learned}
+
+\postersuccess{
+\textbf{Recurring themes across major incidents:}
+\begin{enumerate}
+    \item \textcolor{info}{\faIcon{project-diagram}}\hspace{0.2em}Network segmentation failures enabled lateral movement
+    \item \textcolor{info}{\faIcon{eye-slash}}\hspace{0.2em}Lack of visibility into OT network traffic
+    \item \textcolor{danger}{\faIcon{key}}\hspace{0.2em}Weak authentication and access controls
+    \item \textcolor{info}{\faIcon{band-aid}}\hspace{0.2em}Delayed patching of known vulnerabilities
+\end{enumerate}
+}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Defense Priorities}
+
+\begin{enumerate}
+    \item \textcolor{success}{\faIcon{shield-alt}}\hspace{0.2em}\textbf{Segment} -- Proper IT/OT/DMZ boundaries with firewalls
+    \item \textcolor{success}{\faIcon{fingerprint}}\hspace{0.2em}\textbf{Authenticate} -- MFA for all remote and privileged access
+    \item \textcolor{success}{\faIcon{eye}}\hspace{0.2em}\textbf{Monitor} -- OT network traffic analysis and anomaly detection
+    \item \textcolor{success}{\faIcon{tools}}\hspace{0.2em}\textbf{Patch} -- Risk-based patching during maintenance windows
+    \item \textcolor{success}{\faIcon{clipboard-list}}\hspace{0.2em}\textbf{Respond} -- OT-specific incident response plans and drills
+\end{enumerate}
+
+\posterdanger{
+\textbf{Critical:} Most attacks exploited \textbf{known vulnerabilities} and \textbf{basic security gaps} -- not sophisticated zero-days. Weak passwords, missing MFA, and poor segmentation remain top enablers.
+}
+
+\postertip{
+Study past incidents to identify patterns applicable to your environment -- every major OT attack reinforced the same fundamentals: \textbf{segment, monitor, authenticate, patch, and respond}.
+}
+
+\end{multicols}
+
+\end{document}

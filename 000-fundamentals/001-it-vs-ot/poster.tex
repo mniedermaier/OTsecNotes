@@ -1,0 +1,177 @@
+% ============================================================================
+%  IT vs OT - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {IT vs OT}
+    {Understanding the Fundamental Differences}
+    {Poster 001}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{book}}\hspace{0.4em}Definitions}
+
+\posterdefinition{Information Technology (IT)}{
+Hardware, software, and networks used to process, store, and transmit \textbf{data and information}. Examples: servers, workstations, enterprise apps (ERP, CRM), databases, corporate networks.
+}
+
+\posterdefinition{Operational Technology (OT)}{
+Hardware, software, and networks used to monitor and control \textbf{physical processes and infrastructure}. Examples: PLCs, SCADA, HMIs, DCS, industrial robots, building automation.
+}
+
+\section{\textcolor{accent}{\faIcon{sort-amount-down}}\hspace{0.4em}Priority: CIA vs AIC}
+
+\begin{center}
+\begin{tikzpicture}[
+    tri/.style={regular polygon, regular polygon sides=3, minimum size=1.6cm,
+        draw=#1!60, thick, fill=#1!12, font=\scriptsize\bfseries, align=center},
+    lbl/.style={font=\scriptsize, text=#1},
+]
+    % IT Triangle - CIA
+    \node[lbl=otprimary, font=\scriptsize\bfseries] at (-1.7,1.9) {IT Priority};
+    \node[tri=otinfo] (c1) at (-1.7,0.85) {C};
+    \node[tri=otaccent, scale=0.85] (i1) at (-1.7,0.05) {I};
+    \node[tri=otsuccess, scale=0.7] (a1) at (-1.7,-0.6) {A};
+    \node[lbl=otinfo, right] at (-0.7,0.85) {Confidentiality};
+    \node[lbl=otaccent, right] at (-0.7,0.05) {Integrity};
+    \node[lbl=otsuccess, right] at (-0.7,-0.6) {Availability};
+
+    % OT Triangle - AIC (inverted)
+    \node[lbl=otprimary, font=\scriptsize\bfseries] at (3.5,1.9) {OT Priority};
+    \node[tri=otsuccess] (a2) at (3.5,0.85) {A};
+    \node[tri=otaccent, scale=0.85] (i2) at (3.5,0.05) {I};
+    \node[tri=otinfo, scale=0.7] (c2) at (3.5,-0.6) {C};
+    \node[lbl=otsuccess, left] at (2.5,0.85) {Availability};
+    \node[lbl=otaccent, left] at (2.5,0.05) {Integrity};
+    \node[lbl=otinfo, left] at (2.5,-0.6) {Confid.};
+\end{tikzpicture}
+\end{center}
+
+OT prioritizes \textbf{safety} above all -- downtime can endanger lives, cause environmental damage, and result in enormous financial losses.
+
+\section{\textcolor{accent}{\faIcon{columns}}\hspace{0.4em}Key Differences}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{2.5cm}p{2.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Aspect} & \textcolor{white}{\bfseries IT} & \textcolor{white}{\bfseries OT} \\
+\midrule
+Primary Goal & Process data & Control physical \\
+Top Priority & Confidentiality & Availability \\
+Lifecycle & 3--5 years & 15--25+ years \\
+Patching & Regular, auto & Rare, planned \\
+Downtime & Hours OK & Seconds critical \\
+Protocols & TCP/IP, HTTP & Modbus, DNP3 \\
+Real-time & Not critical & Milliseconds \\
+Environment & Office/DC & Harsh industrial \\
+Testing & Pentesting OK & Can cause damage \\
+Vendor Lock & Multiple & Proprietary \\
+Staff & CS / IT & Engineering \\
+\end{tabular}
+\end{center}
+
+\posterwarning{
+OT systems often run for 15--25 years. Windows XP and Windows 7 are still common in critical infrastructure because control system vendors only certify those platforms.
+}
+
+\posterdanger{
+Many OT protocols were designed decades ago for isolated networks. They lack authentication, encryption, and integrity checking. A single packet can command a PLC to perform dangerous actions.
+}
+
+\section{\textcolor{accent}{\faIcon{exchange-alt}}\hspace{0.4em}IT/OT Convergence}
+
+\begin{center}
+\begin{tikzpicture}[
+    driver/.style={rectangle, draw=otaccent!50, thick, fill=otaccent!8, rounded corners=2pt,
+        minimum height=0.4cm, minimum width=2.2cm, align=center, font=\scriptsize},
+    ctr/.style={circle, draw=otprimary!60, thick, fill=otprimary!15,
+        minimum size=1.2cm, align=center, font=\scriptsize\bfseries, text=otprimary},
+    arr/.style={->, thick, >=stealth, otaccent!60},
+]
+    \node[ctr] (c) at (0,0) {IT/OT\\Convergence};
+    \node[driver] (d1) at (-2.2, 0.9) {\faIcon{plug}\hspace{0.1em}Industry 4.0};
+    \node[driver] (d2) at ( 2.2, 0.9) {\faIcon{chart-line}\hspace{0.1em}Business Data};
+    \node[driver] (d3) at (-2.2,-0.9) {\faIcon{desktop}\hspace{0.1em}Remote Ops};
+    \node[driver] (d4) at ( 2.2,-0.9) {\faIcon{dollar-sign}\hspace{0.1em}Cost Reduction};
+    \draw[arr] (d1) -- (c);
+    \draw[arr] (d2) -- (c);
+    \draw[arr] (d3) -- (c);
+    \draw[arr] (d4) -- (c);
+\end{tikzpicture}
+\end{center}
+
+\subsection{Convergence Challenges}
+
+\begin{itemize}
+    \item Different priorities and cultures between teams
+    \item Legacy systems without security features
+    \item Expanded attack surface through connectivity
+    \item Skill gaps in both IT and OT domains
+\end{itemize}
+
+\postertip{
+\textbf{The Air Gap Myth:} Most OT environments have some IT connection: historian replication, vendor remote access, USB drives, dual-homed workstations, or cloud monitoring. True air gaps are rare.
+}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Security Implications}
+
+\begin{enumerate}
+    \item \textcolor{danger}{\faIcon{hard-hat}}\hspace{0.2em}\textbf{Safety first} -- security must not compromise safety
+    \item \textcolor{warning}{\faIcon{clock}}\hspace{0.2em}\textbf{No downtime} -- systems run 24/7/365
+    \item \textcolor{info}{\faIcon{flask}}\hspace{0.2em}\textbf{No testing} -- cannot pentest production
+    \item \textcolor{accent}{\faIcon{lock}}\hspace{0.2em}\textbf{Vendor lock} -- changes void warranties
+    \item \textcolor{accent}{\faIcon{history}}\hspace{0.2em}\textbf{Long lifecycles} -- secure for decades
+    \item \textcolor{danger}{\faIcon{bolt}}\hspace{0.2em}\textbf{Physical harm} -- cyber causes real damage
+\end{enumerate}
+
+\posterdanger{
+\textbf{Applying IT practices directly to OT is dangerous:}
+\begin{itemize}
+    \item Automatic updates may crash control systems
+    \item Antivirus scans cause CPU spikes, missed deadlines
+    \item Active vulnerability scanning disrupts PLCs
+    \item Network changes break process dependencies
+\end{itemize}
+}
+
+\subsection{\textcolor{accent}{\faIcon{history}}\hspace{0.3em}Key Incidents}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{5.2cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{history}\hspace{0.2em}\bfseries Year} & \textcolor{white}{\faIcon{bolt}\hspace{0.2em}\bfseries Incident} \\
+\midrule
+2010 & Stuxnet -- destroyed centrifuges via PLC \\
+2015 & Ukraine -- IT compromise led to OT control \\
+2017 & TRITON -- targeted safety systems \\
+2021 & Colonial Pipeline -- IT ransomware shut OT \\
+2021 & Oldsmar -- remote access chemical attack \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{handshake}}\hspace{0.4em}Bridging the Gap}
+
+\postersuccess{
+\textbf{Organizational:} Joint IT/OT governance, cross-training, shared RACI, unified (adapted) policies.
+
+\textbf{Technical:} Network segmentation (Purdue Model), industrial DMZ, secure remote access (jump servers, MFA), OT-specific monitoring, passive asset inventory, compensating controls.
+}
+
+\posterdefinition{Key Standards}{
+\textbf{IEC 62443} -- Industrial cybersecurity framework (zones, conduits, security levels).
+\textbf{NIST SP 800-82} -- Guide to OT security.
+\textbf{NERC CIP} -- North American electric grid standards.
+}
+
+\end{multicols}
+
+\end{document}

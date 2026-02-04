@@ -1,0 +1,162 @@
+% ============================================================================
+%  Privileged Access Management - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {Privileged Access Management}
+    {Controlling Administrative Access in OT Environments}
+    {Poster 880}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+PAM controls and monitors access by users with elevated permissions. In OT, privileged accounts include admin credentials, \textbf{vendor remote access, engineering workstation logins}, and service accounts that can modify control system configurations.
+
+\posterinfo{
+\textbf{OT impact:} A compromised privileged account can modify PLC logic, disable safety systems, or disrupt physical processes. OT privileged access affects safety and operations, not just data.
+}
+
+\section{\textcolor{accent}{\faIcon{user-lock}}\hspace{0.4em}Privileged Account Types}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{user-lock}\hspace{0.2em}\bfseries Type} & \textcolor{white}{\faIcon{exclamation-triangle}\hspace{0.2em}\bfseries Description and Risk} \\
+\midrule
+System admin & Full access to servers, workstations \\
+OT engineer & Can modify PLC/DCS logic, HMI configs \\
+Vendor/Integrator & Remote maintenance, broad permissions \\
+Service accounts & Automated processes, elevated privs \\
+Break-glass & High-privilege emergency accounts \\
+Shared accounts & Generic logins, multiple operators \\
+\end{tabular}
+\end{center}
+
+\posterwarning{
+\textbf{OT challenges:} Legacy systems lack modern auth. Shared accounts on HMIs. Vendor access poorly controlled. 24/7 operations need always-on access. Safety systems require rapid access. Air-gapped systems complicate central PAM.
+}
+
+\section{\textcolor{accent}{\faIcon{project-diagram}}\hspace{0.4em}PAM Architecture}
+
+\subsection{\textcolor{accent}{\faIcon{cogs}}\hspace{0.3em}Core Components}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{lock}}\hspace{0.2em}\textbf{Credential vault} -- Store and rotate privileged credentials
+    \item \textcolor{accent}{\faIcon{desktop}}\hspace{0.2em}\textbf{Session gateway} -- Proxy and record sessions
+    \item \textcolor{accent}{\faIcon{clipboard-check}}\hspace{0.2em}\textbf{Access request workflow} -- Manage approval process
+    \item \textcolor{accent}{\faIcon{clock}}\hspace{0.2em}\textbf{Just-in-time access} -- Grant temporary elevation
+    \item \textcolor{accent}{\faIcon{video}}\hspace{0.2em}\textbf{Session recording} -- Capture keystrokes, screens, commands
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{server}}\hspace{0.3em}Jump Server Architecture}
+
+All administrative access to OT should traverse hardened jump servers in the DMZ:
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{cog}}\hspace{0.2em}Minimal software, full session logging
+    \item \textcolor{accent}{\faIcon{fingerprint}}\hspace{0.2em}Multi-factor authentication required
+    \item \textcolor{accent}{\faIcon{ban}}\hspace{0.2em}Direct connections to OT systems blocked
+    \item \textcolor{accent}{\faIcon{layer-group}}\hspace{0.2em}Separate jump servers per security zone
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{truck}}\hspace{0.4em}Vendor Access Management}
+
+\posterdanger{
+\textbf{Vendor remote access is a top OT attack vector.} Attackers compromise vendor credentials or infrastructure, then use trusted connections to reach customer sites. The Kaseya attack demonstrated this at scale.
+}
+
+\subsection{\textcolor{accent}{\faIcon{key}}\hspace{0.3em}Vendor Access Controls}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{key}\hspace{0.2em}\bfseries Control} & \textcolor{white}{\faIcon{cogs}\hspace{0.2em}\bfseries Implementation} \\
+\midrule
+No persistent & Disable connections when not in use \\
+Explicit approval & Customer approves each session \\
+Time-limited & Auto-terminate after defined period \\
+Least privilege & Access only specific systems needed \\
+MFA & Required for all vendor connections \\
+Session recording & Record all vendor activity for audit \\
+Real-time monitor & Alert on unusual vendor behavior \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{tasks}}\hspace{0.3em}Vendor Access Workflow}
+
+\begin{enumerate}
+    \item \textcolor{accent}{\faIcon{paper-plane}}\hspace{0.2em}Vendor requests access with justification
+    \item \textcolor{accent}{\faIcon{check-circle}}\hspace{0.2em}Customer approves and defines scope
+    \item \textcolor{accent}{\faIcon{key}}\hspace{0.2em}Temporary credentials issued via PAM
+    \item \textcolor{accent}{\faIcon{eye}}\hspace{0.2em}Monitored and recorded session
+    \item \textcolor{accent}{\faIcon{times-circle}}\hspace{0.2em}Access automatically revoked after session
+\end{enumerate}
+
+\section{\textcolor{accent}{\faIcon{lock}}\hspace{0.4em}Credential Management}
+
+\subsection{\textcolor{accent}{\faIcon{lock}}\hspace{0.3em}Password Vaulting}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{lock}}\hspace{0.2em}Store all privileged credentials in encrypted vault
+    \item \textcolor{accent}{\faIcon{sign-out-alt}}\hspace{0.2em}Users check out credentials through PAM system
+    \item \textcolor{accent}{\faIcon{sync-alt}}\hspace{0.2em}Automatic rotation after each use or on schedule
+    \item \textcolor{accent}{\faIcon{clipboard-list}}\hspace{0.2em}Full audit trail for all credential access
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{sync-alt}}\hspace{0.3em}Rotation Challenges in OT}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{exclamation-triangle}\hspace{0.2em}\bfseries Challenge} & \textcolor{white}{\faIcon{check-circle}\hspace{0.2em}\bfseries Mitigation} \\
+\midrule
+Hardcoded creds & Plan remediation in maintenance \\
+Service account deps & Map dependencies before rotation \\
+Air-gapped systems & Manual rotation with verification \\
+Legacy (no APIs) & Agent-based or scripted rotation \\
+24/7 operations & Rotate during planned maintenance \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{eye}}\hspace{0.4em}Session Management}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{video}}\hspace{0.2em}\textbf{Video recording} -- Capture screen activity for GUI
+    \item \textcolor{accent}{\faIcon{keyboard}}\hspace{0.2em}\textbf{Keystroke logging} -- Record all commands entered
+    \item \textcolor{accent}{\faIcon{filter}}\hspace{0.2em}\textbf{Command filtering} -- Block or alert on dangerous commands
+    \item \textcolor{accent}{\faIcon{bell}}\hspace{0.2em}\textbf{Real-time alerts} -- Notify on high-risk activities
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{exclamation-circle}}\hspace{0.4em}Emergency Access}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{exclamation-circle}\hspace{0.2em}\bfseries Element} & \textcolor{white}{\faIcon{info-circle}\hspace{0.2em}\bfseries Description} \\
+\midrule
+Emergency accts & Pre-created, high-privilege, sealed \\
+Notification & Auto-alert when emergency used \\
+Time limits & Auto-disable after period \\
+Post-review & Mandatory review of all use \\
+\end{tabular}
+\end{center}
+
+\postertip{
+Focus initial PAM on highest-risk access: vendor remote access, domain admin/root accounts, engineering workstations, then service accounts. Force all access through monitored jump servers. Record all sessions. Implement approval workflows for vendor access with time limits and auto-revocation.
+}
+
+\end{multicols}
+
+\end{document}

@@ -1,0 +1,172 @@
+% ============================================================================
+%  Colonial Pipeline Attack - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {Colonial Pipeline Attack}
+    {Ransomware Incident That Disrupted US Fuel Supply}
+    {Poster 414}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+The Colonial Pipeline ransomware attack (May 2021) demonstrated how \textbf{IT security incidents cascade into OT disruptions}. While the attack targeted IT systems only, the company shut down pipeline operations as a precaution, causing widespread fuel shortages across the US East Coast.
+
+\section{\textcolor{accent}{\faIcon{list-ul}}\hspace{0.4em}Key Facts}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{list-ul}\hspace{0.2em}\bfseries Attribute} & \textcolor{white}{\faIcon{info-circle}\hspace{0.2em}\bfseries Details} \\
+\midrule
+Date & May 7, 2021 \\
+Target & \textcolor{danger}{\faIcon{gas-pump}}\hspace{0.2em}Colonial Pipeline Company \\
+Attack type & \textcolor{danger}{\faIcon{lock}}\hspace{0.2em}Ransomware (DarkSide) \\
+Initial vector & \textcolor{warning}{\faIcon{key}}\hspace{0.2em}Compromised VPN credentials \\
+IT systems & Billing, business systems hit \\
+OT impact & \textcolor{danger}{\faIcon{power-off}}\hspace{0.2em}Voluntary pipeline shutdown \\
+Duration & 6 days of shutdown \\
+Ransom & \textcolor{warning}{\faIcon{dollar-sign}}\hspace{0.2em}\$4.4M (75 BTC), \$2.3M recovered \\
+\end{tabular}
+\end{center}
+
+\posterdanger{
+\textbf{IT/OT convergence risk:} An IT-only attack led to OT shutdown, causing physical-world consequences -- \textcolor{danger}{\faIcon{gas-pump}}\hspace{0.2em}fuel shortages, panic buying, and economic disruption affecting millions of people across 17 states.
+}
+
+\section{\textcolor{accent}{\faIcon{clock}}\hspace{0.4em}Attack Timeline}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{clock}\hspace{0.2em}\bfseries Date} & \textcolor{white}{\faIcon{bolt}\hspace{0.2em}\bfseries Event} \\
+\midrule
+April 2021 & \textcolor{warning}{\faIcon{key}}\hspace{0.2em}VPN credentials exposed (breach) \\
+May 6 & Attackers access IT via VPN \\
+May 7 & \textcolor{danger}{\faIcon{lock}}\hspace{0.2em}Ransomware deployed, 100GB exfil \\
+May 7 & \textcolor{danger}{\faIcon{power-off}}\hspace{0.2em}Pipeline operations shut down \\
+May 8 & US emergency declaration \\
+May 12 & \textcolor{success}{\faIcon{gas-pump}}\hspace{0.2em}Pipeline operations resume \\
+May 13 & Full restoration \\
+\end{tabular}
+\end{center}
+
+\begin{center}
+\begin{tikzpicture}[
+    stepbox/.style={rectangle, draw=#1!60, thick, fill=#1!10, rounded corners=2pt,
+        minimum height=0.4cm, minimum width=4.8cm, align=center, font=\scriptsize},
+    stepbox/.default={otaccent},
+    num/.style={circle, fill=otprimary, text=white, font=\scriptsize\bfseries,
+        minimum size=0.35cm, inner sep=0pt},
+    arr/.style={->, thick, >=stealth, otaccent!50},
+]
+    \node[num] (n1) at (0,0) {1};
+    \node[stepbox=otwarning, right=3pt of n1] (s1) {Stolen VPN credentials (no MFA)};
+    \node[num, below=4pt of n1] (n2) {2};
+    \node[stepbox=otdanger, right=3pt of n2] (s2) {IT network access and recon};
+    \node[num, below=4pt of n2] (n3) {3};
+    \node[stepbox=otdanger, right=3pt of n3] (s3) {DarkSide ransomware deployed};
+    \node[num, below=4pt of n3] (n4) {4};
+    \node[stepbox=otwarning, right=3pt of n4] (s4) {Precautionary OT pipeline shutdown};
+    \node[num, below=4pt of n4] (n5) {5};
+    \node[stepbox=otdanger, right=3pt of n5] (s5) {Fuel shortages across 17 states};
+    \draw[arr] (n1) -- (n2);
+    \draw[arr] (n2) -- (n3);
+    \draw[arr] (n3) -- (n4);
+    \draw[arr] (n4) -- (n5);
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{key}}\hspace{0.4em}Initial Access}
+
+\posterwarning{
+\textbf{Attack vector:} A single compromised VPN account \textbf{without MFA}. Credentials found in a leaked password batch from another breach. The account was no longer actively used but remained enabled. One password, no MFA, no account cleanup.
+}
+
+\section{\textcolor{accent}{\faIcon{power-off}}\hspace{0.4em}Why OT Was Shut Down}
+
+\posterinfo{
+Colonial's \textbf{OT systems were not directly attacked}. The shutdown was precautionary:
+\begin{itemize}
+    \item \textcolor{warning}{\faIcon{dollar-sign}}\hspace{0.2em}Billing systems encrypted -- couldn't invoice
+    \item \textcolor{warning}{\faIcon{exclamation-triangle}}\hspace{0.2em}Uncertainty about OT compromise extent
+    \item \textcolor{danger}{\faIcon{bolt}}\hspace{0.2em}Risk through IT/OT connections
+    \item \textcolor{info}{\faIcon{search}}\hspace{0.2em}Need for safe situation assessment
+\end{itemize}
+}
+
+\section{\textcolor{accent}{\faIcon{bolt}}\hspace{0.4em}Operational Impact}
+
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{gas-pump}}\hspace{0.2em}5,500 miles of pipeline shut down
+    \item \textcolor{danger}{\faIcon{gas-pump}}\hspace{0.2em}Fuel shortages in 17 US states
+    \item \textcolor{warning}{\faIcon{dollar-sign}}\hspace{0.2em}Gas prices spiked to 7-year high
+    \item \textcolor{warning}{\faIcon{exclamation-triangle}}\hspace{0.2em}Panic buying and long queues
+    \item \textcolor{danger}{\faIcon{plane}}\hspace{0.2em}Airlines affected by fuel supply issues
+    \item \textcolor{danger}{\faIcon{flag}}\hspace{0.2em}Federal emergency declaration issued
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{exclamation-triangle}}\hspace{0.4em}Security Gaps Exploited}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{exclamation-triangle}\hspace{0.2em}\bfseries Gap} & \textcolor{white}{\faIcon{bolt}\hspace{0.2em}\bfseries Impact} \\
+\midrule
+No MFA on VPN & Single password = network access \\
+Unused account & Dormant account was vector \\
+Credential reuse & Password from other breach \\
+No monitoring & Attackers went undetected \\
+IT/OT depend. & IT loss forced OT shutdown \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{lock}}\hspace{0.4em}DarkSide Ransomware}
+
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{lock}}\hspace{0.2em}\textbf{Double extortion:} Encrypt + threaten to leak data
+    \item \textcolor{warning}{\faIcon{dollar-sign}}\hspace{0.2em}\textbf{RaaS model:} Developers provide tools to affiliates
+    \item \textcolor{info}{\faIcon{crosshairs}}\hspace{0.2em}\textbf{Target selection:} Claimed to avoid hospitals/schools
+    \item \textcolor{warning}{\faIcon{times-circle}}\hspace{0.2em}Group ``shut down'' after incident backlash
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{gavel}}\hspace{0.4em}Regulatory Response}
+
+\begin{itemize}
+    \item \textcolor{info}{\faIcon{file-alt}}\hspace{0.2em}\textbf{TSA Security Directives} -- New pipeline cyber requirements
+    \item \textcolor{info}{\faIcon{file-alt}}\hspace{0.2em}\textbf{Executive Order 14028} -- Improving national cybersecurity
+    \item \textcolor{info}{\faIcon{shield-alt}}\hspace{0.2em}\textbf{CISA guidance} -- Updated ransomware recommendations
+    \item \textcolor{success}{\faIcon{gavel}}\hspace{0.2em}\textbf{DOJ action} -- Recovered \textcolor{warning}{\faIcon{dollar-sign}}\hspace{0.2em}\$2.3M of ransom payment
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Defense Lessons}
+
+\postersuccess{
+\begin{enumerate}
+    \item \textcolor{success}{\faIcon{fingerprint}}\hspace{0.2em}\textbf{Enforce MFA} -- On all remote access (VPN, RDP)
+    \item \textcolor{success}{\faIcon{user-slash}}\hspace{0.2em}\textbf{Audit accounts} -- Disable unused accounts promptly
+    \item \textcolor{success}{\faIcon{project-diagram}}\hspace{0.2em}\textbf{Segment IT/OT} -- Limit blast radius of IT compromise
+    \item \textcolor{success}{\faIcon{dollar-sign}}\hspace{0.2em}\textbf{Plan for billing loss} -- OT ops may need IT systems
+    \item \textcolor{success}{\faIcon{clipboard-list}}\hspace{0.2em}\textbf{IR planning} -- Know when and how to isolate OT
+    \item \textcolor{success}{\faIcon{hdd}}\hspace{0.2em}\textbf{Offline backups} -- Resistant to ransomware encryption
+\end{enumerate}
+}
+
+\postertip{
+The most impactful single control: \textbf{MFA on all remote access}. Even with IT/OT segmentation, business processes may require both -- plan how OT can safely pause if IT is unavailable.
+}
+
+\end{multicols}
+
+\end{document}

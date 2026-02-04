@@ -1,0 +1,187 @@
+% ============================================================================
+%  Purdue Model Limitations - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {Purdue Model Limitations}
+    {When Traditional Segmentation Meets Modern Connectivity}
+    {Poster 309}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{exclamation-circle}}\hspace{0.4em}Overview}
+
+The Purdue Enterprise Reference Architecture (1990s) guided OT segmentation for decades. It assumes \textbf{clear physical boundaries} between hierarchical levels with traffic flowing between adjacent zones. Modern technologies -- cloud, SDN, virtualization, IIoT -- challenge these fundamental assumptions.
+
+\section{\textcolor{accent}{\faIcon{unlink}}\hspace{0.4em}Broken Assumptions}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Assumption} & \textcolor{white}{\bfseries Modern Reality} \\
+\midrule
+\faIcon{ethernet}\hspace{0.2em}Physical sep. & Virtualized, software-defined nets \\
+\faIcon{ban}\hspace{0.2em}Air-gapped OT & Cloud connectivity, remote access \\
+\faIcon{arrows-alt-v}\hspace{0.2em}Adjacent flow & Direct cloud bypasses hierarchy \\
+\faIcon{border-all}\hspace{0.2em}Static bounds & Dynamic workloads, containers \\
+\faIcon{server}\hspace{0.2em}On-premise & Hybrid cloud, edge, SaaS \\
+\faIcon{exchange-alt}\hspace{0.2em}Predictable & API-driven, event-based arch. \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{project-diagram}}\hspace{0.4em}Why Boundaries Break Down}
+
+\subsection{\textcolor{accent}{\faIcon{cloud}}\hspace{0.3em}Cloud \& IIoT Bypass the Hierarchy}
+
+\begin{center}
+\begin{tikzpicture}[
+    purdue/.style={rectangle, draw=otprimary!60, thick, fill=otprimary!10,
+        minimum width=2.6cm, minimum height=0.38cm, align=center, font=\scriptsize},
+    cloudbox/.style={rectangle, draw=otaccent!60, thick, fill=otaccent!10,
+        rounded corners=4pt, minimum width=1.8cm, minimum height=1.4cm,
+        align=center, font=\scriptsize},
+    bypass/.style={->, thick, >=stealth, otdanger, dashed},
+    legit/.style={<->, thin, otprimary!50},
+]
+\node[purdue, fill=danger!15, draw=danger!60] (l5) at (0, 2.28) {\faIcon{globe}\hspace{0.1em}\textbf{L5} Enterprise};
+\node[purdue, fill=danger!15, draw=danger!60] (l4) at (0, 1.80) {\faIcon{building}\hspace{0.1em}\textbf{L4} Business};
+\node[purdue, fill=otwarning!15, draw=otwarning!60] (dmz) at (0, 1.32) {\faIcon{server}\hspace{0.1em}\textbf{L3.5} DMZ};
+\node[purdue, fill=otsuccess!15, draw=otsuccess!60] (l3) at (0, 0.84) {\faIcon{desktop}\hspace{0.1em}\textbf{L3} Operations};
+\node[purdue, fill=otaccent!15, draw=otaccent!60] (l2) at (0, 0.36) {\faIcon{tv}\hspace{0.1em}\textbf{L2} Supervisory};
+\node[purdue, fill=otinfo!15, draw=otinfo!60] (l1) at (0, -0.12) {\faIcon{microchip}\hspace{0.1em}\textbf{L1} Control};
+\node[purdue, fill=primary!8, draw=primary!40] (l0) at (0, -0.60) {\faIcon{cog}\hspace{0.1em}\textbf{L0} Process};
+
+\foreach \a/\b in {l5/l4, l4/dmz, dmz/l3, l3/l2, l2/l1, l1/l0} {
+    \draw[legit] (\a.south) -- (\b.north);
+}
+
+\node[cloudbox] (cloud) at (3.8, 1.80) {\faIcon{cloud}\\\textbf{Cloud}};
+
+\draw[bypass] (l1.east) -- ++(0.3,0) |- (cloud.south west);
+\draw[bypass] (l0.east) -- ++(0.5,0) |- ([yshift=-0.15cm]cloud.south west);
+\draw[bypass] (l2.east) -- ++(0.1,0) |- ([yshift=0.15cm]cloud.south west);
+
+\node[font=\scriptsize, text=otdanger, align=center, text width=1.6cm] at (3.8, -0.35) {\faIcon{exclamation-triangle}\hspace{0.1em}Direct paths\\bypass hierarchy};
+
+\draw[<->, thin, otprimary!50] (l5.east) -- ++(0.2,0) |- (cloud.north west);
+\node[font=\scriptsize, text=otprimary!70, align=center] at (3.8, 2.65) {\faIcon{check}\hspace{0.1em}Expected path};
+\end{tikzpicture}
+\end{center}
+
+\posterdanger{
+\faIcon{bolt}\hspace{0.2em}Cloud, IIoT gateways, and vendor VPNs create \textbf{direct paths from L0--L2 to the internet}, bypassing DMZ and enterprise layers. A compromised cloud account can reach control systems directly.
+}
+
+\subsection{\textcolor{accent}{\faIcon{network-wired}}\hspace{0.3em}SDN \& Converged Infrastructure}
+
+\begin{itemize}
+    \item \faIcon{code-branch}\hspace{0.2em}\textbf{Virtual switches} -- VM traffic may not traverse FW
+    \item \faIcon{layer-group}\hspace{0.2em}\textbf{Overlay networks} -- Logical nets span physical infra
+    \item \faIcon{docker}\hspace{0.2em}\textbf{Containers} -- Dynamic IPs break static FW rules
+    \item \faIcon{server}\hspace{0.2em}\textbf{Hyperconverged} -- Multiple levels on single host
+    \item \faIcon{microchip}\hspace{0.2em}\textbf{Virtual PLCs} -- Control logic mixed with IT workloads
+    \item \faIcon{database}\hspace{0.2em}\textbf{Unified namespace} -- Data published across all levels
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{exclamation-triangle}}\hspace{0.4em}Security Implications}
+
+\subsection{\textcolor{accent}{\faIcon{crosshairs}}\hspace{0.3em}Attack Surface Expansion}
+
+\begin{itemize}
+    \item \faIcon{cloud}\hspace{0.2em}Cloud credentials compromise reaches OT directly
+    \item \faIcon{random}\hspace{0.2em}Lateral movement bypasses zone firewalls
+    \item \faIcon{truck}\hspace{0.2em}Supply chain attacks through connected vendors
+    \item \faIcon{globe}\hspace{0.2em}Internet-exposed OT components become targets
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{eye-slash}}\hspace{0.3em}Visibility Gaps}
+
+\begin{itemize}
+    \item \faIcon{arrows-alt-h}\hspace{0.2em}East-west traffic in virtualized environments invisible
+    \item \faIcon{lock}\hspace{0.2em}Encrypted cloud connections hide content
+    \item \faIcon{code}\hspace{0.2em}API calls don't match traditional FW rules
+    \item \faIcon{sync}\hspace{0.2em}Dynamic workloads evade static monitoring
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{layer-group}}\hspace{0.3em}Defense in Depth Layers}
+
+When perimeter controls weaken, layer additional defenses:
+
+\begin{enumerate}
+    \item \faIcon{id-card}\hspace{0.2em}Identity and Access Management
+    \item \faIcon{project-diagram}\hspace{0.2em}Network Segmentation (where possible)
+    \item \faIcon{shield-alt}\hspace{0.2em}Endpoint Protection
+    \item \faIcon{code}\hspace{0.2em}Application Security
+    \item \faIcon{lock}\hspace{0.2em}Data Protection and Encryption
+    \item \faIcon{eye}\hspace{0.2em}Monitoring and Detection
+\end{enumerate}
+
+\section{\textcolor{accent}{\faIcon{puzzle-piece}}\hspace{0.4em}Complementary Approaches}
+
+\subsection{\textcolor{accent}{\faIcon{lock}}\hspace{0.3em}Zero Trust Principles}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Principle} & \textcolor{white}{\bfseries OT Application} \\
+\midrule
+\faIcon{fingerprint}\hspace{0.2em}Verify explicitly & Auth every connection, even in zones \\
+\faIcon{key}\hspace{0.2em}Least privilege & Limit access to specific assets \\
+\faIcon{bug}\hspace{0.2em}Assume breach & Monitor for lateral movement \\
+\faIcon{th}\hspace{0.2em}Micro-segment & Isolate critical assets per risk \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{fingerprint}}\hspace{0.3em}Identity-Centric Security}
+
+\begin{itemize}
+    \item \faIcon{fingerprint}\hspace{0.2em}\textbf{Strong auth} -- MFA for all remote/privileged access
+    \item \faIcon{robot}\hspace{0.2em}\textbf{Service accounts} -- Managed machine-to-machine IDs
+    \item \faIcon{clock}\hspace{0.2em}\textbf{Just-in-time} -- Temporary privileges for maintenance
+    \item \faIcon{certificate}\hspace{0.2em}\textbf{Certificate-based} -- Device identity for OT endpoints
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{chart-line}}\hspace{0.3em}Enhanced Monitoring}
+
+\begin{itemize}
+    \item \faIcon{brain}\hspace{0.2em}\textbf{Behavioral analytics} -- Detect anomalies within zones
+    \item \faIcon{code}\hspace{0.2em}\textbf{API monitoring} -- Track cloud and integration traffic
+    \item \faIcon{user-check}\hspace{0.2em}\textbf{Identity analytics} -- Unusual access patterns
+    \item \faIcon{lock}\hspace{0.2em}\textbf{Encrypted traffic} -- Metadata-based detection
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{clipboard-check}}\hspace{0.4em}Practical Recommendations}
+
+\posterwarning{
+\faIcon{search}\hspace{0.2em}\textbf{Assessment first:} Map actual traffic flows, not assumed architecture. Identify all cloud connections and remote access paths. Document where virtualization spans zones.
+}
+
+\begin{itemize}
+    \item \faIcon{shield-alt}\hspace{0.2em}Enforce strict segmentation for safety systems
+    \item \faIcon{tools}\hspace{0.2em}Use compensating controls where boundaries are weak
+    \item \faIcon{crosshairs}\hspace{0.2em}Prioritize \textbf{critical asset protection} over zone purity
+    \item \faIcon{file-alt}\hspace{0.2em}Document all exceptions and accepted risks
+    \item \faIcon{sync}\hspace{0.2em}Re-evaluate architecture annually as technology evolves
+    \item \faIcon{sitemap}\hspace{0.2em}Map actual data flows -- not assumed topology
+\end{itemize}
+
+\postersuccess{
+\faIcon{check-circle}\hspace{0.2em}\textbf{Hybrid approach:} Use the Purdue Model as a conceptual starting point but augment with Zero Trust, identity-centric controls, and continuous monitoring. No single model addresses all modern OT security needs.
+}
+
+\postertip{
+\faIcon{lightbulb}\hspace{0.2em}The goal is \textbf{risk reduction, not architectural purity}. A well-monitored, identity-controlled cloud connection may be more secure than an unmonitored ``compliant'' architecture with shadow IT. Identify crown jewel assets and apply strict micro-segmentation regardless of Purdue level.
+}
+
+\end{multicols}
+
+\end{document}

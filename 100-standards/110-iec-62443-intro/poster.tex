@@ -1,0 +1,173 @@
+% ============================================================================
+%  IEC 62443 Introduction - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {Introduction to IEC 62443}
+    {The International Standard for Industrial Cybersecurity}
+    {Poster 110}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{gavel}}\hspace{0.4em}What is IEC 62443?}
+
+The international standard series for cybersecurity in Industrial Automation and Control Systems (IACS). Developed by IEC in collaboration with ISA (ISA99 committee). Provides a comprehensive, risk-based framework covering the entire lifecycle.
+
+\posterinfo{
+IEC 62443 addresses what IT standards miss: \textbf{availability over confidentiality}, safety requirements, 20+ year legacy systems, and real-time constraints. Most widely referenced OT security standard globally.
+}
+
+\section{\textcolor{accent}{\faIcon{sitemap}}\hspace{0.4em}Standard Structure}
+
+\begin{center}
+\begin{tikzpicture}[
+    ser/.style={rectangle, draw=#1!60, thick, fill=#1!12, rounded corners=2pt,
+        minimum height=0.45cm, minimum width=5.8cm, align=center, font=\scriptsize},
+    ser/.default={otaccent},
+    lbl/.style={font=\scriptsize\bfseries, text=white, fill=#1, rounded corners=1pt, inner sep=2pt},
+]
+    \node[ser=otprimary] (s4) at (0,0) {\faIcon{box}\hspace{0.2em}\textbf{62443-4-x} Component -- Product vendors, developers};
+    \node[ser=otaccent, above=3pt of s4] (s3) {\faIcon{server}\hspace{0.2em}\textbf{62443-3-x} System -- System integrators, architects};
+    \node[ser=otsuccess, above=3pt of s3] (s2) {\faIcon{clipboard-list}\hspace{0.2em}\textbf{62443-2-x} Policies -- Asset owners, service providers};
+    \node[ser=otinfo, above=3pt of s2] (s1) {\faIcon{book}\hspace{0.2em}\textbf{62443-1-x} General -- Concepts, models, terminology};
+\end{tikzpicture}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{file-alt}}\hspace{0.3em}Key Documents}
+
+\begin{itemize}
+    \item \textbf{62443-2-1:} Security program requirements for asset owners
+    \item \textbf{62443-3-2:} Security risk assessment and zone/conduit design
+    \item \textbf{62443-3-3:} System security requirements and security levels
+    \item \textbf{62443-4-1:} Secure product development lifecycle
+    \item \textbf{62443-4-2:} Technical security requirements for components
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{layer-group}}\hspace{0.4em}Security Levels (SL)}
+
+Four levels define protection against different threat actors:
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.2cm}p{2cm}p{3.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries SL} & \textcolor{white}{\bfseries Threat Actor} & \textcolor{white}{\bfseries Protection Against} \\
+\midrule
+\slone & Casual/Coincidental & Accidental errors, basic scripts \\
+\sltwo & Intentional/Simple & Low-resource hackers, known exploits \\
+\slthree & Intentional/Sophisticated & Organized crime, targeted attacks \\
+\slfour & State-Sponsored & APT groups, zero-days, custom malware \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{sliders-h}}\hspace{0.3em}Security Level Types}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{bullseye}}\hspace{0.2em}\textbf{SL-T (Target):} Desired level based on risk assessment
+    \item \textcolor{accent}{\faIcon{check-circle}}\hspace{0.2em}\textbf{SL-A (Achieved):} Actual measured/tested level
+    \item \textcolor{accent}{\faIcon{microchip}}\hspace{0.2em}\textbf{SL-C (Capability):} Maximum level a component can achieve
+\end{itemize}
+
+\posterwarning{
+The goal is \textbf{SL-A $\geq$ SL-T}. If achieved level is below target, you have a security gap that must be addressed through compensating controls or system upgrades.
+}
+
+\section{\textcolor{accent}{\faIcon{project-diagram}}\hspace{0.4em}Zones and Conduits}
+
+\begin{center}
+\begin{tikzpicture}[
+    zn/.style={rectangle, draw=#1!60, thick, fill=#1!10, rounded corners=3pt,
+        minimum height=0.7cm, align=center, font=\scriptsize},
+    zn/.default={otaccent},
+    cnd/.style={rectangle, draw=otwarning!60, thick, fill=otwarning!10, rounded corners=2pt,
+        minimum height=0.35cm, align=center, font=\scriptsize},
+    arr/.style={<->, thick, >=stealth, otwarning!60},
+]
+    \node[zn=otinfo, minimum width=2.2cm] (z1) at (-1.8,0) {\faIcon{building}\hspace{0.1em}\textbf{Zone A}\\(SL-T 2)};
+    \node[zn=otsuccess, minimum width=2.2cm] (z2) at (1.8,0) {\faIcon{industry}\hspace{0.1em}\textbf{Zone B}\\(SL-T 3)};
+    \node[cnd] (c1) at (0,0) {\faIcon{exchange-alt}\hspace{0.1em}Conduit};
+    \draw[arr] (z1) -- (c1);
+    \draw[arr] (c1) -- (z2);
+\end{tikzpicture}
+\end{center}
+
+\posterdefinition{Zone}{
+A logical or physical grouping of assets sharing common security requirements based on criticality, required SL, location, and responsible organization.
+}
+
+\posterdefinition{Conduit}{
+A logical grouping of communication channels connecting zones. Must provide security controls matching or exceeding the highest SL-T of connected zones.
+}
+
+\section{\textcolor{accent}{\faIcon{list-ol}}\hspace{0.4em}7 Foundational Requirements}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{0.5cm}p{2.5cm}p{3.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries FR} & \textcolor{white}{\bfseries Name} & \textcolor{white}{\bfseries Description} \\
+\midrule
+\textcolor{accent}{\textbf{1}} & Identification \& Auth & Control who/what can access \\
+\textcolor{accent}{\textbf{2}} & Use Control & Control what users can do \\
+\textcolor{accent}{\textbf{3}} & System Integrity & Ensure correct operation \\
+\textcolor{accent}{\textbf{4}} & Data Confidentiality & Protect data from disclosure \\
+\textcolor{accent}{\textbf{5}} & Restricted Data Flow & Segment and control data flow \\
+\textcolor{accent}{\textbf{6}} & Timely Response & Respond to security violations \\
+\textcolor{accent}{\textbf{7}} & Resource Availability & Ensure availability against DoS \\
+\end{tabular}
+\end{center}
+
+Each FR contains System Requirements (SRs) and Requirement Enhancements (REs) specifying detailed controls per security level.
+
+\section{\textcolor{accent}{\faIcon{users}}\hspace{0.4em}Roles and Responsibilities}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{building}}\hspace{0.2em}\textbf{Asset Owner:} Defines SL-T via risk assessment, implements security program (62443-2-1), verifies SL-A $\geq$ SL-T
+    \item \textcolor{accent}{\faIcon{tools}}\hspace{0.2em}\textbf{System Integrator:} Designs systems to meet SL-T, implements zones/conduits/controls, follows 62443-2-4
+    \item \textcolor{accent}{\faIcon{box}}\hspace{0.2em}\textbf{Product Vendor:} Develops per secure lifecycle (62443-4-1), documents SL-C, certifies to 62443-4-2
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{certificate}}\hspace{0.4em}Certification}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.5cm}p{4.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Type} & \textcolor{white}{\bfseries Scope} \\
+\midrule
+Component (4-2) & Individual products (SL-C rating) \\
+SDLC (4-1) & Development processes \\
+System (3-3) & Complete systems \\
+Capability & Organization processes \\
+\end{tabular}
+\end{center}
+
+Offered by TUV, Exida, ISASecure. Not mandatory -- many use IEC 62443 as framework without formal certification.
+
+\section{\textcolor{accent}{\faIcon{tasks}}\hspace{0.4em}Implementation Steps}
+
+\postersuccess{
+\textbf{Getting started:}
+\begin{enumerate}
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Inventory:} Document all IACS assets and their criticality
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Risk Assessment:} Determine SL-T for each zone (62443-3-2)
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Gap Analysis:} Compare SL-A to SL-T
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Roadmap:} Prioritize improvements based on risk
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Procurement:} Require 62443-4-2 for new products
+\end{enumerate}
+}
+
+\postertip{
+IEC 62443 provides a \textbf{common language} for OT security between asset owners, integrators, and vendors. Even partial adoption significantly improves security posture.
+}
+
+\end{multicols}
+
+\end{document}

@@ -1,0 +1,177 @@
+% ============================================================================
+%  SIEM for OT - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {SIEM for OT Environments}
+    {Security Information and Event Management for Industrial Systems}
+    {Poster 530}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+SIEM platforms aggregate, correlate, and analyze security data from across the enterprise. Extending SIEM to OT provides \textbf{unified visibility} but requires careful consideration of OT-specific data sources and operational constraints.
+
+\posterinfo{
+\textbf{SIEM benefits for OT:} Unified IT/OT visibility, cross-boundary attack correlation, centralized compliance logging, faster incident investigation, and long-term forensic storage.
+}
+
+\section{\textcolor{accent}{\faIcon{project-diagram}}\hspace{0.4em}Architecture}
+
+\posterwarning{
+\textbf{One-way data flow:} \textcolor{warning}{\faIcon{arrow-right}}\hspace{0.2em}Log data must flow from OT to IT/SIEM, never the reverse. Use data diodes or strict firewall rules to prevent SIEM access back into OT networks.
+}
+
+\subsection{\textcolor{accent}{\faIcon{server}}\hspace{0.3em}Deployment Options}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.5cm}p{2cm}p{2.8cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{server}\hspace{0.2em}\bfseries Option} & \textcolor{white}{\faIcon{check-circle}\hspace{0.2em}\bfseries Advantage} & \textcolor{white}{\faIcon{exclamation-triangle}\hspace{0.2em}\bfseries Consideration} \\
+\midrule
+Unified & Single platform & Needs OT protocol support \\
+Separate & OT-focused & Limited IT correlation \\
+Federated & Local OT + IT & Complex management \\
+Cloud & Scalable & Data sovereignty \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{database}}\hspace{0.4em}OT Data Sources}
+
+\subsection{\textcolor{accent}{\faIcon{layer-group}}\hspace{0.3em}Log Sources by Purdue Level}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.5cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{layer-group}\hspace{0.2em}\bfseries Level} & \textcolor{white}{\faIcon{clipboard-list}\hspace{0.2em}\bfseries Sources} \\
+\midrule
+Level 3 & Engineering workstations, historians, OPC servers \\
+Level 2 & SCADA servers, HMIs, application servers \\
+Level 1 & PLCs, RTUs (if capable), network switches \\
+Level 0 & Smart instruments (very limited) \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{list-ul}}\hspace{0.3em}Data Types}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{list-ul}\hspace{0.2em}\bfseries Data Type} & \textcolor{white}{\faIcon{folder-open}\hspace{0.2em}\bfseries Examples} \\
+\midrule
+Authentication & User logins to HMIs, workstations \\
+Network traffic & Firewall logs, IDS alerts, NetFlow \\
+System events & Windows/Linux events, services \\
+Application logs & Historian queries, SCADA events \\
+Config changes & PLC logic mods, setpoint changes \\
+Process alarms & Safety alerts, limit violations \\
+\end{tabular}
+\end{center}
+
+\posterdanger{
+\textbf{OT logging limitations:} Many PLCs have no logging capability. Legacy systems may lack syslog support. Bandwidth constraints exist in some OT networks. \textcolor{danger}{\faIcon{clock}}\hspace{0.2em}Time synchronization issues affect correlation. Proprietary formats require custom parsing.
+}
+
+\section{\textcolor{accent}{\faIcon{bell}}\hspace{0.4em}Detection Use Cases}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{bell}\hspace{0.2em}\bfseries Use Case} & \textcolor{white}{\faIcon{search}\hspace{0.2em}\bfseries Detection Logic} \\
+\midrule
+Unauth. access & VPN/RDP from unexpected IP \\
+Workstation comp. & Unusual outbound connections \\
+PLC logic change & Config change without ticket \\
+Protocol anomaly & Unknown function codes \\
+Cross-zone traffic & IT device talking to OT \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{link}}\hspace{0.3em}Correlation Rules}
+
+\postersuccess{
+\textbf{Multi-source correlation:}
+\begin{itemize}
+    \item \textcolor{success}{\faIcon{check-circle}}\hspace{0.2em}VPN login + FW allow + HMI access = normal session
+    \item \textcolor{danger}{\faIcon{ban}}\hspace{0.2em}VPN login + FW deny + retries = potential attack
+    \item \textcolor{warning}{\faIcon{user-secret}}\hspace{0.2em}Badge out + remote from inside = credential theft
+    \item \textcolor{danger}{\faIcon{virus}}\hspace{0.2em}IT malware + OT traffic anomaly = lateral movement
+\end{itemize}
+}
+
+\subsection{\textcolor{accent}{\faIcon{sort-amount-down}}\hspace{0.3em}Alert Prioritization}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.5cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{sort-amount-down}\hspace{0.2em}\bfseries Priority} & \textcolor{white}{\faIcon{bell}\hspace{0.2em}\bfseries Alert Type} \\
+\midrule
+Critical & Safety system modifications \\
+High & PLC logic changes, unauthorized access \\
+Medium & Protocol anomalies, failed logins \\
+Low & Informational events, normal deviations \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{cogs}}\hspace{0.4em}Implementation}
+
+\subsection{\textcolor{accent}{\faIcon{clock}}\hspace{0.3em}Time Synchronization}
+
+\begin{itemize}
+    \item \faIcon{server}\hspace{0.2em}Deploy NTP servers in OT network (isolated)
+    \item \faIcon{sync}\hspace{0.2em}Synchronize all logging sources
+    \item \faIcon{globe}\hspace{0.2em}Use UTC for log timestamps
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{hdd}}\hspace{0.3em}Storage and Retention}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{1.5cm}p{2.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{hdd}\hspace{0.2em}\bfseries Data} & \textcolor{white}{\faIcon{calendar}\hspace{0.2em}\bfseries Retain} & \textcolor{white}{\faIcon{gavel}\hspace{0.2em}\bfseries Driver} \\
+\midrule
+Security events & 1--3 yr & NERC CIP, IEC 62443 \\
+Auth logs & 1--2 yr & Compliance, forensics \\
+Network flows & 90d--1yr & Capacity, forensics \\
+Packet capture & 7--30d & Storage cost \\
+Config changes & 3--7 yr & Audit requirements \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{building}}\hspace{0.4em}SOC Integration}
+
+\subsection{\textcolor{accent}{\faIcon{users}}\hspace{0.3em}Tiered Response Model}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.2cm}p{1.5cm}p{3.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{users}\hspace{0.2em}\bfseries Tier} & \textcolor{white}{\faIcon{user-tag}\hspace{0.2em}\bfseries Role} & \textcolor{white}{\faIcon{tasks}\hspace{0.2em}\bfseries Responsibility} \\
+\midrule
+Tier 1 & IT SOC & Initial triage, known patterns \\
+Tier 2 & OT specialist & OT context, investigation \\
+Tier 3 & OT engineer & Process knowledge, response \\
+\end{tabular}
+\end{center}
+
+\postertip{
+Extend existing IT SIEM to OT using \textbf{one-way data flow} through DMZ log collectors. Ensure time synchronization across all sources. Build OT-specific detection rules---IT patterns don't translate directly. Correlate IT and OT events to detect cross-boundary attacks. Route OT alerts to personnel who understand industrial context.
+}
+
+\end{multicols}
+
+\end{document}

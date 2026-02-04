@@ -1,0 +1,162 @@
+% ============================================================================
+%  Application Whitelisting & System Lockdown - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {Application Whitelisting \& System Lockdown}
+    {Protecting OT Endpoints Through Allowlisting and Lockdown}
+    {Poster 810}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+Application whitelisting permits only \textbf{pre-approved applications} to execute, blocking all others by default. Combined with system lockdown, it provides robust defense-in-depth for OT endpoints where traditional antivirus falls short.
+
+\posterinfo{
+\textbf{Why not antivirus in OT?} Requires frequent updates, cannot detect zero-day threats, may flag legitimate industrial software, resource-intensive scanning impacts real-time performance, and takes a reactive approach.
+}
+
+\section{\textcolor{accent}{\faIcon{list-alt}}\hspace{0.4em}Whitelisting Methods}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.8cm}p{4.7cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{list-alt}\hspace{0.2em}\bfseries Method} & \textcolor{white}{\faIcon{info-circle}\hspace{0.2em}\bfseries Description} \\
+\midrule
+Hash-based & SHA-256 of each file; most secure, requires update on every change \\
+Certificate & Trusts vendor-signed apps; easier maintenance \\
+Publisher & Allows all from trusted vendors \\
+Path-based & Execution from specific dirs only; least secure \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{lock}}\hspace{0.4em}System Lockdown Components}
+
+\begin{itemize}
+    \item \textcolor{success}{\faIcon{file-alt}}\hspace{0.2em}\textbf{Write protection} -- Prevent modifications to system files
+    \item \textcolor{success}{\faIcon{cog}}\hspace{0.2em}\textbf{Registry protection} -- Lock critical registry keys
+    \item \textcolor{success}{\faIcon{usb}}\hspace{0.2em}\textbf{Device control} -- Block unauthorized USB/removable media
+    \item \textcolor{success}{\faIcon{network-wired}}\hspace{0.2em}\textbf{Network lockdown} -- Restrict connections to approved endpoints
+    \item \textcolor{success}{\faIcon{user-lock}}\hspace{0.2em}\textbf{User restrictions} -- Limit privileges, disable unused accounts
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{desktop}}\hspace{0.4em}OT Endpoint Categories}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{1.3cm}p{2.8cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{desktop}\hspace{0.2em}\bfseries Endpoint} & \textcolor{white}{\faIcon{exchange-alt}\hspace{0.2em}\bfseries Change} & \textcolor{white}{\faIcon{cogs}\hspace{0.2em}\bfseries Approach} \\
+\midrule
+HMI stations & Low & Hash-based, full lockdown \\
+Eng. workstations & Medium & Certificate, partial lockdown \\
+SCADA servers & Low & Hash-based, full lockdown \\
+Historian servers & Low-Med & Certificate, write protection \\
+Jump servers & Medium & Certificate, strict device ctrl \\
+\end{tabular}
+\end{center}
+
+\posterwarning{
+\textbf{Purdue integration:} Apply stricter lockdown at lower levels where systems are more critical and changes less frequent. Levels 0--1: maximum lockdown, hash-based. Level 2: full lockdown with engineering exceptions. Level 3: certificate-based. DMZ: strict whitelisting on jump servers.
+}
+
+\section{\textcolor{accent}{\faIcon{cogs}}\hspace{0.4em}Implementation Phases}
+
+\subsection{\textcolor{accent}{\faIcon{search}}\hspace{0.3em}Phase 1: Discovery and Baselining}
+
+\begin{enumerate}
+    \item \textcolor{accent}{\faIcon{eye}}\hspace{0.2em}Run whitelisting in \textbf{audit/monitor-only} mode
+    \item \textcolor{accent}{\faIcon{list-alt}}\hspace{0.2em}Capture all running executables, DLLs, scripts
+    \item \textcolor{accent}{\faIcon{handshake}}\hspace{0.2em}Coordinate with vendors for required components
+    \item \textcolor{accent}{\faIcon{file-alt}}\hspace{0.2em}Document software inventory with justification
+\end{enumerate}
+
+\posterinfo{
+\textbf{Baselining period:} Run discovery for at least 2--4 weeks to capture all operational scenarios including startup sequences, scheduled tasks, and maintenance activities.
+}
+
+\subsection{\textcolor{accent}{\faIcon{clipboard-check}}\hspace{0.3em}Phase 2: Policy Development}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{check-circle}}\hspace{0.2em}Define trust sources (OS, vendor apps, security tools)
+    \item \textcolor{accent}{\faIcon{code}}\hspace{0.2em}Create execution rules (hash for critical, cert for vendor)
+    \item \textcolor{accent}{\faIcon{clipboard-list}}\hspace{0.2em}Define exceptions and approval process
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{play-circle}}\hspace{0.3em}Phase 3: Staged Rollout}
+
+\begin{enumerate}
+    \item \textcolor{accent}{\faIcon{flask}}\hspace{0.2em}Start with non-critical systems (test, non-production)
+    \item \textcolor{accent}{\faIcon{search}}\hspace{0.2em}Monitor for false positives and violations
+    \item \textcolor{accent}{\faIcon{sliders-h}}\hspace{0.2em}Refine policies based on findings
+    \item \textcolor{accent}{\faIcon{expand-arrows-alt}}\hspace{0.2em}Gradually expand to production systems
+\end{enumerate}
+
+\posterdanger{
+\textbf{Never enable enforcement on all systems simultaneously.} A phased approach prevents widespread disruption if policies are incomplete. Always have emergency bypass procedures ready.
+}
+
+\subsection{\textcolor{accent}{\faIcon{wrench}}\hspace{0.3em}Phase 4: Maintenance}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{sync-alt}}\hspace{0.2em}Integrate with change management processes
+    \item \textcolor{accent}{\faIcon{clipboard-check}}\hspace{0.2em}Regularly audit whitelist for obsolete software
+    \item \textcolor{accent}{\faIcon{bell}}\hspace{0.2em}Investigate all blocked execution attempts
+    \item \textcolor{accent}{\faIcon{download}}\hspace{0.2em}Obtain vendor hashes/certificates before updates
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{gavel}}\hspace{0.4em}IEC 62443 Alignment}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.2cm}p{5.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{gavel}\hspace{0.2em}\bfseries Req.} & \textcolor{white}{\faIcon{shield-alt}\hspace{0.2em}\bfseries How Whitelisting Helps} \\
+\midrule
+SR 3.4 & Software integrity -- prevents unauthorized code \\
+SR 7.6 & Config protection -- lockdown protects settings \\
+SR 2.1 & Authorization -- restricts executable software \\
+CR 7.2 & Availability -- prevents malware resource exhaustion \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{layer-group}}\hspace{0.3em}Security Level Mapping}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{shield-alt}}\hspace{0.2em}\textbf{SL 1} -- Basic antivirus may be sufficient
+    \item \textcolor{info}{\faIcon{shield-alt}}\hspace{0.2em}\textbf{SL 2} -- Application whitelisting recommended
+    \item \textcolor{warning}{\faIcon{shield-alt}}\hspace{0.2em}\textbf{SL 3} -- Whitelisting with full system lockdown required
+    \item \textcolor{danger}{\faIcon{shield-alt}}\hspace{0.2em}\textbf{SL 4} -- Hardware-enforced integrity, strict whitelisting
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{exclamation-circle}}\hspace{0.4em}Common Pitfalls}
+
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{times-circle}}\hspace{0.2em}Enabling enforcement without thorough baselining
+    \item \textcolor{danger}{\faIcon{folder-open}}\hspace{0.2em}Relying solely on path-based rules (easily bypassed)
+    \item \textcolor{danger}{\faIcon{terminal}}\hspace{0.2em}Forgetting scripts (PowerShell, VBScript, batch)
+    \item \textcolor{danger}{\faIcon{puzzle-piece}}\hspace{0.2em}Ignoring DLLs and libraries (DLL hijacking)
+    \item \textcolor{danger}{\faIcon{calendar-times}}\hspace{0.2em}Deploying during critical production periods
+    \item \textcolor{danger}{\faIcon{sync}}\hspace{0.2em}Assuming vendor software is static (background updaters)
+\end{itemize}
+
+\postersuccess{
+\textbf{Emergency procedures:} Always maintain local administrator override capability, emergency boot media with whitelisting disabled, out-of-band management access, and documented escalation procedures. Process safety must take priority over security controls.
+}
+
+\postertip{
+Application whitelisting transforms endpoint security from reactive ``find the bad'' to proactive ``allow only good''---perfectly suited for stable OT systems. Start in audit mode, involve OT operators and vendors, maintain emergency bypass procedures, and integrate with change management. Stricter policies for lower Purdue levels, more flexibility higher up.
+}
+
+\end{multicols}
+
+\end{document}

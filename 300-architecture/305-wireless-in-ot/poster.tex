@@ -1,0 +1,172 @@
+% ============================================================================
+%  Wireless in OT Environments - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {Wireless in OT}
+    {WiFi, 5G, LoRaWAN, and Industrial Wireless Security}
+    {Poster 305}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{wifi}}\hspace{0.4em}Overview}
+
+Wireless technologies are increasingly deployed in OT for mobility, flexibility, and cost reduction. However, they introduce \textbf{unique security challenges}: wireless extends the attack surface beyond the physical perimeter. An attacker only needs to be within radio range.
+
+\subsection{\textcolor{accent}{\faIcon{project-diagram}}\hspace{0.3em}Wireless OT Architecture}
+
+\begin{center}
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=1.6cm,
+                minimum height=0.9cm, align=center, font=\scriptsize},
+    arrow/.style={->, thick, >=stealth},
+    lbl/.style={font=\scriptsize, text=mediumgray}
+]
+    % Physical Perimeter (drawn first, behind everything)
+    \draw[dashed, thick, otdanger, fill=otdanger!3]
+        (1.9,-1.2) rectangle (8.0,1.0);
+
+    % Attack Surface (wireless side, up to Access Point)
+    \draw[dashed, thick, otwarning, fill=otwarning!5]
+        (-1.1,-1.2) rectangle (1.35,1.0);
+
+    % Labels above the top edge of each box
+    \node[font=\scriptsize\bfseries, text=otwarning] at (0.1,1.25) {\faIcon{exclamation-triangle}\hspace{0.1em}Attack Surface};
+    \node[font=\scriptsize\bfseries, text=otdanger] at (6.2,1.25) {\faIcon{lock}\hspace{0.1em}Physical Perimeter};
+
+    \node[box, fill=otaccent!15, draw=otaccent] (dev) at (0,0)
+        {\faIcon{tablet-alt}\\\textbf{Wireless}\\\textbf{Device}};
+    \node[box, fill=otinfo!15, draw=otinfo] (ap) at (2.9,0)
+        {\faIcon{wifi}\\\textbf{Access}\\\textbf{Point}};
+    \node[box, fill=otdanger!15, draw=otdanger] (fw) at (5.0,0)
+        {\faIcon{shield-alt}\\\textbf{OT}\\\textbf{Firewall}};
+    \node[box, fill=otsuccess!15, draw=otsuccess] (ot) at (7.0,0)
+        {\faIcon{industry}\\\textbf{OT}\\\textbf{Network}};
+
+    \draw[otaccent, thick, dashed, ->, >=stealth] (dev) -- (ap);
+    \draw[arrow, otprimary] (ap) -- (fw);
+    \draw[arrow, otsuccess] (fw) -- (ot);
+
+    \node[lbl] at (1.45,-0.85) {RF signal};
+    \node[lbl] at (3.95,-0.85) {Wired};
+    \node[lbl] at (6.0,-0.85) {Secured};
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{columns}}\hspace{0.4em}Technology Comparison}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.8cm}p{1.5cm}p{1cm}p{2cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Tech} & \textcolor{white}{\bfseries Range} & \textcolor{white}{\bfseries Speed} & \textcolor{white}{\bfseries OT Use} \\
+\midrule
+\faIcon{wifi}\hspace{0.2em}WiFi & 50--100m & High & HMI, video, data \\
+\faIcon{broadcast-tower}\hspace{0.2em}5G/LTE & 1--10km & High & Remote sites \\
+\faIcon{signal}\hspace{0.2em}LoRaWAN & 2--15km & Low & Sensors, metering \\
+\faIcon{microchip}\hspace{0.2em}WirelessHART & 50--250m & Low & Process instr. \\
+\faIcon{cog}\hspace{0.2em}ISA100.11a & 50--250m & Low & Process auto. \\
+\faIcon{building}\hspace{0.2em}Zigbee & 10--100m & Low & Building auto. \\
+\faIcon{bluetooth-b}\hspace{0.2em}Bluetooth & 10--100m & Med & Local pairing \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{exclamation-triangle}}\hspace{0.4em}Wireless-Specific Threats}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries \faIcon{crosshairs}\hspace{0.2em}Threat} & \textcolor{white}{\bfseries Description} \\
+\midrule
+\faIcon{headphones}\hspace{0.2em}Eavesdropping & Passive traffic interception \\
+\faIcon{wifi}\hspace{0.2em}Rogue AP & Unauthorized access points \\
+\faIcon{mask}\hspace{0.2em}Evil Twin & Fake AP mimicking legitimate \\
+\faIcon{power-off}\hspace{0.2em}Deauth & Force clients to disconnect \\
+\faIcon{user-secret}\hspace{0.2em}MitM & Intercept and modify comms \\
+\faIcon{bolt}\hspace{0.2em}Jamming & Radio interference (DoS) \\
+\faIcon{key}\hspace{0.2em}Credential Theft & Capture auth handshakes \\
+\end{tabular}
+\end{center}
+
+\posterdanger{
+\faIcon{industry}\hspace{0.2em}\textbf{OT-specific wireless risks:} Safety commands over wireless, unencrypted legacy protocols, interference with control timing, extended attack surface beyond fence line.
+}
+
+\section{\textcolor{accent}{\faIcon{lock}}\hspace{0.4em}WiFi Security Standards}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{2cm}p{2.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Standard} & \textcolor{white}{\bfseries Encryption} & \textcolor{white}{\bfseries Status} \\
+\midrule
+WEP & RC4 (broken) & \textcolor{danger}{\faIcon{times}} Never use \\
+WPA & TKIP & \textcolor{danger}{\faIcon{times}} Avoid \\
+WPA2-Personal & AES-CCMP & \textcolor{warning}{\faIcon{exclamation}} Low-risk \\
+WPA2-Enterprise & AES + 802.1X & \textcolor{success}{\faIcon{check}} Recommended \\
+WPA3 & SAE + AES-GCM & \textcolor{success}{\faIcon{check}} Best available \\
+\end{tabular}
+\end{center}
+
+\postersuccess{
+\faIcon{check-circle}\hspace{0.2em}\textbf{Minimum for OT WiFi:} WPA2-Enterprise or WPA3, 802.1X with RADIUS, dedicated SSIDs for OT, certificate-based auth where possible, wireless IDS/IPS.
+}
+
+\section{\textcolor{accent}{\faIcon{broadcast-tower}}\hspace{0.4em}5G and Private LTE}
+
+\begin{itemize}
+    \item \faIcon{lock}\hspace{0.2em}\textbf{Private networks:} Dedicated spectrum, full control
+    \item \faIcon{tachometer-alt}\hspace{0.2em}\textbf{Low latency:} Suitable for real-time control
+    \item \faIcon{check-double}\hspace{0.2em}\textbf{High reliability:} Carrier-grade availability
+    \item \faIcon{map-marked-alt}\hspace{0.2em}\textbf{Wide coverage:} Large facilities, remote sites
+    \item \faIcon{sim-card}\hspace{0.2em}\textbf{SIM-based auth:} Built-in device authentication
+\end{itemize}
+
+\posterwarning{
+\faIcon{exclamation-triangle}\hspace{0.2em}For 5G: use \textbf{private networks} for critical systems. Implement network slicing. Monitor for IMSI catchers. Encrypt at application layer.
+}
+
+\section{\textcolor{accent}{\faIcon{ban}}\hspace{0.4em}What NOT to Put on Wireless}
+
+\posterdanger{
+\faIcon{skull-crossbones}\hspace{0.2em}\textbf{Avoid wireless for:} Safety Instrumented Systems (SIS), emergency shutdown commands, primary control loops, high-speed motion control, any latency/jitter-critical application.
+}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Implementation Guidelines}
+
+\begin{enumerate}
+    \item \faIcon{project-diagram}\hspace{0.2em}\textbf{Segment} -- Separate SSID/VLAN for OT wireless
+    \item \faIcon{shield-alt}\hspace{0.2em}\textbf{Firewall} -- All wireless through OT firewall
+    \item \faIcon{fingerprint}\hspace{0.2em}\textbf{Authenticate} -- 802.1X, certs, or strong PSK
+    \item \faIcon{lock}\hspace{0.2em}\textbf{Encrypt} -- WPA2-Enterprise min, WPA3 preferred
+    \item \faIcon{eye}\hspace{0.2em}\textbf{Monitor} -- Wireless IDS, rogue AP detection
+    \item \faIcon{ban}\hspace{0.2em}\textbf{Limit} -- Restrict to non-safety applications
+    \item \faIcon{map-marker-alt}\hspace{0.2em}\textbf{Position APs} to minimize signal outside
+    \item \faIcon{search}\hspace{0.2em}\textbf{Survey regularly} to detect rogue devices
+\end{enumerate}
+
+\subsection{\textcolor{accent}{\faIcon{eye}}\hspace{0.3em}Monitoring and Detection}
+
+\begin{itemize}
+    \item \faIcon{shield-alt}\hspace{0.2em}Deploy Wireless Intrusion Detection (WIDS)
+    \item \faIcon{map}\hspace{0.2em}Conduct regular wireless site surveys
+    \item \faIcon{bell}\hspace{0.2em}Alert on deauthentication floods
+    \item \faIcon{chart-line}\hspace{0.2em}Track RF spectrum for jamming attempts
+    \item \faIcon{list-alt}\hspace{0.2em}Maintain inventory of authorized wireless devices
+\end{itemize}
+
+\postertip{
+\faIcon{lightbulb}\hspace{0.2em}Common OT wireless use cases: mobile HMI/tablets, wireless sensor networks, remote asset monitoring (IIoT), temporary maintenance connections. Always treat wireless as an \textbf{untrusted network segment}.
+}
+
+\end{multicols}
+
+\end{document}

@@ -1,0 +1,173 @@
+% ============================================================================
+%  TRITON/TRISIS - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {TRITON / TRISIS}
+    {The First Cyber Attack Targeting Safety Instrumented Systems}
+    {Poster 412}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+TRITON (also TRISIS/HatMan), discovered 2017, is the \textbf{first known malware targeting Safety Instrumented Systems (SIS)}. It crossed a critical line -- targeting systems designed to prevent catastrophic accidents and protect human life at a Middle Eastern petrochemical facility.
+
+\section{\textcolor{accent}{\faIcon{list-ul}}\hspace{0.4em}Key Facts}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{list-ul}\hspace{0.2em}\bfseries Attribute} & \textcolor{white}{\faIcon{info-circle}\hspace{0.2em}\bfseries Details} \\
+\midrule
+Discovery & December 2017 \\
+Target & Middle Eastern petrochemical \\
+Systems & Schneider Triconex SIS \\
+Goal & Disable safety systems \\
+Outcome & Attack failed; safe shutdown \\
+Attribution & CNIIHM (Russian govt.) \\
+\end{tabular}
+\end{center}
+
+\posterdanger{
+\textcolor{danger}{\faIcon{skull-crossbones}}\hspace{0.2em} TRITON demonstrates \textbf{willingness to potentially cause loss of life}. By targeting the last line of defense against industrial disasters, it represents a significant escalation in cyber attacks on industrial systems.
+}
+
+\section{\textcolor{accent}{\faIcon{hard-hat}}\hspace{0.4em}What is a SIS?}
+
+A Safety Instrumented System is an \textbf{autonomous control system} that brings a process to a safe state when dangerous conditions are detected. It operates independently from the BPCS and is the last automated defense.
+
+\subsection{\textcolor{accent}{\faIcon{cogs}}\hspace{0.3em}SIS Functions}
+
+\begin{itemize}
+    \item \textcolor{warning}{\faIcon{hard-hat}}\hspace{0.2em} \textbf{Emergency Shutdown (ESD)} -- Stop dangerous processes
+    \item \textcolor{warning}{\faIcon{hard-hat}}\hspace{0.2em} \textbf{Fire \& Gas Detection} -- Trigger alarms/protection
+    \item \textcolor{warning}{\faIcon{hard-hat}}\hspace{0.2em} \textbf{Burner Management} -- Safe startup/shutdown
+    \item \textcolor{warning}{\faIcon{hard-hat}}\hspace{0.2em} \textbf{HIPPS} -- High Integrity Pressure Protection
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{layer-group}}\hspace{0.3em}Protection Layers}
+
+\begin{enumerate}
+    \item \faIcon{drafting-compass}\hspace{0.2em}Process Design (inherently safer)
+    \item \faIcon{sliders-h}\hspace{0.2em}Basic Process Control System (BPCS)
+    \item \faIcon{bell}\hspace{0.2em}Alarms and Operator Response
+    \item \textcolor{warning}{\faIcon{hard-hat}}\hspace{0.2em} \textbf{Safety Instrumented System (SIS)} $\leftarrow$ \textit{TRITON target}
+    \item \faIcon{compress-arrows-alt}\hspace{0.2em}Physical Protection (relief valves, rupture discs)
+\end{enumerate}
+
+\posterwarning{
+\textcolor{warning}{\faIcon{hard-hat}}\hspace{0.2em} The SIS is the \textbf{last automated barrier} before physical protection and potential disaster. Compromising it could allow dangerous conditions to escalate: explosions, toxic releases, loss of life.
+}
+
+\section{\textcolor{accent}{\faIcon{link}}\hspace{0.4em}Attack Chain}
+
+\begin{center}
+\begin{tikzpicture}[
+    step/.style={rectangle, draw=#1!40, thick, fill=#1!5, minimum height=0.38cm, rounded corners=2pt, font=\scriptsize, text width=4.5cm, align=left},
+    step/.default={otdanger},
+    num/.style={circle, fill=#1, text=white, font=\scriptsize\bfseries, minimum size=0.33cm, inner sep=0pt},
+    num/.default={otdanger},
+]
+    \node[num=otwarning] (n1) at (0,0) {1};
+    \node[step=otwarning, right=3pt of n1] (s1) {Compromise corporate IT ($\sim$2014)};
+    \node[num=otwarning, below=2pt of n1] (n2) {2};
+    \node[step=otwarning, right=3pt of n2] (s2) {Lateral movement IT $\rightarrow$ OT};
+    \node[num=otdanger, below=2pt of n2] (n3) {3};
+    \node[step=otdanger, right=3pt of n3] (s3) {Access SIS engineering workstation};
+    \node[num=otdanger, below=2pt of n3] (n4) {4};
+    \node[step=otdanger, right=3pt of n4] (s4) {Study Triconex architecture};
+    \node[num=otdanger, below=2pt of n4] (n5) {5};
+    \node[step=otdanger, right=3pt of n5] (s5) {Deploy custom Triconex payload};
+    \node[num=otsuccess, below=2pt of n5] (n6) {6};
+    \node[step=otsuccess, right=3pt of n6] (s6) {\faIcon{check}\hspace{0.1em}Bug triggers safe shutdown};
+
+    \foreach \i/\j in {1/2,2/3,3/4,4/5,5/6} {
+        \draw[thick, otdanger!40] (n\i.south) -- (n\j.north);
+    }
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{bug}}\hspace{0.4em}Malware Components}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{bug}\hspace{0.2em}\bfseries Component} & \textcolor{white}{\faIcon{cogs}\hspace{0.2em}\bfseries Purpose} \\
+\midrule
+trilog.exe & Main exec (disguised as legit) \\
+library.zip & Python libraries for execution \\
+inject.bin & Shellcode for Triconex controller \\
+imain.bin & Main malicious logic \\
+\end{tabular}
+\end{center}
+
+The malware communicated with Triconex via the \textbf{TriStation protocol}, could read/write controller memory, upload custom code, and potentially disable safety functions while hiding from operators.
+
+\section{\textcolor{accent}{\faIcon{check-circle}}\hspace{0.4em}Why the Attack Failed}
+
+\postersuccess{
+The malicious code contained a \textbf{bug} that caused the safety controller to detect an invalid state and initiate a \textbf{safe shutdown}. This triggered an investigation that uncovered the intrusion. The SIS performed its designed function -- failing safely.
+}
+
+\section{\textcolor{accent}{\faIcon{skull-crossbones}}\hspace{0.4em}Potential Consequences}
+
+Had the attack succeeded:
+
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{skull-crossbones}}\hspace{0.2em} Safety functions disabled silently
+    \item \textcolor{danger}{\faIcon{skull-crossbones}}\hspace{0.2em} Hazardous conditions hidden from operators
+    \item \textcolor{danger}{\faIcon{skull-crossbones}}\hspace{0.2em} Possible explosions, fires, or toxic releases
+    \item \textcolor{danger}{\faIcon{skull-crossbones}}\hspace{0.2em} Environmental contamination
+    \item \textcolor{danger}{\faIcon{skull-crossbones}}\hspace{0.2em} Potential loss of life
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{search}}\hspace{0.4em}Detection Indicators}
+
+\begin{itemize}
+    \item \faIcon{network-wired}\hspace{0.2em}Unauthorized TriStation protocol communications
+    \item \faIcon{file-alt}\hspace{0.2em}Unexpected files on SIS engineering workstations
+    \item \faIcon{toggle-on}\hspace{0.2em}Safety controller in programming mode unexpectedly
+    \item \faIcon{chart-bar}\hspace{0.2em}Anomalous network traffic to/from safety systems
+    \item \faIcon{bell}\hspace{0.2em}Unexpected safety system shutdowns or alarms
+    \item \faIcon{user-lock}\hspace{0.2em}Unauthorized access to SIS programming tools
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{bullhorn}}\hspace{0.4em}Industry Response}
+
+\begin{itemize}
+    \item \faIcon{tools}\hspace{0.2em}Schneider Electric released security advisories and patches
+    \item \faIcon{bullhorn}\hspace{0.2em}ICS-CERT issued alerts and recommended mitigations
+    \item \faIcon{users}\hspace{0.2em}Industry groups developed SIS-specific security guidelines
+    \item \faIcon{book}\hspace{0.2em}Increased focus on safety system cybersecurity in IEC 61511
+    \item \faIcon{project-diagram}\hspace{0.2em}New emphasis on physical separation of SIS from BPCS
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Defense Recommendations}
+
+\begin{enumerate}
+    \item \faIcon{lock}\hspace{0.2em}\textbf{Isolate SIS networks} -- Physical/strong logical separation
+    \item \faIcon{user-shield}\hspace{0.2em}\textbf{Restrict engineering access} -- Limit who programs SIS
+    \item \faIcon{eye}\hspace{0.2em}\textbf{Monitor SIS changes} -- Detect unauthorized mods
+    \item \faIcon{key}\hspace{0.2em}\textbf{Hardware key switches} -- Physical programming mode
+    \item \faIcon{clipboard-check}\hspace{0.2em}\textbf{Change management} -- Approve all SIS changes
+    \item \faIcon{search}\hspace{0.2em}\textbf{Integrity checks} -- Verify logic against baseline
+    \item \faIcon{ban}\hspace{0.2em}\textbf{No direct connectivity} -- SIS to business networks
+\end{enumerate}
+
+\postertip{
+SIS engineering workstations should \textbf{not be connected to general OT networks}. Access to safety system programming should require physical presence and multi-person authorization. Use hardware key switches to control programming mode. Regularly compare SIS logic against approved baselines. Monitor for unauthorized TriStation protocol communications. The SIS saved the day here -- proper safety system design is the ultimate backstop.
+}
+
+\end{multicols}
+
+\end{document}

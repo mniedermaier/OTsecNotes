@@ -1,0 +1,164 @@
+% ============================================================================
+%  OT Backup and Recovery - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {OT Backup and Recovery}
+    {Strategies for Protecting and Restoring Industrial Control Systems}
+    {Poster 850}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+Unlike IT where data is the primary asset, OT must protect and restore \textbf{control logic, configurations, and operational state}---often for systems that cannot tolerate extended downtime. Without proper backups, \textcolor{danger}{\faIcon{exclamation-triangle}}\hspace{0.2em}ransomware or failures can mean weeks recreating control logic from scratch.
+
+\section{\textcolor{accent}{\faIcon{columns}}\hspace{0.4em}OT vs IT Backup}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{2cm}p{2.2cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{exchange-alt}\hspace{0.2em}\bfseries Aspect} & \textcolor{white}{\faIcon{desktop}\hspace{0.2em}\bfseries IT} & \textcolor{white}{\faIcon{cogs}\hspace{0.2em}\bfseries OT} \\
+\midrule
+Primary asset & Data files & Control logic, configs \\
+Frequency & Daily/hourly & After changes \\
+Restore window & Hours OK & Minutes critical \\
+Agents & Standard & Often not possible \\
+Network access & Always connected & Air-gapped common \\
+Validation & File integrity & Functional testing \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{hdd}}\hspace{0.4em}What to Back Up}
+
+\posterinfo{
+\textbf{Critical OT assets:} PLC/RTU programs (ladder logic, function blocks), HMI projects (graphics, tags, alarms), SCADA configurations, DCS controller configs, safety system logic, network device configs, and engineering workstation project files.
+}
+
+\subsection{\textcolor{accent}{\faIcon{database}}\hspace{0.3em}Operational Data}
+
+\begin{itemize}
+    \item \faIcon{chart-line}\hspace{0.2em}Historian databases (process data, trends)
+    \item \faIcon{bell}\hspace{0.2em}Alarm and event logs
+    \item \faIcon{industry}\hspace{0.2em}Batch records and production data
+    \item \faIcon{clipboard-list}\hspace{0.2em}Audit trails and access logs
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{file-alt}}\hspace{0.3em}Supporting Documentation}
+
+\begin{itemize}
+    \item \faIcon{project-diagram}\hspace{0.2em}Network diagrams and IP assignments
+    \item \faIcon{plug}\hspace{0.2em}I/O lists and wiring documentation
+    \item \faIcon{sliders-h}\hspace{0.2em}Setpoint and tuning parameters
+    \item \faIcon{file-alt}\hspace{0.2em}Recovery procedures
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{clock}}\hspace{0.4em}Backup Strategies}
+
+\postersuccess{
+\textbf{Change-triggered backups:} Perform a full backup immediately before and after any change to control logic. This creates a \textcolor{success}{\faIcon{check-circle}}\hspace{0.2em}known-good state and documents what changed.
+}
+
+\subsection{\textcolor{accent}{\faIcon{calendar-alt}}\hspace{0.3em}Scheduled Backups}
+
+Even without changes, periodic backups catch:
+\begin{itemize}
+    \item \faIcon{user-secret}\hspace{0.2em}Unauthorized modifications
+    \item \faIcon{sliders-h}\hspace{0.2em}Runtime parameter drift
+    \item \faIcon{exclamation-triangle}\hspace{0.2em}Configuration corruption
+    \item \faIcon{balance-scale}\hspace{0.2em}Comparison baselines for integrity monitoring
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{download}}\hspace{0.3em}Backup Methods}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{1.8cm}p{2.2cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{tools}\hspace{0.2em}\bfseries Method} & \textcolor{white}{\faIcon{thumbs-up}\hspace{0.2em}\bfseries Advantage} & \textcolor{white}{\faIcon{thumbs-down}\hspace{0.2em}\bfseries Disadvantage} \\
+\midrule
+Online (running) & No downtime & May miss state \\
+Offline (stopped) & Complete capture & Requires outage \\
+Memory card & Direct, complete & Physical access \\
+Network upload & Remote capable & Protocol limits \\
+Disk image & Bare-metal restore & Large size \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{lock}}\hspace{0.4em}Storage and Protection}
+
+\posterdanger{
+\textbf{Backups must be stored separately from production.} If ransomware encrypts your OT network, it should not reach your backups.
+}
+
+\subsection{\textcolor{accent}{\faIcon{layer-group}}\hspace{0.3em}3-2-1 Rule for OT}
+
+\begin{itemize}
+    \item \faIcon{copy}\hspace{0.2em}\textbf{3} copies of critical data
+    \item \faIcon{hdd}\hspace{0.2em}\textbf{2} different storage media/types
+    \item \faIcon{map-marker-alt}\hspace{0.2em}\textbf{1} copy offsite or air-gapped
+    \item \faIcon{lock}\hspace{0.2em}Plus: at least one copy \textbf{offline} and immune to network attacks
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.3em}Backup Security}
+
+\begin{itemize}
+    \item \faIcon{lock}\hspace{0.2em}\textbf{Encryption} -- AES-256 at rest and in transit
+    \item \faIcon{user-lock}\hspace{0.2em}\textbf{Access control} -- Limit who can read/write/delete
+    \item \faIcon{fingerprint}\hspace{0.2em}\textbf{Integrity verification} -- Hash validation, checksums
+    \item \faIcon{database}\hspace{0.2em}\textbf{Immutable storage} -- Write-once or immutable cloud
+    \item \faIcon{history}\hspace{0.2em}\textbf{Version retention} -- Keep multiple generations
+\end{itemize}
+
+\posterwarning{
+\textbf{\textcolor{warning}{\faIcon{key}}\hspace{0.2em}Key management:} Encrypted backups are useless without decryption keys. Never store keys on the same media. Maintain offline key copies in physically secure storage. Include decryption in recovery drills.
+}
+
+\section{\textcolor{accent}{\faIcon{undo}}\hspace{0.4em}Recovery Planning}
+
+\subsection{\textcolor{accent}{\faIcon{clock}}\hspace{0.3em}Recovery Time Objectives}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{1.5cm}p{2.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{server}\hspace{0.2em}\bfseries System} & \textcolor{white}{\faIcon{stopwatch}\hspace{0.2em}\bfseries RTO} & \textcolor{white}{\faIcon{flag}\hspace{0.2em}\bfseries Priority} \\
+\midrule
+Safety systems & Minutes & Critical \\
+Critical PLCs & 1--4 hours & High \\
+HMI/SCADA & 4--8 hours & High \\
+Historians & 24 hours & Medium \\
+Eng. stations & Days & Low \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{vial}}\hspace{0.4em}Testing and Validation}
+
+\posterdanger{
+\textbf{Untested backups are not backups.} Many organizations discover their backups are corrupt, incomplete, or unusable only when needed most.
+}
+
+\subsection{\textcolor{accent}{\faIcon{calendar-check}}\hspace{0.3em}Testing Schedule}
+
+\begin{itemize}
+    \item \faIcon{robot}\hspace{0.2em}\textbf{Every backup} -- Automated verification (hash, completeness)
+    \item \faIcon{calendar-alt}\hspace{0.2em}\textbf{Quarterly} -- Procedure review and tabletop exercise
+    \item \faIcon{flask}\hspace{0.2em}\textbf{Semi-annually} -- Lab restoration test
+    \item \faIcon{hard-hat}\hspace{0.2em}\textbf{Annually} -- Full recovery drill during maintenance
+\end{itemize}
+
+\postertip{
+Back up PLCs, HMIs, network devices, and documentation. Use change-triggered backups. Follow the 3-2-1 rule with at least one offline copy. Test recovery regularly.
+}
+
+\end{multicols}
+
+\end{document}

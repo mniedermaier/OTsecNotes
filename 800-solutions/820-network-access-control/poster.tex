@@ -1,0 +1,183 @@
+% ============================================================================
+%  Network Access Control for OT - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {Network Access Control for OT}
+    {NAC Implementation in Industrial Environments}
+    {Poster 820}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+Network Access Control (NAC) ensures only \textbf{authorized and compliant devices} can connect to the OT network. It provides visibility into connected assets and enforces security policies before granting access.
+
+\posterinfo{
+\textbf{Core capabilities:} \textcolor{accent}{\faIcon{user-lock}}\hspace{0.2em}Authentication (verify identity), \textcolor{accent}{\faIcon{user-lock}}\hspace{0.2em}authorization (determine access level), assessment (check compliance), remediation (quarantine non-compliant), and visibility (inventory all devices).
+}
+
+\section{\textcolor{accent}{\faIcon{key}}\hspace{0.4em}NAC Methods}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{2cm}p{2.2cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{key}\hspace{0.2em}\bfseries Method} & \textcolor{white}{\faIcon{align-left}\hspace{0.2em}\bfseries Description} & \textcolor{white}{\faIcon{industry}\hspace{0.2em}\bfseries OT Suitability} \\
+\midrule
+802.1X & Port-based auth via RADIUS & Limited \\
+MAB & MAC address auth & Common \\
+Agent-based & Software on endpoint & Very limited \\
+Agentless & Passive profiling & Recommended \\
+Out-of-band & Monitor via SPAN & Recommended \\
+Inline & NAC inline with traffic & Moderate \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{microchip}}\hspace{0.4em}OT Device Capabilities}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.5cm}p{1cm}p{1cm}p{1cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{microchip}\hspace{0.2em}\bfseries Device} & \textcolor{white}{\bfseries 1X} & \textcolor{white}{\bfseries Agent} & \textcolor{white}{\bfseries MAB} \\
+\midrule
+Modern HMI & Yes & Yes & Yes \\
+Legacy Windows & Ltd & Ltd & Yes \\
+Eng. workstation & Yes & Yes & Yes \\
+PLC / RTU & No & No & Yes \\
+Field sensor & No & No & Maybe \\
+IP camera & Ltd & No & Yes \\
+\end{tabular}
+\end{center}
+
+\posterdanger{
+\textbf{Why traditional NAC fails in OT:} PLCs/RTUs cannot run agents. Legacy devices don't support 802.1X. Authentication delays may disrupt real-time control. Blocking a device could stop production. Many OT devices use static IPs.
+}
+
+\section{\textcolor{accent}{\faIcon{layer-group}}\hspace{0.4em}Deployment by Zone}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{1.8cm}p{2.4cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{layer-group}\hspace{0.2em}\bfseries Zone} & \textcolor{white}{\faIcon{key}\hspace{0.2em}\bfseries NAC Mode} & \textcolor{white}{\faIcon{info-circle}\hspace{0.2em}\bfseries Rationale} \\
+\midrule
+Enterprise IT & Full 802.1X & Devices support it \\
+Industrial DMZ & 802.1X + MAB & Mix of IT and OT \\
+Manufacturing & MAB + Monitor & HMIs may support 1X \\
+Control & Monitor only & Cannot risk blocking \\
+Safety & No NAC & Isolation preferred \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{cogs}}\hspace{0.4em}Implementation Phases}
+
+\subsection{\textcolor{accent}{\faIcon{eye}}\hspace{0.3em}Phase 1: Visibility}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{eye}}\hspace{0.2em}Deploy passive monitoring (no enforcement)
+    \item \textcolor{accent}{\faIcon{list-alt}}\hspace{0.2em}Build complete asset inventory
+    \item \textcolor{accent}{\faIcon{fingerprint}}\hspace{0.2em}Profile all device types and behaviors
+    \item \textcolor{accent}{\faIcon{bell}}\hspace{0.2em}Alert only on unknown devices
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{tags}}\hspace{0.3em}Phase 2: Classification}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{tags}}\hspace{0.2em}Categorize devices by type and criticality
+    \item \textcolor{accent}{\faIcon{clipboard-list}}\hspace{0.2em}Define policy groups per zone
+    \item \textcolor{accent}{\faIcon{barcode}}\hspace{0.2em}Document MAC addresses for MAB enrollment
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.3em}Phase 3: Selective Enforcement}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{key}}\hspace{0.2em}Enable 802.1X on IT-like OT devices
+    \item \textcolor{accent}{\faIcon{ethernet}}\hspace{0.2em}Implement MAB for industrial devices
+    \item \textcolor{accent}{\faIcon{flask}}\hspace{0.2em}Start with low-risk zones first
+    \item \textcolor{accent}{\faIcon{heartbeat}}\hspace{0.2em}Monitor continuously for disruption
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{network-wired}}\hspace{0.3em}Phase 4: Full Deployment}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{expand-arrows-alt}}\hspace{0.2em}Extend to all zones (except safety)
+    \item \textcolor{accent}{\faIcon{ban}}\hspace{0.2em}Automate quarantine for unknown devices
+    \item \textcolor{accent}{\faIcon{project-diagram}}\hspace{0.2em}Integrate with incident response workflows
+\end{itemize}
+
+\posterwarning{
+\textbf{Start in monitor mode.} Always deploy passive monitoring before enabling enforcement. A phased approach prevents disruption from incomplete device profiling.
+}
+
+\section{\textcolor{accent}{\faIcon{fingerprint}}\hspace{0.4em}Device Profiling Techniques}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{network-wired}}\hspace{0.2em}\textbf{DHCP fingerprinting} -- Identify by DHCP options
+    \item \textcolor{accent}{\faIcon{barcode}}\hspace{0.2em}\textbf{MAC OUI lookup} -- Manufacturer identification
+    \item \textcolor{accent}{\faIcon{chart-line}}\hspace{0.2em}\textbf{Traffic analysis} -- Protocol and behavior patterns
+    \item \textcolor{accent}{\faIcon{search}}\hspace{0.2em}\textbf{Active scanning} -- Probe devices (use carefully in OT)
+    \item \textcolor{accent}{\faIcon{plug}}\hspace{0.2em}\textbf{Integration} -- Import from asset management tools
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{project-diagram}}\hspace{0.4em}NAC Decision Flow}
+
+\begin{center}
+\begin{tikzpicture}[
+    proc/.style={rectangle, draw=#1!50, thick, fill=#1!10, rounded corners=2pt,
+                 minimum height=0.38cm, minimum width=1.6cm, align=center, font=\scriptsize},
+    proc/.default={otaccent},
+    dec/.style={diamond, draw=otwarning!50, thick, fill=otwarning!10, aspect=2.2,
+                align=center, font=\scriptsize, inner sep=1pt},
+    arr/.style={->, thick, >=stealth, otaccent!60},
+    lbl/.style={font=\scriptsize, fill=white, inner sep=1pt},
+]
+    \node[proc=otinfo] (connect) at (0,0) {Device Connects};
+    \node[proc=otaccent, below=5pt of connect] (profile) {Profiling};
+    \node[dec, below=6pt of profile] (known) {Known?};
+    \node[proc=otsuccess, below left=6pt and 6pt of known] (allow) {Assign VLAN};
+    \node[proc=otdanger, below right=6pt and 6pt of known] (quar) {Quarantine};
+
+    \draw[arr] (connect) -- (profile);
+    \draw[arr] (profile) -- (known);
+    \draw[arr] (known) -| node[lbl, above left=-1pt] {Yes} (allow);
+    \draw[arr] (known) -| node[lbl, above right=-1pt] {No} (quar);
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{clipboard-list}}\hspace{0.4em}Policy Examples}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.5cm}p{4cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{clipboard-list}\hspace{0.2em}\bfseries Condition} & \textcolor{white}{\faIcon{check-circle}\hspace{0.2em}\bfseries Action} \\
+\midrule
+Known PLC (in inventory) & Allow, assign Control VLAN \\
+Known HMI with cert & Allow, Manufacturing VLAN \\
+Unknown device & Alert SOC, monitor traffic \\
+Contractor laptop & Quarantine VLAN, require approval \\
+Device fails posture & Limited access, remediation \\
+Known device, wrong port & Alert, investigate \\
+\end{tabular}
+\end{center}
+
+\postersuccess{
+\textbf{Integration points:} SIEM (event correlation), asset management (inventory sync), CMDB (authorized device validation), firewall (dynamic policy updates), vulnerability scanner (trigger on new devices), ticketing (auto-create violation tickets).
+}
+
+\postertip{
+Use \textbf{agentless, passive} profiling for OT devices. Deploy out-of-band monitoring rather than inline blocking. Use 802.1X only for capable devices and MAC Authentication Bypass for PLCs and RTUs. Different zones need different NAC modes---never block critical control devices. NAC provides essential asset visibility even before enforcement is enabled.
+}
+
+\end{multicols}
+
+\end{document}

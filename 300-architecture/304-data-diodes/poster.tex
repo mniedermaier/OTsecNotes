@@ -1,0 +1,176 @@
+% ============================================================================
+%  Data Diodes - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {Data Diodes}
+    {Unidirectional Security Gateways for OT}
+    {Poster 304}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{long-arrow-alt-right}}\hspace{0.4em}Overview}
+
+Data diodes (unidirectional security gateways) are \textbf{hardware-enforced one-way data transfer devices}. They physically prevent any data from flowing back to the source network -- the highest level of network isolation while still allowing data export.
+
+\posterinfo{
+\faIcon{lightbulb}\hspace{0.2em}Data diodes use fiber optic cables with a transmitter on one side and a receiver on the other -- with \textbf{no transmitter on the receiving side}. This makes reverse data flow physically impossible.
+}
+
+\section{\textcolor{accent}{\faIcon{cubes}}\hspace{0.4em}Components}
+
+\begin{itemize}
+    \item \faIcon{upload}\hspace{0.2em}\textbf{TX appliance:} Connects to source network, sends data
+    \item \faIcon{dot-circle}\hspace{0.2em}\textbf{Optical fiber:} One-way light transmission medium
+    \item \faIcon{download}\hspace{0.2em}\textbf{RX appliance:} Receives data, connects to destination
+    \item \faIcon{ban}\hspace{0.2em}\textbf{No return fiber:} Physical absence of backward path
+\end{itemize}
+
+\begin{center}
+\begin{tikzpicture}[
+    net/.style={rectangle, draw=#1!60, thick, fill=#1!10, rounded corners=3pt, minimum width=1.8cm, minimum height=0.7cm, align=center, font=\scriptsize},
+    net/.default={otaccent},
+    diode/.style={rectangle, draw=otdanger!80, thick, fill=otdanger!15, minimum width=1.2cm, minimum height=0.7cm, align=center, font=\scriptsize},
+]
+    \node[net=otsuccess] (ot) at (0,0) {\faIcon{industry}\\\textbf{OT Network}};
+    \node[diode] (dd) at (3,0) {\faIcon{long-arrow-alt-right}\\\textbf{Diode}};
+    \node[net=otinfo] (it) at (6,0) {\faIcon{building}\\\textbf{IT/DMZ}};
+
+    \draw[->, line width=2pt, otsuccess!60] (ot) -- (dd);
+    \draw[->, line width=2pt, otinfo!60] (dd) -- (it);
+
+    \node[font=\scriptsize, text=otdanger, below=3pt of dd] {Hardware-enforced};
+    \node[font=\scriptsize, text=otsuccess, above=2pt of ot.north east, anchor=south] {TX};
+    \node[font=\scriptsize, text=otinfo, above=2pt of it.north west, anchor=south] {RX};
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{exchange-alt}}\hspace{0.4em}Protocol Handling}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{1.5cm}p{3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Protocol} & \textcolor{white}{\bfseries Native} & \textcolor{white}{\bfseries Diode Handling} \\
+\midrule
+\faIcon{network-wired}\hspace{0.2em}UDP & \textcolor{success}{\faIcon{check}} Yes & Direct transfer \\
+\faIcon{exchange-alt}\hspace{0.2em}TCP & \textcolor{danger}{\faIcon{times}} No & Protocol break/proxy \\
+\faIcon{file-alt}\hspace{0.2em}File transfer & \textcolor{danger}{\faIcon{times}} No & Store-and-forward \\
+\faIcon{database}\hspace{0.2em}Database & \textcolor{danger}{\faIcon{times}} No & Specialized replication \\
+\faIcon{video}\hspace{0.2em}Video streams & \textcolor{success}{\faIcon{check}} Yes & Direct or buffered \\
+\faIcon{clipboard-list}\hspace{0.2em}Syslog & \textcolor{success}{\faIcon{check}} Yes & Native UDP support \\
+\end{tabular}
+\end{center}
+
+\posterwarning{
+\faIcon{exclamation-triangle}\hspace{0.2em}TCP requires bidirectional communication (ACKs). Data diodes must use \textbf{protocol break/proxy} -- TX terminates TCP locally and retransmits via UDP. RX reconstructs the TCP connection.
+}
+
+\section{\textcolor{accent}{\faIcon{list-ul}}\hspace{0.4em}Use Cases}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.5cm}p{4cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Use Case} & \textcolor{white}{\bfseries Description} \\
+\midrule
+\faIcon{database}\hspace{0.2em}Historian repl. & Process data to enterprise \\
+\faIcon{clipboard-list}\hspace{0.2em}Log export & Security logs to corp SIEM \\
+\faIcon{chart-bar}\hspace{0.2em}SCADA to biz & Production data to ERP \\
+\faIcon{balance-scale}\hspace{0.2em}Regulatory & Compliance data export \\
+\faIcon{hdd}\hspace{0.2em}Backup export & Backups out, no restore cmds \\
+\faIcon{video}\hspace{0.2em}Video export & Camera feeds from secure areas \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{industry}}\hspace{0.3em}Industry Applications}
+
+\begin{itemize}
+    \item \faIcon{atom}\hspace{0.2em}\textbf{Nuclear:} Regulatory requirement for safety isolation
+    \item \faIcon{fighter-jet}\hspace{0.2em}\textbf{Defense:} Classified network boundaries
+    \item \faIcon{bolt}\hspace{0.2em}\textbf{Energy:} NERC CIP compliance for critical assets
+    \item \faIcon{cogs}\hspace{0.2em}\textbf{Manufacturing:} Protecting proprietary processes
+    \item \faIcon{tint}\hspace{0.2em}\textbf{Water/Utilities:} Critical infrastructure protection
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{columns}}\hspace{0.4em}Diode vs Firewall}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.5cm}p{1.5cm}p{2.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Capability} & \textcolor{white}{\bfseries FW} & \textcolor{white}{\bfseries Diode} \\
+\midrule
+Bidirectional & \textcolor{success}{\faIcon{check}} Yes & \textcolor{danger}{\faIcon{times}} No \\
+SW configurable & \textcolor{success}{\faIcon{check}} Yes & Limited \\
+Can misconfig & \textcolor{danger}{\faIcon{check}} Yes & Minimal \\
+SW hackable & Possible & \textcolor{success}{\faIcon{times}} No (HW) \\
+Native TCP & \textcolor{success}{\faIcon{check}} Yes & Requires proxy \\
+Remote access & \textcolor{success}{\faIcon{check}} Yes & \textcolor{danger}{\faIcon{times}} No \\
+\end{tabular}
+\end{center}
+
+\posterdanger{
+\faIcon{ban}\hspace{0.2em}\textbf{When NOT to use:} Bidirectional communication required, remote access needed, cost prohibitive for risk level, or protocol support unavailable.
+}
+
+\section{\textcolor{accent}{\faIcon{project-diagram}}\hspace{0.4em}Deployment Pattern}
+
+\postersuccess{
+\textbf{Basic data export pattern:}
+\begin{enumerate}
+    \item \faIcon{database}\hspace{0.2em}OT historian collects process data
+    \item \faIcon{upload}\hspace{0.2em}Data diode TX reads from OT historian
+    \item \faIcon{long-arrow-alt-right}\hspace{0.2em}One-way transfer to RX appliance
+    \item \faIcon{download}\hspace{0.2em}RX writes to replica historian in DMZ
+    \item \faIcon{building}\hspace{0.2em}Enterprise apps read from replica
+\end{enumerate}
+}
+
+\section{\textcolor{accent}{\faIcon{check-double}}\hspace{0.4em}Reliability Without ACKs}
+
+Since there's no return path for acknowledgments:
+\begin{itemize}
+    \item \faIcon{code}\hspace{0.2em}\textbf{FEC:} Forward Error Correction codes
+    \item \faIcon{clone}\hspace{0.2em}\textbf{Redundant TX:} Send data multiple times
+    \item \faIcon{check-circle}\hspace{0.2em}\textbf{App-level verify:} Checks on receiving side
+    \item \faIcon{hdd}\hspace{0.2em}\textbf{Buffering:} Store-and-forward on TX side
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Best Practices}
+
+\begin{enumerate}
+    \item \faIcon{file-alt}\hspace{0.2em}Define data requirements and flow direction
+    \item \faIcon{check-circle}\hspace{0.2em}Verify protocol support for your applications
+    \item \faIcon{ban}\hspace{0.2em}Plan for no return path in application design
+    \item \faIcon{tachometer-alt}\hspace{0.2em}Size for throughput and latency requirements
+    \item \faIcon{flask}\hspace{0.2em}Test all data flows before production
+    \item \faIcon{sitemap}\hspace{0.2em}Document architecture with flow diagrams
+    \item \faIcon{tools}\hspace{0.2em}Plan maintenance for systems on both sides
+\end{enumerate}
+
+\subsection{\textcolor{accent}{\faIcon{exclamation-triangle}}\hspace{0.3em}Implementation Challenges}
+
+\begin{itemize}
+    \item \faIcon{sync}\hspace{0.2em}\textbf{Software updates:} Cannot push patches back to OT side
+    \item \faIcon{heartbeat}\hspace{0.2em}\textbf{Health monitoring:} TX side status invisible from RX
+    \item \faIcon{dollar-sign}\hspace{0.2em}\textbf{Cost:} Significantly more expensive than firewalls
+    \item \faIcon{puzzle-piece}\hspace{0.2em}\textbf{Integration:} Requires custom app proxies for each protocol
+    \item \faIcon{user-cog}\hspace{0.2em}\textbf{Skill gap:} Staff need training on unidirectional concepts
+    \item \faIcon{clock}\hspace{0.2em}\textbf{Latency:} Protocol break adds processing delay to transfers
+\end{itemize}
+
+\postertip{
+\faIcon{lightbulb}\hspace{0.2em}Data diodes provide \textbf{air-gap level security with data flow}. They complement firewalls -- use diodes at the most critical boundaries and firewalls where bidirectional communication is needed. Verify protocol support before procurement.
+}
+
+\end{multicols}
+
+\end{document}

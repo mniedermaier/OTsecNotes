@@ -1,0 +1,176 @@
+% ============================================================================
+%  Secure Remote Access - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,shapes.geometric}
+
+\begin{document}
+
+\makepostertitle
+    {Secure Remote Access}
+    {Safe Remote Connectivity to Industrial Systems}
+    {Poster 301}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{key}}\hspace{0.4em}Overview}
+
+Remote access to OT environments is increasingly necessary for operations, maintenance, and vendor support. However, improperly implemented remote access has been the \textbf{entry point for numerous high-profile attacks} including the Ukraine power grid attacks (2015/2016).
+
+\posterdanger{
+\faIcon{skull-crossbones}\hspace{0.2em}Remote access was the attack vector in the \textbf{Ukraine power grid attacks}. Attackers used hijacked VPN credentials to access SCADA systems. Password-only authentication is insufficient.
+}
+
+\section{\textcolor{accent}{\faIcon{project-diagram}}\hspace{0.4em}Architecture Principles}
+
+\postersuccess{
+\textbf{Secure remote access must provide:}
+\begin{enumerate}
+    \item \faIcon{fingerprint}\hspace{0.2em}Strong authentication (MFA, not just passwords)
+    \item \faIcon{lock}\hspace{0.2em}Encrypted transport (protect data in transit)
+    \item \faIcon{user-lock}\hspace{0.2em}Access control (limit what users can reach)
+    \item \faIcon{eye}\hspace{0.2em}Session monitoring (record and audit all activity)
+    \item \faIcon{door-open}\hspace{0.2em}Controlled entry point (single, monitored gateway)
+\end{enumerate}
+}
+
+Remote access should terminate in the \textbf{Industrial DMZ}, never directly into OT. All sessions must pass through a jump server.
+
+\begin{center}
+\begin{tikzpicture}[
+    node distance=0.3cm,
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=1.2cm,
+                minimum height=0.85cm, align=center, font=\scriptsize\bfseries},
+    arr/.style={-{Stealth[length=2.5pt]}, thick, otprimary},
+]
+    \node[box, fill=otinfo!25, text=otprimary] (user) {\faIcon{user}\\Remote\\User};
+    \node[box, fill=otsuccess!25, text=otprimary, right=of user] (vpn) {\faIcon{lock}\\VPN\\+ MFA};
+    \node[box, fill=otwarning!25, text=otprimary, right=of vpn] (dmz) {\faIcon{laptop}\\DMZ\\Jump Srv};
+    \node[box, fill=otdanger!25, text=otprimary, right=of dmz] (fw) {\faIcon{shield-alt}\\Inner\\Firewall};
+    \node[box, fill=otaccent!25, text=otprimary, right=of fw] (ot) {\faIcon{cogs}\\OT\\Systems};
+
+    \draw[arr] (user) -- (vpn);
+    \draw[arr] (vpn) -- (dmz);
+    \draw[arr] (dmz) -- (fw);
+    \draw[arr] (fw) -- (ot);
+
+    \node[below=0.08cm of user, font=\scriptsize, otinfo] {Internet};
+    \node[below=0.08cm of dmz, font=\scriptsize, otwarning!80!black] {Zone 3.5};
+    \node[below=0.08cm of ot, font=\scriptsize, otaccent] {Zone 0--3};
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{cubes}}\hspace{0.4em}Key Components}
+
+\subsection{\textcolor{accent}{\faIcon{laptop}}\hspace{0.3em}Jump Servers (Bastion Hosts)}
+
+\begin{itemize}
+    \item \faIcon{door-open}\hspace{0.2em}\textbf{Single entry point:} All remote sessions pass through
+    \item \faIcon{random}\hspace{0.2em}\textbf{Session brokering:} Connects users to authorized systems
+    \item \faIcon{ban}\hspace{0.2em}\textbf{No direct OT access:} Users cannot bypass jump server
+    \item \faIcon{tools}\hspace{0.2em}\textbf{Hardened system:} Minimal services, fully patched
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{lock}}\hspace{0.3em}VPN Technologies}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.8cm}p{4.7cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Type} & \textcolor{white}{\bfseries Considerations} \\
+\midrule
+\faIcon{shield-alt}\hspace{0.2em}IPsec & Strong encryption, complex config \\
+\faIcon{globe}\hspace{0.2em}SSL/TLS VPN & Easier deployment, browser-based \\
+\faIcon{bolt}\hspace{0.2em}WireGuard & Modern, lightweight, good perf. \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{fingerprint}}\hspace{0.3em}Multi-Factor Authentication}
+
+\begin{itemize}
+    \item \faIcon{key}\hspace{0.2em}\textbf{Something you know:} Password, PIN
+    \item \faIcon{mobile-alt}\hspace{0.2em}\textbf{Something you have:} Hardware token, mobile app
+    \item \faIcon{fingerprint}\hspace{0.2em}\textbf{Something you are:} Biometrics (less common in OT)
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{user-lock}}\hspace{0.4em}Access Control}
+
+\begin{itemize}
+    \item \faIcon{users-cog}\hspace{0.2em}\textbf{Role-based access:} Specific permissions per role
+    \item \faIcon{server}\hspace{0.2em}\textbf{System-level restrictions:} Limit reachable systems
+    \item \faIcon{clock}\hspace{0.2em}\textbf{Time-based access:} Business hours or maintenance windows
+    \item \faIcon{user-tag}\hspace{0.2em}\textbf{Purpose-specific accounts:} Separate per function
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{user-tie}}\hspace{0.3em}Vendor Access Management}
+
+\posterwarning{
+\textbf{Third-party access controls:}
+\begin{itemize}
+    \item \faIcon{id-card}\hspace{0.2em}Dedicated vendor accounts (no shared creds)
+    \item \faIcon{toggle-off}\hspace{0.2em}Access enabled only when needed
+    \item \faIcon{check-circle}\hspace{0.2em}Explicit approval per session
+    \item \faIcon{video}\hspace{0.2em}All sessions monitored and recorded
+    \item \faIcon{project-diagram}\hspace{0.2em}Network limited to target systems
+\end{itemize}
+}
+
+\section{\textcolor{accent}{\faIcon{eye}}\hspace{0.4em}Monitoring and Audit}
+
+\begin{itemize}
+    \item \faIcon{video}\hspace{0.2em}\textbf{Session recording:} Capture video, keystrokes, files
+    \item \faIcon{desktop}\hspace{0.2em}\textbf{Real-time visibility:} Active sessions, anomaly alerts
+    \item \faIcon{clipboard-list}\hspace{0.2em}\textbf{Audit trail:} Auth, access, and activity logs
+    \item \faIcon{globe}\hspace{0.2em}\textbf{Geo-restrictions:} Block unexpected locations
+    \item \faIcon{database}\hspace{0.2em}\textbf{Retention:} Store per compliance requirements
+    \item \faIcon{lock}\hspace{0.2em}\textbf{Log integrity:} Protect audit logs from tampering
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{exclamation-circle}}\hspace{0.4em}Common Mistakes}
+
+\posterdanger{
+\textbf{Remote access failures:}
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{times}}\hspace{0.2em}Direct VPN to OT (bypassing DMZ/jump servers)
+    \item \textcolor{danger}{\faIcon{times}}\hspace{0.2em}Shared credentials among multiple users
+    \item \textcolor{danger}{\faIcon{times}}\hspace{0.2em}No MFA -- password-only authentication
+    \item \textcolor{danger}{\faIcon{times}}\hspace{0.2em}Always-on vendor connections left enabled
+    \item \textcolor{danger}{\faIcon{times}}\hspace{0.2em}No monitoring -- sessions not recorded
+    \item \textcolor{danger}{\faIcon{times}}\hspace{0.2em}Forgotten access -- former staff still enabled
+\end{itemize}
+}
+
+\section{\textcolor{accent}{\faIcon{clipboard-check}}\hspace{0.4em}Implementation Checklist}
+
+\begin{enumerate}
+    \item \faIcon{server}\hspace{0.2em}Remote access terminates in DMZ
+    \item \faIcon{laptop}\hspace{0.2em}Jump server required for all OT access
+    \item \faIcon{fingerprint}\hspace{0.2em}Multi-factor authentication enforced
+    \item \faIcon{users-cog}\hspace{0.2em}Role-based access control implemented
+    \item \faIcon{video}\hspace{0.2em}All sessions recorded and logged
+    \item \faIcon{user-tie}\hspace{0.2em}Vendor access disabled by default
+    \item \faIcon{calendar-alt}\hspace{0.2em}Regular access reviews conducted
+    \item \faIcon{file-alt}\hspace{0.2em}IR plan includes remote access scenarios
+\end{enumerate}
+
+\subsection{\textcolor{accent}{\faIcon{ban}}\hspace{0.3em}Emergency Access}
+
+\begin{itemize}
+    \item \faIcon{exclamation-circle}\hspace{0.2em}\textbf{Break-glass accounts:} Pre-provisioned emergency credentials stored in sealed envelopes or vaults for use when primary auth fails
+    \item \faIcon{clipboard-list}\hspace{0.2em}\textbf{Audit immediately:} All break-glass usage must be reviewed within 24 hours
+    \item \faIcon{undo}\hspace{0.2em}\textbf{Reset after use:} Rotate credentials after every emergency access
+    \item \faIcon{phone}\hspace{0.2em}\textbf{Out-of-band verification:} Confirm identity via separate channel before granting access
+\end{itemize}
+
+\postertip{
+\faIcon{lightbulb}\hspace{0.2em}Every remote access connection is a potential attack path. MFA is non-negotiable -- stolen credentials were the primary vector in the Ukraine incidents. Consider implementing a \textbf{Privileged Access Management} (PAM) solution for session control and credential vaulting.
+}
+
+\end{multicols}
+
+\end{document}

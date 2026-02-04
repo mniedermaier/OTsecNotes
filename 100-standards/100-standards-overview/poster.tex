@@ -1,0 +1,170 @@
+% ============================================================================
+%  OT Security Standards Overview - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {OT Security Standards Overview}
+    {Global Industrial Cybersecurity Regulations}
+    {Poster 100}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{globe}}\hspace{0.4em}Overview}
+
+The convergence of IT and OT, combined with rising cyber threats to critical infrastructure, has led to numerous cybersecurity standards worldwide. Understanding these is essential for multi-region or multi-sector organizations.
+
+\section{\textcolor{accent}{\faIcon{sitemap}}\hspace{0.4em}Standards Landscape}
+
+\begin{center}
+\begin{tikzpicture}[
+    std/.style={rectangle, draw=#1!60, thick, fill=#1!12, rounded corners=2pt,
+        minimum height=0.4cm, align=center, font=\scriptsize},
+    std/.default={otaccent},
+    cat/.style={font=\scriptsize\bfseries, text=#1},
+    conn/.style={-, thick, #1!30},
+    conn/.default={otaccent},
+]
+    % Center - IEC 62443
+    \node[std=otprimary, minimum width=2.2cm, minimum height=0.5cm, font=\scriptsize\bfseries] (iec) at (0,0) {IEC 62443};
+
+    % International
+    \node[std=otinfo, minimum width=1.5cm] (iso) at (-2.2,0.8) {ISO 27001};
+    \node[std=otinfo, minimum width=1.5cm] (isa) at (2.2,0.8) {ISA-95};
+
+    % Regional
+    \node[std=otsuccess, minimum width=1.5cm] (nist) at (-2.2,-0.1) {NIST 800-82};
+    \node[std=otdanger, minimum width=1.5cm] (nerc) at (-2.2,-0.9) {NERC CIP};
+    \node[std=otwarning, minimum width=1.2cm] (nis2) at (2.2,-0.1) {NIS2};
+    \node[std=otwarning, minimum width=1.2cm] (cra) at (2.2,-0.9) {CRA};
+
+    % Connections
+    \draw[conn=otinfo] (iso) -- (iec);
+    \draw[conn=otinfo] (isa) -- (iec);
+    \draw[conn=otsuccess] (nist) -- (iec);
+    \draw[conn=otdanger] (nerc) -- (iec);
+    \draw[conn=otwarning] (nis2) -- (iec);
+    \draw[conn=otwarning] (cra) -- (iec);
+
+    % Region labels
+    \node[cat=otinfo] at (0,1.2) {International};
+    \node[cat=otsuccess] at (-2.8,-0.5) {USA};
+    \node[cat=otwarning] at (2.8,-0.5) {EU};
+\end{tikzpicture}
+\end{center}
+
+\posterinfo{
+\textbf{Types of standards:} International (ISO, IEC, ISA), Regional regulations (EU, North America), National guidelines, and Sector-specific (energy, water, manufacturing).
+}
+
+\section{\textcolor{accent}{\faIcon{map}}\hspace{0.4em}Global Standards Map}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{2.8cm}p{1.8cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Region} & \textcolor{white}{\bfseries Key Standards} & \textcolor{white}{\bfseries Mandatory} \\
+\midrule
+International & IEC 62443, ISO 27001 & No \\
+North America & NIST 800-82, NERC CIP & Partial \\
+Europe & NIS2, CRA, BSI & Yes \\
+Asia-Pacific & GB/T 30976, METI & Partial \\
+Australia/NZ & SOCI Act, AESCSF & Yes \\
+Middle East & NESA (UAE), NCA (SA) & Yes \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{globe-americas}}\hspace{0.4em}International Standards}
+
+\subsection{\textcolor{accent}{\faIcon{gavel}}\hspace{0.3em}IEC 62443}
+Comprehensive IACS security framework. Four series: General, Policies/Procedures, System, Component. Covers asset owners, integrators, and vendors. \textbf{Most widely referenced standard globally.}
+
+\subsection{\faIcon{certificate}\hspace{0.3em}ISO/IEC 27001}
+Information security management systems (ISMS). Certifiable. General framework often combined with IEC 62443 for OT-specific requirements.
+
+\subsection{\faIcon{sitemap}\hspace{0.3em}ISA-95 / IEC 62264}
+Enterprise-control system integration. Defines functional hierarchy, basis for Purdue Model.
+
+\section{\textcolor{accent}{\faIcon{flag-usa}}\hspace{0.4em}North America}
+
+\begin{itemize}
+    \item \textcolor{info}{\faIcon{book}}\hspace{0.2em}\textbf{NIST SP 800-82:} Primary US guidance for OT security (Rev. 3, 2023). Voluntary.
+    \item \textcolor{danger}{\faIcon{exclamation-triangle}}\hspace{0.2em}\textbf{NERC CIP:} \textbf{Mandatory} for bulk electric system. Penalties up to \$1M/violation/day.
+    \item \textcolor{accent}{\faIcon{shield-alt}}\hspace{0.2em}\textbf{NIST CSF:} Risk-based framework, all sectors.
+    \item \textcolor{accent}{\faIcon{road}}\hspace{0.2em}\textbf{TSA Directives:} Pipeline and rail cybersecurity requirements.
+    \item \textcolor{accent}{\faIcon{flag}}\hspace{0.2em}\textbf{Canada:} CSA Z246.1 (petroleum/gas), NERC CIP (power).
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{globe}}\hspace{0.4em}Europe}
+
+\posterdanger{
+\textbf{NIS2 Directive:} Mandatory for essential and important entities across EU. Significantly expands scope -- energy, transport, health, water, digital infrastructure, manufacturing. Member states must transpose into national law.
+}
+
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{shield-alt}}\hspace{0.2em}\textbf{Cyber Resilience Act (CRA):} Mandatory cybersecurity for products with digital elements -- hardware and software including OT components.
+    \item \textcolor{accent}{\faIcon{building}}\hspace{0.2em}\textbf{Germany:} BSI IT-Grundschutz (OT module: IND), IT-Sicherheitsgesetz 2.0, KRITIS Verordnung.
+    \item \textcolor{accent}{\faIcon{flag}}\hspace{0.2em}\textbf{UK:} NIS Regulations, NCSC Cyber Assessment Framework.
+    \item \textcolor{accent}{\faIcon{flag}}\hspace{0.2em}\textbf{France:} LPM (Military Programming Law), ANSSI Guidelines.
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{globe-asia}}\hspace{0.4em}Asia-Pacific \& Others}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{flag}}\hspace{0.2em}\textbf{China:} GB/T 22239, GB/T 30976 (ICS), Cybersecurity Law (mandatory for CI).
+    \item \textcolor{accent}{\faIcon{flag}}\hspace{0.2em}\textbf{Japan:} METI Cyber-Physical Security Framework, NISC.
+    \item \textcolor{accent}{\faIcon{flag}}\hspace{0.2em}\textbf{Australia:} SOCI Act, AESCSF (energy), Essential Eight.
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{industry}}\hspace{0.4em}Sector-Specific Standards}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.5cm}p{2.2cm}p{3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Sector} & \textcolor{white}{\bfseries Standard} & \textcolor{white}{\bfseries Scope} \\
+\midrule
+\faIcon{bolt}\hspace{0.1em}Power & NERC CIP & Bulk electric system \\
+\faIcon{gas-pump}\hspace{0.1em}Oil \& Gas & API 1164 & Pipeline SCADA \\
+\faIcon{tint}\hspace{0.1em}Water & AWWA Guide & Water utilities \\
+\faIcon{atom}\hspace{0.1em}Nuclear & NRC 10 CFR & US nuclear cybersecurity \\
+\faIcon{ship}\hspace{0.1em}Maritime & IMO MSC.428 & Cyber risk management \\
+\faIcon{train}\hspace{0.1em}Rail & EN 50129 & Safety-related systems \\
+\faIcon{car}\hspace{0.1em}Auto & ISO/SAE 21434 & Vehicle cybersecurity \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{columns}}\hspace{0.4em}Standards Comparison}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.8cm}p{0.7cm}p{0.7cm}p{0.7cm}p{2cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Standard} & \textcolor{white}{\bfseries Mand.} & \textcolor{white}{\bfseries Cert.} & \textcolor{white}{\bfseries OT} & \textcolor{white}{\bfseries Region} \\
+\midrule
+IEC 62443 & No & Yes & Yes & International \\
+ISO 27001 & No & Yes & No & International \\
+NIST 800-82 & No & No & Yes & USA \\
+NERC CIP & Yes & No & Yes & N. America \\
+NIS2 & Yes & No & Part & EU \\
+GB/T 30976 & Yes & No & Yes & China \\
+\end{tabular}
+\end{center}
+
+\posterwarning{
+\textbf{Compliance is not security.} Standards provide a minimum baseline. Organizations should use risk-based approaches to go beyond checklists -- especially in OT where safety and availability are paramount.
+}
+
+\postertip{
+When operating across multiple regions, use \textbf{IEC 62443 as a baseline} framework and map to regional requirements. This provides a common foundation while ensuring local compliance.
+}
+
+\end{multicols}
+
+\end{document}

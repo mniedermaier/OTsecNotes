@@ -1,0 +1,169 @@
+% ============================================================================
+%  IEC 62443 Security Level Mapping - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {IEC 62443 SL Mapping}
+    {Security Solutions Mapped to SL1--SL4}
+    {Poster 120}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{layer-group}}\hspace{0.4em}Security Levels}
+
+\begin{center}
+\begin{tikzpicture}[
+    slbox/.style={rectangle, draw=#1!60, thick, fill=#1!15, rounded corners=2pt,
+        minimum height=0.45cm, align=center, font=\scriptsize},
+    arr/.style={->, very thick, >=stealth, otaccent!40},
+]
+    \node[slbox=otsuccess, minimum width=1.2cm] (sl1) at (0,0) {\textbf{SL 1}};
+    \node[slbox=otinfo, minimum width=1.2cm, right=4pt of sl1] (sl2) {\textbf{SL 2}};
+    \node[slbox=otwarning, minimum width=1.2cm, right=4pt of sl2] (sl3) {\textbf{SL 3}};
+    \node[slbox=otdanger, minimum width=1.2cm, right=4pt of sl3] (sl4) {\textbf{SL 4}};
+    \draw[arr] (sl1) -- (sl2);
+    \draw[arr] (sl2) -- (sl3);
+    \draw[arr] (sl3) -- (sl4);
+    \node[font=\scriptsize, text=otsuccess, below=1pt of sl1] {Casual};
+    \node[font=\scriptsize, text=otinfo, below=1pt of sl2] {Intentional};
+    \node[font=\scriptsize, text=otwarning, below=1pt of sl3] {Sophisticated};
+    \node[font=\scriptsize, text=otdanger, below=1pt of sl4] {Nation-State};
+\end{tikzpicture}
+\end{center}
+
+\posterwarning{
+Most environments should target \textbf{SL2} as baseline. Critical infrastructure (energy, water, chemical) typically requires \textbf{SL3}. SL4 is reserved for high-value national security targets.
+}
+
+\section{\textcolor{accent}{\faIcon{user-check}}\hspace{0.4em}FR1: Identification \& Auth}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.2cm}p{5.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries SL} & \textcolor{white}{\bfseries Solutions} \\
+\midrule
+\slone & Unique accounts, basic passwords, IP/hostname ID \\
+\sltwo & Strong passwords, RBAC, central auth (AD), device certs \\
+\slthree & MFA, hardware tokens, cert-based device auth, PAM \\
+\slfour & Biometrics, HSM, mutual TLS, continuous verification \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{user-lock}}\hspace{0.4em}FR2: Use Control}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.2cm}p{5.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries SL} & \textcolor{white}{\bfseries Solutions} \\
+\midrule
+\slone & Basic perms on HMI, separate operator/engineer, timeout \\
+\sltwo & Granular RBAC, least privilege, auto-lock, audit logging \\
+\slthree & ABAC, JIT privilege, dual authorization, access reviews \\
+\slfour & Four-eyes principle, real-time monitoring, zero-trust \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{check-circle}}\hspace{0.4em}FR3: System Integrity}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.2cm}p{5.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries SL} & \textcolor{white}{\bfseries Solutions} \\
+\midrule
+\slone & Antivirus, basic change mgmt, manual config backups \\
+\sltwo & App whitelisting, FIM, automated backup, patch mgmt \\
+\slthree & Code signing, PLC integrity verify, secure boot, CMDB \\
+\slfour & Hardware root of trust (TPM), crypto verify, auto-remediation \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{lock}}\hspace{0.4em}FR4: Data Confidentiality}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.2cm}p{5.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries SL} & \textcolor{white}{\bfseries Solutions} \\
+\midrule
+\slone & Password-protected files, physical access, basic separation \\
+\sltwo & VPN, HTTPS for web, encrypted DB, data classification \\
+\slthree & E2E encryption (OPC UA Secure), FDE, DLP, encrypted tunnels \\
+\slfour & HW encryption (SED), encrypted memory, data diodes \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{filter}}\hspace{0.4em}FR5: Restricted Data Flow}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.2cm}p{5.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries SL} & \textcolor{white}{\bfseries Solutions} \\
+\midrule
+\slone & Basic firewall IT/OT, VLANs, default deny rules \\
+\sltwo & Industrial DMZ, stateful inspection, jump servers, NAC \\
+\slthree & DPI for OT protocols, micro-segmentation, data diodes \\
+\slfour & HW data diodes, air-gapped safety, protocol break, zero-trust \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{bell}}\hspace{0.4em}FR6: Timely Response}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.2cm}p{5.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries SL} & \textcolor{white}{\bfseries Solutions} \\
+\midrule
+\slone & Local logging, basic failure alerts, manual log review \\
+\sltwo & SIEM, OT IDS, documented IR plan, regular IR drills \\
+\slthree & OT anomaly detection, 24/7 SOC, threat intel, forensic readiness \\
+\slfour & AI/ML threat detection, SOAR, dedicated OT SOC, threat hunting \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{server}}\hspace{0.4em}FR7: Resource Availability}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.2cm}p{5.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries SL} & \textcolor{white}{\bfseries Solutions} \\
+\midrule
+\slone & UPS, regular backups, basic spare parts \\
+\sltwo & Redundant network, hot standby, DoS protection, tested recovery \\
+\slthree & Redundant controllers (2oo3), geo-redundancy, rate limiting \\
+\slfour & Full system redundancy, isolated backup control room, EMP prot. \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{map}}\hspace{0.4em}Implementation Guidance}
+
+\postersuccess{
+\textbf{Assessment approach:}
+\begin{enumerate}
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Map zones and conduits} -- Document OT architecture
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Determine target SL} -- Based on risk assessment
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Gap analysis} -- Compare current state to target
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Prioritize} -- Address highest-risk gaps first
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Implement incrementally} -- Don't try SL3 overnight
+\end{enumerate}
+}
+
+\posterdanger{
+\textbf{Common pitfalls:} Applying IT solutions without OT adaptation; targeting SL4 when SL2 is sufficient; ignoring operational impact of security controls; focusing on technology without processes and training.
+}
+
+\end{multicols}
+
+\end{document}

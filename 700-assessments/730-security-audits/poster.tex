@@ -1,0 +1,187 @@
+% ============================================================================
+%  OT Security Audits - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {OT Security Audits}
+    {Conducting Effective Security Assessments in Industrial Environments}
+    {Poster 730}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+Security audits systematically evaluate controls against established standards, policies, or regulatory requirements. In OT, audits must \textbf{balance thoroughness with operational safety} and involve unique constraints not found in IT audits.
+
+\posterinfo{
+\textbf{Audit objectives:} Compliance verification, control assessment, gap identification, risk quantification, and improvement roadmap development.
+}
+
+\section{\textcolor{accent}{\faIcon{clipboard-check}}\hspace{0.4em}Types of OT Audits}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{clipboard-check}\hspace{0.2em}\bfseries Type} & \textcolor{white}{\bfseries Focus Areas} \\
+\midrule
+Compliance & IEC 62443, NERC CIP, ISO 27001 \\
+Technical & Network, config, access, vulns \\
+Operational & Procedures, training, IR, change mgmt \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{gavel}}\hspace{0.3em}Compliance Standards}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{gavel}\hspace{0.2em}\bfseries Standard} & \textcolor{white}{\bfseries Industry / Focus} \\
+\midrule
+IEC 62443 & All industrial -- security levels \\
+NERC CIP & Power/utilities -- CIP \\
+NIST 800-82 & Government -- OT security \\
+ISO 27001 & General -- ISMS with OT scope \\
+TSA Pipeline & Oil \& gas -- cyber directives \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{clipboard-list}}\hspace{0.4em}Audit Planning}
+
+\begin{enumerate}
+    \item \faIcon{crosshairs}\hspace{0.2em}Define audit scope and objectives
+    \item \faIcon{gavel}\hspace{0.2em}Identify applicable standards/requirements
+    \item \faIcon{folder-open}\hspace{0.2em}Request documentation and network diagrams
+    \item \faIcon{users}\hspace{0.2em}Coordinate with OT operations team
+    \item \faIcon{hard-hat}\hspace{0.2em}Plan on-site activities and safety briefing
+\end{enumerate}
+
+\subsection{\textcolor{accent}{\faIcon{crosshairs}}\hspace{0.3em}Scope Considerations}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{crosshairs}\hspace{0.2em}\bfseries Element} & \textcolor{white}{\bfseries Considerations} \\
+\midrule
+Locations & Which facilities, remote sites? \\
+Systems & All OT or specific zones? \\
+Standards & Which frameworks apply? \\
+Depth & Full or focused review? \\
+Testing & Passive only or include active? \\
+Timeline & Duration, report deadline? \\
+\end{tabular}
+\end{center}
+
+\posterwarning{
+\textbf{Critical stakeholders:} OT Operations (access, context), Engineering (documentation, architecture), IT Security (integration, policies), Safety (safety system considerations), Management (authorization, resources).
+}
+
+\section{\textcolor{accent}{\faIcon{cogs}}\hspace{0.4em}Audit Execution}
+
+\subsection{\textcolor{accent}{\faIcon{file-alt}}\hspace{0.3em}Document Review}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{file-alt}\hspace{0.2em}\bfseries Document} & \textcolor{white}{\bfseries Review Focus} \\
+\midrule
+Network diagrams & Accuracy, segmentation \\
+Security policies & OT-specific coverage \\
+Procedures & Change mgmt, IR \\
+Asset inventory & Completeness, currency \\
+Risk assessments & Methodology, findings \\
+Previous audits & Prior findings, remediation \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{search}}\hspace{0.3em}Technical Assessment Areas}
+
+\begin{itemize}
+    \item \textcolor{info}{\faIcon{network-wired}}\hspace{0.2em}\textbf{Network} -- Segmentation, firewall rules, remote access
+    \item \textcolor{accent}{\faIcon{server}}\hspace{0.2em}\textbf{Systems} -- Configuration hardening, patch status, auth
+    \item \textcolor{success}{\faIcon{database}}\hspace{0.2em}\textbf{Data} -- Backup verification, encryption, log management
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{users}}\hspace{0.3em}Interviews and Observation}
+
+\begin{itemize}
+    \item \textcolor{warning}{\faIcon{user}}\hspace{0.2em}Operator interviews -- Security awareness, procedures
+    \item \textcolor{warning}{\faIcon{cog}}\hspace{0.2em}Engineer interviews -- Change management, system knowledge
+    \item \textcolor{warning}{\faIcon{door-open}}\hspace{0.2em}Physical observation -- Access controls, badge usage
+    \item \textcolor{warning}{\faIcon{eye}}\hspace{0.2em}Process observation -- How procedures are actually followed
+\end{itemize}
+
+\posterdanger{
+\textbf{Safety requirements for auditors:} Complete site safety orientation. Wear required PPE. Never touch OT equipment without authorization. Coordinate all testing with operations. Know emergency procedures. Never compromise safety for audit completeness.
+}
+
+\section{\textcolor{accent}{\faIcon{exclamation-circle}}\hspace{0.4em}Common Audit Findings}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{exclamation-circle}\hspace{0.2em}\bfseries Category} & \textcolor{white}{\bfseries Common Examples} \\
+\midrule
+Network & Insufficient segmentation \\
+Access control & Shared accounts, weak passwords \\
+Assets & Incomplete inventory \\
+Patching & Outdated systems, no process \\
+Remote access & Direct internet, no logging \\
+Monitoring & Limited visibility, no alerting \\
+Documentation & Outdated diagrams, missing procedures \\
+Training & No OT security awareness \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{file-alt}}\hspace{0.4em}Reporting and Remediation}
+
+\postersuccess{
+\textbf{Effective audit reports include:} Executive summary with priorities. Scope and methodology. Detailed findings with evidence. Prioritized remediation ranked by risk. Compliance mapping to requirements. Supporting technical appendices.
+}
+
+\subsection{\textcolor{accent}{\faIcon{pen}}\hspace{0.3em}Finding Documentation}
+
+Each finding should include:
+
+\begin{itemize}
+    \item \faIcon{align-left}\hspace{0.2em}\textbf{Description} -- Clear explanation of the issue
+    \item \faIcon{camera}\hspace{0.2em}\textbf{Evidence} -- Screenshots, logs, observations
+    \item \faIcon{exclamation-triangle}\hspace{0.2em}\textbf{Risk} -- Potential impact and likelihood
+    \item \faIcon{check-circle}\hspace{0.2em}\textbf{Recommendation} -- Specific remediation guidance
+    \item \faIcon{bookmark}\hspace{0.2em}\textbf{Reference} -- Related standard/requirement
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{calendar-alt}}\hspace{0.3em}Audit Frequency}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{1.5cm}p{2.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{calendar-alt}\hspace{0.2em}\bfseries Type} & \textcolor{white}{\bfseries Freq.} & \textcolor{white}{\bfseries Driver} \\
+\midrule
+Full compliance & Annual & Regulatory \\
+Technical & Semi-annual & Risk management \\
+Focused review & As needed & Changes, incidents \\
+Self-assessment & Quarterly & Improvement \\
+Third-party & 1--3 years & Certification \\
+\end{tabular}
+\end{center}
+
+\postertip{
+OT security audits require \textbf{operational awareness and safety consciousness}. Coordinate with operations, never compromise safety for completeness. Use a mix of compliance, technical, and operational audits. Track remediation progress and watch for recurring findings. Combine internal audits for continuous improvement with external audits for independent verification. Evidence-based findings drive real security improvement.
+}
+
+\end{multicols}
+
+\end{document}

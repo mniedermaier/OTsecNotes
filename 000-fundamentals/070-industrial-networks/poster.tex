@@ -1,0 +1,204 @@
+% ============================================================================
+%  Industrial Networks - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {Industrial Networks}
+    {OT Network Technologies, Topologies, and Fieldbus Systems}
+    {Poster 070}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{network-wired}}\hspace{0.4em}Overview}
+
+Industrial networks connect field devices, controllers, and supervisory systems. Unlike IT networks optimized for throughput, industrial networks prioritize \textbf{determinism}, \textbf{reliability}, and \textbf{real-time performance} for process control.
+
+\section{\textcolor{accent}{\faIcon{project-diagram}}\hspace{0.4em}Network Topologies}
+
+\begin{center}
+\begin{tikzpicture}[
+    nd/.style={circle, draw=#1!60, thick, fill=#1!20, minimum size=0.25cm, inner sep=0pt},
+    nd/.default={otaccent},
+    sw/.style={rectangle, draw=otprimary!60, thick, fill=otprimary!15, minimum size=0.3cm, inner sep=0pt, font=\scriptsize},
+    lk/.style={-, thick, #1!50},
+    lk/.default={otaccent},
+    tlbl/.style={font=\scriptsize\bfseries, text=otprimary},
+]
+    % Star topology
+    \node[tlbl] at (-2.8,1.4) {Star};
+    \node[sw] (sc) at (-2.8,0.7) {\faIcon{server}};
+    \node[nd] (s1) at (-3.5,0.2) {};
+    \node[nd] (s2) at (-2.8,0) {};
+    \node[nd] (s3) at (-2.1,0.2) {};
+    \node[nd] (s4) at (-3.3,1.2) {};
+    \node[nd] (s5) at (-2.3,1.2) {};
+    \draw[lk] (sc)--(s1); \draw[lk] (sc)--(s2); \draw[lk] (sc)--(s3);
+    \draw[lk] (sc)--(s4); \draw[lk] (sc)--(s5);
+
+    % Ring topology
+    \node[tlbl] at (-0.3,1.4) {Ring};
+    \node[nd=otsuccess] (r1) at (-0.3,1.05) {};
+    \node[nd=otsuccess] (r2) at (0.25,0.7) {};
+    \node[nd=otsuccess] (r3) at (0.15,0.15) {};
+    \node[nd=otsuccess] (r4) at (-0.75,0.15) {};
+    \node[nd=otsuccess] (r5) at (-0.85,0.7) {};
+    \draw[lk=otsuccess] (r1)--(r2); \draw[lk=otsuccess] (r2)--(r3);
+    \draw[lk=otsuccess] (r3)--(r4); \draw[lk=otsuccess] (r4)--(r5);
+    \draw[lk=otsuccess] (r5)--(r1);
+
+    % Bus/Line topology
+    \node[tlbl] at (1.9,1.4) {Bus};
+    \draw[lk=otwarning, very thick] (1.2,0.6) -- (2.6,0.6);
+    \node[nd=otwarning] at (1.4,0.6) {};
+    \node[nd=otwarning] at (1.7,0.6) {};
+    \node[nd=otwarning] at (2.0,0.6) {};
+    \node[nd=otwarning] at (2.3,0.6) {};
+
+    % Mesh topology
+    \node[tlbl] at (3.8,1.4) {Mesh};
+    \node[nd=otinfo] (m1) at (3.4,1.0) {};
+    \node[nd=otinfo] (m2) at (4.2,1.0) {};
+    \node[nd=otinfo] (m3) at (3.4,0.2) {};
+    \node[nd=otinfo] (m4) at (4.2,0.2) {};
+    \draw[lk=otinfo] (m1)--(m2); \draw[lk=otinfo] (m2)--(m3);
+    \draw[lk=otinfo] (m3)--(m4); \draw[lk=otinfo] (m4)--(m1);
+    \draw[lk=otinfo] (m1)--(m3); \draw[lk=otinfo] (m2)--(m4);
+\end{tikzpicture}
+\end{center}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.2cm}p{1.8cm}p{1cm}p{2.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Topo.} & \textcolor{white}{\bfseries Redundancy} & \textcolor{white}{\bfseries Cost} & \textcolor{white}{\bfseries Common Use} \\
+\midrule
+Star & None (single SW) & Med & Ethernet networks \\
+Ring & High (dual path) & High & Critical systems \\
+Bus/Line & None & Low & Legacy fieldbus \\
+Mesh & Very high & High & Wireless, critical \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{plug}}\hspace{0.4em}Serial Communications}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{arrows-alt-h}}\hspace{0.2em}\textbf{RS-232:} Point-to-point, $<$15m, HMI-to-PLC, up to 115.2 kbps
+    \item \textcolor{accent}{\faIcon{sitemap}}\hspace{0.2em}\textbf{RS-485:} Multi-drop (32 devices), up to 1200m, basis for Modbus RTU, up to 10 Mbps
+\end{itemize}
+
+\posterwarning{
+Serial protocols have \textbf{no authentication or encryption}. Physical bus access allows reading and injecting traffic. Serial-to-Ethernet converters expose insecure protocols to IP networks.
+}
+
+\section{\textcolor{accent}{\faIcon{exchange-alt}}\hspace{0.4em}Legacy Fieldbus Protocols}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{1.8cm}p{2.8cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Protocol} & \textcolor{white}{\bfseries Physical} & \textcolor{white}{\bfseries Typical Use} \\
+\midrule
+Modbus RTU & RS-485 & Universal, simple I/O \\
+PROFIBUS DP & RS-485 & Siemens environments \\
+DeviceNet & CAN bus & Rockwell/Allen-Bradley \\
+Foundation FF & H1 (31.25k) & Process instruments \\
+HART & 4-20mA+dig & Smart instruments \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{ethernet}}\hspace{0.4em}Industrial Ethernet}
+
+Industrial Ethernet adapts standard Ethernet for factory and process automation with enhanced reliability and real-time capabilities.
+
+\subsection{\textcolor{accent}{\faIcon{not-equal}}\hspace{0.3em}Key Differences from IT Ethernet}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{clock}}\hspace{0.2em}\textbf{Deterministic timing:} Guaranteed delivery within defined time
+    \item \textcolor{accent}{\faIcon{shield-alt}}\hspace{0.2em}\textbf{Ruggedized hardware:} Extended temp, vibration, EMI resistance
+    \item \textcolor{accent}{\faIcon{copy}}\hspace{0.2em}\textbf{Ring redundancy:} Sub-50ms failover (MRP, HSR, PRP)
+    \item \textcolor{accent}{\faIcon{layer-group}}\hspace{0.2em}\textbf{Application layer:} Industrial-specific protocols
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{list-ul}}\hspace{0.3em}Industrial Ethernet Protocols}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{2.2cm}p{2.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Protocol} & \textcolor{white}{\bfseries Vendor/Org} & \textcolor{white}{\bfseries Real-Time Method} \\
+\midrule
+EtherNet/IP & ODVA (Rockwell) & Standard TCP/IP + CIP \\
+PROFINET & Siemens/PI & IRT (Isochronous RT) \\
+Modbus TCP & Modbus.org & Standard TCP/IP \\
+EtherCAT & Beckhoff/ETG & Processing on the fly \\
+OPC UA & OPC Foundation & Pub/Sub, TSN \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{copy}}\hspace{0.4em}Network Redundancy}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1cm}p{3cm}p{2.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Proto} & \textcolor{white}{\bfseries Description} & \textcolor{white}{\bfseries Recovery} \\
+\midrule
+MRP & Media Redundancy, ring & \textcolor{warning}{$<$200ms} \\
+RSTP & Rapid Spanning Tree & \textcolor{danger}{$<$2s} \\
+HSR & Seamless Redundancy & \textcolor{success}{Zero (0ms)} \\
+PRP & Parallel Redundancy & \textcolor{success}{Zero (0ms)} \\
+\end{tabular}
+\end{center}
+
+\posterinfo{
+\textbf{MRP} uses ring topology with one blocked port. On link failure, the blocked port activates. \textbf{HSR/PRP} provide zero-loss redundancy by sending frames on two paths simultaneously.
+}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Security Considerations}
+
+\posterdanger{
+\textbf{Common vulnerabilities:}
+\begin{itemize}
+    \item \textbf{No authentication:} Most fieldbus protocols accept any command
+    \item \textbf{No encryption:} Traffic readable by anyone on the network
+    \item \textbf{Flat networks:} No segmentation between zones
+    \item \textbf{Legacy devices:} Cannot be patched or upgraded
+    \item \textbf{Broadcast traffic:} Easy reconnaissance via passive sniffing
+\end{itemize}
+}
+
+\postersuccess{
+\textbf{Security measures:}
+\begin{itemize}
+    \item Segment networks by function and criticality (zones/conduits)
+    \item Deploy industrial firewalls at zone boundaries
+    \item Use managed switches with port security and VLANs
+    \item Implement network monitoring and anomaly detection
+    \item Disable unused ports and services on all devices
+    \item Consider encrypted tunnels (VPN) for sensitive traffic
+\end{itemize}
+}
+
+\subsection{\textcolor{accent}{\faIcon{tools}}\hspace{0.3em}Network Design Best Practices}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{network-wired}}\hspace{0.2em}\textbf{Managed switches:} Enable port security, MAC filtering, and VLAN tagging to isolate traffic between zones
+    \item \textcolor{accent}{\faIcon{shield-alt}}\hspace{0.2em}\textbf{Deep packet inspection:} Industrial-aware firewalls can parse OT protocols and enforce allowlists at the application layer
+    \item \textcolor{accent}{\faIcon{search}}\hspace{0.2em}\textbf{Passive monitoring:} Use SPAN/mirror ports to monitor traffic without affecting real-time operations
+    \item \textcolor{accent}{\faIcon{copy}}\hspace{0.2em}\textbf{Preserve redundancy:} Security implementations must not break MRP/HSR/PRP failover paths -- test thoroughly before deployment
+\end{itemize}
+
+\postertip{
+\textbf{Key takeaway:} Topology matters -- star, ring, and bus have different reliability profiles. Serial fieldbus remains common in brownfield sites. Industrial Ethernet differs from IT Ethernet in determinism and redundancy requirements.
+}
+
+\end{multicols}
+
+\end{document}

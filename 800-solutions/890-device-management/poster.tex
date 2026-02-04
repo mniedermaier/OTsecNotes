@@ -1,0 +1,178 @@
+% ============================================================================
+%  Device Management in OT - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {Device Management in OT}
+    {Centralized Management, Directory Services, and Software Deployment}
+    {Poster 890}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+OT device management must balance \textbf{operational requirements, safety, and security} when managing diverse industrial assets. Unlike IT, OT contains heterogeneous devices with varying management capabilities.
+
+\posterinfo{
+\textbf{Scope:} Asset inventory, configuration management, software deployment, identity management (authentication/authorization), and health/compliance monitoring.
+}
+
+\section{\textcolor{accent}{\faIcon{server}}\hspace{0.4em}Device Landscape}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{1.8cm}p{2.4cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{server}\hspace{0.2em}\bfseries Device} & \textcolor{white}{\bfseries Mgmt Cap.} & \textcolor{white}{\bfseries Approach} \\
+\midrule
+Windows HMI & Full domain & Directory services, updates \\
+Linux servers & SSH, config mgmt & Ansible, Puppet, manual \\
+PLCs/RTUs & Proprietary & Vendor tools only \\
+Network equip. & SNMP, SSH, web & Network mgmt systems \\
+Embedded & Limited/none & Firmware via USB \\
+Safety (SIS) & Restricted & Isolated, manual \\
+\end{tabular}
+\end{center}
+
+\posterwarning{
+\textbf{Availability:} OT systems operate 24/7 with minimal maintenance windows. Forced reboots or auto-updates can cause production outages or safety incidents. Management traffic must respect zone boundaries.
+}
+
+\section{\textcolor{accent}{\faIcon{sitemap}}\hspace{0.4em}Directory Services}
+
+\subsection{\textcolor{accent}{\faIcon{project-diagram}}\hspace{0.3em}Deployment Options}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{project-diagram}\hspace{0.2em}\bfseries Option} & \textcolor{white}{\bfseries Trade-offs} \\
+\midrule
+Dedicated OT domain & Full isolation; duplicate admin \\
+Extended enterprise & Single sign-on; IT-to-OT attack path \\
+One-way trust & Enterprise auth, OT isolated; complex \\
+\end{tabular}
+\end{center}
+
+\postersuccess{
+\textbf{Recommendation:} Use dedicated OT domains or one-way trusts. Place Read-Only Domain Controllers (RODCs) in the DMZ to service OT authentication without exposing writable directory services.
+}
+
+\subsection{\textcolor{accent}{\faIcon{columns}}\hspace{0.3em}Group Policy: IT vs OT}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{1.8cm}p{2.4cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Policy} & \textcolor{white}{\bfseries IT} & \textcolor{white}{\bfseries OT} \\
+\midrule
+Auto updates & Enabled & Disabled/controlled \\
+Screen lock & 5--15 min & Extended/disabled \\
+Password expiry & 60--90 days & Longer or certs \\
+USB control & Blocked & Maintenance access \\
+Software restrict & AppLocker & App whitelisting \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{download}}\hspace{0.4em}Software Deployment}
+
+\subsection{\textcolor{accent}{\faIcon{layer-group}}\hspace{0.3em}Hierarchical Update Architecture}
+
+\begin{center}
+\begin{tikzpicture}[
+    sbox/.style={rectangle, draw=otprimary, rounded corners=2pt,
+                 fill=#1!12, minimum width=3.2cm, minimum height=0.3cm,
+                 font=\scriptsize, align=center, inner sep=2pt},
+    fw/.style={font=\scriptsize, text=otdanger},
+    arr/.style={->, >=stealth, otaccent},
+]
+    \node[sbox=otprimary] (int) at (0,0) {\faIcon{globe} Internet};
+    \node[sbox=otaccent]  (ent) at (0,-0.5) {\faIcon{building} Enterprise};
+    \node[sbox=otwarning]  (dmz) at (0,-1.0) {\faIcon{server} DMZ};
+    \node[sbox=otsuccess]  (zon) at (0,-1.5) {\faIcon{sitemap} Zone Server};
+    \node[sbox=otinfo]     (cli) at (0,-2.0) {\faIcon{desktop} OT Clients};
+    \foreach \a/\b in {int/ent, ent/dmz, dmz/zon, zon/cli}
+        \draw[arr] (\a) -- (\b);
+    \node[fw] at (2.0,-0.25) {\faIcon{shield-alt}};
+    \node[fw] at (2.0,-0.75) {\faIcon{shield-alt}};
+    \node[fw] at (2.0,-1.25) {\faIcon{shield-alt}};
+\end{tikzpicture}
+\end{center}
+
+\posterdanger{
+\textbf{Never configure OT systems to pull updates directly from the internet.} All updates should flow through controlled internal servers after testing and vendor approval.
+}
+
+\subsection{\textcolor{accent}{\faIcon{cogs}}\hspace{0.3em}Configuration Management}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{1.5cm}p{2.7cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{cogs}\hspace{0.2em}\bfseries Approach} & \textcolor{white}{\bfseries Model} & \textcolor{white}{\bfseries OT Suitability} \\
+\midrule
+Agentless & Push/Pull & Good -- no agent install \\
+Agent-based & Pull & Needs agent + connectivity \\
+Image-based & Push & Standardized HMI deploys \\
+Manual scripts & Push & Limited scale, error-prone \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{clipboard-check}}\hspace{0.3em}Deployment Best Practices}
+
+\begin{enumerate}
+    \item \textcolor{info}{\faIcon{flask}}\hspace{0.2em}Validate all updates in test environment
+    \item \textcolor{info}{\faIcon{rocket}}\hspace{0.2em}Staged rollout: pilot systems first
+    \item \textcolor{success}{\faIcon{undo}}\hspace{0.2em}Maintain rollback capability
+    \item \textcolor{info}{\faIcon{calendar-alt}}\hspace{0.2em}Schedule during planned maintenance
+    \item \textcolor{info}{\faIcon{check-circle}}\hspace{0.2em}Confirm vendor approval before deploy
+\end{enumerate}
+
+\section{\textcolor{accent}{\faIcon{database}}\hspace{0.4em}Asset Inventory}
+
+Comprehensive asset tracking is the foundation of device management:
+
+\begin{itemize}
+    \item \textcolor{info}{\faIcon{server}}\hspace{0.2em}Hardware inventory (model, serial, location)
+    \item \textcolor{info}{\faIcon{code}}\hspace{0.2em}Software and firmware versions
+    \item \textcolor{info}{\faIcon{network-wired}}\hspace{0.2em}Network configuration (IP, VLAN, zone)
+    \item \textcolor{info}{\faIcon{shield-alt}}\hspace{0.2em}Security posture and patch level
+    \item \textcolor{info}{\faIcon{hdd}}\hspace{0.2em}Configuration backups
+    \item \textcolor{info}{\faIcon{user-tag}}\hspace{0.2em}Ownership and criticality rating
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{network-wired}}\hspace{0.4em}Management Network Design}
+
+\begin{itemize}
+    \item \textcolor{warning}{\faIcon{random}}\hspace{0.2em}Separate management from process traffic
+    \item \textcolor{warning}{\faIcon{ethernet}}\hspace{0.2em}Dual-homed devices: management NIC + process NIC
+    \item \textcolor{warning}{\faIcon{shield-alt}}\hspace{0.2em}All admin access through jump servers (MFA)
+    \item \textcolor{warning}{\faIcon{video}}\hspace{0.2em}Session recording for all management activities
+    \item \textcolor{warning}{\faIcon{clock}}\hspace{0.2em}Time-based access controls
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{clipboard-list}}\hspace{0.4em}Compliance Monitoring}
+
+\begin{itemize}
+    \item \textcolor{info}{\faIcon{check-circle}}\hspace{0.2em}OS hardening standard verification
+    \item \textcolor{info}{\faIcon{shield-alt}}\hspace{0.2em}Required security software presence
+    \item \textcolor{info}{\faIcon{ban}}\hspace{0.2em}Prohibited software detection
+    \item \textcolor{info}{\faIcon{users-cog}}\hspace{0.2em}Account and permission compliance
+    \item \textcolor{info}{\faIcon{download}}\hspace{0.2em}Patch level verification
+    \item \textcolor{info}{\faIcon{exclamation-triangle}}\hspace{0.2em}Configuration drift alerting
+\end{itemize}
+
+\postertip{
+Place management infrastructure per zone boundaries---use DMZ servers and one-way trusts. OT Group Policies differ from IT: disable auto-updates, extend lock timeouts, accommodate maintenance USB access. Use hierarchical update servers to control software flow. Test everything before deployment. Maintain comprehensive asset inventory including firmware, configuration, and security posture.
+}
+
+\end{multicols}
+
+\end{document}

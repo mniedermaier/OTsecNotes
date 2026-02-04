@@ -1,0 +1,204 @@
+% ============================================================================
+%  OT Forensics - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {OT Forensics}
+    {Evidence Collection and Analysis in Industrial Environments}
+    {Poster 610}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+Digital forensics in OT requires specialized approaches that balance \textbf{evidence preservation with operational continuity}. Unlike IT, OT investigators must work with proprietary systems, real-time constraints, and equipment that cannot be taken offline.
+
+\posterwarning{
+\textbf{Critical difference:} In IT, you take systems offline for imaging. In OT, shutting down a PLC or HMI may halt production or create safety hazards. \textcolor{warning}{\faIcon{exclamation-triangle}}\hspace{0.2em}\textbf{Live forensics} is often the only option.
+}
+
+\section{\textcolor{accent}{\faIcon{columns}}\hspace{0.4em}OT vs IT Forensics}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.8cm}p{2.2cm}p{2.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{columns}\hspace{0.2em}\bfseries Aspect} & \textcolor{white}{\faIcon{laptop}\hspace{0.2em}\bfseries IT} & \textcolor{white}{\faIcon{industry}\hspace{0.2em}\bfseries OT} \\
+\midrule
+Access & Image offline & Preserve ops \\
+Evidence & Disk, memory & Controllers, historian \\
+Tools & Standard suites & Vendor-specific \\
+File systems & NTFS, ext4 & Proprietary \\
+Time & Hours to days & Minutes to hours \\
+Expertise & IT analysts & OT + forensics \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{folder-open}}\hspace{0.4em}Evidence Sources}
+
+\subsection{\textcolor{accent}{\faIcon{network-wired}}\hspace{0.3em}Network Evidence}
+
+\begin{itemize}
+    \item \faIcon{save}\hspace{0.2em}\textbf{Packet captures} -- Full PCAP from TAPs or SPAN ports
+    \item \faIcon{chart-bar}\hspace{0.2em}\textbf{NetFlow/IPFIX} -- Connection metadata and flow stats
+    \item \faIcon{shield-alt}\hspace{0.2em}\textbf{Firewall logs} -- Allowed and denied connections
+    \item \faIcon{bell}\hspace{0.2em}\textbf{IDS/IPS alerts} -- Detection events with packet samples
+    \item \faIcon{code}\hspace{0.2em}\textbf{Protocol logs} -- Modbus, DNP3, OPC UA transactions
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{database}}\hspace{0.3em}Historian Data}
+
+\postersuccess{
+\textcolor{success}{\faIcon{check-circle}}\hspace{0.2em}\textbf{Key evidence source:} Historians often contain the best timeline of process anomalies. Sudden setpoint changes, unusual values, or gaps in data collection can indicate compromise.
+}
+
+\begin{itemize}
+    \item \faIcon{chart-line}\hspace{0.2em}Process variable trends (before, during, after)
+    \item \faIcon{bell}\hspace{0.2em}Alarm and event sequences
+    \item \faIcon{user-cog}\hspace{0.2em}Operator actions and acknowledgments
+    \item \faIcon{heartbeat}\hspace{0.2em}System health metrics
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{microchip}}\hspace{0.3em}Controller Evidence}
+
+\begin{itemize}
+    \item \faIcon{file-code}\hspace{0.2em}\textbf{Program files} -- Current logic vs known-good baseline
+    \item \faIcon{sliders-h}\hspace{0.2em}\textbf{Runtime variables} -- Current values in memory
+    \item \faIcon{clipboard-list}\hspace{0.2em}\textbf{Diagnostic buffers} -- Error logs, comm stats
+    \item \faIcon{microchip}\hspace{0.2em}\textbf{Firmware version} -- Check for unauthorized changes
+    \item \faIcon{folder-open}\hspace{0.2em}\textbf{Project files} -- Engineering workstation copies
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{desktop}}\hspace{0.3em}Endpoint Evidence}
+
+\begin{itemize}
+    \item \faIcon{hdd}\hspace{0.2em}Engineering workstation disk images
+    \item \faIcon{usb}\hspace{0.2em}USB device connection logs
+    \item \faIcon{key}\hspace{0.2em}Remote access session logs
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{sort-amount-down}}\hspace{0.4em}Order of Volatility}
+
+Collect evidence in order of how quickly it may be lost:
+
+\begin{center}
+\begin{tikzpicture}[
+    stepbox/.style={rectangle, draw=#1!50, thick, fill=#1!10,
+        rounded corners=2pt, minimum height=0.38cm, minimum width=5.8cm,
+        align=center, font=\scriptsize\bfseries},
+    stepbox/.default={otaccent},
+    num/.style={circle, fill=#1, text=white, font=\scriptsize\bfseries,
+        inner sep=0pt, minimum size=0.35cm},
+    num/.default={otprimary},
+    arr/.style={->, thick, >=stealth, otaccent!60},
+]
+    \node[stepbox=otdanger] (s1) at (0,0) {\textcolor{otdanger!80!black}{Network Traffic}};
+    \node[num=otdanger, left=2pt of s1] {1};
+    \node[stepbox=otwarning, below=3pt of s1] (s2) {\textcolor{otwarning!80!black}{Controller Memory}};
+    \node[num=otwarning, left=2pt of s2] {2};
+    \node[stepbox=otwarning, below=3pt of s2] (s3) {\textcolor{otwarning!80!black}{System RAM}};
+    \node[num=otwarning, left=2pt of s3] {3};
+    \node[stepbox=otinfo, below=3pt of s3] (s4) {\textcolor{otinfo!80!black}{Running Processes}};
+    \node[num=otinfo, left=2pt of s4] {4};
+    \node[stepbox=otsuccess, below=3pt of s4] (s5) {\textcolor{otsuccess!80!black}{Historian Data}};
+    \node[num=otsuccess, left=2pt of s5] {5};
+    \node[stepbox=otsuccess, below=3pt of s5] (s6) {\textcolor{otsuccess!80!black}{Disk Storage}};
+    \node[num=otsuccess, left=2pt of s6] {6};
+
+    \draw[arr] (s1) -- (s2);
+    \draw[arr] (s2) -- (s3);
+    \draw[arr] (s3) -- (s4);
+    \draw[arr] (s4) -- (s5);
+    \draw[arr] (s5) -- (s6);
+
+    \node[font=\scriptsize, otdanger, right=2pt of s1] {\faIcon{bolt} Most volatile};
+    \node[font=\scriptsize, otsuccess, right=2pt of s6] {\faIcon{hdd} Most persistent};
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{search}}\hspace{0.4em}Live Collection Techniques}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{search}\hspace{0.2em}\bfseries Method} & \textcolor{white}{\faIcon{align-left}\hspace{0.2em}\bfseries Description} \\
+\midrule
+Network TAP & Passive copy of all traffic \\
+SPAN port & Switch-based traffic copy \\
+PLC upload & Read-only program extract \\
+Historian export & Query historical data via API \\
+Log forwarding & Real-time copy to forensic server \\
+\end{tabular}
+\end{center}
+
+\posterdanger{
+\textcolor{danger}{\faIcon{ban}}\hspace{0.2em}\textbf{Do not:} Stop or restart controllers during evidence collection. Install forensic agents on production OT systems. Run active network scans. Modify system configurations to enable logging.
+}
+
+\section{\textcolor{accent}{\faIcon{link}}\hspace{0.4em}Chain of Custody}
+
+\begin{itemize}
+    \item \faIcon{user}\hspace{0.2em}\textbf{Who} collected the evidence
+    \item \faIcon{file-alt}\hspace{0.2em}\textbf{What} was collected (hashes, descriptions)
+    \item \faIcon{clock}\hspace{0.2em}\textbf{When} collection occurred (timestamps)
+    \item \faIcon{map-marker-alt}\hspace{0.2em}\textbf{Where} evidence was stored
+    \item \faIcon{tools}\hspace{0.2em}\textbf{How} collection was performed (tools, methods)
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{fingerprint}}\hspace{0.3em}Evidence Integrity}
+
+\begin{itemize}
+    \item \faIcon{hashtag}\hspace{0.2em}Calculate SHA-256 hashes immediately
+    \item \faIcon{lock}\hspace{0.2em}Use write-blockers for disk imaging
+    \item \faIcon{shield-alt}\hspace{0.2em}Store on encrypted, access-controlled media
+    \item \faIcon{clipboard-list}\hspace{0.2em}Maintain detailed logs of all access
+    \item \faIcon{copy}\hspace{0.2em}Create working copies for analysis
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{microscope}}\hspace{0.4em}Analysis Techniques}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{microscope}\hspace{0.2em}\bfseries Technique} & \textcolor{white}{\faIcon{cogs}\hspace{0.2em}\bfseries Application} \\
+\midrule
+Timeline & Correlate events across sources \\
+PLC analysis & Compare logic to known-good \\
+Network traffic & Identify unauthorized connections \\
+Protocol analysis & Analyze industrial commands \\
+Malware analysis & Examine suspicious files \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{wrench}}\hspace{0.4em}Forensic Tools}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{wrench}\hspace{0.2em}\bfseries Category} & \textcolor{white}{\faIcon{toolbox}\hspace{0.2em}\bfseries Tools} \\
+\midrule
+Network & Wireshark, tcpdump, NetworkMiner \\
+Disk imaging & FTK Imager, dd, Guymager \\
+Memory & Volatility, Rekall \\
+Timeline & log2timeline/Plaso, Timesketch \\
+PLC analysis & Vendor tools, custom scripts \\
+\end{tabular}
+\end{center}
+
+\postertip{
+OT forensics is fundamentally different from IT. \textbf{Live collection is usually the only option}---never disrupt operations for evidence. Network captures and historian data are your primary sources. Follow order of volatility: capture network traffic first, then controller state, then persistent storage. Always compare PLC programs against known-good baselines. Maintain rigorous chain of custody---normalize all timestamps to UTC for cross-source correlation.
+}
+
+\end{multicols}
+
+\end{document}

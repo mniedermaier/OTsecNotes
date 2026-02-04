@@ -1,0 +1,179 @@
+% ============================================================================
+%  Oldsmar Water Treatment Attack - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\makepostertitle
+    {Oldsmar Water Treatment Attack}
+    {Remote Access Intrusion Targeting Public Water Supply}
+    {Poster 415}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+In February 2021, an attacker remotely accessed the Oldsmar, Florida water treatment plant and attempted to increase \textbf{sodium hydroxide (lye) from 100 ppm to 11,100 ppm} -- a potentially lethal concentration. An alert operator observed the intrusion in real-time and immediately reversed the changes.
+
+\section{\textcolor{accent}{\faIcon{list-ul}}\hspace{0.4em}Key Facts}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{list-ul}\hspace{0.2em}\bfseries Attribute} & \textcolor{white}{\faIcon{info-circle}\hspace{0.2em}\bfseries Details} \\
+\midrule
+Date & February 5, 2021 \\
+Target & \textcolor{danger}{\faIcon{tint}}\hspace{0.2em}Oldsmar Water Plant, FL \\
+Population & $\sim$15,000 residents \\
+Vector & \textcolor{warning}{\faIcon{desktop}}\hspace{0.2em}TeamViewer remote access \\
+Method & \textcolor{danger}{\faIcon{tint}}\hspace{0.2em}Changed NaOH setpoint \\
+Change & 100 $\rightarrow$ 11,100 ppm (111x) \\
+Detection & Operator saw cursor moving \\
+Impact & None -- reversed immediately \\
+\end{tabular}
+\end{center}
+
+\posterdanger{
+This attack demonstrated that \textbf{small water utilities are vulnerable targets}. The attacker used legitimate remote access software (\textcolor{warning}{\faIcon{desktop}}\hspace{0.2em}TeamViewer) to directly manipulate \textcolor{danger}{\faIcon{tint}}\hspace{0.2em}chemical dosing -- a direct threat to public health.
+}
+
+\section{\textcolor{accent}{\faIcon{clock}}\hspace{0.4em}Attack Timeline}
+
+\begin{itemize}
+    \item \textbf{8:00 AM} -- \textcolor{warning}{\faIcon{desktop}}\hspace{0.2em}Brief remote access; operator assumed supervisor
+    \item \textbf{1:30 PM} -- \textcolor{warning}{\faIcon{desktop}}\hspace{0.2em}Attacker returns via TeamViewer
+    \item \textbf{1:30--1:35 PM} -- Navigates SCADA, changes \textcolor{danger}{\faIcon{tint}}\hspace{0.2em}NaOH to 11,100 ppm
+    \item \textbf{1:35 PM} -- Operator observes and immediately reverses
+    \item \textbf{3:00 PM} -- Supervisor notified, law enforcement contacted
+\end{itemize}
+
+\begin{center}
+\begin{tikzpicture}[
+    stepbox/.style={rectangle, draw=#1!60, thick, fill=#1!10, rounded corners=2pt,
+        minimum height=0.4cm, minimum width=4.8cm, align=center, font=\scriptsize},
+    stepbox/.default={otaccent},
+    num/.style={circle, fill=otprimary, text=white, font=\scriptsize\bfseries,
+        minimum size=0.35cm, inner sep=0pt},
+    arr/.style={->, thick, >=stealth, otaccent!50},
+]
+    \node[num] (n1) at (0,0) {1};
+    \node[stepbox=otwarning, right=3pt of n1] (s1) {Remote access via TeamViewer};
+    \node[num, below=4pt of n1] (n2) {2};
+    \node[stepbox=otdanger, right=3pt of n2] (s2) {Navigate SCADA HMI interface};
+    \node[num, below=4pt of n2] (n3) {3};
+    \node[stepbox=otdanger, right=3pt of n3] (s3) {Change NaOH: 100 $\rightarrow$ 11,100 ppm};
+    \node[num, below=4pt of n3] (n4) {4};
+    \node[stepbox=otsuccess, right=3pt of n4] (s4) {Operator detects and reverses};
+    \draw[arr] (n1) -- (n2);
+    \draw[arr] (n2) -- (n3);
+    \draw[arr] (n3) -- (n4);
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{exclamation-triangle}}\hspace{0.4em}Security Failures}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{exclamation-triangle}\hspace{0.2em}\bfseries Failure} & \textcolor{white}{\faIcon{bolt}\hspace{0.2em}\bfseries Impact} \\
+\midrule
+\textcolor{warning}{\faIcon{desktop}}\hspace{0.2em}TeamViewer on SCADA & Direct internet-to-process control \\
+Shared password & No individual accountability \\
+No MFA & Single password = full access \\
+Windows 7 (EOL) & No security updates \\
+Flat network & No IT/OT segmentation \\
+No monitoring & Remote access not logged \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{exclamation-circle}}\hspace{0.4em}Sodium Hydroxide Danger}
+
+\posterwarning{
+\textcolor{danger}{\faIcon{tint}}\hspace{0.2em}\textbf{NaOH at 11,100 ppm} is extremely dangerous. Normal treatment use is 25--100 ppm. At the attempted level: chemical burns, tissue damage, potentially fatal if ingested. However, multiple safety barriers existed.
+}
+
+\subsection{\textcolor{accent}{\faIcon{hard-hat}}\hspace{0.3em}Safety Barriers}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{hard-hat}\hspace{0.2em}\bfseries Barrier} & \textcolor{white}{\faIcon{shield-alt}\hspace{0.2em}\bfseries Protection} \\
+\midrule
+Operator watch & Real-time observation caught it \\
+pH sensors & Would detect abnormal levels \\
+Time delay & 24+ hours to reach customers \\
+Downstream & Sensors check water quality \\
+Manual testing & Regular sampling detects anomalies \\
+\end{tabular}
+\end{center}
+
+\posterinfo{
+\textbf{Defense-in-depth works:} Even if the cyber attack succeeded, multiple process and safety controls would likely have prevented \textcolor{danger}{\faIcon{tint}}\hspace{0.2em}contaminated water from reaching customers. No single failure causes harm.
+}
+
+\section{\textcolor{accent}{\faIcon{search}}\hspace{0.4em}Investigation}
+
+\begin{itemize}
+    \item \textcolor{info}{\faIcon{user-shield}}\hspace{0.2em}FBI, Pinellas County Sheriff, CISA, Secret Service involved
+    \item \textcolor{warning}{\faIcon{key}}\hspace{0.2em}Shared credentials made attribution difficult
+    \item \textcolor{warning}{\faIcon{desktop}}\hspace{0.2em}TeamViewer logs insufficient for identification
+    \item \textcolor{danger}{\faIcon{gavel}}\hspace{0.2em}In late 2023, a \textbf{former employee was charged}
+    \item \textcolor{warning}{\faIcon{user-secret}}\hspace{0.2em}Case highlights insider threat + weak access control risk
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{building}}\hspace{0.4em}Small Utility Challenges}
+
+\begin{itemize}
+    \item \textcolor{warning}{\faIcon{users}}\hspace{0.2em}Limited IT/security staff and expertise
+    \item \textcolor{warning}{\faIcon{dollar-sign}}\hspace{0.2em}Budget constraints for security improvements
+    \item \textcolor{warning}{\faIcon{history}}\hspace{0.2em}Legacy systems difficult to upgrade
+    \item \textcolor{warning}{\faIcon{wifi}}\hspace{0.2em}Remote operations require remote access
+    \item \textcolor{danger}{\faIcon{globe}}\hspace{0.2em}Thousands of potential targets nationwide
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{gavel}}\hspace{0.4em}Regulatory Response}
+
+\begin{itemize}
+    \item \textcolor{info}{\faIcon{shield-alt}}\hspace{0.2em}\textbf{CISA alerts} -- Guidance for \textcolor{danger}{\faIcon{tint}}\hspace{0.2em}water/wastewater utilities
+    \item \textcolor{info}{\faIcon{landmark}}\hspace{0.2em}\textbf{EPA focus} -- Increased \textcolor{danger}{\faIcon{tint}}\hspace{0.2em}water sector cybersecurity attention
+    \item \textcolor{info}{\faIcon{flag}}\hspace{0.2em}\textbf{State actions} -- Florida increased water utility oversight
+    \item \textcolor{info}{\faIcon{share-alt}}\hspace{0.2em}\textbf{WaterISAC} -- Enhanced threat sharing and resources
+    \item \textcolor{info}{\faIcon{clipboard-list}}\hspace{0.2em}\textbf{AWWA guidance} -- Updated cybersecurity recommendations
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Defense Recommendations}
+
+\postersuccess{
+\begin{enumerate}
+    \item \textbf{Secure remote access} -- \textcolor{warning}{\faIcon{desktop}}\hspace{0.2em}No direct internet-to-SCADA
+    \item \textbf{Implement MFA} -- Required for all remote access
+    \item \textbf{Individual accounts} -- No shared passwords
+    \item \textbf{Update OS} -- Replace Windows 7 and EOL systems
+    \item \textbf{Segment networks} -- Separate IT, OT, internet
+    \item \textbf{Monitor access} -- Log and alert on connections
+\end{enumerate}
+}
+
+\postertip{
+\textbf{Secure remote access:} Internet $\rightarrow$ VPN with MFA $\rightarrow$ Jump Server $\rightarrow$ OT Firewall $\rightarrow$ SCADA. Every step encrypted, logged, and monitored. Never install remote desktop tools directly on SCADA workstations.
+}
+
+\end{multicols}
+
+\end{document}

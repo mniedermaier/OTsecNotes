@@ -1,0 +1,155 @@
+% ============================================================================
+%  Industrial DMZ Design - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {Industrial DMZ Design}
+    {Secure Buffer Zone Architecture for OT Networks}
+    {Poster 302}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{server}}\hspace{0.4em}Overview}
+
+An Industrial DMZ (IDMZ) is a network segment acting as a \textbf{secure buffer between enterprise IT and OT networks}. Provides controlled connectivity while preventing direct communication between business and control systems. Sits at \textbf{Purdue Level 3.5}.
+
+\posterinfo{
+\faIcon{shield-alt}\hspace{0.2em}The IDMZ is one of the most critical security controls in OT. A properly designed DMZ prevents lateral movement from compromised IT systems to critical control networks.
+}
+
+\section{\textcolor{accent}{\faIcon{columns}}\hspace{0.4em}IT DMZ vs Industrial DMZ}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{2cm}p{2.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Aspect} & \textcolor{white}{\bfseries IT DMZ} & \textcolor{white}{\bfseries IDMZ} \\
+\midrule
+\faIcon{bullseye}\hspace{0.2em}Purpose & Expose to internet & Separate IT/OT \\
+\faIcon{exchange-alt}\hspace{0.2em}Traffic & Inbound & Bidirectional \\
+\faIcon{cubes}\hspace{0.2em}Services & Web, email, DNS & Historians, jump \\
+\faIcon{handshake}\hspace{0.2em}Trust & Internet untrusted & IT semi-trusted \\
+\faIcon{clock}\hspace{0.2em}Availability & High & Critical \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{project-diagram}}\hspace{0.4em}Architecture Patterns}
+
+\subsection{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.3em}Dual-Firewall DMZ (Recommended)}
+
+\begin{center}
+\begin{tikzpicture}[
+    zone/.style={rectangle, draw=#1!60, thick, fill=#1!10, rounded corners=3pt, minimum width=5.5cm, minimum height=0.5cm, align=center, font=\scriptsize},
+    zone/.default={otaccent},
+    fw/.style={rectangle, draw=otdanger!80, thick, fill=otdanger!20, minimum width=5.5cm, minimum height=0.35cm, align=center, font=\scriptsize\bfseries, text=otdanger},
+]
+    \node[zone=red] (ent) at (0,0) {\faIcon{building}\hspace{0.2em}Enterprise Network (L4--5)};
+    \node[fw, below=3pt of ent] (ofw) {\faIcon{shield-alt}\hspace{0.2em}Outer Firewall (Vendor A)};
+    \node[zone=orange, below=3pt of ofw] (dmz) {\faIcon{server}\hspace{0.2em}Industrial DMZ (L3.5)};
+    \node[fw, below=3pt of dmz] (ifw) {\faIcon{shield-alt}\hspace{0.2em}Inner Firewall (Vendor B)};
+    \node[zone=green!60!black, below=3pt of ifw] (ot) {\faIcon{industry}\hspace{0.2em}OT Network (L0--3)};
+
+    \draw[->, thick, otaccent] (ent) -- (ofw);
+    \draw[->, thick, otaccent] (ofw) -- (dmz);
+    \draw[->, thick, otaccent] (dmz) -- (ifw);
+    \draw[->, thick, otaccent] (ifw) -- (ot);
+\end{tikzpicture}
+\end{center}
+
+\postersuccess{
+\faIcon{check-circle}\hspace{0.2em}\textbf{Different vendors} for inner/outer firewalls prevents single vulnerability from compromising both. OT initiates outbound connections to DMZ.
+}
+
+\subsection{\textcolor{accent}{\faIcon{long-arrow-alt-right}}\hspace{0.3em}Data Diode Integration}
+
+For highest security, add hardware-enforced unidirectional gateways:
+\begin{itemize}
+    \item \faIcon{arrow-right}\hspace{0.2em}\textbf{Outbound diode:} OT to DMZ (historian replication)
+    \item \faIcon{ban}\hspace{0.2em}\textbf{No inbound path:} Physically prevents IT attacks
+    \item \faIcon{industry}\hspace{0.2em}\textbf{Use cases:} Nuclear, critical infrastructure
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{list-ul}}\hspace{0.4em}DMZ Services}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.5cm}p{4cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Service} & \textcolor{white}{\bfseries Purpose} \\
+\midrule
+\faIcon{database}\hspace{0.2em}Historian Mirror & Read-only process data for business \\
+\faIcon{laptop}\hspace{0.2em}Jump Server & Secure remote access to OT \\
+\faIcon{download}\hspace{0.2em}Patch Server & Tested update staging area \\
+\faIcon{shield-alt}\hspace{0.2em}AV/Update Server & Signature and software updates \\
+\faIcon{file-alt}\hspace{0.2em}File Transfer & Secure IT-OT file exchange \\
+\faIcon{lock}\hspace{0.2em}RA Gateway & VPN termination for remote users \\
+\faIcon{clipboard-list}\hspace{0.2em}Log Collector & OT security log aggregation \\
+\end{tabular}
+\end{center}
+
+\posterwarning{
+\faIcon{exclamation-triangle}\hspace{0.2em}\textbf{Service placement rules:} No service should have simultaneous connections to IT and OT. Data must ``break'' in the DMZ. OT initiates connections outbound. IT connects only to DMZ, never to OT.
+}
+
+\section{\textcolor{accent}{\faIcon{exchange-alt}}\hspace{0.4em}Traffic Flow Design}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{2cm}p{2.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Source} & \textcolor{white}{\bfseries Dest} & \textcolor{white}{\bfseries Purpose} \\
+\midrule
+\faIcon{industry}\hspace{0.2em}OT $\rightarrow$ DMZ & Hist mirror & Data replication \\
+\faIcon{industry}\hspace{0.2em}OT $\rightarrow$ DMZ & Log collect & Security events \\
+\faIcon{server}\hspace{0.2em}DMZ $\rightarrow$ OT & Patch srv & Tested updates \\
+\faIcon{building}\hspace{0.2em}IT $\rightarrow$ DMZ & Hist mirror & Data queries \\
+\faIcon{building}\hspace{0.2em}IT $\rightarrow$ DMZ & Jump srv & Remote admin \\
+\end{tabular}
+\end{center}
+
+\posterdanger{
+\textbf{Never allow:}
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{times}}\hspace{0.2em}IT directly to OT (any protocol)
+    \item \textcolor{danger}{\faIcon{times}}\hspace{0.2em}OT directly to IT
+    \item \textcolor{danger}{\faIcon{times}}\hspace{0.2em}Internet directly to DMZ or OT
+    \item \textcolor{danger}{\faIcon{times}}\hspace{0.2em}Broad ``any-any'' rules through the DMZ
+\end{itemize}
+}
+
+\section{\textcolor{accent}{\faIcon{filter}}\hspace{0.4em}Firewall Configuration}
+
+\begin{enumerate}
+    \item \faIcon{ban}\hspace{0.2em}\textbf{Default deny} -- block all not explicitly permitted
+    \item \faIcon{key}\hspace{0.2em}\textbf{Least privilege} -- only required ports/protocols
+    \item \faIcon{crosshairs}\hspace{0.2em}\textbf{Specific sources/dest} -- no ``any'' in rules
+    \item \faIcon{search}\hspace{0.2em}\textbf{Application awareness} -- OT-aware DPI
+    \item \faIcon{clipboard-list}\hspace{0.2em}\textbf{Logging} -- log all traffic, especially denied
+\end{enumerate}
+
+\section{\textcolor{accent}{\faIcon{eye}}\hspace{0.4em}Monitoring and Management}
+
+\begin{itemize}
+    \item \faIcon{chart-line}\hspace{0.2em}\textbf{Traffic analysis:} Monitor for anomalous patterns
+    \item \faIcon{shield-alt}\hspace{0.2em}\textbf{IDS/IPS:} Deploy at DMZ boundaries
+    \item \faIcon{database}\hspace{0.2em}\textbf{Log correlation:} Aggregate from all DMZ systems
+    \item \faIcon{bell}\hspace{0.2em}\textbf{Alerting:} Immediate notification of violations
+    \item \faIcon{tasks}\hspace{0.2em}\textbf{Change management:} Strict change control
+    \item \faIcon{flask}\hspace{0.2em}\textbf{Testing:} Validate changes in non-production first
+    \item \faIcon{users}\hspace{0.2em}\textbf{Approval:} Both IT and OT stakeholders
+\end{itemize}
+
+\postertip{
+\faIcon{lightbulb}\hspace{0.2em}The dual-firewall IDMZ with different vendor firewalls is the gold standard. OT systems should \textbf{push data outbound} to the DMZ -- never allow inbound connections from IT into OT. Quarterly rule reviews prevent ``rule creep.''
+}
+
+\end{multicols}
+
+\end{document}

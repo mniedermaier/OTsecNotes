@@ -1,0 +1,191 @@
+% ============================================================================
+%  PROFINET Protocol - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {PROFINET Protocol}
+    {Industrial Ethernet for Siemens and European Automation}
+    {Poster 204}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{network-wired}}\hspace{0.4em}Overview}
+
+PROFINET (Process Field Network) is an industrial Ethernet standard developed by \textbf{Siemens and PROFIBUS International (PI)}. Dominant in European manufacturing, it is the successor to PROFIBUS. Supports real-time communication for factory and process automation. Standardized as \textbf{IEC 61158/61784}.
+
+\subsection{\textcolor{accent}{\faIcon{users}}\hspace{0.3em}Device Topology}
+
+\begin{center}
+\begin{tikzpicture}[
+    dev/.style={rectangle, draw=#1, thick, fill=#1!10, rounded corners=2pt,
+                minimum height=0.5cm, align=center, font=\scriptsize},
+    dev/.default={otaccent},
+    link/.style={<->, thick, >=stealth, #1!60},
+    link/.default={otaccent}
+]
+    \node[dev=otprimary, minimum width=3cm] (ctrl) at (0,0.5) {\faIcon{microchip}\hspace{0.2em}\textbf{IO Controller (PLC)}};
+    \node[dev=otinfo, minimum width=2.5cm] (sup) at (3.5,0.5) {\faIcon{laptop}\hspace{0.2em}IO Supervisor};
+    \node[dev, minimum width=1.5cm] (d1) at (-1.5,-0.5) {\faIcon{cog} IO Device};
+    \node[dev, minimum width=1.5cm] (d2) at (0.5,-0.5) {\faIcon{cog} IO Device};
+    \node[dev, minimum width=1.5cm] (d3) at (2.5,-0.5) {\faIcon{cog} IO Device};
+    \draw[link=otprimary] (ctrl) -- (d1) node[midway, left, font=\scriptsize, text=otsuccess] {RT};
+    \draw[link=otprimary] (ctrl) -- (d2);
+    \draw[link=otprimary] (ctrl) -- (d3);
+    \draw[link=otinfo, dashed] (sup.south) -- (d3.north east) node[midway, right, font=\scriptsize, text=otinfo] {Diag};
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{clock}}\hspace{0.4em}Communication Classes}
+
+\begin{center}
+\begin{tikzpicture}[
+    cls/.style={rectangle, draw=#1, thick, fill=#1!10, rounded corners=3pt,
+                minimum width=2cm, minimum height=0.6cm, align=center, font=\scriptsize},
+]
+    \node[cls=otsuccess] (nrt) at (0,0) {\faIcon{hourglass-half}\\\textbf{NRT}\\100+ ms};
+    \node[cls=otwarning] (rt) at (2.5,0) {\faIcon{tachometer-alt}\\\textbf{RT}\\1--10 ms};
+    \node[cls=otdanger] (irt) at (5,0) {\faIcon{bolt}\\\textbf{IRT}\\<1 ms};
+    \draw[->, very thick, >=stealth, otaccent!50] (nrt.east) -- (rt.west);
+    \draw[->, very thick, >=stealth, otaccent!50] (rt.east) -- (irt.west);
+    \node[font=\scriptsize, text=mediumgray] at (2.5,-0.65) {Speed $\longrightarrow$};
+\end{tikzpicture}
+\end{center}
+
+\posterinfo{
+\faIcon{layer-group}\hspace{0.2em}NRT uses standard TCP/UDP. RT uses \textbf{Layer 2 frames (EtherType 0x8892)}, bypassing TCP/IP. IRT requires hardware time synchronization.
+}
+
+\subsection{\textcolor{accent}{\faIcon{stream}}\hspace{0.3em}PROFINET RT Frame}
+
+\begin{center}
+\begin{tikzpicture}[
+    field/.style={rectangle, draw=otaccent, thick, minimum height=0.65cm, align=center, fill=otaccent!10, font=\scriptsize},
+    lbl/.style={font=\scriptsize, text=mediumgray}
+]
+    \node[field, minimum width=1.2cm, fill=otprimary!15, draw=otprimary] (eth) at (0,0) {EthType};
+    \node[field, minimum width=1cm, right=0pt of eth, fill=otwarning!15, draw=otwarning] (fid) {FrameID};
+    \node[field, minimum width=2cm, right=0pt of fid] (data) {I/O Data};
+    \node[field, minimum width=1cm, right=0pt of data, fill=otinfo!15, draw=otinfo] (cyc) {Cycle};
+    \node[field, minimum width=1cm, right=0pt of cyc, fill=otsuccess!15, draw=otsuccess] (stat) {Status};
+
+    \node[lbl, below=2pt of eth] {0x8892};
+    \node[lbl, below=2pt of fid] {2B};
+    \node[lbl, below=2pt of data] {N bytes};
+    \node[lbl, below=2pt of cyc] {2B};
+    \node[lbl, below=2pt of stat] {1B};
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{door-open}}\hspace{0.4em}Ports and Protocols}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{1.5cm}p{2.8cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Port/Type} & \textcolor{white}{\bfseries Proto} & \textcolor{white}{\bfseries Purpose} \\
+\midrule
+EtherType 0x8892 & L2 & PROFINET RT data \\
+UDP/34964 & DCP & Discovery, config \\
+TCP/102 & ISO-TSAP & S7 communication \\
+UDP/161 & SNMP & Device management \\
+TCP/80/443 & HTTP/S & Web interface \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{search}}\hspace{0.3em}Discovery (DCP)}
+
+DCP (Discovery and Configuration Protocol) operates at \textbf{Layer 2} for device discovery, setting device names and IP addresses, identifying devices by MAC address, and reading device information. DCP is essential for commissioning but is a significant attack surface.
+
+\posterwarning{
+\faIcon{exclamation-triangle}\hspace{0.2em}DCP has \textbf{no authentication}. Any device on the same segment can discover and reconfigure PROFINET devices -- changing names, IPs, and disrupting communication.
+}
+
+\section{\textcolor{accent}{\faIcon{exclamation-triangle}}\hspace{0.4em}Security Vulnerabilities}
+
+\posterdanger{
+PROFINET lacks \textbf{authentication, encryption, and integrity protection}. RT traffic uses Layer 2 frames that \textbf{bypass IP-based firewalls entirely}.
+}
+
+\subsection{\textcolor{accent}{\faIcon{crosshairs}}\hspace{0.3em}Attack Vectors}
+
+\begin{enumerate}
+    \item \textcolor{accent}{\faIcon{edit}}\hspace{0.2em}\textbf{DCP attacks:} Change device names/IPs
+    \item \textcolor{accent}{\faIcon{user-secret}}\hspace{0.2em}\textbf{AR hijacking:} Take over controller role
+    \item \textcolor{accent}{\faIcon{syringe}}\hspace{0.2em}\textbf{I/O injection:} Send fake RT frames
+    \item \textcolor{accent}{\faIcon{bomb}}\hspace{0.2em}\textbf{DoS flooding:} Overwhelm with RT traffic
+    \item \textcolor{accent}{\faIcon{search}}\hspace{0.2em}\textbf{Network mapping:} Enumerate via DCP
+    \item \textcolor{accent}{\faIcon{random}}\hspace{0.2em}\textbf{MitM:} Intercept and modify RT traffic
+\end{enumerate}
+
+\section{\textcolor{accent}{\faIcon{lock}}\hspace{0.4em}Security Extensions}
+
+\subsection{\textcolor{accent}{\faIcon{certificate}}\hspace{0.3em}Security Class 1}
+
+\begin{itemize}
+    \item \faIcon{fingerprint}\hspace{0.2em}Integrity protection for RT communication
+    \item \faIcon{id-card}\hspace{0.2em}Authentication of devices
+    \item \faIcon{file-alt}\hspace{0.2em}Based on IEC 62443 requirements
+    \item \faIcon{microchip}\hspace{0.2em}Requires compatible hardware
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.3em}Secure Communication}
+
+\begin{itemize}
+    \item \faIcon{lock}\hspace{0.2em}TLS for NRT/TCP communications
+    \item \faIcon{user-lock}\hspace{0.2em}SNMPv3 for secure management
+    \item \faIcon{check-circle}\hspace{0.2em}Secure DCP (authenticated config)
+    \item \faIcon{certificate}\hspace{0.2em}Certificate-based device identity
+\end{itemize}
+
+\posterwarning{
+Security extensions require \textbf{newer hardware and firmware}. Most existing installations lack these capabilities.
+}
+
+\section{\textcolor{accent}{\faIcon{tools}}\hspace{0.4em}Security Mitigations}
+
+\postersuccess{
+RT traffic uses \textbf{Layer 2 frames} -- standard IP firewalls cannot filter it. Use Layer 2 segmentation, managed switches, and PROFINET-aware security devices.
+}
+
+\begin{itemize}
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{VLAN segmentation} -- Isolate PROFINET cells
+    \item \faIcon{ethernet}\hspace{0.2em}\textbf{Managed switches} -- Port access control
+    \item \faIcon{filter}\hspace{0.2em}\textbf{Industrial firewalls} -- PROFINET-aware DPI
+    \item \faIcon{power-off}\hspace{0.2em}\textbf{Disable unused services} -- HTTP, SNMP, Telnet
+    \item \faIcon{user-lock}\hspace{0.2em}\textbf{SNMPv3} -- Replace v1/v2c
+    \item \faIcon{download}\hspace{0.2em}\textbf{Keep firmware updated}
+    \item \faIcon{ban}\hspace{0.2em}\textbf{Disable DCP} if static config is acceptable
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{eye}}\hspace{0.3em}Monitoring}
+
+\begin{itemize}
+    \item \faIcon{bell}\hspace{0.2em}Monitor for unexpected DCP requests and new devices
+    \item \faIcon{chart-line}\hspace{0.2em}Baseline RT traffic; detect AR from unauthorized sources
+    \item \faIcon{exchange-alt}\hspace{0.2em}Watch for configuration changes and firmware updates
+    \item \faIcon{clock}\hspace{0.2em}Monitor IRT timing deviations as anomaly indicator
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{toolbox}}\hspace{0.3em}Common Tools}
+
+\begin{itemize}
+    \item \faIcon{binoculars}\hspace{0.2em}\textbf{Wireshark} -- PROFINET/DCP dissector
+    \item \faIcon{crosshairs}\hspace{0.2em}\textbf{Nmap} -- Network scanning for port 102/DCP
+    \item \faIcon{terminal}\hspace{0.2em}\textbf{Profinetutils} -- PROFINET analysis tools
+    \item \faIcon{shield-alt}\hspace{0.2em}\textbf{Codesys} -- PLC programming interface
+\end{itemize}
+
+\postertip{
+\faIcon{info-circle}\hspace{0.2em}Common devices: Siemens \textbf{S7-1200/1500} PLCs, ET 200 I/O, SINAMICS drives, SIMATIC HMI. When used alongside S7comm (TCP/102), assess both protocols. IRT requires PROFINET-capable switches throughout the network path.
+}
+
+\end{multicols}
+
+\end{document}

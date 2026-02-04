@@ -1,0 +1,174 @@
+% ============================================================================
+%  Secure Removable Media Handling - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {Secure Removable Media Handling}
+    {Controlling USB Drives and Portable Storage in OT Environments}
+    {Poster 840}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+Removable media represents one of the most significant \textbf{attack vectors for OT environments}. Stuxnet spread via USB drives, and many ransomware incidents trace back to infected portable media crossing the air gap.
+
+\posterinfo{
+\textbf{Why media is still needed in OT:} Vendor software/firmware updates, PLC program transfers, diagnostic tool delivery, data export for analysis, and emergency recovery procedures.
+}
+
+\section{\textcolor{accent}{\faIcon{usb}}\hspace{0.4em}Media Types and Risks}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{2.2cm}p{1.8cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{usb}\hspace{0.2em}\bfseries Type} & \textcolor{white}{\faIcon{cogs}\hspace{0.2em}\bfseries Common Use} & \textcolor{white}{\faIcon{exclamation-triangle}\hspace{0.2em}\bfseries Risk} \\
+\midrule
+\textcolor{danger}{\faIcon{usb}}\hspace{0.2em}USB flash drives & General file transfer & High \\
+\textcolor{danger}{\faIcon{usb}}\hspace{0.2em}External HDD/SSD & Backups, large data & High \\
+SD/MicroSD & Embedded, cameras & Medium \\
+CD/DVD-ROM & Software distro & Medium \\
+Memory cards & PLCs, ind. cameras & Medium \\
+\end{tabular}
+\end{center}
+
+\posterdanger{
+\textcolor{danger}{\faIcon{usb}}\hspace{0.2em}\textbf{USB weaponization beyond malware:} BadUSB (firmware-level attacks appearing as keyboards), USB Killers (physical port destruction), Rubber Ducky (keystroke injection), and covert data exfiltration via modified firmware.
+}
+
+\section{\textcolor{accent}{\faIcon{desktop}}\hspace{0.4em}Scanning Kiosk}
+
+\subsection{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.3em}Kiosk Requirements}
+
+\begin{itemize}
+    \item \faIcon{project-diagram}\hspace{0.2em}\textbf{Isolation} -- No connection to OT or corporate networks
+    \item \faIcon{shield-alt}\hspace{0.2em}\textbf{Multiple AV engines} -- At least 2--3 different vendors
+    \item \faIcon{sync-alt}\hspace{0.2em}\textbf{Regular updates} -- Signatures via secure one-way channel
+    \item \faIcon{filter}\hspace{0.2em}\textbf{File type filtering} -- Block executables, scripts by default
+    \item \faIcon{clipboard-list}\hspace{0.2em}\textbf{Logging} -- Record all scans, results, user actions
+    \item \faIcon{redo}\hspace{0.2em}\textbf{Regular reimaging} -- Weekly or after any detection
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{map-marker-alt}}\hspace{0.3em}Physical Placement}
+
+\begin{itemize}
+    \item \faIcon{door-open}\hspace{0.2em}Located at controlled entry points to OT areas
+    \item \faIcon{video}\hspace{0.2em}Visible to security cameras
+    \item \faIcon{box}\hspace{0.2em}Secure storage for clean media nearby
+    \item \faIcon{sign}\hspace{0.2em}Clear signage with procedures
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{exchange-alt}}\hspace{0.4em}Media Handling Process}
+
+\begin{center}
+\begin{tikzpicture}[
+    box/.style={rectangle, draw=#1!60, thick, fill=#1!10, rounded corners=2pt,
+                minimum width=2.2cm, minimum height=0.5cm, align=center, font=\scriptsize},
+    box/.default={otaccent},
+    decision/.style={diamond, draw=otwarning!60, thick, fill=otwarning!10, aspect=2.2,
+                     align=center, font=\scriptsize, inner sep=1pt},
+    arr/.style={->, thick, >=stealth, #1!70},
+    arr/.default={otprimary}
+]
+    \node[box=otdanger] (ext) at (0,0) {\faIcon{usb}\hspace{0.1em}\textbf{External}\\\textbf{Media}};
+    \node[box=otinfo] (kiosk) at (0,-1.05) {\faIcon{shield-alt}\hspace{0.1em}\textbf{Scanning}\\\textbf{Kiosk}};
+    \node[decision] (dec) at (0,-2.15) {\textbf{Clean?}};
+    \node[box=otsuccess] (clean) at (-1.8,-3.2) {\faIcon{hdd}\hspace{0.1em}\textbf{Company}\\\textbf{Media}};
+    \node[box=otdanger] (quar) at (1.8,-3.2) {\faIcon{ban}\hspace{0.1em}\textbf{Quarantine}};
+    \node[box=otsuccess] (ot) at (-1.8,-4.25) {\faIcon{industry}\hspace{0.1em}\textbf{OT System}};
+
+    \draw[arr] (ext) -- (kiosk);
+    \draw[arr=otwarning] (kiosk) -- (dec);
+    \draw[arr=otsuccess] (dec) -| node[above, font=\scriptsize, pos=0.25, text=otsuccess] {\faIcon{check}} (clean);
+    \draw[arr=otdanger] (dec) -| node[above, font=\scriptsize, pos=0.25, text=otdanger] {\faIcon{times}} (quar);
+    \draw[arr=otsuccess] (clean) -- (ot);
+\end{tikzpicture}
+\end{center}
+
+\begin{enumerate}
+    \item \faIcon{clipboard-list}\hspace{0.2em}\textbf{Register} -- Log source, owner, purpose, date
+    \item \faIcon{eye}\hspace{0.2em}\textbf{Inspect} -- Check for physical tampering
+    \item \faIcon{shield-alt}\hspace{0.2em}\textbf{Scan} -- Full scan with multiple AV engines
+    \item \faIcon{copy}\hspace{0.2em}\textbf{Transfer} -- Copy clean files to company media
+    \item \faIcon{industry}\hspace{0.2em}\textbf{Deploy} -- Use clean media in target OT system
+    \item \faIcon{trash-alt}\hspace{0.2em}\textbf{Post-use} -- Wipe or securely store after use
+\end{enumerate}
+
+\posterwarning{
+\textcolor{danger}{\faIcon{usb}}\hspace{0.2em}\textbf{Never insert untrusted media directly into OT systems.} Even ``quick checks'' bypass security controls and have caused major incidents.
+}
+
+\section{\textcolor{accent}{\faIcon{lock}}\hspace{0.4em}USB Port Controls}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{1.5cm}p{2.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{tools}\hspace{0.2em}\bfseries Method} & \textcolor{white}{\faIcon{check-circle}\hspace{0.2em}\bfseries Effect.} & \textcolor{white}{\faIcon{sticky-note}\hspace{0.2em}\bfseries Notes} \\
+\midrule
+BIOS/UEFI disable & High & Requires physical access \\
+Group Policy & Medium & Bypassed with admin rights \\
+Endpoint protection & Med-High & Granular control \\
+Physical blockers & High & Visible, tamper-evident \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{key}}\hspace{0.3em}Selective USB Access}
+
+\begin{itemize}
+    \item \faIcon{list-alt}\hspace{0.2em}\textbf{Device whitelisting} -- Only registered devices allowed
+    \item \faIcon{book-open}\hspace{0.2em}\textbf{Read-only mode} -- Allow reading, block writing
+    \item \faIcon{clock}\hspace{0.2em}\textbf{Time-limited} -- Enable only during maintenance
+    \item \faIcon{user-friends}\hspace{0.2em}\textbf{Supervised} -- Two-person authorization required
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{id-card}}\hspace{0.4em}Company Media Program}
+
+\postersuccess{
+\textbf{Best practice:} Maintain a pool of company-owned, managed removable media. Personal devices should never enter OT environments. Track with unique IDs, check-out/check-in system, assigned custodians, and regular audits.
+}
+
+\subsection{\textcolor{accent}{\faIcon{sync-alt}}\hspace{0.3em}Media Lifecycle}
+
+\begin{enumerate}
+    \item \faIcon{shopping-cart}\hspace{0.2em}\textbf{Procurement} -- Trusted sources, verify authenticity
+    \item \faIcon{cog}\hspace{0.2em}\textbf{Initialization} -- Format, scan, assign ID, register
+    \item \faIcon{exchange-alt}\hspace{0.2em}\textbf{Active use} -- Track assignments, scan before/after
+    \item \faIcon{times-circle}\hspace{0.2em}\textbf{Retirement} -- Secure wipe or physical destruction
+\end{enumerate}
+
+\section{\textcolor{accent}{\faIcon{truck}}\hspace{0.4em}Vendor Media Policy}
+
+\begin{itemize}
+    \item \faIcon{bell}\hspace{0.2em}\textbf{Advance notification} -- Declare file transfer needs before visit
+    \item \faIcon{envelope}\hspace{0.2em}\textbf{Pre-transfer} -- Encourage electronic file submission
+    \item \textcolor{danger}{\faIcon{usb}}\hspace{0.2em}\textbf{No direct insertion} -- Vendor media never touches OT
+    \item \faIcon{hdd}\hspace{0.2em}\textbf{Company media provided} -- Transfer scanned files only
+    \item \faIcon{user-shield}\hspace{0.2em}\textbf{Supervision required} -- Escort during all media handling
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{clipboard-list}}\hspace{0.4em}Logging and Auditing}
+
+\begin{itemize}
+    \item \faIcon{calendar-alt}\hspace{0.2em}Date, time, and user identity
+    \item \faIcon{hdd}\hspace{0.2em}Media type, serial number, and source
+    \item \faIcon{file-alt}\hspace{0.2em}Files transferred (names, sizes, hashes)
+    \item \faIcon{shield-alt}\hspace{0.2em}Scan results from all engines
+    \item \faIcon{server}\hspace{0.2em}Destination system and purpose
+\end{itemize}
+
+\postertip{
+\textcolor{danger}{\faIcon{usb}}\hspace{0.2em}USB drives enabled Stuxnet and many OT attacks. Implement dedicated scanning kiosks with multiple AV engines at controlled entry points. Disable USB ports by default and enable selectively. Use only company-owned media---never personal or vendor devices. Require vendors to submit files through your controlled process. Log all transfers for audit trails and incident response support.
+}
+
+\end{multicols}
+
+\end{document}

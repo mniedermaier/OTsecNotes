@@ -1,0 +1,169 @@
+% ============================================================================
+%  OT Patch Management - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {OT Patch Management}
+    {Strategies for Updating Industrial Control Systems}
+    {Poster 860}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+OT patching is one of the most challenging security tasks. Systems run 24/7, require vendor approval, and have dependencies that make patching \textbf{risky or impossible}. A failed patch can halt production and cause safety incidents.
+
+\section{\textcolor{accent}{\faIcon{columns}}\hspace{0.4em}OT vs IT Patching}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{2cm}p{2.2cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{columns}\hspace{0.2em}\bfseries Aspect} & \textcolor{white}{\faIcon{desktop}\hspace{0.2em}\bfseries IT} & \textcolor{white}{\faIcon{industry}\hspace{0.2em}\bfseries OT} \\
+\midrule
+Frequency & Weekly/Monthly & Quarterly/Annually \\
+Downtime & Hours OK & Minutes may not be \\
+Testing & Limited/staged & Extensive lab required \\
+Vendor approval & Rarely needed & Often mandatory \\
+Automation & Highly automated & Mostly manual \\
+Rollback & Straightforward & May need full restore \\
+Lifecycle & 3--5 years & 15--25 years \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{sync-alt}}\hspace{0.4em}Patch Lifecycle}
+
+\begin{center}
+\begin{tikzpicture}[
+    step/.style={rectangle, draw=#1!40, thick, fill=#1!5, minimum height=0.38cm, rounded corners=2pt, font=\scriptsize, text width=4.2cm, align=left},
+    step/.default={otaccent},
+    num/.style={circle, fill=#1, text=white, font=\scriptsize\bfseries, minimum size=0.33cm, inner sep=0pt},
+    num/.default={otprimary},
+]
+    \node[num] (n1) at (0,0) {1};
+    \node[step, right=3pt of n1] (s1) {Identify -- monitor for patches};
+    \node[num, below=2pt of n1] (n2) {2};
+    \node[step, right=3pt of n2] (s2) {Assess -- evaluate risk/relevance};
+    \node[num, below=2pt of n2] (n3) {3};
+    \node[step, right=3pt of n3] (s3) {Vendor -- verify approval};
+    \node[num, below=2pt of n3] (n4) {4};
+    \node[step, right=3pt of n4] (s4) {Lab test -- representative env};
+    \node[num=otwarning, below=2pt of n4] (n5) {5};
+    \node[step=otwarning, right=3pt of n5] (s5) {Plan -- schedule maint. window};
+    \node[num=otwarning, below=2pt of n5] (n6) {6};
+    \node[step=otwarning, right=3pt of n6] (s6) {Backup -- full system backup};
+    \node[num=otsuccess, below=2pt of n6] (n7) {7};
+    \node[step=otsuccess, right=3pt of n7] (s7) {Deploy -- apply with rollback};
+    \node[num=otsuccess, below=2pt of n7] (n8) {8};
+    \node[step=otsuccess, right=3pt of n8] (s8) {Validate -- verify function};
+    \node[num=otinfo, below=2pt of n8] (n9) {9};
+    \node[step=otinfo, right=3pt of n9] (s9) {Document -- record changes};
+
+    \foreach \i/\j in {1/2,2/3,3/4,4/5,5/6,6/7,7/8,8/9} {
+        \draw[thick, otaccent!30] (n\i.south) -- (n\j.north);
+    }
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{sort-amount-down}}\hspace{0.4em}Risk-Based Prioritization}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.2cm}p{2.5cm}p{2.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{sort-amount-down}\hspace{0.2em}\bfseries Priority} & \textcolor{white}{\faIcon{crosshairs}\hspace{0.2em}\bfseries Criteria} & \textcolor{white}{\faIcon{clock}\hspace{0.2em}\bfseries Timeline} \\
+\midrule
+Critical & Active exploit, safety impact & Next maintenance window \\
+High & Remote exploit, no auth & Within 30 days \\
+Medium & Local or complex attack & Within 90 days \\
+Low & Theoretical, low impact & Next scheduled outage \\
+\end{tabular}
+\end{center}
+
+\posterwarning{
+\textbf{Before patching any OT system:} Check vendor compatibility list. Verify vendor has tested the specific patch. Understand impact on support agreements. Review vendor security bulletins. Contact vendor support if uncertain.
+}
+
+\section{\textcolor{accent}{\faIcon{server}}\hspace{0.4em}Strategy by System Type}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{server}\hspace{0.2em}\bfseries System} & \textcolor{white}{\faIcon{wrench}\hspace{0.2em}\bfseries Strategy} \\
+\midrule
+Eng. workstations & Regular patching, similar to IT \\
+HMI/Operator & Vendor-approved patches only \\
+Historians & Patch during maintenance windows \\
+SCADA servers & Vendor coordination required \\
+PLCs/RTUs & Firmware updates during outages \\
+Legacy (XP, 2003) & Compensating controls instead \\
+Safety systems & Extreme caution, vendor mandatory \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Compensating Controls}
+
+\postersuccess{
+\textbf{When patching is impossible:} Network segmentation and firewall rules. Application whitelisting. Disable unnecessary services/ports. Enhanced monitoring and logging. Virtual patching via IPS/IDS rules. Physical access controls.
+}
+
+\section{\textcolor{accent}{\faIcon{vial}}\hspace{0.4em}Testing Requirements}
+
+\subsection{\textcolor{accent}{\faIcon{flask}}\hspace{0.3em}Lab Environment}
+
+\begin{itemize}
+    \item \textcolor{warning}{\faIcon{server}}\hspace{0.2em}Mirror production configuration
+    \item \textcolor{warning}{\faIcon{code}}\hspace{0.2em}Include same software versions
+    \item \textcolor{warning}{\faIcon{project-diagram}}\hspace{0.2em}Test integration with connected systems
+    \item \textcolor{warning}{\faIcon{microchip}}\hspace{0.2em}Validate control logic execution
+    \item \textcolor{warning}{\faIcon{network-wired}}\hspace{0.2em}Verify communication protocols
+    \item \textcolor{warning}{\faIcon{sync-alt}}\hspace{0.2em}Test failover and redundancy
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{check-circle}}\hspace{0.3em}Post-Patch Validation}
+
+\begin{enumerate}
+    \item \textcolor{accent}{\faIcon{power-off}}\hspace{0.2em}System boots correctly after patch
+    \item \textcolor{accent}{\faIcon{cog}}\hspace{0.2em}All services start properly
+    \item \textcolor{accent}{\faIcon{microchip}}\hspace{0.2em}Control logic executes as expected
+    \item \textcolor{accent}{\faIcon{desktop}}\hspace{0.2em}HMI displays update correctly
+    \item \textcolor{accent}{\faIcon{bell}}\hspace{0.2em}Alarms and events function
+    \item \textcolor{accent}{\faIcon{broadcast-tower}}\hspace{0.2em}Communication with field devices works
+    \item \textcolor{accent}{\faIcon{tachometer-alt}}\hspace{0.2em}Performance is not degraded
+\end{enumerate}
+
+\section{\textcolor{accent}{\faIcon{exclamation-triangle}}\hspace{0.4em}Legacy System Challenges}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{exclamation-triangle}\hspace{0.2em}\bfseries Challenge} & \textcolor{white}{\faIcon{shield-alt}\hspace{0.2em}\bfseries Mitigation} \\
+\midrule
+No security patches & Network isolation, virtual patching \\
+Vulnerable services & Disable or firewall unused services \\
+No vendor support & Third-party extended support \\
+Incompatible AV & Application whitelisting \\
+End of life & Plan and budget for migration \\
+\end{tabular}
+\end{center}
+
+\posterdanger{
+\textbf{Air-gapped patching:} Use dedicated, scanned USB media. Verify patch integrity (checksums). Scan media at secure transfer station. Maintain strict chain of custody. Document media handling process.
+}
+
+\postertip{
+Never patch production OT without lab testing. Check vendor compatibility first. Patch only during maintenance windows with full backups. Use risk-based prioritization---critical exploits first. When patching is impossible, implement compensating controls (segmentation, whitelisting, monitoring). Document everything and communicate changes to operations.
+}
+
+\end{multicols}
+
+\end{document}

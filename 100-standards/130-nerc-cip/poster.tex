@@ -1,0 +1,164 @@
+% ============================================================================
+%  NERC CIP Standards - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {NERC CIP Standards}
+    {Critical Infrastructure Protection for the Bulk Electric System}
+    {Poster 130}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{bolt}}\hspace{0.4em}Overview}
+
+NERC CIP standards are \textbf{mandatory} cybersecurity requirements for the bulk electric system (BES) in North America. FERC approves standards, NERC develops them, regional entities enforce through audits.
+
+\posterdanger{
+Violations can result in penalties up to \textbf{\$1 million per violation per day}. In 2019, a single utility was fined \$10M for 127 violations. Compliance is mandatory for all registered entities.
+}
+
+\section{\textcolor{accent}{\faIcon{layer-group}}\hspace{0.4em}Impact Rating}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{2.2cm}p{2.2cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Impact} & \textcolor{white}{\bfseries Criteria} & \textcolor{white}{\bfseries Requirements} \\
+\midrule
+\riskhigh High & Control centers $\geq$3000 MW & Most stringent \\
+\riskmedium Med & Generation 1500+ MW & Substantial \\
+\risklow Low & Remaining BES assets & Baseline \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}ESP / PSP Boundaries}
+
+\begin{center}
+\begin{tikzpicture}[
+    peri/.style={rectangle, draw=#1!50, thick, dashed, rounded corners=3pt, inner sep=5pt},
+    dev/.style={rectangle, draw=#1!60, thick, fill=#1!12, rounded corners=2pt,
+        minimum height=0.35cm, align=center, font=\scriptsize},
+    dev/.default={otaccent},
+    lbl/.style={font=\scriptsize\bfseries, text=#1},
+]
+    % PSP (outer)
+    \node[peri=otwarning, minimum width=5.8cm, minimum height=2.5cm] (psp) at (0,0) {};
+    \node[lbl=otwarning, above] at (psp.south) {};
+    \node[lbl=otwarning] at ([yshift=-3pt]psp.north) {\faIcon{lock}\hspace{0.1em}Physical Security Perimeter (PSP)};
+
+    % ESP (inner)
+    \node[peri=otinfo, minimum width=4.6cm, minimum height=1.2cm] (esp) at (0,-0.2) {};
+    \node[lbl=otinfo] at ([yshift=-3pt]esp.north) {\faIcon{shield-alt}\hspace{0.1em}Electronic Security Perimeter (ESP)};
+
+    % Devices inside
+    \node[dev=otaccent, minimum width=1cm] at (-1.5,-0.5) {\faIcon{microchip}\hspace{0.1em}PLC};
+    \node[dev=otaccent, minimum width=1cm] at (0,-0.5) {\faIcon{desktop}\hspace{0.1em}HMI};
+    \node[dev=otaccent, minimum width=1.1cm] at (1.5,-0.5) {\faIcon{server}\hspace{0.1em}SCADA};
+
+    % EAP
+    \node[dev=otdanger, minimum width=1.6cm] at (3.2,-0.2) {\faIcon{shield-alt}\hspace{0.1em}EAP/FW};
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{list-ul}}\hspace{0.4em}CIP Standards Family}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.2cm}p{5.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries CIP} & \textcolor{white}{\bfseries Standard} \\
+\midrule
+002 & \faIcon{tags}\hspace{0.2em}BES Cyber System Categorization \\
+003 & \faIcon{clipboard-list}\hspace{0.2em}Security Management Controls \\
+004 & \faIcon{user-graduate}\hspace{0.2em}Personnel \& Training \\
+005 & \faIcon{shield-alt}\hspace{0.2em}Electronic Security Perimeters \\
+006 & \faIcon{lock}\hspace{0.2em}Physical Security \\
+007 & \faIcon{server}\hspace{0.2em}System Security Management \\
+008 & \faIcon{fire-extinguisher}\hspace{0.2em}Incident Reporting \& Response \\
+009 & \faIcon{undo}\hspace{0.2em}Recovery Plans \\
+010 & \faIcon{cogs}\hspace{0.2em}Configuration \& Vulnerability Mgmt \\
+011 & \faIcon{file-alt}\hspace{0.2em}Information Protection \\
+012 & \faIcon{exchange-alt}\hspace{0.2em}Comms Between Control Centers \\
+013 & \faIcon{truck}\hspace{0.2em}Supply Chain Risk Management \\
+014 & \faIcon{building}\hspace{0.2em}Physical Security (Transmission) \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{clipboard-check}}\hspace{0.4em}Key Requirements}
+
+\subsection{\textcolor{accent}{\faIcon{tags}}\hspace{0.3em}CIP-002: Categorization}
+Identify and categorize all BES Cyber Systems. Assign High/Medium/Low impact. Review annually. Senior manager approval.
+
+\subsection{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.3em}CIP-005: Electronic Security}
+Define Electronic Security Perimeters (ESP). Control all inbound/outbound access. Malicious communications detection. Encrypt remote access.
+
+\subsection{\textcolor{accent}{\faIcon{user-graduate}}\hspace{0.3em}CIP-004: Personnel}
+Annual security awareness. Role-based training for BES access. Background checks every 7 years. Access revocation within 24 hours.
+
+\subsection{\textcolor{accent}{\faIcon{server}}\hspace{0.3em}CIP-007: System Security}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{plug}}\hspace{0.2em}\textbf{Ports/Services:} Disable unnecessary, document enabled
+    \item \textcolor{accent}{\faIcon{sync}}\hspace{0.2em}\textbf{Patching:} Evaluate/apply within 35 days
+    \item \textcolor{accent}{\faIcon{bug}}\hspace{0.2em}\textbf{Malware:} Deploy anti-malware or document mitigations
+    \item \textcolor{accent}{\faIcon{clipboard-list}}\hspace{0.2em}\textbf{Events:} Log and alert on security events
+    \item \textcolor{accent}{\faIcon{key}}\hspace{0.2em}\textbf{Access:} Unique credentials, complexity, lockout
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{fire-extinguisher}}\hspace{0.3em}CIP-008/009: IR \& Recovery}
+Documented IR plan with defined roles. Report to E-ISAC per timelines. Annual plan testing. Recovery plans for High/Medium. Test every 15 months.
+
+\subsection{\textcolor{accent}{\faIcon{truck}}\hspace{0.3em}CIP-013: Supply Chain}
+Supply chain risk management plan. Security requirements in procurement. Verify vendor practices. Address vendor remote access risks.
+
+\section{\textcolor{accent}{\faIcon{gavel}}\hspace{0.4em}Compliance \& Enforcement}
+
+\posterwarning{
+\textbf{Audit types:} Self-Certification (annual), Spot Checks (regional entity), On-Site Audits (every 3 years), Self-Reports (entity-initiated).
+}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.5cm}p{5.2cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Level} & \textcolor{white}{\bfseries Penalty Range (per day)} \\
+\midrule
+Lower & Up to \$10,000 \\
+Moderate & \$10,000 -- \$100,000 \\
+High & \$100,000 -- \$500,000 \\
+Severe & \$500,000 -- \$1,000,000+ \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{exclamation-circle}}\hspace{0.4em}Common Gaps}
+
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{times}}\hspace{0.2em}\textbf{Asset inventory:} Incomplete BES Cyber Asset identification
+    \item \textcolor{danger}{\faIcon{times}}\hspace{0.2em}\textbf{Documentation:} Insufficient evidence of implementation
+    \item \textcolor{danger}{\faIcon{times}}\hspace{0.2em}\textbf{Change mgmt:} Unauthorized baseline changes
+    \item \textcolor{danger}{\faIcon{times}}\hspace{0.2em}\textbf{Access control:} Shared accounts, excessive permissions
+    \item \textcolor{danger}{\faIcon{times}}\hspace{0.2em}\textbf{Patching:} Missed 35-day evaluation windows
+\end{itemize}
+
+\postersuccess{
+Successful CIP compliance requires close collaboration between OT operations, IT security, and compliance teams. Technical controls must not compromise grid reliability. Use Reliability Standards Audit Worksheets (RSAWs) from NERC to prepare for audits.
+}
+
+\posterinfo{
+\textbf{TFE Process:} Technical Feasibility Exceptions allow entities to document why a requirement cannot be met and what compensating measures are in place. Must be approved and reviewed annually.
+}
+
+\postertip{
+\textbf{History:} 2003 Northeast blackout $\rightarrow$ 2006 first CIP standards $\rightarrow$ 2013 CIP v5 (risk-based) $\rightarrow$ 2016 CIP-013 (supply chain). Continuous updates address emerging threats.
+}
+
+\end{multicols}
+
+\end{document}

@@ -1,0 +1,173 @@
+% ============================================================================
+%  Intrusion Detection for OT - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {Intrusion Detection for OT}
+    {IDS/IPS Deployment Strategies for Industrial Environments}
+    {Poster 520}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+Intrusion Detection Systems (IDS) and Intrusion Prevention Systems (IPS) monitor network traffic for malicious activity. In OT, these systems must understand \textbf{industrial protocols} and prioritize availability over aggressive blocking.
+
+\posterinfo{
+OT traffic is inherently \textbf{predictable and deterministic}---devices communicate in regular patterns with known peers. This makes anomaly detection particularly effective in industrial environments compared to IT networks.
+}
+
+\subsection{\textcolor{accent}{\faIcon{columns}}\hspace{0.3em}Key OT Differences}
+
+\begin{itemize}
+    \item \faIcon{code}\hspace{0.2em}\textbf{Protocol awareness} -- Must parse Modbus, DNP3, OPC, etc.
+    \item \faIcon{shield-alt}\hspace{0.2em}\textbf{Availability focus} -- False positives can disrupt operations
+    \item \faIcon{eye-slash}\hspace{0.2em}\textbf{Passive preferred} -- Active blocking requires careful thought
+    \item \faIcon{chart-bar}\hspace{0.2em}\textbf{Deterministic traffic} -- OT patterns are predictable
+    \item \faIcon{clock}\hspace{0.2em}\textbf{Long baselines} -- Systems run unchanged for extended periods
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{eye}}\hspace{0.4em}IDS vs IPS in OT}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.5cm}p{2.3cm}p{2.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Aspect} & \textcolor{white}{\faIcon{eye}\hspace{0.2em}\bfseries IDS} & \textcolor{white}{\faIcon{shield-alt}\hspace{0.2em}\bfseries IPS} \\
+\midrule
+Action & Alert only & Block traffic \\
+Deploy & Passive (TAP) & Inline \\
+Avail. risk & Low & Higher \\
+Response & Human review & Automated \\
+OT use & Preferred & With caution \\
+\end{tabular}
+\end{center}
+
+\posterwarning{
+\textbf{IPS caution in OT:} Inline IPS can block legitimate traffic due to false positives, potentially disrupting critical processes. Most OT environments use IDS (detection mode) rather than IPS (prevention) to avoid availability impacts.
+}
+
+\section{\textcolor{accent}{\faIcon{bell}}\hspace{0.4em}Detection Methods}
+
+\subsection{\textcolor{accent}{\faIcon{fingerprint}}\hspace{0.3em}Signature-Based Detection}
+
+\begin{itemize}
+    \item \faIcon{database}\hspace{0.2em}Compares traffic against known attack pattern database
+    \item \faIcon{check-circle}\hspace{0.2em}Low false positives, well-understood, fast
+    \item \faIcon{ban}\hspace{0.2em}Cannot detect novel/zero-day attacks
+    \item \faIcon{cogs}\hspace{0.2em}Requires OT-specific signatures (Modbus exploits, etc.)
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{chart-line}}\hspace{0.3em}Anomaly-Based Detection}
+
+\begin{itemize}
+    \item \faIcon{chart-line}\hspace{0.2em}Establishes baseline of ``normal'' and alerts on deviations
+    \item \faIcon{search}\hspace{0.2em}Can detect unknown attacks, learns environment
+    \item \faIcon{sliders-h}\hspace{0.2em}Higher false positive rate, requires tuning
+    \item \faIcon{industry}\hspace{0.2em}OT advantage: predictable traffic makes anomalies stand out
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{search}}\hspace{0.3em}Protocol-Aware (DPI)}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{layer-group}\hspace{0.2em}\bfseries Layer} & \textcolor{white}{\faIcon{search}\hspace{0.2em}\bfseries Inspection Capability} \\
+\midrule
+Application & Validate OT protocol commands \\
+Protocol & Parse Modbus, DNP3, S7comm \\
+Transport & Port and connection analysis \\
+Network & IP reputation, geolocation \\
+\end{tabular}
+\end{center}
+
+\postersuccess{
+\textbf{Protocol inspection examples:} Detect unauthorized Modbus write commands to PLCs. Alert on DNP3 commands from unexpected sources. Identify firmware upload attempts via S7comm. Flag changes to safety system parameters.
+}
+
+\section{\textcolor{accent}{\faIcon{stream}}\hspace{0.4em}Industrial Protocol Support}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{stream}\hspace{0.2em}\bfseries Protocol} & \textcolor{white}{\faIcon{bell}\hspace{0.2em}\bfseries Detection Capabilities} \\
+\midrule
+Modbus & Function codes, register addresses \\
+DNP3 & Object types, secure authentication \\
+EtherNet/IP & CIP commands, config changes \\
+OPC UA/DA & Node access, write operations \\
+S7comm & Block transfers, program downloads \\
+IEC 61850 & Substation comms, GOOSE msgs \\
+BACnet & Property writes, building auto. \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{project-diagram}}\hspace{0.4em}Deployment Architecture}
+
+\subsection{\textcolor{accent}{\faIcon{map-marker-alt}}\hspace{0.3em}Sensor Placement}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{map-marker-alt}\hspace{0.2em}\bfseries Location} & \textcolor{white}{\faIcon{crosshairs}\hspace{0.2em}\bfseries Monitoring Focus} \\
+\midrule
+IT/OT boundary & North-south, unauthorized access \\
+DMZ connections & Data transfers, remote access \\
+Control network & East-west OT traffic, anomalies \\
+Eng. workstations & Config changes, PLC downloads \\
+Remote access & VPN sessions, jump servers \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{clock}}\hspace{0.3em}Baseline Considerations}
+
+\begin{itemize}
+    \item \faIcon{hourglass-half}\hspace{0.2em}Allow sufficient learning period for normal operations
+    \item \faIcon{power-off}\hspace{0.2em}Include startup, shutdown, and maintenance periods
+    \item \faIcon{sync}\hspace{0.2em}Account for seasonal variations in processes
+    \item \faIcon{redo}\hspace{0.2em}Re-baseline after legitimate modifications
+\end{itemize}
+
+\posterdanger{
+\textbf{Baseline risk:} If the network is already compromised during baseline creation, malicious traffic will be learned as ``normal.'' Conduct a security assessment before establishing baselines.
+}
+
+\section{\textcolor{accent}{\faIcon{cogs}}\hspace{0.4em}Implementation Best Practices}
+
+\begin{enumerate}
+    \item \faIcon{sitemap}\hspace{0.2em}Assess network architecture before deploying
+    \item \faIcon{eye}\hspace{0.2em}Start in detection mode -- alert only, no blocking
+    \item \faIcon{hourglass-half}\hspace{0.2em}Allow adequate baseline learning period
+    \item \faIcon{sliders-h}\hspace{0.2em}Tune aggressively to reduce false positives
+    \item \faIcon{link}\hspace{0.2em}Integrate with SIEM for correlation
+    \item \faIcon{clipboard-list}\hspace{0.2em}Define clear response procedures for alerts
+    \item \faIcon{flask}\hspace{0.2em}Test detection capabilities regularly
+\end{enumerate}
+
+\subsection{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.3em}IPS Deployment (If Required)}
+
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{exclamation-triangle}}\hspace{0.2em}\textbf{Fail-open mode} -- Traffic continues if IPS fails
+    \item \textcolor{success}{\faIcon{check-circle}}\hspace{0.2em}\textbf{Whitelist approach} -- Block only confirmed threats
+    \item \textcolor{info}{\faIcon{flask}}\hspace{0.2em}\textbf{Test extensively} -- Validate in lab before production
+    \item \textcolor{warning}{\faIcon{power-off}}\hspace{0.2em}\textbf{Bypass capability} -- Ability to disable quickly
+    \item \textcolor{accent}{\faIcon{server}}\hspace{0.2em}\textbf{High availability} -- Redundant for critical paths
+\end{itemize}
+
+\postertip{
+Deploy IDS in \textbf{detection mode first}---never start with inline prevention in OT. Place sensors at zone boundaries, especially the IT/OT boundary. Leverage OT traffic predictability for anomaly detection. Tune aggressively before expanding coverage. Integrate with SIEM and asset inventory for context-rich alerts. OT protocol awareness is essential---generic IT IDS misses industrial-specific threats.
+}
+
+\end{multicols}
+
+\end{document}

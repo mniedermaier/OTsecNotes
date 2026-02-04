@@ -1,0 +1,161 @@
+% ============================================================================
+%  Endpoint Protection for OT - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {Endpoint Protection for OT}
+    {Antivirus, EDR, and Endpoint Security in Industrial Environments}
+    {Poster 830}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+OT endpoint protection must balance \textbf{security with operational stability}. Traditional IT tools can disrupt industrial processes, while no protection leaves systems vulnerable to \textcolor{danger}{\faIcon{bug}}\hspace{0.2em}malware like Stuxnet, TRITON, and Industroyer.
+
+\posterinfo{
+\textbf{OT endpoints:} HMI workstations, engineering stations, historian servers, SCADA servers, Windows-based PLCs, jump servers, and remote access systems.
+}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Protection Technologies}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{2.5cm}p{1.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{shield-alt}\hspace{0.2em}\bfseries Technology} & \textcolor{white}{\faIcon{info-circle}\hspace{0.2em}\bfseries Description} & \textcolor{white}{\faIcon{check}\hspace{0.2em}\bfseries OT Fit} \\
+\midrule
+Traditional AV & Signature-based detection & Limited \\
+Next-Gen AV & Behavioral + signature & Moderate \\
+Whitelisting & Only approved apps run & Excellent \\
+EDR & Detect, investigate, respond & Moderate \\
+Host firewall & Control network connections & Good \\
+Device control & USB/media control & Excellent \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{columns}}\hspace{0.3em}Technology Comparison}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{0.8cm}p{0.8cm}p{0.8cm}p{0.8cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Criteria} & \textcolor{white}{\bfseries AV} & \textcolor{white}{\bfseries WL} & \textcolor{white}{\bfseries EDR} & \textcolor{white}{\bfseries Dev} \\
+\midrule
+Known \textcolor{danger}{\faIcon{bug}}\hspace{0.2em}malware & Yes & Yes & Yes & Part \\
+Unknown \textcolor{danger}{\faIcon{bug}}\hspace{0.2em}malware & Ltd & Yes & Mod & Ltd \\
+Works offline & Ltd & Yes & Ltd & Yes \\
+Legacy support & Varies & Good & Ltd & Good \\
+Low impact & Mod & High & Mod & High \\
+\end{tabular}
+\end{center}
+
+\posterdanger{
+\textbf{Why IT endpoint security fails in OT:} Signature updates require internet (air-gapped networks). Scans consume CPU during critical operations. False positives block control system software. Reboots for updates often impossible. Legacy OS unsupported. Vendor support voided by third-party software.
+}
+
+\section{\textcolor{accent}{\faIcon{layer-group}}\hspace{0.4em}Recommended Layered Strategy}
+
+\postersuccess{
+\textbf{OT endpoint protection stack:}
+\begin{enumerate}
+    \item \faIcon{list-alt}\hspace{0.2em}\textbf{Application whitelisting} -- Primary control
+    \item \faIcon{usb}\hspace{0.2em}\textbf{Device control} -- Block unauthorized USB/media
+    \item \faIcon{network-wired}\hspace{0.2em}\textbf{Host firewall} -- Limit network connections
+    \item \faIcon{shield-alt}\hspace{0.2em}\textbf{AV/EDR} -- Secondary, where vendor-compatible
+\end{enumerate}
+}
+
+\section{\textcolor{accent}{\faIcon{desktop}}\hspace{0.4em}Protection by System Type}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{desktop}\hspace{0.2em}\bfseries System} & \textcolor{white}{\faIcon{shield-alt}\hspace{0.2em}\bfseries Recommended Protection} \\
+\midrule
+Eng. workstation & Full EDR + AV + Whitelisting + Dev ctrl \\
+HMI / Operator & Whitelisting + Device ctrl + Host FW \\
+Historian server & AV + Whitelisting + Host FW \\
+SCADA server & Whitelisting + Device ctrl \\
+Jump server & Full EDR + AV + MFA \\
+Legacy (XP) & Whitelisting + Network isolation \\
+Embedded Win & Whitelisting or Write Filter \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{usb}}\hspace{0.4em}Device Control}
+
+\subsection{\textcolor{accent}{\faIcon{lock}}\hspace{0.3em}USB/Removable Media Policies}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{lock}\hspace{0.2em}\bfseries Policy} & \textcolor{white}{\faIcon{info-circle}\hspace{0.2em}\bfseries Description} \\
+\midrule
+Block all USB & Most restrictive, may impact ops \\
+Read-only USB & Allow export, prevent execution \\
+Approved only & Whitelist specific serial numbers \\
+Scan before use & AV scan on USB mount \\
+Transfer station & Dedicated kiosk for file transfer \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{search}}\hspace{0.4em}EDR in OT}
+
+\posterwarning{
+\textbf{EDR deployment cautions:} Never auto-quarantine in OT. Ensure agent doesn't interfere with real-time processes. Plan for offline/air-gapped operation. Verify compatibility with control system software. Consider network bandwidth for telemetry.
+}
+
+\subsection{\textcolor{accent}{\faIcon{desktop}}\hspace{0.3em}EDR Deployment Targets}
+
+\begin{itemize}
+    \item \faIcon{laptop}\hspace{0.2em}Engineering workstations -- Yes
+    \item \faIcon{server}\hspace{0.2em}Jump servers -- Yes
+    \item \faIcon{desktop}\hspace{0.2em}HMIs with internet access -- Consider
+    \item \faIcon{lock}\hspace{0.2em}Isolated HMIs -- Whitelisting preferred
+    \item \faIcon{cog}\hspace{0.2em}Control servers -- Test thoroughly first
+    \item \faIcon{microchip}\hspace{0.2em}PLCs/RTUs -- Not applicable (no OS agent)
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{cogs}}\hspace{0.4em}Deployment Best Practices}
+
+\begin{enumerate}
+    \item \faIcon{flask}\hspace{0.2em}\textbf{Test in lab} -- Never deploy untested in production
+    \item \faIcon{check-circle}\hspace{0.2em}\textbf{Check vendor compatibility} -- Get written approval
+    \item \faIcon{eye}\hspace{0.2em}\textbf{Start with monitoring} -- Audit mode before enforcement
+    \item \faIcon{ban}\hspace{0.2em}\textbf{Exclude control processes} -- Whitelist critical executables
+    \item \faIcon{calendar-alt}\hspace{0.2em}\textbf{Schedule scans} -- During maintenance windows only
+    \item \faIcon{download}\hspace{0.2em}\textbf{Plan update strategy} -- Offline updates for air-gapped
+    \item \faIcon{file-alt}\hspace{0.2em}\textbf{Document exceptions} -- Track all exclusions
+    \item \faIcon{tachometer-alt}\hspace{0.2em}\textbf{Monitor performance} -- Watch CPU/memory impact
+\end{enumerate}
+
+\section{\textcolor{accent}{\faIcon{server}}\hspace{0.4em}Legacy System Protection}
+
+For unsupported OS (Windows XP, Server 2003):
+
+\begin{itemize}
+    \item \faIcon{list-alt}\hspace{0.2em}\textbf{Application whitelisting} -- Primary defense
+    \item \faIcon{project-diagram}\hspace{0.2em}\textbf{Network isolation} -- Strict firewall rules
+    \item \faIcon{minus-circle}\hspace{0.2em}\textbf{Disable services} -- Reduce attack surface
+    \item \faIcon{globe}\hspace{0.2em}\textbf{Remove internet} -- No browsing or email
+    \item \faIcon{shield-alt}\hspace{0.2em}\textbf{Virtual patching} -- IPS rules at network level
+    \item \faIcon{arrow-up}\hspace{0.2em}\textbf{Plan migration} -- Upgrade to supported OS
+\end{itemize}
+
+\postertip{
+Application whitelisting is the \textbf{best primary control} for stable OT environments. Always test in lab first, check vendor compatibility lists, and never enable auto-remediation. Use a layered approach combining whitelisting, device control, host firewall, and AV/EDR where compatible. Schedule scans during maintenance windows and plan offline update strategies for air-gapped networks.
+}
+
+\end{multicols}
+
+\end{document}

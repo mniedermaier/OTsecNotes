@@ -1,0 +1,193 @@
+% ============================================================================
+%  Ukraine Power Grid Attacks - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {Ukraine Power Grid Attacks}
+    {Analysis of the 2015 and 2016 Cyber Attacks}
+    {Poster 411}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+The Ukraine power grid attacks (2015 and 2016) are \textbf{landmark events in OT security}. They demonstrated that adversaries could compromise power distribution systems and cause widespread outages affecting civilian populations. The 2015 attack was the first publicly confirmed cyber attack to cause a \textcolor{danger}{\faIcon{power-off}}\hspace{0.2em}power outage.
+
+\section{\textcolor{accent}{\faIcon{bolt}}\hspace{0.4em}2015 Attack}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{tag}\hspace{0.2em}\bfseries Attribute} & \textcolor{white}{\faIcon{file-alt}\hspace{0.2em}\bfseries Details} \\
+\midrule
+Date & December 23, 2015 \\
+Target & 3 power distribution companies \\
+Duration & 1--6 hours of outages \\
+Impact & \textcolor{danger}{\faIcon{power-off}}\hspace{0.2em}225,000 customers without power \\
+Malware & BlackEnergy 3, KillDisk \\
+Attribution & Sandworm (Russia) \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{link}}\hspace{0.3em}2015 Attack Chain}
+
+\begin{center}
+\begin{tikzpicture}[
+    step/.style={rectangle, draw=#1!40, thick, fill=#1!5, minimum height=0.38cm, rounded corners=2pt, font=\scriptsize, text width=4.5cm, align=left},
+    step/.default={otdanger},
+    num/.style={circle, fill=#1, text=white, font=\scriptsize\bfseries, minimum size=0.33cm, inner sep=0pt},
+    num/.default={otdanger},
+]
+    \node[num=otwarning] (n1) at (0,0) {1};
+    \node[step=otwarning, right=3pt of n1] (s1) {\faIcon{envelope}\hspace{0.1em}Spear-phishing with macros};
+    \node[num=otwarning, below=2pt of n1] (n2) {2};
+    \node[step=otwarning, right=3pt of n2] (s2) {BlackEnergy backdoor installed};
+    \node[num=otdanger, below=2pt of n2] (n3) {3};
+    \node[step=otdanger, right=3pt of n3] (s3) {Months of recon and mapping};
+    \node[num=otdanger, below=2pt of n3] (n4) {4};
+    \node[step=otdanger, right=3pt of n4] (s4) {VPN hijack: IT $\rightarrow$ SCADA};
+    \node[num=otdanger, below=2pt of n4] (n5) {5};
+    \node[step=otdanger, right=3pt of n5] (s5) {\faIcon{power-off}\hspace{0.1em}Open breakers via remote desktop};
+    \node[num=otprimary, below=2pt of n5] (n6) {6};
+    \node[step=otprimary, right=3pt of n6] (s6) {KillDisk wipe + UPS sabotage};
+
+    \foreach \i/\j in {1/2,2/3,3/4,4/5,5/6} {
+        \draw[thick, otdanger!40] (n\i.south) -- (n\j.north);
+    }
+\end{tikzpicture}
+\end{center}
+
+\posterdanger{
+Attackers used \textbf{legitimate remote access tools} (VPNs, remote desktop) to control SCADA. Operators watched helplessly as breakers were opened remotely. Call centers were flooded with fake calls to hinder response.
+}
+
+\subsection{\textcolor{accent}{\faIcon{chess}}\hspace{0.3em}Operational Planning}
+
+\begin{itemize}
+    \item \faIcon{users}\hspace{0.2em}\textbf{Coordinated:} Three utilities hit simultaneously
+    \item \faIcon{phone}\hspace{0.2em}\textbf{DoS:} Flooded call centers with fake phone calls
+    \item \faIcon{ethernet}\hspace{0.2em}\textbf{Persistence denial:} Corrupted serial-to-Ethernet converters
+    \item \faIcon{eraser}\hspace{0.2em}\textbf{Recovery hindrance:} KillDisk wiped workstations
+    \item \faIcon{battery-half}\hspace{0.2em}\textbf{UPS sabotage:} Modified firmware to fail during recovery
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{bolt}}\hspace{0.4em}2016 Attack (Industroyer)}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{tag}\hspace{0.2em}\bfseries Attribute} & \textcolor{white}{\faIcon{file-alt}\hspace{0.2em}\bfseries Details} \\
+\midrule
+Date & December 17, 2016 \\
+Target & Ukrenergo (Kyiv transmission) \\
+Duration & $\sim$1 hour outage \\
+Impact & \textcolor{danger}{\faIcon{power-off}}\hspace{0.2em}Portion of Kyiv without power \\
+Malware & Industroyer / CrashOverride \\
+Attribution & Sandworm (Russia) \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{stream}}\hspace{0.3em}Industroyer Protocol Modules}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{network-wired}\hspace{0.2em}\bfseries Protocol} & \textcolor{white}{\faIcon{bullseye}\hspace{0.2em}\bfseries Purpose} \\
+\midrule
+IEC 60870-5-101 & Serial telecontrol \\
+IEC 60870-5-104 & TCP/IP telecontrol \\
+IEC 61850 & Substation automation \\
+OPC DA & Industrial data access \\
+\end{tabular}
+\end{center}
+
+\posterwarning{
+Industroyer was the \textbf{first malware specifically designed to attack power grid equipment}. Its modular protocol support makes it adaptable to various grid configurations worldwide. Fully automated -- no operator interaction needed.
+}
+
+\section{\textcolor{accent}{\faIcon{columns}}\hspace{0.4em}2015 vs 2016 Comparison}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.8cm}p{2.2cm}p{2.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{list}\hspace{0.2em}\bfseries Aspect} & \textcolor{white}{\bfseries 2015} & \textcolor{white}{\bfseries 2016} \\
+\midrule
+Method & Remote desktop & Protocol malware \\
+Human & Manual SCADA & Automated \\
+Sophistic. & Existing tools & Custom ICS malware \\
+Scalability & Labor-intensive & Highly scalable \\
+Target & Distribution & Transmission \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{exclamation-triangle}}\hspace{0.4em}Network Weaknesses Exploited}
+
+\begin{itemize}
+    \item \faIcon{network-wired}\hspace{0.2em}VPN connections between corporate and OT networks
+    \item \faIcon{key}\hspace{0.2em}Shared credentials between IT and OT systems
+    \item \faIcon{project-diagram}\hspace{0.2em}Insufficient network segmentation
+    \item \faIcon{fingerprint}\hspace{0.2em}Lack of multi-factor authentication
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{crosshairs}}\hspace{0.4em}MITRE ATT\&CK for ICS}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.3cm}p{2cm}p{3.2cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{hashtag}\hspace{0.2em}\bfseries ID} & \textcolor{white}{\faIcon{flag}\hspace{0.2em}\bfseries Tactic} & \textcolor{white}{\faIcon{cogs}\hspace{0.2em}\bfseries Technique} \\
+\midrule
+T0865 & Initial Access & \textcolor{warning}{\faIcon{envelope}}\hspace{0.2em}Spearphishing Attachment \\
+T0859 & Persistence & Valid Accounts \\
+T0886 & Lateral Mov. & Remote Services \\
+T0855 & Execution & Unauthorized Commands \\
+T0831 & Impact & Manipulation of Control \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{undo}}\hspace{0.4em}Recovery and Impact}
+
+\textcolor{danger}{\faIcon{power-off}}\hspace{0.2em}Power restored within 1--6 hours through \textbf{manual operations}:
+
+\begin{itemize}
+    \item \faIcon{walking}\hspace{0.2em}Operators physically traveled to substations
+    \item \faIcon{hand-paper}\hspace{0.2em}Breakers closed manually at each location
+    \item \faIcon{cogs}\hspace{0.2em}Ukrainian grid design allowed manual override
+    \item \faIcon{calendar-alt}\hspace{0.2em}Full IT system recovery took months
+\end{itemize}
+
+\posterinfo{
+\textbf{Industry impact:} Increased global grid cybersecurity investment, ICS threat intelligence sharing programs, enhanced regulatory focus on critical infrastructure, greater utility--government collaboration.
+}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Defense Lessons}
+
+\postersuccess{
+\begin{enumerate}
+    \item \textcolor{warning}{\faIcon{envelope}}\hspace{0.2em}\textbf{Spear-phishing works} -- Email remains top initial access
+    \item \textcolor{warning}{\faIcon{network-wired}}\hspace{0.2em}\textbf{IT/OT convergence = risk} -- VPNs bridged networks
+    \item \textcolor{warning}{\faIcon{key}}\hspace{0.2em}\textbf{Credential theft pivots} -- Shared passwords exploited
+    \item \textcolor{warning}{\faIcon{tools}}\hspace{0.2em}\textbf{Manual ops saved the day} -- Ability to operate without SCADA
+    \item \textcolor{warning}{\faIcon{clock}}\hspace{0.2em}\textbf{Patience pays off} -- Months of recon before attack
+    \item \textcolor{warning}{\faIcon{users}}\hspace{0.2em}\textbf{Coordination multiplies} -- Multiple targets simultaneously
+\end{enumerate}
+}
+
+\postertip{
+\textbf{Key defenses:} Implement MFA for all remote access. Properly segment IT/OT with DMZ. Monitor OT traffic for anomalous commands. Maintain manual override capabilities for critical equipment. Deploy advanced email threat protection and conduct user training. Develop OT-specific incident response plans and exercise them regularly.
+}
+
+\end{multicols}
+
+\end{document}

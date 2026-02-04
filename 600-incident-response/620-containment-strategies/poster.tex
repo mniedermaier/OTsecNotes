@@ -1,0 +1,184 @@
+% ============================================================================
+%  OT Containment Strategies - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {OT Containment Strategies}
+    {Isolating Compromised Systems While Maintaining Safe Operations}
+    {Poster 620}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+Containment in OT requires balancing \textbf{cybersecurity response with operational safety}. Unlike IT where systems can be quickly isolated, OT containment must consider process dependencies, safety implications, and potential physical consequences.
+
+\posterdanger{
+\textbf{\textcolor{danger}{\faIcon{exclamation-triangle}}\hspace{0.2em}Safety first:} Never implement containment actions that could cause unsafe process conditions, environmental releases, or harm to personnel. Always coordinate with operations before any action.
+}
+
+\section{\textcolor{accent}{\faIcon{question-circle}}\hspace{0.4em}Decision Framework}
+
+\subsection{\textcolor{accent}{\faIcon{clipboard-list}}\hspace{0.3em}Key Questions Before Action}
+
+\begin{enumerate}
+    \item \faIcon{hard-hat}\hspace{0.2em}Is there immediate safety risk from the compromise?
+    \item \faIcon{bolt}\hspace{0.2em}Is the attack actively spreading?
+    \item \faIcon{server}\hspace{0.2em}What systems are affected or at risk?
+    \item \faIcon{link}\hspace{0.2em}What are the dependencies between systems?
+    \item \faIcon{cog}\hspace{0.2em}Can we isolate without causing process upset?
+\end{enumerate}
+
+\section{\textcolor{accent}{\faIcon{layer-group}}\hspace{0.4em}Containment Levels}
+
+\begin{center}
+\begin{tikzpicture}[
+    lvl/.style={rectangle, draw=#1!50, thick, fill=#1!10,
+        rounded corners=2pt, minimum height=0.38cm, minimum width=5.8cm,
+        align=center, font=\scriptsize\bfseries},
+    lvl/.default={otaccent},
+    lbl/.style={font=\scriptsize, anchor=west},
+    arr/.style={->, thick, >=stealth, gray!60},
+]
+    \node[lvl=otsuccess] (l1) at (0,0) {\textcolor{otsuccess!80!black}{L1: Host Isolation}};
+    \node[lbl, right=2pt of l1] {\textcolor{otsuccess}{\faIcon{circle}}};
+    \node[lvl=otinfo, below=3pt of l1] (l2) {\textcolor{otinfo!80!black}{L2: Segment Isolation}};
+    \node[lbl, right=2pt of l2] {\textcolor{otinfo}{\faIcon{circle}}};
+    \node[lvl=otwarning, below=3pt of l2] (l3) {\textcolor{otwarning!80!black}{L3: Zone Isolation}};
+    \node[lbl, right=2pt of l3] {\textcolor{otwarning}{\faIcon{circle}}};
+    \node[lvl=otwarning, below=3pt of l3] (l4) {\textcolor{otwarning!70!otdanger}{L4: IT/OT Disconnect}};
+    \node[lbl, right=2pt of l4] {\textcolor{otwarning!70!otdanger}{\faIcon{circle}}};
+    \node[lvl=otdanger, below=3pt of l4] (l5) {\textcolor{otdanger!80!black}{L5: Full Air-Gap}};
+    \node[lbl, right=2pt of l5] {\textcolor{otdanger}{\faIcon{circle}}};
+
+    \draw[arr] (l1) -- (l2);
+    \draw[arr] (l2) -- (l3);
+    \draw[arr] (l3) -- (l4);
+    \draw[arr] (l4) -- (l5);
+
+    \node[font=\scriptsize, otsuccess, left=2pt of l1, anchor=east] {\faIcon{shield-alt} Low impact};
+    \node[font=\scriptsize, otdanger, left=2pt of l5, anchor=east] {\faIcon{bolt} High impact};
+\end{tikzpicture}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{balance-scale}}\hspace{0.3em}Level Selection Criteria}
+
+\begin{itemize}
+    \item \faIcon{desktop}\hspace{0.2em}\textbf{L1} -- Single compromised host, no lateral movement
+    \item \faIcon{layer-group}\hspace{0.2em}\textbf{L2} -- Multiple hosts in one segment affected
+    \item \faIcon{arrows-alt-h}\hspace{0.2em}\textbf{L3} -- Compromise spans segment boundaries
+    \item \faIcon{exchange-alt}\hspace{0.2em}\textbf{L4} -- Attack from IT, OT integrity uncertain
+    \item \faIcon{globe}\hspace{0.2em}\textbf{L5} -- Widespread compromise, unknown scope
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{network-wired}}\hspace{0.4em}Network Containment}
+
+\subsection{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.3em}Firewall-Based Isolation}
+
+\begin{itemize}
+    \item \faIcon{ban}\hspace{0.2em}\textbf{Block hosts} -- Deny traffic to/from compromised IPs
+    \item \faIcon{lock}\hspace{0.2em}\textbf{Block protocols} -- Disable RDP, SMB as needed
+    \item \faIcon{upload}\hspace{0.2em}\textbf{Deny outbound} -- Prevent C2 and exfiltration
+    \item \faIcon{project-diagram}\hspace{0.2em}\textbf{Zone isolation} -- Block inter-zone traffic
+    \item \faIcon{check-circle}\hspace{0.2em}\textbf{Allow-list only} -- Permit only known-good traffic
+\end{itemize}
+
+\posterwarning{
+\textbf{\textcolor{warning}{\faIcon{clipboard-check}}\hspace{0.2em}Pre-plan rules:} Have containment firewall rules pre-written and tested. During an incident is not the time to figure out syntax or rule ordering.
+}
+
+\subsection{\textcolor{accent}{\faIcon{project-diagram}}\hspace{0.3em}Switch-Based Isolation}
+
+\begin{itemize}
+    \item \faIcon{power-off}\hspace{0.2em}\textbf{Port shutdown} -- Disable ports for compromised hosts
+    \item \faIcon{random}\hspace{0.2em}\textbf{VLAN reassignment} -- Move to quarantine VLAN
+    \item \faIcon{ethernet}\hspace{0.2em}\textbf{MAC filtering} -- Block specific MAC addresses
+    \item \faIcon{list-alt}\hspace{0.2em}\textbf{ACLs} -- Apply access control lists at Layer 2
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{hand-paper}}\hspace{0.3em}Physical Isolation}
+
+When logical isolation is insufficient:
+
+\begin{itemize}
+    \item \faIcon{unlink}\hspace{0.2em}Disconnect network cables (document which ones)
+    \item \faIcon{ethernet}\hspace{0.2em}Physically disconnect IT/OT boundary links
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{hard-hat}}\hspace{0.4em}Process-Safe Containment}
+
+\postersuccess{
+\textbf{\textcolor{success}{\faIcon{check-circle}}\hspace{0.2em}Key principle:} Isolate compromised systems while preserving control paths to field devices. A PLC can often operate independently even if HMI access is lost.
+}
+
+\subsection{\textcolor{accent}{\faIcon{cogs}}\hspace{0.3em}Strategies}
+
+\begin{itemize}
+    \item \faIcon{tv}\hspace{0.2em}\textbf{Isolate supervisory, preserve control} -- Block HMI traffic while allowing PLC-to-field communication
+    \item \faIcon{eye}\hspace{0.2em}\textbf{Read-only mode} -- Allow monitoring, block commands
+    \item \faIcon{hand-paper}\hspace{0.2em}\textbf{Local control} -- Switch to manual operation at field
+    \item \faIcon{copy}\hspace{0.2em}\textbf{Backup systems} -- Activate redundant HMIs/paths
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{users}}\hspace{0.3em}Operations Coordination}
+
+Before any containment action:
+
+\begin{enumerate}
+    \item \faIcon{bullhorn}\hspace{0.2em}Notify operations/control room of planned actions
+    \item \faIcon{link}\hspace{0.2em}Identify process dependencies on affected systems
+    \item \faIcon{tools}\hspace{0.2em}Prepare for manual operation if needed
+    \item \faIcon{undo}\hspace{0.2em}Have rollback plan ready
+    \item \faIcon{walking}\hspace{0.2em}Station personnel at critical equipment
+\end{enumerate}
+
+\section{\textcolor{accent}{\faIcon{server}}\hspace{0.4em}Containment by System Type}
+
+\subsection{\textcolor{accent}{\faIcon{desktop}}\hspace{0.3em}Compromised HMI/SCADA}
+
+\begin{enumerate}
+    \item \faIcon{unlink}\hspace{0.2em}Disconnect from network (preserve power for evidence)
+    \item \faIcon{copy}\hspace{0.2em}Activate backup HMI if available
+    \item \faIcon{microchip}\hspace{0.2em}Verify PLCs continue operating correctly
+    \item \faIcon{sliders-h}\hspace{0.2em}Enable local indication/control panels
+    \item \faIcon{chart-line}\hspace{0.2em}Monitor process via historian or alternate views
+\end{enumerate}
+
+\subsection{\textcolor{accent}{\faIcon{laptop}}\hspace{0.3em}Compromised Engineering Workstation}
+
+\begin{enumerate}
+    \item \faIcon{ethernet}\hspace{0.2em}Immediately disconnect from all networks
+    \item \faIcon{search}\hspace{0.2em}Verify no unauthorized changes to controllers
+    \item \faIcon{balance-scale}\hspace{0.2em}Compare programs against known-good baselines
+    \item \faIcon{lock}\hspace{0.2em}Block remote programming ports on controllers
+    \item \faIcon{clipboard-list}\hspace{0.2em}Review audit logs for recent project changes
+\end{enumerate}
+
+\subsection{\textcolor{accent}{\faIcon{microchip}}\hspace{0.3em}Suspected PLC Compromise}
+
+\posterdanger{
+\textbf{Do not power cycle or stop a potentially compromised PLC} without assessing process impact. The current logic may be maintaining safe operations even if modified.
+}
+
+\section{\textcolor{accent}{\faIcon{comments}}\hspace{0.4em}Communication}
+
+\begin{itemize}
+    \item \faIcon{broadcast-tower}\hspace{0.2em}Use \textbf{out-of-band} channels (not compromised network)
+    \item \textcolor{info}{\faIcon{phone}}\hspace{0.2em}Phone calls (not VoIP on affected network)
+    \item \faIcon{mobile-alt}\hspace{0.2em}Mobile devices on cellular network
+\end{itemize}
+
+\postertip{
+Containment is a \textbf{graduated response}---match the level to the threat scope. Pre-plan firewall rules and isolation procedures before incidents occur. Always coordinate with operations and have rollback plans ready. Preserve control paths to field devices while isolating supervisory systems. Document every action with timestamps, authorization, and observed impact. Out-of-band communication is essential---assume the network is compromised.
+}
+
+\end{multicols}
+
+\end{document}

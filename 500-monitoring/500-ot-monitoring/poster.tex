@@ -1,0 +1,177 @@
+% ============================================================================
+%  OT Network Monitoring - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {OT Network Monitoring}
+    {Visibility and Detection in Industrial Networks}
+    {Poster 500}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+Network monitoring in OT environments provides visibility into industrial communications, enabling detection of anomalies, threats, and operational issues. Unlike IT monitoring, OT monitoring must account for \textbf{specialized protocols, safety constraints}, and the critical nature of industrial processes.
+
+\posterinfo{
+\textbf{You cannot protect what you cannot see.} OT network monitoring is foundational to any industrial security program---it enables asset discovery, threat detection, and incident response.
+}
+
+\subsection{\textcolor{accent}{\faIcon{columns}}\hspace{0.3em}Key Differences from IT}
+
+\begin{itemize}
+    \item \faIcon{eye-slash}\hspace{0.2em}\textbf{Passive only} -- Active scanning can crash OT devices
+    \item \faIcon{code}\hspace{0.2em}\textbf{Protocol awareness} -- Must understand Modbus, DNP3, OPC, etc.
+    \item \faIcon{cogs}\hspace{0.2em}\textbf{Process context} -- Security events need operational context
+    \item \textcolor{danger}{\faIcon{exclamation-triangle}}\hspace{0.2em} \textbf{Availability focus} -- Monitoring must not impact operations
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{eye}}\hspace{0.4em}Monitoring Approaches}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.5cm}p{2.3cm}p{2.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{eye}\hspace{0.2em}\bfseries Aspect} & \textcolor{white}{\bfseries Passive} & \textcolor{white}{\bfseries Active} \\
+\midrule
+Impact & None to OT & Can crash devices \\
+Discovery & Traffic-based & Query-based \\
+Coverage & Active comms & All addressable \\
+Protocols & Deep inspection & Limited \\
+OT use & Preferred & With caution \\
+\end{tabular}
+\end{center}
+
+\posterdanger{
+\textbf{Active scanning danger:} Nmap, vulnerability scanners, and other active tools can crash PLCs and RTUs. Never perform active scanning in OT without explicit approval and during maintenance windows only.
+}
+
+\section{\textcolor{accent}{\faIcon{database}}\hspace{0.4em}Data Collection Methods}
+
+\subsection{\textcolor{accent}{\faIcon{network-wired}}\hspace{0.3em}Network TAPs}
+
+\begin{itemize}
+    \item \faIcon{microchip}\hspace{0.2em}Hardware devices that copy traffic without interruption
+    \item \textcolor{success}{\faIcon{check-circle}}\hspace{0.2em} Fail-safe: network continues if TAP loses power
+    \item \faIcon{arrows-alt-h}\hspace{0.2em}Full duplex: captures both directions of traffic
+    \item \faIcon{check-double}\hspace{0.2em}Recommended for critical OT network segments
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{clone}}\hspace{0.3em}SPAN/Mirror Ports}
+
+\begin{itemize}
+    \item \faIcon{random}\hspace{0.2em}Switch feature that copies traffic to monitoring port
+    \item \faIcon{dollar-sign}\hspace{0.2em}Lower cost than dedicated TAPs
+    \item \textcolor{warning}{\faIcon{exclamation-circle}}\hspace{0.2em} May drop packets under high load
+    \item \faIcon{server}\hspace{0.2em}Suitable for less critical segments
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{map-marker-alt}}\hspace{0.3em}Strategic Placement}
+
+Monitor at key network boundaries:
+
+\begin{itemize}
+    \item \faIcon{shield-alt}\hspace{0.2em}\textbf{IT/OT boundary} -- DMZ firewalls, data diodes
+    \item \faIcon{layer-group}\hspace{0.2em}\textbf{Zone boundaries} -- Between Purdue levels
+    \item \faIcon{server}\hspace{0.2em}\textbf{Critical assets} -- Historians, engineering workstations
+    \item \faIcon{key}\hspace{0.2em}\textbf{Remote access} -- VPN and jump server traffic
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{bell}}\hspace{0.4em}Detection Capabilities}
+
+\subsection{\textcolor{accent}{\faIcon{crosshairs}}\hspace{0.3em}Threat Detection}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{crosshairs}\hspace{0.2em}\bfseries Threat} & \textcolor{white}{\bfseries Detection Method} \\
+\midrule
+Reconnaissance & Port scans, protocol enumeration \\
+Unauthorized access & New connections, failed auth \\
+Malicious commands & Dangerous PLC write operations \\
+Lateral movement & Unusual communication patterns \\
+Data exfiltration & Large transfers, unusual destinations \\
+Malware C2 & Known bad IPs, DNS anomalies \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{chart-line}}\hspace{0.3em}Operational Anomalies}
+
+\begin{itemize}
+    \item \faIcon{ban}\hspace{0.2em}\textbf{Protocol violations} -- Malformed packets, invalid commands
+    \item \faIcon{clock}\hspace{0.2em}\textbf{Timing anomalies} -- Unusual polling intervals
+    \item \faIcon{cog}\hspace{0.2em}\textbf{Config changes} -- PLC logic modifications
+    \item \faIcon{sync}\hspace{0.2em}\textbf{Network issues} -- Retransmissions, packet loss
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{stream}}\hspace{0.4em}Protocol Support}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{stream}\hspace{0.2em}\bfseries Category} & \textcolor{white}{\bfseries Protocols} \\
+\midrule
+Process control & Modbus, DNP3, IEC 104, IEC 61850 \\
+Industrial Eth. & EtherNet/IP, PROFINET \\
+Building auto. & BACnet, LonWorks \\
+Enterprise & OPC UA, OPC DA \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{search}}\hspace{0.3em}Asset Discovery}
+
+Passive monitoring reveals:
+
+\begin{itemize}
+    \item \faIcon{map-marker-alt}\hspace{0.2em}IP and MAC addresses of communicating devices
+    \item \faIcon{fingerprint}\hspace{0.2em}Device types and vendors (protocol fingerprinting)
+    \item \faIcon{project-diagram}\hspace{0.2em}Communication patterns and relationships
+    \item \textcolor{info}{\faIcon{plus-circle}}\hspace{0.2em} New or unauthorized devices on the network
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{cogs}}\hspace{0.4em}Implementation}
+
+\subsection{\textcolor{accent}{\faIcon{clipboard-check}}\hspace{0.3em}Deployment Best Practices}
+
+\begin{enumerate}
+    \item \faIcon{sitemap}\hspace{0.2em}Assess network architecture before deploying
+    \item \faIcon{play-circle}\hspace{0.2em}Start with passive monitoring at IT/OT boundary
+    \item \faIcon{expand-arrows-alt}\hspace{0.2em}Expand to zone boundaries and critical segments
+    \item \faIcon{hourglass-half}\hspace{0.2em}Allow adequate baseline learning period
+    \item \faIcon{sliders-h}\hspace{0.2em}Tune aggressively to reduce false positives
+    \item \faIcon{clipboard-list}\hspace{0.2em}Define clear response procedures for alerts
+\end{enumerate}
+
+\subsection{\textcolor{accent}{\faIcon{plug}}\hspace{0.3em}Integration Points}
+
+\begin{itemize}
+    \item \faIcon{chart-bar}\hspace{0.2em}\textbf{SIEM} -- Forward alerts to security operations
+    \item \faIcon{list-alt}\hspace{0.2em}\textbf{Asset management} -- Sync discovered assets to inventory
+    \item \faIcon{tasks}\hspace{0.2em}\textbf{Ticketing} -- Create incidents for investigation
+    \item \faIcon{database}\hspace{0.2em}\textbf{Historian} -- Correlate network events with process data
+\end{itemize}
+
+\posterwarning{
+\textbf{Common challenges:} Encrypted traffic (OPC UA, TLS) limits visibility. High-volume networks require significant storage. Proprietary protocols may lack decoder support. Alert tuning is essential to reduce false positives.
+}
+
+\postersuccess{
+\textbf{Quick wins:} Deploy a network TAP at the IT/OT boundary as a first step. This single monitoring point reveals cross-boundary traffic, unauthorized connections, and provides immediate security value with minimal operational risk.
+}
+
+\postertip{
+OT monitoring is the \textbf{foundation of industrial security}. Start with passive monitoring using TAPs at IT/OT boundaries. Ensure your solution supports the specific industrial protocols in your environment. Integrate with SIEM and asset inventory.
+}
+
+\end{multicols}
+
+\end{document}

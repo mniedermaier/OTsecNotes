@@ -106,7 +106,7 @@ OTsecNotes/
 
 # Each document folder contains:
 category/XXX-topic-name/
-├── main.tex                    # Document source
+├── document.tex                    # Document source
 ├── images/                     # Document-specific images
 └── XXX-topic-name.pdf          # Generated PDF
 ```
@@ -190,7 +190,7 @@ The shared template (`templates/otsec-template.sty`) provides:
 
 1. Create a new document using `make new NAME=XXX-topic-name`
    - Documents are automatically placed in the correct category folder based on their number
-2. Add your content to the generated `main.tex` file
+2. Add your content to the generated `document.tex` file
 3. Build and verify with `make XXX-topic-name`
 4. Run `make list` to see all detected documents
 

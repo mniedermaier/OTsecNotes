@@ -7,22 +7,31 @@ TEXFLAGS = -interaction=nonstopmode -halt-on-error
 BUILD_DIR = build
 TEMPLATE_DIR = templates
 STYLE_FILE = $(TEMPLATE_DIR)/otsec-template.sty
+POSTER_STYLE = $(TEMPLATE_DIR)/otsec-poster.sty
 
 # Category folders
 CATEGORIES := 000-fundamentals 100-standards 200-protocols 300-architecture 400-threats 500-monitoring 600-incident-response 700-assessments 800-solutions
 
-# Auto-detect document folders (nested structure: category/XXX-*/main.tex)
-TOPIC_PATHS := $(sort $(dir $(wildcard [0-9]*-*/[0-9]*-*/main.tex)))
+# Auto-detect document folders (nested structure: category/XXX-*/document.tex)
+TOPIC_PATHS := $(sort $(dir $(wildcard [0-9]*-*/[0-9]*-*/document.tex)))
 TOPIC_PATHS := $(TOPIC_PATHS:/=)
 
 # Extract just the document name (last part of path) for targets
 TOPICS := $(notdir $(TOPIC_PATHS))
+
+# Auto-detect poster files (category/XXX-*/poster.tex)
+POSTER_PATHS := $(sort $(dir $(wildcard [0-9]*-*/[0-9]*-*/poster.tex)))
+POSTER_PATHS := $(POSTER_PATHS:/=)
+
+# Extract poster document names for targets
+POSTER_TOPICS := $(notdir $(POSTER_PATHS))
 
 # Colors for output
 GREEN = \033[0;32m
 YELLOW = \033[0;33m
 RED = \033[0;31m
 CYAN = \033[0;36m
+PURPLE = \033[0;35m
 NC = \033[0m
 
 # Default target - build all documents
@@ -30,7 +39,10 @@ NC = \033[0m
 all: $(TOPICS)
 
 # Function to find category for a topic
-find_category = $(firstword $(foreach cat,$(CATEGORIES),$(if $(wildcard $(cat)/$(1)/main.tex),$(cat))))
+find_category = $(firstword $(foreach cat,$(CATEGORIES),$(if $(wildcard $(cat)/$(1)/document.tex),$(cat))))
+
+# Function to find category for a poster topic
+find_poster_category = $(firstword $(foreach cat,$(CATEGORIES),$(if $(wildcard $(cat)/$(1)/poster.tex),$(cat))))
 
 # Build a specific topic by name (e.g., make 200-modbus)
 .PHONY: $(TOPICS)
@@ -43,11 +55,11 @@ $(TOPICS): %: $(STYLE_FILE)
 	fi
 	@echo "$(CYAN)[BUILD]$(NC) $(DOC_PATH)"
 	@mkdir -p $(BUILD_DIR)/$(DOC_PATH)
-	@(cd $(DOC_PATH) && TEXINPUTS="../../$(TEMPLATE_DIR):$$TEXINPUTS" $(TEX) $(TEXFLAGS) -output-directory=../../$(BUILD_DIR)/$(DOC_PATH) main.tex > /dev/null 2>&1) || \
-		(echo "$(RED)[ERROR]$(NC) First pass failed for $(DOC_PATH)"; cd $(DOC_PATH) && TEXINPUTS="../../$(TEMPLATE_DIR):$$TEXINPUTS" $(TEX) $(TEXFLAGS) -output-directory=../../$(BUILD_DIR)/$(DOC_PATH) main.tex; exit 1)
-	@(cd $(DOC_PATH) && TEXINPUTS="../../$(TEMPLATE_DIR):$$TEXINPUTS" $(TEX) $(TEXFLAGS) -output-directory=../../$(BUILD_DIR)/$(DOC_PATH) main.tex > /dev/null 2>&1) || \
+	@(cd $(DOC_PATH) && TEXINPUTS="../../$(TEMPLATE_DIR):$$TEXINPUTS" $(TEX) $(TEXFLAGS) -output-directory=../../$(BUILD_DIR)/$(DOC_PATH) document.tex > /dev/null 2>&1) || \
+		(echo "$(RED)[ERROR]$(NC) First pass failed for $(DOC_PATH)"; cd $(DOC_PATH) && TEXINPUTS="../../$(TEMPLATE_DIR):$$TEXINPUTS" $(TEX) $(TEXFLAGS) -output-directory=../../$(BUILD_DIR)/$(DOC_PATH) document.tex; exit 1)
+	@(cd $(DOC_PATH) && TEXINPUTS="../../$(TEMPLATE_DIR):$$TEXINPUTS" $(TEX) $(TEXFLAGS) -output-directory=../../$(BUILD_DIR)/$(DOC_PATH) document.tex > /dev/null 2>&1) || \
 		(echo "$(RED)[ERROR]$(NC) Second pass failed for $(DOC_PATH)"; exit 1)
-	@mv $(BUILD_DIR)/$(DOC_PATH)/main.pdf $(DOC_PATH)/$@.pdf
+	@mv $(BUILD_DIR)/$(DOC_PATH)/document.pdf $(DOC_PATH)/$@.pdf
 	@echo "$(GREEN)[DONE]$(NC) Generated $(DOC_PATH)/$@.pdf"
 
 # Build all documents in parallel
@@ -56,6 +68,78 @@ parallel:
 	@echo "$(CYAN)[PARALLEL]$(NC) Building all documents..."
 	@$(MAKE) -j$(shell nproc) all
 	@echo "$(GREEN)[DONE]$(NC) All documents built"
+
+# Build a specific poster (e.g., make poster-200-modbus)
+poster-%: $(STYLE_FILE) $(POSTER_STYLE)
+	$(eval CATEGORY := $(call find_poster_category,$*))
+	$(eval DOC_PATH := $(CATEGORY)/$*)
+	@if [ -z "$(CATEGORY)" ]; then \
+		echo "$(RED)[ERROR]$(NC) Poster for $* not found in any category"; \
+		exit 1; \
+	fi
+	@echo "$(PURPLE)[POSTER]$(NC) $(DOC_PATH)"
+	@mkdir -p $(BUILD_DIR)/$(DOC_PATH)
+	@(cd $(DOC_PATH) && TEXINPUTS="../../$(TEMPLATE_DIR):$$TEXINPUTS" $(TEX) $(TEXFLAGS) -output-directory=../../$(BUILD_DIR)/$(DOC_PATH) poster.tex > /dev/null 2>&1) || \
+		(echo "$(RED)[ERROR]$(NC) First pass failed for poster $(DOC_PATH)"; cd $(DOC_PATH) && TEXINPUTS="../../$(TEMPLATE_DIR):$$TEXINPUTS" $(TEX) $(TEXFLAGS) -output-directory=../../$(BUILD_DIR)/$(DOC_PATH) poster.tex; exit 1)
+	@(cd $(DOC_PATH) && TEXINPUTS="../../$(TEMPLATE_DIR):$$TEXINPUTS" $(TEX) $(TEXFLAGS) -output-directory=../../$(BUILD_DIR)/$(DOC_PATH) poster.tex > /dev/null 2>&1) || \
+		(echo "$(RED)[ERROR]$(NC) Second pass failed for poster $(DOC_PATH)"; exit 1)
+	@mv $(BUILD_DIR)/$(DOC_PATH)/poster.pdf $(DOC_PATH)/$*-poster.pdf
+	@echo "$(GREEN)[DONE]$(NC) Generated $(DOC_PATH)/$*-poster.pdf"
+
+# Build all posters
+.PHONY: posters
+posters: $(addprefix poster-,$(POSTER_TOPICS))
+
+# Build all posters in parallel
+.PHONY: posters-parallel
+posters-parallel:
+	@echo "$(PURPLE)[PARALLEL]$(NC) Building all posters..."
+	@$(MAKE) -j$(shell nproc) posters
+	@echo "$(GREEN)[DONE]$(NC) All posters built"
+
+# Check poster fill percentage (usage: make check-poster-fill)
+.PHONY: check-poster-fill
+check-poster-fill:
+	@echo "$(PURPLE)[CHECK]$(NC) Checking poster fill percentages..."
+	@FAILED=0; \
+	for path in $(POSTER_PATHS); do \
+		docname=$$(basename $$path); \
+		pdf="$$path/$${docname}-poster.pdf"; \
+		if [ -f "$$pdf" ]; then \
+			result=$$(python3 scripts/check-poster-fill.py "$$pdf" 85 2>&1); \
+			if [ $$? -eq 0 ]; then \
+				echo "$(GREEN)  $$result$(NC)"; \
+			else \
+				echo "$(YELLOW)  $$result$(NC)"; \
+				FAILED=1; \
+			fi; \
+		else \
+			echo "$(YELLOW)  SKIP: $$pdf (not built yet)$(NC)"; \
+		fi; \
+	done; \
+	if [ "$$FAILED" -eq 1 ]; then \
+		echo "$(YELLOW)[WARN]$(NC) Some posters are below 85% fill threshold"; \
+	else \
+		echo "$(GREEN)[DONE]$(NC) All posters pass fill check"; \
+	fi
+
+# Check for documents missing posters
+.PHONY: check-missing-posters
+check-missing-posters:
+	@echo "$(PURPLE)[CHECK]$(NC) Checking for documents missing posters..."
+	@MISSING=0; \
+	for path in $(TOPIC_PATHS); do \
+		docname=$$(basename $$path); \
+		if [ ! -f "$$path/poster.tex" ]; then \
+			echo "$(YELLOW)  MISSING: $$path/poster.tex$(NC)"; \
+			MISSING=$$((MISSING + 1)); \
+		fi; \
+	done; \
+	if [ "$$MISSING" -gt 0 ]; then \
+		echo "$(YELLOW)[WARN]$(NC) $$MISSING document(s) missing poster.tex"; \
+	else \
+		echo "$(GREEN)[DONE]$(NC) All documents have poster.tex"; \
+	fi
 
 # Verbose build for a specific topic (usage: make verbose-200-modbus)
 verbose-%:
@@ -67,9 +151,9 @@ verbose-%:
 	fi
 	@echo "$(CYAN)[BUILD]$(NC) $(DOC_PATH) (verbose)"
 	@mkdir -p $(BUILD_DIR)/$(DOC_PATH)
-	cd $(DOC_PATH) && TEXINPUTS="../../$(TEMPLATE_DIR):$$TEXINPUTS" $(TEX) -output-directory=../../$(BUILD_DIR)/$(DOC_PATH) main.tex
-	cd $(DOC_PATH) && TEXINPUTS="../../$(TEMPLATE_DIR):$$TEXINPUTS" $(TEX) -output-directory=../../$(BUILD_DIR)/$(DOC_PATH) main.tex
-	@mv $(BUILD_DIR)/$(DOC_PATH)/main.pdf $(DOC_PATH)/$*.pdf
+	cd $(DOC_PATH) && TEXINPUTS="../../$(TEMPLATE_DIR):$$TEXINPUTS" $(TEX) -output-directory=../../$(BUILD_DIR)/$(DOC_PATH) document.tex
+	cd $(DOC_PATH) && TEXINPUTS="../../$(TEMPLATE_DIR):$$TEXINPUTS" $(TEX) -output-directory=../../$(BUILD_DIR)/$(DOC_PATH) document.tex
+	@mv $(BUILD_DIR)/$(DOC_PATH)/document.pdf $(DOC_PATH)/$*.pdf
 	@echo "$(GREEN)[DONE]$(NC) Generated $(DOC_PATH)/$*.pdf"
 
 # Clean auxiliary files
@@ -102,12 +186,16 @@ list:
 	@echo "$(CYAN)Available documents (auto-detected):$(NC)"
 	@echo ""
 	@for cat in $(CATEGORIES); do \
-		if [ -d "$$cat" ] && ls $$cat/*/main.tex >/dev/null 2>&1; then \
+		if [ -d "$$cat" ] && ls $$cat/*/document.tex >/dev/null 2>&1; then \
 			echo "$(YELLOW)$$cat/$(NC)"; \
 			for doc in $$cat/*/; do \
-				if [ -f "$$doc/main.tex" ]; then \
+				if [ -f "$$doc/document.tex" ]; then \
 					docname=$$(basename $$doc); \
-					echo "  $$docname"; \
+					if [ -f "$$doc/poster.tex" ]; then \
+						echo "  $$docname $(PURPLE)[poster]$(NC)"; \
+					else \
+						echo "  $$docname"; \
+					fi; \
 				fi; \
 			done; \
 			echo ""; \
@@ -148,32 +236,57 @@ new:
 		exit 1; \
 	fi; \
 	mkdir -p "$$CATDIR/$(NAME)/images"; \
-	echo '% ============================================================================' > "$$CATDIR/$(NAME)/main.tex"; \
-	echo '%  $(NAME) - OT Security Learning Resource' >> "$$CATDIR/$(NAME)/main.tex"; \
-	echo '% ============================================================================' >> "$$CATDIR/$(NAME)/main.tex"; \
-	echo '' >> "$$CATDIR/$(NAME)/main.tex"; \
-	echo '\\documentclass[11pt,a4paper]{article}' >> "$$CATDIR/$(NAME)/main.tex"; \
-	echo '\\usepackage{otsec-template}' >> "$$CATDIR/$(NAME)/main.tex"; \
-	echo '' >> "$$CATDIR/$(NAME)/main.tex"; \
-	echo '\\begin{document}' >> "$$CATDIR/$(NAME)/main.tex"; \
-	echo '' >> "$$CATDIR/$(NAME)/main.tex"; \
-	echo '\\maketitlepage' >> "$$CATDIR/$(NAME)/main.tex"; \
-	echo '    {Your Title Here}' >> "$$CATDIR/$(NAME)/main.tex"; \
-	echo '    {Subtitle description}' >> "$$CATDIR/$(NAME)/main.tex"; \
-	echo '    {OT Security Learning Series}' >> "$$CATDIR/$(NAME)/main.tex"; \
-	echo '    {Document XXX \\quad|\\quad January 2026}' >> "$$CATDIR/$(NAME)/main.tex"; \
-	echo '    {Your Name}' >> "$$CATDIR/$(NAME)/main.tex"; \
-	echo '' >> "$$CATDIR/$(NAME)/main.tex"; \
-	echo '\\tableofcontents' >> "$$CATDIR/$(NAME)/main.tex"; \
-	echo '\\newpage' >> "$$CATDIR/$(NAME)/main.tex"; \
-	echo '' >> "$$CATDIR/$(NAME)/main.tex"; \
-	echo '\\section{Introduction}' >> "$$CATDIR/$(NAME)/main.tex"; \
-	echo '' >> "$$CATDIR/$(NAME)/main.tex"; \
-	echo 'Your content here.' >> "$$CATDIR/$(NAME)/main.tex"; \
-	echo '' >> "$$CATDIR/$(NAME)/main.tex"; \
-	echo '\\end{document}' >> "$$CATDIR/$(NAME)/main.tex"; \
+	echo '% ============================================================================' > "$$CATDIR/$(NAME)/document.tex"; \
+	echo '%  $(NAME) - OT Security Learning Resource' >> "$$CATDIR/$(NAME)/document.tex"; \
+	echo '% ============================================================================' >> "$$CATDIR/$(NAME)/document.tex"; \
+	echo '' >> "$$CATDIR/$(NAME)/document.tex"; \
+	echo '\\documentclass[11pt,a4paper]{article}' >> "$$CATDIR/$(NAME)/document.tex"; \
+	echo '\\usepackage{otsec-template}' >> "$$CATDIR/$(NAME)/document.tex"; \
+	echo '' >> "$$CATDIR/$(NAME)/document.tex"; \
+	echo '\\begin{document}' >> "$$CATDIR/$(NAME)/document.tex"; \
+	echo '' >> "$$CATDIR/$(NAME)/document.tex"; \
+	echo '\\maketitlepage' >> "$$CATDIR/$(NAME)/document.tex"; \
+	echo '    {Your Title Here}' >> "$$CATDIR/$(NAME)/document.tex"; \
+	echo '    {Subtitle description}' >> "$$CATDIR/$(NAME)/document.tex"; \
+	echo '    {OT Security Learning Series}' >> "$$CATDIR/$(NAME)/document.tex"; \
+	echo '    {Document XXX \\quad|\\quad January 2026}' >> "$$CATDIR/$(NAME)/document.tex"; \
+	echo '    {Your Name}' >> "$$CATDIR/$(NAME)/document.tex"; \
+	echo '' >> "$$CATDIR/$(NAME)/document.tex"; \
+	echo '\\tableofcontents' >> "$$CATDIR/$(NAME)/document.tex"; \
+	echo '\\newpage' >> "$$CATDIR/$(NAME)/document.tex"; \
+	echo '' >> "$$CATDIR/$(NAME)/document.tex"; \
+	echo '\\section{Introduction}' >> "$$CATDIR/$(NAME)/document.tex"; \
+	echo '' >> "$$CATDIR/$(NAME)/document.tex"; \
+	echo 'Your content here.' >> "$$CATDIR/$(NAME)/document.tex"; \
+	echo '' >> "$$CATDIR/$(NAME)/document.tex"; \
+	echo '\\end{document}' >> "$$CATDIR/$(NAME)/document.tex"; \
+	echo '% ============================================================================' > "$$CATDIR/$(NAME)/poster.tex"; \
+	echo '%  $(NAME) - Poster / Cheat Sheet' >> "$$CATDIR/$(NAME)/poster.tex"; \
+	echo '% ============================================================================' >> "$$CATDIR/$(NAME)/poster.tex"; \
+	echo '' >> "$$CATDIR/$(NAME)/poster.tex"; \
+	echo '\\documentclass[9pt,a4paper]{extarticle}' >> "$$CATDIR/$(NAME)/poster.tex"; \
+	echo '\\usepackage{otsec-poster}' >> "$$CATDIR/$(NAME)/poster.tex"; \
+	echo '\\usepackage{float}' >> "$$CATDIR/$(NAME)/poster.tex"; \
+	echo '' >> "$$CATDIR/$(NAME)/poster.tex"; \
+	echo '\\begin{document}' >> "$$CATDIR/$(NAME)/poster.tex"; \
+	echo '' >> "$$CATDIR/$(NAME)/poster.tex"; \
+	echo '\\makepostertitle' >> "$$CATDIR/$(NAME)/poster.tex"; \
+	echo '    {Your Title Here}' >> "$$CATDIR/$(NAME)/poster.tex"; \
+	echo '    {Subtitle description}' >> "$$CATDIR/$(NAME)/poster.tex"; \
+	echo '    {Poster XXX}' >> "$$CATDIR/$(NAME)/poster.tex"; \
+	echo '    {Matthias Niedermaier}' >> "$$CATDIR/$(NAME)/poster.tex"; \
+	echo '' >> "$$CATDIR/$(NAME)/poster.tex"; \
+	echo '\\begin{multicols}{3}' >> "$$CATDIR/$(NAME)/poster.tex"; \
+	echo '' >> "$$CATDIR/$(NAME)/poster.tex"; \
+	echo '\\section{Overview}' >> "$$CATDIR/$(NAME)/poster.tex"; \
+	echo '' >> "$$CATDIR/$(NAME)/poster.tex"; \
+	echo 'Your content here.' >> "$$CATDIR/$(NAME)/poster.tex"; \
+	echo '' >> "$$CATDIR/$(NAME)/poster.tex"; \
+	echo '\\end{multicols}' >> "$$CATDIR/$(NAME)/poster.tex"; \
+	echo '' >> "$$CATDIR/$(NAME)/poster.tex"; \
+	echo '\\end{document}' >> "$$CATDIR/$(NAME)/poster.tex"; \
 	echo "$(GREEN)[DONE]$(NC) Created $$CATDIR/$(NAME)/"; \
-	echo "       Document will be auto-detected on next build"
+	echo "       Document and poster skeleton will be auto-detected on next build"
 
 # Help
 .PHONY: help
@@ -188,6 +301,15 @@ help:
 	@echo "  parallel         Build all documents in parallel"
 	@echo "  <topic-name>     Build specific topic (e.g., make 200-modbus)"
 	@echo "  verbose-<topic>  Build with full LaTeX output"
+	@echo ""
+	@echo "$(PURPLE)Poster Targets:$(NC)"
+	@echo "  poster-<topic>   Build poster for topic (e.g., make poster-200-modbus)"
+	@echo "  posters          Build all posters"
+	@echo "  posters-parallel Build all posters in parallel"
+	@echo ""
+	@echo "$(CYAN)Validation Targets:$(NC)"
+	@echo "  check-poster-fill    Check poster content fill (>= 85%%)"
+	@echo "  check-missing-posters Find documents without poster.tex"
 	@echo ""
 	@echo "$(CYAN)Utility Targets:$(NC)"
 	@echo "  clean            Remove auxiliary files"
@@ -211,3 +333,6 @@ help:
 	@echo ""
 	@echo "$(CYAN)Auto-detected Documents:$(NC)"
 	@for topic in $(TOPICS); do echo "  $$topic"; done
+	@echo ""
+	@echo "$(PURPLE)Auto-detected Posters:$(NC)"
+	@for topic in $(POSTER_TOPICS); do echo "  poster-$$topic"; done

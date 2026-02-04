@@ -19,6 +19,9 @@ for pdf in "$PDF_DIR"/*.pdf; do
     # Skip the zip file if it somehow got here
     [[ "$filename" == *"all-documents"* ]] && continue
 
+    # Skip poster PDFs (they are cheat sheets, not full documents)
+    [[ "$filename" == *"-poster" ]] && continue
+
     # Extract document number and title
     doc_num=${filename%%-*}
     # Convert kebab-case to title, fix common abbreviations

@@ -1,0 +1,164 @@
+% ============================================================================
+%  Industrial Firewalls - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {Industrial Firewalls}
+    {Network Security Controls for OT Environments}
+    {Poster 307}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Overview}
+
+Firewalls enforce network segmentation by controlling traffic between zones. In OT, firewalls must balance security with \textbf{operational constraints}: real-time performance, protocol support, and high availability demands differ significantly from IT deployments.
+
+\section{\textcolor{accent}{\faIcon{layer-group}}\hspace{0.4em}Firewall Types}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{1.5cm}p{3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Type} & \textcolor{white}{\bfseries Layer} & \textcolor{white}{\bfseries OT Advantage} \\
+\midrule
+\faIcon{filter}\hspace{0.2em}Packet Filter & L3-4 & Low latency, simple \\
+\faIcon{exchange-alt}\hspace{0.2em}Stateful & L3-4 & Blocks unsolicited traffic \\
+\faIcon{search}\hspace{0.2em}App-Aware & L7 & Detects protocol abuse \\
+\faIcon{search-plus}\hspace{0.2em}NGFW/DPI & L7+ & Content inspection, IPS \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{search}}\hspace{0.3em}Deep Packet Inspection for OT}
+
+DPI-capable firewalls inspect OT protocol content:
+
+\begin{itemize}
+    \item \faIcon{microchip}\hspace{0.2em}\textbf{Modbus:} Validate function codes, register addresses
+    \item \faIcon{broadcast-tower}\hspace{0.2em}\textbf{DNP3:} Inspect object types, function codes
+    \item \faIcon{plug}\hspace{0.2em}\textbf{OPC UA:} Validate service requests, node access
+    \item \faIcon{industry}\hspace{0.2em}\textbf{EtherNet/IP:} Inspect CIP services and objects
+    \item \faIcon{cog}\hspace{0.2em}\textbf{S7comm:} Monitor read/write operations to PLCs
+\end{itemize}
+
+\posterwarning{
+\faIcon{exclamation-triangle}\hspace{0.2em}DPI for OT protocols requires \textbf{specific protocol support}. Verify coverage before deployment -- unsupported protocols are treated as generic TCP/UDP.
+}
+
+\section{\textcolor{accent}{\faIcon{industry}}\hspace{0.4em}OT-Specific Requirements}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Requirement} & \textcolor{white}{\bfseries Description} \\
+\midrule
+\faIcon{tachometer-alt}\hspace{0.2em}Low latency & Control loops need minimal delay \\
+\faIcon{check-double}\hspace{0.2em}High availability & Process cannot tolerate failures \\
+\faIcon{code}\hspace{0.2em}Protocol support & Must understand OT protocols \\
+\faIcon{temperature-high}\hspace{0.2em}Environmental & Ruggedized for plant floor \\
+\faIcon{clock}\hspace{0.2em}Long lifecycle & Supportable for 10--20 years \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{copy}}\hspace{0.3em}High Availability}
+
+\begin{itemize}
+    \item \faIcon{pause}\hspace{0.2em}\textbf{Active/Passive:} Standby takes over on failure
+    \item \faIcon{play}\hspace{0.2em}\textbf{Active/Active:} Load sharing with failover
+    \item \faIcon{exclamation-circle}\hspace{0.2em}\textbf{Bypass mode:} Fail-open for critical paths (use cautiously)
+\end{itemize}
+
+\posterdanger{
+\faIcon{exclamation-triangle}\hspace{0.2em}\textbf{Fail-open bypass} maintains availability but eliminates security. Use only where safety demands it, with compensating controls.
+}
+
+\section{\textcolor{accent}{\faIcon{sitemap}}\hspace{0.4em}Deployment Architecture}
+
+\begin{center}
+\begin{tikzpicture}[
+    zone/.style={rectangle, draw=#1!60, thick, fill=#1!10, rounded corners=3pt,
+        minimum width=5.8cm, minimum height=0.9cm, align=center, font=\scriptsize},
+    zone/.default={otaccent},
+    fw/.style={rectangle, draw=otdanger!70, thick, fill=otdanger!12,
+        minimum width=4.2cm, minimum height=0.55cm, align=center, font=\scriptsize\bfseries,
+        rounded corners=2pt},
+    fwarrow/.style={->, thick, >=stealth, otprimary!60},
+]
+\node[zone=otdanger] (enterprise) {\faIcon{building}\hspace{0.3em}\textbf{Enterprise Network (IT)} -- Zone 4/5};
+\node[fw, below=0.3cm of enterprise] (fw1) {\faIcon{shield-alt}\hspace{0.3em}Perimeter Firewall};
+\node[zone=otwarning, below=0.3cm of fw1] (dmz) {\faIcon{server}\hspace{0.3em}\textbf{Industrial DMZ} -- Historian, Jump Srv};
+\node[fw, below=0.3cm of dmz] (fw2) {\faIcon{shield-alt}\hspace{0.3em}OT Firewall \textcolor{otaccent}{\faIcon{search}\hspace{0.1em}DPI}};
+\node[zone=otsuccess, below=0.3cm of fw2] (ot) {\faIcon{industry}\hspace{0.3em}\textbf{OT Network} -- PLCs, HMIs, RTUs};
+\draw[fwarrow] (enterprise) -- (fw1);
+\draw[fwarrow] (fw1) -- (dmz);
+\draw[fwarrow] (dmz) -- (fw2);
+\draw[fwarrow] (fw2) -- (ot);
+\node[right=0.15cm of fw2, font=\scriptsize, text=otaccent, text width=1.8cm, align=left] {\scriptsize Modbus, DNP3, OPC~UA inspection};
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{cogs}}\hspace{0.4em}Configuration Best Practices}
+
+\subsection{\textcolor{accent}{\faIcon{list-ol}}\hspace{0.3em}Rule Design Principles}
+
+\begin{itemize}
+    \item \faIcon{ban}\hspace{0.2em}\textbf{Default Deny} -- Block all not explicitly permitted
+    \item \faIcon{key}\hspace{0.2em}\textbf{Least Privilege} -- Only required protocols/ports
+    \item \faIcon{crosshairs}\hspace{0.2em}\textbf{Specificity} -- Use specific IPs, not broad subnets
+    \item \faIcon{long-arrow-alt-right}\hspace{0.2em}\textbf{Direction Aware} -- Consider which side initiates
+    \item \faIcon{file-alt}\hspace{0.2em}\textbf{Documented} -- Business justification per rule
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{table}}\hspace{0.3em}Example Rule Set}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1cm}p{1.5cm}p{1.5cm}p{1.2cm}p{1.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Act} & \textcolor{white}{\bfseries Source} & \textcolor{white}{\bfseries Dest} & \textcolor{white}{\bfseries Port} & \textcolor{white}{\bfseries Proto} \\
+\midrule
+\textcolor{success}{\faIcon{check}} & Historian & PLCs & 502 & TCP \\
+\textcolor{success}{\faIcon{check}} & Eng WS & PLCs & 102 & TCP \\
+\textcolor{success}{\faIcon{check}} & Jump Srv & HMIs & 3389 & TCP \\
+\textcolor{danger}{\faIcon{times}} & Any & Any & Any & Any \\
+\end{tabular}
+\end{center}
+
+\postersuccess{
+\faIcon{search}\hspace{0.2em}Define rules at the \textbf{application level} where possible. Use DPI to restrict specific Modbus function codes (e.g., allow reads but block writes from monitoring systems).
+}
+
+\section{\textcolor{accent}{\faIcon{exclamation-circle}}\hspace{0.4em}Common Mistakes}
+
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{times}}\hspace{0.2em}\textbf{Any-to-any rules} -- defeats segmentation
+    \item \textcolor{danger}{\faIcon{times}}\hspace{0.2em}\textbf{Disabled logging} -- no visibility
+    \item \textcolor{danger}{\faIcon{times}}\hspace{0.2em}\textbf{No rule review} -- rules become permissive
+    \item \textcolor{danger}{\faIcon{times}}\hspace{0.2em}\textbf{Temporary bypass} -- becomes permanent
+    \item \textcolor{danger}{\faIcon{times}}\hspace{0.2em}\textbf{No outbound rules} -- misses exfiltration and C2
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{eye}}\hspace{0.4em}Monitoring \& Maintenance}
+
+\begin{itemize}
+    \item \faIcon{clipboard-list}\hspace{0.2em}\textbf{Log} denied/allowed connections for detection
+    \item \faIcon{history}\hspace{0.2em}\textbf{Audit} config changes for compliance
+    \item \faIcon{heartbeat}\hspace{0.2em}\textbf{Monitor health:} CPU, memory, sessions
+    \item \faIcon{calendar-alt}\hspace{0.2em}\textbf{Review rules} quarterly and after incidents
+    \item \faIcon{database}\hspace{0.2em}\textbf{Integrate logs} with SIEM for visibility
+\end{itemize}
+
+\postertip{
+\faIcon{lightbulb}\hspace{0.2em}Prioritize \textbf{low latency, high availability, and OT protocol support} over IT-centric features. Deploy redundant firewalls for production. Use DPI for protocol inspection, stateful for basic segmentation.
+}
+
+\end{multicols}
+
+\end{document}

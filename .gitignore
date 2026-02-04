@@ -4,6 +4,10 @@ build/
 # Local preview directory
 preview/
 
+# Python cache (from scripts/)
+__pycache__/
+*.pyc
+
 # Generated PDFs (built via CI/CD, available on GitHub Pages)
 [0-9][0-9][0-9]-*/[0-9][0-9][0-9]-*/*.pdf
 

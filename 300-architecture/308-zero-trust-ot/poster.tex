@@ -1,0 +1,173 @@
+% ============================================================================
+%  Zero Trust for OT - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {Zero Trust for OT}
+    {Applying Zero Trust Principles to Industrial Environments}
+    {Poster 308}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{lock}}\hspace{0.4em}Overview}
+
+Zero Trust is based on \textbf{``never trust, always verify.''} Rather than assuming everything inside a network perimeter is safe, it requires continuous verification of every user, device, and connection. OT environments cannot simply adopt IT Zero Trust -- principles must be adapted for real-time requirements, legacy systems, and safety constraints.
+
+\section{\textcolor{accent}{\faIcon{list-ol}}\hspace{0.4em}Core Principles}
+
+\begin{enumerate}
+    \item \faIcon{ban}\hspace{0.2em}\textbf{Never trust, always verify} -- No implicit trust
+    \item \faIcon{bug}\hspace{0.2em}\textbf{Assume breach} -- Design for compromised systems
+    \item \faIcon{fingerprint}\hspace{0.2em}\textbf{Verify explicitly} -- Authenticate every connection
+    \item \faIcon{key}\hspace{0.2em}\textbf{Least privilege access} -- Minimal permissions
+    \item \faIcon{th}\hspace{0.2em}\textbf{Micro-segment} -- Isolate assets individually
+    \item \faIcon{eye}\hspace{0.2em}\textbf{Monitor everything} -- Log and analyze all activity
+\end{enumerate}
+
+\subsection{\textcolor{accent}{\faIcon{columns}}\hspace{0.3em}Traditional vs Zero Trust}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{2cm}p{2.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Aspect} & \textcolor{white}{\bfseries Traditional} & \textcolor{white}{\bfseries Zero Trust} \\
+\midrule
+\faIcon{handshake}\hspace{0.2em}Trust & Perimeter-based & No implicit trust \\
+\faIcon{home}\hspace{0.2em}Internal & Trusted default & Verified per request \\
+\faIcon{door-open}\hspace{0.2em}Access & Location-based & Identity/context \\
+\faIcon{project-diagram}\hspace{0.2em}Segments & Flat or minimal & Micro-segmented \\
+\faIcon{check}\hspace{0.2em}Verify & One-time & Continuous \\
+\faIcon{shield-alt}\hspace{0.2em}Breach & Prevent at edge & Assume occurred \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{exclamation-triangle}}\hspace{0.4em}OT-Specific Challenges}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Constraint} & \textcolor{white}{\bfseries Impact on Zero Trust} \\
+\midrule
+\faIcon{history}\hspace{0.2em}Legacy devices & Cannot support modern auth or agents \\
+\faIcon{tachometer-alt}\hspace{0.2em}Real-time reqs & Verification latency unacceptable \\
+\faIcon{code}\hspace{0.2em}Proprietary proto & May not support encryption/auth \\
+\faIcon{hard-hat}\hspace{0.2em}Safety systems & Cannot tolerate control disruption \\
+\faIcon{clock}\hspace{0.2em}Long lifecycles & Devices in service 15--25 years \\
+\faIcon{microchip}\hspace{0.2em}Limited compute & PLCs/RTUs can't run security SW \\
+\end{tabular}
+\end{center}
+
+\posterwarning{
+\faIcon{industry}\hspace{0.2em}\textbf{Operational constraints:} Availability and safety take precedence. Production resists frequent changes. Testing on live systems is limited. Vendor changes may void warranties.
+}
+
+\section{\textcolor{accent}{\faIcon{project-diagram}}\hspace{0.4em}Architecture Components}
+
+\begin{itemize}
+    \item \faIcon{brain}\hspace{0.2em}\textbf{Policy Decision Point (PDP)} -- Evaluates access against policy and context
+    \item \faIcon{shield-alt}\hspace{0.2em}\textbf{Policy Enforcement Point (PEP)} -- Enforces at zone boundaries
+    \item \faIcon{id-card}\hspace{0.2em}\textbf{Identity Provider} -- Authenticates users and devices
+    \item \faIcon{list-alt}\hspace{0.2em}\textbf{Device Inventory} -- Authoritative OT asset database
+    \item \faIcon{chart-line}\hspace{0.2em}\textbf{Monitoring System} -- Provides behavioral context
+\end{itemize}
+
+\begin{center}
+\begin{tikzpicture}[
+    hub/.style={rectangle, draw=otprimary, thick, fill=otprimary!15,
+        rounded corners=4pt, minimum width=2.2cm, minimum height=0.7cm,
+        align=center, font=\scriptsize\bfseries},
+    spoke/.style={rectangle, draw=#1!60, thick, fill=#1!10,
+        rounded corners=3pt, minimum width=1.8cm, minimum height=0.55cm,
+        align=center, font=\scriptsize},
+    spoke/.default={otaccent},
+    pep/.style={rectangle, draw=otdanger!60, thick, fill=otdanger!10,
+        rounded corners=3pt, minimum width=1.6cm, minimum height=0.55cm,
+        align=center, font=\scriptsize},
+    conn/.style={->, thick, >=stealth, otaccent!70},
+    connbi/.style={<->, thick, >=stealth, otprimary!60},
+]
+    \node[hub] (pdp) {\faIcon{brain}\hspace{0.2em}Policy Decision\\Point (PDP)};
+    \node[spoke=otinfo, above left=0.7cm and 1.1cm of pdp] (idp) {\faIcon{id-card}\hspace{0.1em}Identity\\Provider};
+    \node[spoke=otsuccess, above right=0.7cm and 1.1cm of pdp] (inv) {\faIcon{list-alt}\hspace{0.1em}Device\\Inventory};
+    \node[spoke=otwarning, below left=0.7cm and 1.1cm of pdp] (mon) {\faIcon{chart-line}\hspace{0.1em}Monitoring\\System};
+    \node[pep, below right=0.4cm and 1.1cm of pdp] (pep1) {\faIcon{shield-alt}\hspace{0.1em}PEP};
+    \node[pep, below=0.15cm of pep1] (pep2) {\faIcon{shield-alt}\hspace{0.1em}PEP};
+    \node[font=\scriptsize, text=mediumgray, below=0.08cm of pep2] {Zone boundaries};
+    \draw[connbi] (idp) -- (pdp);
+    \draw[connbi] (inv) -- (pdp);
+    \draw[connbi] (mon) -- (pdp);
+    \draw[conn] (pdp) -- (pep1);
+    \draw[conn] (pdp) -- (pep2);
+\end{tikzpicture}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{tasks}}\hspace{0.3em}Phased Implementation}
+
+\begin{enumerate}
+    \item \faIcon{globe}\hspace{0.2em}\textbf{Phase 1:} Remote access, IT/OT boundary
+    \item \faIcon{project-diagram}\hspace{0.2em}\textbf{Phase 2:} Zone boundaries, DMZ controls
+    \item \faIcon{th}\hspace{0.2em}\textbf{Phase 3:} Internal OT micro-segments
+    \item \faIcon{microchip}\hspace{0.2em}\textbf{Phase 4:} Device-level (where possible)
+\end{enumerate}
+
+\section{\textcolor{accent}{\faIcon{user-check}}\hspace{0.4em}Identity and Access Controls}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Control} & \textcolor{white}{\bfseries OT Implementation} \\
+\midrule
+\faIcon{fingerprint}\hspace{0.2em}User auth & MFA for remote and admin access \\
+\faIcon{ethernet}\hspace{0.2em}Device auth & 802.1X; MAC-based for legacy \\
+\faIcon{robot}\hspace{0.2em}Service accts & Vaulted, just-in-time access \\
+\faIcon{user-tie}\hspace{0.2em}Vendor access & Explicit approval, time-limited \\
+\faIcon{key}\hspace{0.2em}Local accounts & Minimize; centralize where possible \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{history}}\hspace{0.4em}Legacy \& Compensating Controls}
+
+\posterdanger{
+\faIcon{exclamation-circle}\hspace{0.2em}Many OT devices \textbf{cannot participate in Zero Trust verification}. Use \textbf{compensating controls}.
+}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Limitation} & \textcolor{white}{\bfseries Compensating Control} \\
+\midrule
+\faIcon{unlock}\hspace{0.2em}No auth & Network isolation, strict FW rules \\
+\faIcon{eye-slash}\hspace{0.2em}No encryption & IPsec/MACsec at network layer \\
+\faIcon{times}\hspace{0.2em}No agent & Network-based monitoring \\
+\faIcon{key}\hspace{0.2em}Static creds & Tight segmentation, monitor access \\
+\faIcon{file-alt}\hspace{0.2em}No logging & Capture traffic at network level \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{hard-hat}}\hspace{0.4em}Safety Considerations}
+
+\begin{itemize}
+    \item \faIcon{toggle-on}\hspace{0.2em}\textbf{Fail-open for safety} -- Safety comms continue if controls fail
+    \item \faIcon{ban}\hspace{0.2em}\textbf{No inline blocking} on safety system paths
+    \item \faIcon{eye}\hspace{0.2em}\textbf{Passive monitoring} rather than active blocking for SIS
+    \item \faIcon{level-down-alt}\hspace{0.2em}\textbf{Graceful degradation} -- Reduced access, not halted ops
+    \item \faIcon{hand-paper}\hspace{0.2em}\textbf{Manual override} -- Emergency bypass with logging
+\end{itemize}
+
+\postertip{
+\faIcon{lightbulb}\hspace{0.2em}Most OT environments should target the \textbf{``Defined'' maturity level}. Full Zero Trust at Level 0/1 is often impractical. Focus verification at zone boundaries and human access points. Implement progressively from outside in.
+}
+
+\end{multicols}
+
+\end{document}

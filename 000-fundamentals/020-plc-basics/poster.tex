@@ -1,0 +1,211 @@
+% ============================================================================
+%  PLC Basics - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {PLC Fundamentals}
+    {Programmable Logic Controllers}
+    {Poster 020}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{microchip}}\hspace{0.4em}What is a PLC?}
+
+A Programmable Logic Controller is a ruggedized industrial computer designed to control manufacturing processes, machinery, and automation equipment. PLCs replaced hard-wired relay systems in the late 1960s and are found in virtually every industrial sector.
+
+\posterinfo{
+Understanding PLC architecture, operation, and vulnerabilities is essential for OT security professionals. PLCs are the most common target in ICS-focused attacks.
+}
+
+\section{\textcolor{accent}{\faIcon{cubes}}\hspace{0.4em}Architecture}
+
+\begin{center}
+\begin{tikzpicture}[
+    mod/.style={rectangle, draw=#1!60, thick, fill=#1!12, rounded corners=2pt,
+        minimum height=0.55cm, minimum width=1.4cm, align=center, font=\scriptsize},
+    mod/.default={otaccent},
+    cpu/.style={rectangle, draw=otprimary!70, very thick, fill=otprimary!15, rounded corners=3pt,
+        minimum height=0.9cm, minimum width=1.6cm, align=center, font=\scriptsize\bfseries},
+    bus/.style={draw=otprimary!40, very thick, fill=otprimary!5},
+    conn/.style={-, thick, otaccent!50},
+]
+    % Backplane bus
+    \fill[otprimary!8, rounded corners=2pt] (-3.2,-0.35) rectangle (3.2,0.35);
+    \draw[otprimary!40, thick, rounded corners=2pt] (-3.2,-0.35) rectangle (3.2,0.35);
+    \node[font=\scriptsize, text=otprimary!60] at (0,-0.55) {Backplane Bus};
+
+    % CPU in center
+    \node[cpu] (cpu) at (0,1.2) {\faIcon{microchip}\hspace{0.1em}CPU};
+    \draw[conn] (cpu.south) -- (0,0.35);
+
+    % Modules
+    \node[mod=otwarning] (pwr) at (-2.5,1.2) {\faIcon{bolt}\hspace{0.1em}PSU};
+    \draw[conn] (pwr.south) -- (-2.5,0.35);
+
+    \node[mod=otsuccess] (di) at (-1.2,2.2) {\faIcon{arrow-right}\hspace{0.1em}DI};
+    \draw[conn] (di.south) -- (-1.2,0.35);
+
+    \node[mod=otsuccess] (do) at (1.2,2.2) {\faIcon{arrow-left}\hspace{0.1em}DO};
+    \draw[conn] (do.south) -- (1.2,0.35);
+
+    \node[mod=otinfo] (ai) at (-1.2,-1.2) {\faIcon{wave-square}\hspace{0.1em}AI};
+    \draw[conn] (ai.north) -- (-1.2,-0.35);
+
+    \node[mod=otinfo] (ao) at (1.2,-1.2) {\faIcon{wave-square}\hspace{0.1em}AO};
+    \draw[conn] (ao.north) -- (1.2,-0.35);
+
+    \node[mod=otaccent] (com) at (2.5,1.2) {\faIcon{wifi}\hspace{0.1em}Comm};
+    \draw[conn] (com.south) -- (2.5,0.35);
+\end{tikzpicture}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{plug}}\hspace{0.3em}I/O Types}
+
+\begin{itemize}
+    \item \textbf{Digital I/O:} On/off signals (24V DC, 120V AC) -- pushbuttons, limit switches, solenoids, indicator lights
+    \item \textbf{Analog I/O:} Continuous signals (4--20mA, 0--10V) -- temperature, pressure, flow, variable speed drives
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{memory}}\hspace{0.3em}Memory Types}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.5cm}p{2cm}p{2.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Type} & \textcolor{white}{\bfseries Purpose} & \textcolor{white}{\bfseries Persistence} \\
+\midrule
+RAM & Runtime data & Volatile \\
+ROM/EPROM & Firmware, OS & Non-volatile \\
+Flash & User program & Non-volatile \\
+Battery RAM & Retentive data & Semi-persistent \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{sync-alt}}\hspace{0.4em}Scan Cycle}
+
+The PLC operates in a continuous loop (typically 1--100ms):
+
+\begin{center}
+\begin{tikzpicture}[
+    phase/.style={rectangle, draw=#1!50, thick, fill=#1!10, rounded corners=2pt, minimum height=0.5cm, minimum width=2.6cm, align=center, font=\scriptsize\bfseries},
+    phase/.default={otaccent},
+    arr/.style={->, thick, >=stealth, otaccent!60},
+]
+    \node[phase=otinfo] (r) at (0,0) {\faIcon{arrow-right}\hspace{0.1em}1. Read Inputs};
+    \node[phase=otwarning, right=5pt of r] (e) {\faIcon{cogs}\hspace{0.1em}2. Execute Logic};
+    \node[phase=otsuccess, below=6pt of r] (w) {\faIcon{arrow-left}\hspace{0.1em}3. Write Outputs};
+    \node[phase=otaccent, right=5pt of w] (d) {\faIcon{stethoscope}\hspace{0.1em}4. Diagnostics};
+
+    \draw[arr] (r) -- (e);
+    \draw[arr] (e.south) -- ++(0,-0.18) -| (d.north);
+    \draw[arr] (d) -- (w);
+    \draw[arr] (w.north) -- ++(0,0.18) -| (r.south);
+\end{tikzpicture}
+\end{center}
+
+\posterwarning{
+Attackers can time malicious commands between scan cycles. Watchdog timers reset the PLC if scan time exceeds limits. Complex programs or network floods increase scan time.
+}
+
+\section{\textcolor{accent}{\faIcon{code}}\hspace{0.4em}Programming Languages}
+
+IEC 61131-3 defines five PLC programming languages:
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.8cm}p{1cm}p{3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Language} & \textcolor{white}{\bfseries Type} & \textcolor{white}{\bfseries Notes} \\
+\midrule
+\faIcon{project-diagram}\hspace{0.2em}Ladder Diagram & Visual & Most common, relay-based \\
+\faIcon{cubes}\hspace{0.2em}Function Block & Visual & Block diagrams \\
+\faIcon{file-code}\hspace{0.2em}Structured Text & Text & Pascal-like, high-level \\
+\faIcon{terminal}\hspace{0.2em}Instruction List & Text & Assembly-like (legacy) \\
+\faIcon{stream}\hspace{0.2em}Sequential FC & Visual & State machine \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{network-wired}}\hspace{0.4em}Communication Protocols}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{1.6cm}p{3.2cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Protocol} & \textcolor{white}{\bfseries Typical} & \textcolor{white}{\bfseries Security} \\
+\midrule
+Modbus TCP/RTU & Any vendor & \risklow None \\
+EtherNet/IP & Rockwell & \riskmedium CIP opt. \\
+PROFINET & Siemens & \riskmedium TLS opt. \\
+S7comm & Siemens & \risklow Minimal \\
+OPC UA & Modern & \riskhigh Built-in \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Security Considerations}
+
+\posterdanger{
+\textbf{Common vulnerabilities:}
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{unlock}}\hspace{0.2em}Default credentials on most PLCs
+    \item \textcolor{danger}{\faIcon{eye-slash}}\hspace{0.2em}Insecure protocols without authentication
+    \item Unencrypted program uploads/downloads
+    \item Minimal logging and audit capabilities
+    \item Firmware vulnerabilities (buffer overflows, hardcoded keys)
+    \item Unprotected USB and serial ports
+\end{itemize}
+}
+
+\postersuccess{
+\textbf{Key security controls:}
+\begin{itemize}
+    \item Change default passwords immediately
+    \item Segment PLC networks from IT/business
+    \item Disable unnecessary services and ports
+    \item Deploy network monitoring and anomaly detection
+    \item Maintain firmware update procedures
+    \item Use encrypted protocols where available (OPC UA)
+    \item Restrict physical access to PLC hardware
+    \item Regular program backups with integrity verification
+\end{itemize}
+}
+
+\subsection{\textcolor{accent}{\faIcon{columns}}\hspace{0.3em}Controller Types}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{microchip}}\hspace{0.2em}\textbf{PLC} -- Discrete/hybrid control, fast I/O, rugged
+    \item \textcolor{accent}{\faIcon{server}}\hspace{0.2em}\textbf{DCS} -- Continuous process, integrated HMI
+    \item \textcolor{accent}{\faIcon{broadcast-tower}}\hspace{0.2em}\textbf{RTU} -- Remote sites, telemetry, low power
+    \item \textcolor{accent}{\faIcon{laptop}}\hspace{0.2em}\textbf{PAC} -- PLC + PC combined capabilities
+    \item \textcolor{danger}{\faIcon{hard-hat}}\hspace{0.2em}\textbf{Safety PLC} -- SIL-rated, redundant design
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{industry}}\hspace{0.3em}Major PLC Vendors}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.5cm}p{4.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Vendor} & \textcolor{white}{\bfseries Product Lines} \\
+\midrule
+Siemens & S7-300/400/1200/1500 \\
+Rockwell/AB & ControlLogix, CompactLogix \\
+Schneider & Modicon M340/M580 \\
+Mitsubishi & MELSEC iQ-R/F \\
+ABB & AC500 series \\
+\end{tabular}
+\end{center}
+
+\postertip{
+\textbf{Key takeaway:} PLCs are the backbone of industrial automation. Their security posture directly impacts physical safety. Prioritize network segmentation, credential management, and firmware integrity to protect these critical assets.
+}
+
+\end{multicols}
+
+\end{document}

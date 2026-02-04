@@ -1,0 +1,184 @@
+% ============================================================================
+%  OT Risk Assessment - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {OT Risk Assessment}
+    {Assessing Cybersecurity Risk in Industrial Environments}
+    {Poster 700}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+OT risk assessment must consider factors beyond traditional IT---including \textbf{physical safety, environmental impact, and operational continuity}. It bridges cybersecurity and process safety, requiring collaboration between security, engineering, and operations.
+
+\posterinfo{
+\textbf{Risk = Threat $\times$ Vulnerability $\times$ Consequence.} Threat: who might attack and how likely? Vulnerability: what weaknesses exist? Consequence: what is the impact if successful?
+}
+
+\section{\textcolor{accent}{\faIcon{columns}}\hspace{0.4em}OT vs IT Risk}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{2cm}p{2.2cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{columns}\hspace{0.2em}\bfseries Factor} & \textcolor{white}{\bfseries IT} & \textcolor{white}{\bfseries OT} \\
+\midrule
+Concern & Confidentiality & Safety/availability \\
+Impact & Business ops & Physical world \\
+Threats & Criminals, APTs & Nation-states \\
+Lifetime & 3--5 years & 15--25+ years \\
+Patching & Regular & Constrained \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{exclamation-triangle}}\hspace{0.4em}Consequence Categories}
+
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{heartbeat}}\hspace{0.2em} \textbf{Safety} -- Potential for injury or loss of life
+    \item \textcolor{warning}{\faIcon{leaf}}\hspace{0.2em} \textbf{Environmental} -- Spills, emissions, contamination
+    \item \textcolor{info}{\faIcon{industry}}\hspace{0.2em} \textbf{Operational} -- Production loss, equipment damage
+    \item \textcolor{accent}{\faIcon{dollar-sign}}\hspace{0.2em} \textbf{Financial} -- Direct costs and business impact
+    \item \textcolor{accent}{\faIcon{newspaper}}\hspace{0.2em} \textbf{Reputational} -- Customer and public trust
+    \item \textcolor{warning}{\faIcon{gavel}}\hspace{0.2em} \textbf{Regulatory} -- Fines, compliance violations
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{gavel}}\hspace{0.4em}IEC 62443 Approach}
+
+\subsection{\textcolor{accent}{\faIcon{project-diagram}}\hspace{0.3em}Zone and Conduit Process}
+
+\begin{center}
+\begin{tikzpicture}[
+    stepbox/.style={rectangle, draw=otaccent!40, thick, fill=otaccent!5, minimum height=0.4cm, rounded corners=2pt, font=\scriptsize, text width=4.5cm, align=left},
+    num/.style={circle, fill=otprimary, text=white, font=\scriptsize\bfseries, minimum size=0.35cm, inner sep=0pt},
+]
+    \node[num] (n1) at (0,0) {1};
+    \node[stepbox, right=3pt of n1] (s1) {Identify system under consideration};
+    \node[num, below=3pt of n1] (n2) {2};
+    \node[stepbox, right=3pt of n2] (s2) {Initial risk assessment};
+    \node[num, below=3pt of n2] (n3) {3};
+    \node[stepbox, right=3pt of n3] (s3) {Partition into zones and conduits};
+    \node[num, below=3pt of n3] (n4) {4};
+    \node[stepbox, right=3pt of n4] (s4) {Assign target security levels (SL-T)};
+    \node[num, below=3pt of n4] (n5) {5};
+    \node[stepbox, right=3pt of n5] (s5) {Document security requirements};
+
+    \draw[thick, otaccent!40] (n1.south) -- (n2.north);
+    \draw[thick, otaccent!40] (n2.south) -- (n3.north);
+    \draw[thick, otaccent!40] (n3.south) -- (n4.north);
+    \draw[thick, otaccent!40] (n4.south) -- (n5.north);
+\end{tikzpicture}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{layer-group}}\hspace{0.3em}Security Levels}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{0.8cm}p{2cm}p{3.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{layer-group}\hspace{0.2em}\bfseries SL} & \textcolor{white}{\bfseries Threat} & \textcolor{white}{\bfseries Description} \\
+\midrule
+SL 1 & Casual & Unintentional errors \\
+SL 2 & Simple intent & Low skill, general motive \\
+SL 3 & Sophisticated & Moderate skill, specific target \\
+SL 4 & Nation-state & High skill, extensive resources \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{clipboard-check}}\hspace{0.4em}Assessment Process}
+
+\subsection{\textcolor{accent}{\faIcon{crosshairs}}\hspace{0.3em}Step 1: Scope Definition}
+
+\begin{itemize}
+    \item \textcolor{info}{\faIcon{border-all}}\hspace{0.2em} Define boundaries (facility, system, zone)
+    \item \textcolor{info}{\faIcon{users}}\hspace{0.2em} Identify stakeholders and their concerns
+    \item \textcolor{info}{\faIcon{folder-open}}\hspace{0.2em} Gather documentation (diagrams, procedures)
+    \item \textcolor{info}{\faIcon{check-circle}}\hspace{0.2em} Establish risk tolerance criteria
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{sitemap}}\hspace{0.3em}Step 2: Asset Identification}
+
+\begin{itemize}
+    \item \textcolor{info}{\faIcon{list-alt}}\hspace{0.2em} Inventory all assets in scope
+    \item \textcolor{info}{\faIcon{star}}\hspace{0.2em} Classify by criticality and function
+    \item \textcolor{info}{\faIcon{project-diagram}}\hspace{0.2em} Map communication flows and dependencies
+    \item \textcolor{info}{\faIcon{exchange-alt}}\hspace{0.2em} Identify cross-zone data flows
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{user-secret}}\hspace{0.3em}Step 3: Threat Assessment}
+
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{user-secret}}\hspace{0.2em} Identify relevant threat actors
+    \item \textcolor{danger}{\faIcon{tools}}\hspace{0.2em} Consider capabilities and motivations
+    \item \textcolor{danger}{\faIcon{rss}}\hspace{0.2em} Review industry-specific threat intelligence
+    \item \textcolor{danger}{\faIcon{crosshairs}}\hspace{0.2em} Assess targeting likelihood
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{bug}}\hspace{0.3em}Step 4: Vulnerability Assessment}
+
+\posterwarning{
+\textbf{OT vulnerability assessment:} Avoid active scanning of production systems. Use passive methods and configuration review. Consider architectural weaknesses, not just CVEs. Assess compensating controls effectiveness.
+}
+
+\subsection{\textcolor{accent}{\faIcon{balance-scale}}\hspace{0.3em}Step 5: Risk Evaluation}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{calculator}}\hspace{0.2em} Calculate risk for each threat-vulnerability pair
+    \item \textcolor{accent}{\faIcon{shield-alt}}\hspace{0.2em} Consider existing controls and effectiveness
+    \item \textcolor{accent}{\faIcon{sort-amount-down}}\hspace{0.2em} Prioritize by consequence severity
+    \item \textcolor{accent}{\faIcon{file-alt}}\hspace{0.2em} Document assumptions and uncertainties
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{wrench}}\hspace{0.4em}Risk Treatment}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.5cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{wrench}\hspace{0.2em}\bfseries Option} & \textcolor{white}{\bfseries Description} \\
+\midrule
+Mitigate & Implement controls to reduce risk \\
+Transfer & Insurance, vendor contracts \\
+Accept & Document with management approval \\
+Avoid & Eliminate the risk source entirely \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.3em}Control Selection Priorities}
+
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{arrow-up}}\hspace{0.2em} Address highest risks first
+    \item \textcolor{info}{\faIcon{cog}}\hspace{0.2em} Compatible with operational requirements
+    \item \textcolor{warning}{\faIcon{hard-hat}}\hspace{0.2em} No safety impact from implementation
+    \item \textcolor{info}{\faIcon{layer-group}}\hspace{0.2em} Provide defense in depth
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{file-alt}}\hspace{0.4em}Documentation}
+
+\postersuccess{
+\textbf{Required outputs:} Asset inventory with criticality ratings. Zone and conduit diagram with security levels. Risk register with ratings and treatment plans. Security requirements for each zone. Residual risk statement with management sign-off.
+}
+
+\subsection{\textcolor{accent}{\faIcon{sync-alt}}\hspace{0.3em}Review Cycle}
+
+\begin{itemize}
+    \item \textcolor{info}{\faIcon{calendar-alt}}\hspace{0.2em} \textbf{Annual} -- Full reassessment recommended
+    \item \textcolor{warning}{\faIcon{bolt}}\hspace{0.2em} \textbf{Trigger-based} -- After incidents, major changes, new threats
+    \item \textcolor{success}{\faIcon{sync}}\hspace{0.2em} \textbf{Continuous} -- Update as new vulnerabilities discovered
+\end{itemize}
+
+\postertip{
+OT risk assessment bridges \textbf{cybersecurity and process safety}. Use IEC 62443 zone and conduit methodology. Consider all consequence types: safety, environmental, operational, financial, and regulatory. Involve operations and engineering---they understand consequences that security teams may miss. Prioritize safety-related risks above all others. Document everything and review regularly, especially after incidents or major system changes.
+}
+
+\end{multicols}
+
+\end{document}

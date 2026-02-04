@@ -1,0 +1,178 @@
+% ============================================================================
+%  The Purdue Model - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {The Purdue Model}
+    {Industrial Network Architecture}
+    {Poster 010}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+The Purdue Enterprise Reference Architecture (PERA), developed in the 1990s, is the de facto standard for ICS network segmentation. It separates industrial networks into hierarchical levels with specific functions and security boundaries.
+
+\posterinfo{
+The Purdue Model defines \textbf{where} security controls go and \textbf{what} traffic flows between levels. Referenced by IEC 62443 and NIST SP 800-82.
+}
+
+\section{\textcolor{accent}{\faIcon{layer-group}}\hspace{0.4em}Architecture Diagram}
+
+\begin{center}
+\begin{tikzpicture}[
+    lvl/.style={rectangle, draw=#1!60, thick, fill=#1!15, minimum width=6cm, minimum height=0.5cm, align=center, font=\scriptsize},
+    lvl/.default={otaccent},
+    ico/.style={font=\scriptsize, text=#1},
+    ico/.default={white},
+]
+    \node[lvl=red] (l5) at (0,0) {\faIcon{cloud}\hspace{0.2em}\textbf{L5} Enterprise -- Internet, Cloud};
+    \node[lvl=red, below=1pt of l5] (l4) {\faIcon{building}\hspace{0.2em}\textbf{L4} Business -- ERP, Email};
+    \node[lvl=orange, below=4pt of l4] (dmz) {\faIcon{shield-alt}\hspace{0.2em}\textbf{L3.5} DMZ -- Jump Servers, Data Diodes};
+    \node[lvl=green!60!black, below=4pt of dmz] (l3) {\faIcon{server}\hspace{0.2em}\textbf{L3} Operations -- MES, Historian};
+    \node[lvl=cyan!60!black, below=1pt of l3] (l2) {\faIcon{desktop}\hspace{0.2em}\textbf{L2} Supervisory -- HMI, SCADA};
+    \node[lvl=blue, below=1pt of l2] (l1) {\faIcon{microchip}\hspace{0.2em}\textbf{L1} Control -- PLCs, RTUs};
+    \node[lvl=violet, below=1pt of l1] (l0) {\faIcon{thermometer-half}\hspace{0.2em}\textbf{L0} Physical -- Sensors, Actuators};
+
+    % Firewall indicators
+    \draw[otdanger, line width=1.5pt, dashed] ([xshift=-0.3cm]l4.south west) -- ([xshift=0.3cm]l4.south east);
+    \draw[otdanger, line width=1.5pt, dashed] ([xshift=-0.3cm]dmz.south west) -- ([xshift=0.3cm]dmz.south east);
+
+    \node[font=\scriptsize, text=otdanger, anchor=west] at ([xshift=0.35cm]l4.south east) {\faIcon{shield-alt}\hspace{0.1em}FW};
+    \node[font=\scriptsize, text=otdanger, anchor=west] at ([xshift=0.35cm]dmz.south east) {\faIcon{shield-alt}\hspace{0.1em}FW};
+
+    % Data flow arrows on left
+    \draw[->, thick, >=stealth, otinfo!70] ([xshift=-0.5cm]l0.west) -- ([xshift=-0.5cm]l5.west)
+        node[midway, left, font=\scriptsize, text=otinfo, rotate=90, anchor=south] {Data flows up};
+    % Command flow arrows on right
+    \draw[->, thick, >=stealth, otdanger!70] ([xshift=1.4cm]l5.east) -- ([xshift=1.4cm]l0.east)
+        node[midway, right, font=\scriptsize, text=otdanger, rotate=-90, anchor=south] {Commands flow down};
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{list-ul}}\hspace{0.4em}Level Details}
+
+\textbf{\textcolor{violet}{L0} (Physical):} Sensors, actuators, motors. No network. Physical security paramount.
+
+\textbf{\textcolor{blue}{L1} (Basic Control):} PLCs, RTUs, IEDs, VFDs. Protocols: Modbus, PROFINET, EtherNet/IP. Often lacks authentication.
+
+\textbf{\textcolor{cyan!60!black}{L2} (Supervisory):} HMIs, SCADA, engineering workstations. User authentication required. App whitelisting recommended.
+
+\textbf{\textcolor{green!60!black}{L3} (Site Operations):} Historians, OPC servers, MES. Database security and access controls.
+
+\textbf{\textcolor{orange}{L3.5} (DMZ):}
+
+\posterdanger{
+\textbf{Critical buffer zone} between IT and OT:
+\begin{itemize}
+    \item \textbf{No direct} IT-to-OT connections allowed
+    \item All traffic proxied through DMZ services
+    \item Data diodes for unidirectional data flow
+    \item Jump servers for remote access
+    \item Strict firewalls on both sides
+\end{itemize}
+}
+
+\textbf{\textcolor{red}{L4--5} (Enterprise):} Corporate IT, ERP, email, cloud. Standard IT security applies.
+
+\section{\textcolor{accent}{\faIcon{cogs}}\hspace{0.4em}Implementation}
+
+\subsection{\textcolor{accent}{\faIcon{check-circle}}\hspace{0.3em}Key Principles}
+
+\begin{enumerate}
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}Each level on \textbf{separate network segments/VLANs}
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Firewalls between levels} with strict rule sets
+    \item Information flows \textbf{up}; commands flow \textbf{down}
+    \item \textbf{Never skip levels} (no L5-to-L1 direct connection)
+    \item All IT/OT traffic through DMZ -- no exceptions
+\end{enumerate}
+
+\subsection{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.3em}Firewall Rules (DMZ $\leftrightarrow$ L3)}
+
+\begin{itemize}
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Allow:} Historian replication (specific ports/hosts)
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Allow:} Patch downloads from DMZ to L3
+    \item \textcolor{danger}{\faIcon{times}}\hspace{0.2em}\textbf{Deny:} All inbound from IT to OT
+    \item \textcolor{danger}{\faIcon{times}}\hspace{0.2em}\textbf{Deny:} Direct database queries from IT
+    \item \textcolor{info}{\faIcon{file-alt}}\hspace{0.2em}\textbf{Log:} All denied traffic for analysis
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{exclamation-circle}}\hspace{0.3em}Common Mistakes}
+
+\posterwarning{
+\begin{itemize}
+    \item \textbf{Flat networks:} All devices communicate freely -- enables lateral movement
+    \item \textbf{Direct remote access:} VPN into Level 2 bypasses the DMZ
+    \item \textbf{Skipping levels:} IT systems directly querying OT databases
+    \item \textbf{Dual-homed hosts:} Workstations on both IT and OT networks
+\end{itemize}
+}
+
+\section{\textcolor{accent}{\faIcon{bookmark}}\hspace{0.4em}Quick Reference}
+
+\subsection{\textcolor{accent}{\faIcon{network-wired}}\hspace{0.3em}Protocols by Level}
+
+\begin{itemize}
+    \item \textbf{L0--L1:} Modbus, PROFINET, EtherNet/IP, HART
+    \item \textbf{L2--L3:} OPC UA/DA, SQL, SNMP, HTTP
+    \item \textbf{L3.5:} IPsec, TLS, SSH (tunneled)
+    \item \textbf{L4--L5:} Standard IT protocols (HTTPS, SMTP, LDAP)
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{exchange-alt}}\hspace{0.3em}Data Flow Rules}
+
+\begin{itemize}
+    \item \textcolor{info}{\faIcon{arrow-up}}\hspace{0.2em}\textbf{Upward:} Process data, alarms, events, logs
+    \item \textcolor{danger}{\faIcon{arrow-down}}\hspace{0.2em}\textbf{Downward:} Setpoints, commands, configurations
+    \item \textcolor{accent}{\faIcon{arrows-alt-h}}\hspace{0.2em}\textbf{Lateral:} Only within same level (peer comms)
+    \item \textcolor{warning}{\faIcon{random}}\hspace{0.2em}\textbf{Cross-level:} Must pass through firewalls
+\end{itemize}
+
+\postersuccess{
+\textbf{Standards referencing Purdue Model:} IEC 62443 (zones and conduits), NIST SP 800-82 (network architecture), ISA-95/IEC 62264 (enterprise-control integration).
+}
+
+\section{\textcolor{accent}{\faIcon{table}}\hspace{0.4em}Level Reference Table}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.2cm}p{2cm}p{3.8cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{layer-group}\hspace{0.2em}\bfseries Lvl} & \textcolor{white}{\bfseries Name} & \textcolor{white}{\bfseries Key Components} \\
+\midrule
+\zonefour & Enterprise & Corporate IT, internet, cloud services \\
+\zonefour & Site Business & ERP, email, business applications \\
+\zonedmz & DMZ & Data diodes, jump servers, historians \\
+\zonethree & Site Operations & Historians, MES, OPC servers \\
+\zonetwo & Supervisory & HMI, SCADA, eng. workstations \\
+\zoneone & Basic Control & PLCs, RTUs, IEDs, VFDs \\
+\zonezero & Physical & Sensors, actuators, motors, valves \\
+\end{tabular}
+\end{center}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.5cm}p{2.5cm}p{3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Zone} & \textcolor{white}{\bfseries Levels} & \textcolor{white}{\bfseries Security Focus} \\
+\midrule
+IT Zone & 4--5 & Standard IT controls \\
+Buffer & 3.5 (DMZ) & Proxy, filter, inspect \\
+OT Zone & 0--3 & Availability, safety first \\
+\end{tabular}
+\end{center}
+
+\postertip{
+When assessing an OT environment, map the existing network to the Purdue Model first. This identifies segmentation gaps, unauthorized connections, and missing security controls at each level.
+}
+
+\end{multicols}
+
+\end{document}

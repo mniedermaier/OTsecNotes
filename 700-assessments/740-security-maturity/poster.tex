@@ -1,0 +1,180 @@
+% ============================================================================
+%  OT Security Maturity Models - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {OT Security Maturity Models}
+    {Measuring and Improving Industrial Cybersecurity Capability}
+    {Poster 740}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+Security maturity models provide a structured framework for assessing cybersecurity capabilities against defined benchmarks. For OT, maturity assessments help \textbf{identify gaps, prioritize investments, and track improvement} over time.
+
+\posterinfo{
+\textbf{Benefits:} Baseline establishment, gap identification, resource prioritization, progress tracking, industry benchmarking, and executive communication of security posture.
+}
+
+\subsection{\textcolor{accent}{\faIcon{industry}}\hspace{0.3em}OT-Specific Considerations}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{industry}\hspace{0.2em}\bfseries Factor} & \textcolor{white}{\faIcon{cogs}\hspace{0.2em}\bfseries Impact on Maturity} \\
+\midrule
+Safety & Controls must not compromise safety \\
+Legacy systems & May not support modern practices \\
+Availability & Limited downtime for improvements \\
+Vendor deps & Third-party support affects maturity \\
+Regulatory & Compliance sets minimum baselines \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{globe}}\hspace{0.4em}Common Frameworks}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{sitemap}\hspace{0.2em}\bfseries Model} & \textcolor{white}{\faIcon{align-left}\hspace{0.2em}\bfseries Description} \\
+\midrule
+C2M2 & DOE capability maturity (10 domains) \\
+IEC 62443 & Security levels for industrial systems \\
+NIST CSF & Implementation tiers (4 levels) \\
+ES-C2M2 & Electricity subsector specific \\
+ONG-C2M2 & Oil \& natural gas specific \\
+CMMC & Defense industrial base \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{layer-group}}\hspace{0.4em}Maturity Levels}
+
+\begin{center}
+\begin{tikzpicture}[
+    lvl/.style={rectangle, draw=#1!50, thick, fill=#1!15, rounded corners=2pt,
+                minimum height=0.38cm, align=center, font=\scriptsize},
+    lvl/.default={otaccent},
+    lbl/.style={font=\scriptsize, anchor=west},
+]
+    % Staircase blocks (ascending left to right)
+    \node[lvl=otdanger, minimum width=1.1cm] (l0) at (0,0) {\textbf{0}};
+    \node[lvl=otwarning, minimum width=1.1cm] (l1) at (1.35,0.45) {\textbf{1}};
+    \node[lvl=otinfo, minimum width=1.1cm] (l2) at (2.7,0.9) {\textbf{2}};
+    \node[lvl=otaccent, minimum width=1.1cm] (l3) at (4.05,1.35) {\textbf{3}};
+    \node[lvl=otsuccess, minimum width=1.1cm] (l4) at (5.4,1.8) {\textbf{4}};
+
+    % Labels below each level
+    \node[font=\scriptsize, anchor=north, text width=1.2cm, align=center] at (l0.south) {None};
+    \node[font=\scriptsize, anchor=north, text width=1.2cm, align=center] at (l1.south) {Initial};
+    \node[font=\scriptsize, anchor=north, text width=1.2cm, align=center] at (l2.south) {Managed};
+    \node[font=\scriptsize, anchor=north, text width=1.2cm, align=center] at (l3.south) {Defined};
+    \node[font=\scriptsize, anchor=north, text width=1.2cm, align=center] at (l4.south) {Optimized};
+
+    % Connecting arrows
+    \draw[->, thick, >=stealth, otdanger!60] (l0.east) -- (l1.west);
+    \draw[->, thick, >=stealth, otwarning!60] (l1.east) -- (l2.west);
+    \draw[->, thick, >=stealth, otinfo!60] (l2.east) -- (l3.west);
+    \draw[->, thick, >=stealth, otaccent!60] (l3.east) -- (l4.west);
+\end{tikzpicture}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{chart-line}}\hspace{0.3em}OT Examples by Level}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.5cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{layer-group}\hspace{0.2em}\bfseries Level} & \textcolor{white}{\faIcon{industry}\hspace{0.2em}\bfseries OT Example} \\
+\midrule
+\textcolor{accent}{\faIcon{seedling}}\hspace{0.2em}Initial & Firewall exists but rules undocumented \\
+\textcolor{accent}{\faIcon{clipboard-list}}\hspace{0.2em}Managed & Patch process defined for SCADA servers \\
+\textcolor{accent}{\faIcon{sitemap}}\hspace{0.2em}Defined & All sites follow same access control policy \\
+\textcolor{accent}{\faIcon{chart-line}}\hspace{0.2em}Optimized & KPIs track and improve detection time \\
+\end{tabular}
+\end{center}
+
+\posterwarning{
+\textbf{Higher is not always better.} Target maturity should align with risk appetite. Level 4 for low-risk systems wastes resources that could protect critical assets. Set targets per domain based on asset criticality.
+}
+
+\section{\textcolor{accent}{\faIcon{gavel}}\hspace{0.4em}IEC 62443 Security Levels}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{0.8cm}p{2cm}p{3.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{shield-alt}\hspace{0.2em}\bfseries SL} & \textcolor{white}{\faIcon{user-secret}\hspace{0.2em}\bfseries Threat} & \textcolor{white}{\faIcon{lock}\hspace{0.2em}\bfseries Protection Against} \\
+\midrule
+\slone & Casual & Unintentional violations \\
+\sltwo & Intentional & Limited means attack \\
+\slthree & Sophisticated & Moderate resources \\
+\slfour & Nation-state & Extended resources \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{clipboard-check}}\hspace{0.4em}Assessment Process}
+
+\begin{enumerate}
+    \item \faIcon{crosshairs}\hspace{0.2em}\textbf{Scope definition} -- Systems, domains, standards
+    \item \faIcon{folder-open}\hspace{0.2em}\textbf{Evidence collection} -- Docs, interviews, technical review
+    \item \faIcon{search}\hspace{0.2em}\textbf{Gap analysis} -- Compare current vs target state
+    \item \faIcon{star}\hspace{0.2em}\textbf{Scoring and reporting} -- Maturity ratings per domain
+    \item \faIcon{map}\hspace{0.2em}\textbf{Roadmap development} -- Prioritized improvement plan
+\end{enumerate}
+
+\subsection{\textcolor{accent}{\faIcon{folder-open}}\hspace{0.3em}Evidence Sources}
+
+\begin{itemize}
+    \item \faIcon{file-alt}\hspace{0.2em}\textbf{Documentation} -- Policies, procedures, network diagrams
+    \item \faIcon{comments}\hspace{0.2em}\textbf{Interviews} -- Engineers, operators, security staff
+    \item \faIcon{server}\hspace{0.2em}\textbf{Technical review} -- Configs, logs, tool outputs
+    \item \faIcon{eye}\hspace{0.2em}\textbf{Observation} -- Site visits, process walkthroughs
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{chart-bar}}\hspace{0.4em}Using Assessment Results}
+
+\subsection{\textcolor{accent}{\faIcon{sort-amount-down}}\hspace{0.3em}Gap Prioritization}
+
+\begin{itemize}
+    \item \faIcon{exclamation-triangle}\hspace{0.2em}\textbf{Risk impact} -- How much does this gap increase risk?
+    \item \faIcon{gavel}\hspace{0.2em}\textbf{Compliance} -- Is this a regulatory violation?
+    \item \faIcon{project-diagram}\hspace{0.2em}\textbf{Dependencies} -- Do other improvements depend on this?
+    \item \faIcon{tools}\hspace{0.2em}\textbf{Feasibility} -- Available resources?
+    \item \faIcon{bolt}\hspace{0.2em}\textbf{Quick wins} -- Low effort, high impact?
+\end{itemize}
+
+\postersuccess{
+\textbf{Phased roadmap:} Phase 1 (0--6 months): Address critical gaps and quick wins. Phase 2 (6--18 months): Build core capabilities and foundation. Phase 3 (18+ months): Optimization and continuous improvement.
+}
+
+\section{\textcolor{accent}{\faIcon{exclamation-circle}}\hspace{0.4em}Common Pitfalls}
+
+\begin{itemize}
+    \item \faIcon{check-square}\hspace{0.2em}\textbf{Checkbox mentality} -- Scoring over actual security
+    \item \faIcon{industry}\hspace{0.2em}\textbf{Ignoring OT context} -- Applying IT expectations to OT
+    \item \faIcon{calendar-times}\hspace{0.2em}\textbf{One-time assessment} -- Treating as project, not process
+    \item \faIcon{arrow-up}\hspace{0.2em}\textbf{Unrealistic targets} -- Level 4 for all domains
+    \item \faIcon{file-alt}\hspace{0.2em}\textbf{Documentation focus} -- Policies without implementation
+\end{itemize}
+
+\posterdanger{
+A documented policy without implementation scores higher on some assessments but provides \textbf{no actual security}. Verify that documented practices are actually followed in operations.
+}
+
+\postertip{
+Choose a maturity model appropriate for your sector (C2M2 for energy, IEC 62443 for manufacturing). Set \textbf{right-sized targets} per domain based on asset criticality---not everything needs maximum maturity. Include both IT and OT stakeholders. Focus on high-risk gaps and quick wins first. Reassess periodically to track progress. Evidence-based assessments combined with a prioritized improvement roadmap drive meaningful security improvement.
+}
+
+\end{multicols}
+
+\end{document}

@@ -1,0 +1,189 @@
+% ============================================================================
+%  Historian Systems - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {Historian Systems}
+    {Industrial Data Collection and Time-Series Storage}
+    {Poster 075}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{database}}\hspace{0.4em}Overview}
+
+Historians are specialized databases for collecting, storing, and retrieving \textbf{time-series data} from industrial processes. They capture measurements from sensors, PLCs, and SCADA systems at high speeds while maintaining long-term archives.
+
+\posterinfo{
+Historians bridge OT and IT networks (typically at Purdue Level 3), containing sensitive operational data and providing pathways attackers can exploit.
+}
+
+\section{\textcolor{accent}{\faIcon{project-diagram}}\hspace{0.4em}Data Flow Architecture}
+
+\begin{center}
+\begin{tikzpicture}[
+    comp/.style={rectangle, draw=#1!60, thick, fill=#1!12, rounded corners=2pt,
+        minimum height=0.5cm, align=center, font=\scriptsize},
+    comp/.default={otaccent},
+    arr/.style={->, thick, >=stealth, #1!60},
+    arr/.default={otaccent},
+    zone/.style={rectangle, draw=#1!30, dashed, rounded corners=3pt, inner sep=4pt},
+]
+    % OT Zone
+    \node[comp=otaccent, minimum width=1cm] (plc1) at (-1.5,-0.2) {\faIcon{microchip}\hspace{0.1em}PLC};
+    \node[comp=otaccent, minimum width=1.2cm] (scada) at (0.5,-0.2) {\faIcon{desktop}\hspace{0.1em}SCADA};
+    \node[comp=otaccent, minimum width=0.9cm] (rtu) at (2.3,-0.2) {\faIcon{broadcast-tower}\hspace{0.1em}RTU};
+    \node[font=\scriptsize, text=otsuccess!80] at (-2.5,-0.2) {\textbf{OT Zone}};
+
+    % Collectors
+    \node[comp=otwarning, minimum width=4.5cm] (coll) at (0.5,0.7) {\faIcon{download}\hspace{0.2em}\textbf{Data Collectors} (OPC, Modbus, MQTT)};
+    \draw[arr=otaccent] (plc1) -- (coll);
+    \draw[arr=otaccent] (scada) -- (coll);
+    \draw[arr=otaccent] (rtu) -- (coll);
+
+    % Historian Server
+    \node[comp=otprimary, minimum width=4.5cm, minimum height=0.6cm] (hist) at (0.5,1.7) {\faIcon{database}\hspace{0.2em}\textbf{Historian Server} (Time-Series DB)};
+    \draw[arr=otwarning] (coll) -- (hist);
+    \node[font=\scriptsize, text=otwarning!80] at (-2.5,1.2) {\textbf{DMZ/L3}};
+
+    % IT Zone clients
+    \node[comp=otinfo, minimum width=1.3cm] (client) at (-1,2.7) {\faIcon{chart-bar}\hspace{0.1em}Reports};
+    \node[comp=otinfo, minimum width=1.3cm] (api) at (0.8,2.7) {\faIcon{code}\hspace{0.1em}API/Web};
+    \node[comp=otinfo, minimum width=1.3cm] (erp) at (2.6,2.7) {\faIcon{building}\hspace{0.1em}ERP};
+    \draw[arr=otprimary] (hist) -- (client);
+    \draw[arr=otprimary] (hist) -- (api);
+    \draw[arr=otprimary] (hist) -- (erp);
+    \node[font=\scriptsize, text=otinfo!80] at (-2.5,2.7) {\textbf{IT Zone}};
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{columns}}\hspace{0.4em}Historian vs Traditional DB}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{2.3cm}p{2.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Aspect} & \textcolor{white}{\bfseries Historian} & \textcolor{white}{\bfseries Relational DB} \\
+\midrule
+Data type & Time-series & Structured records \\
+Write pattern & Continuous, high-freq & Transaction-based \\
+Query pattern & Time-range retrieval & SQL queries \\
+Data volume & Millions pts/sec & Moderate \\
+Retention & Years to decades & Varies \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{chart-line}}\hspace{0.4em}Common Use Cases}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{chart-bar}}\hspace{0.2em}\textbf{Process Optimization:} Analyze trends to improve efficiency
+    \item \textcolor{accent}{\faIcon{search}}\hspace{0.2em}\textbf{Troubleshooting:} Review historical data during incidents
+    \item \textcolor{accent}{\faIcon{clipboard-check}}\hspace{0.2em}\textbf{Compliance:} Maintain records for regulatory requirements
+    \item \textcolor{accent}{\faIcon{tools}}\hspace{0.2em}\textbf{Predictive Maintenance:} Identify equipment degradation
+    \item \textcolor{accent}{\faIcon{file-alt}}\hspace{0.2em}\textbf{Reporting:} Generate operational and management reports
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{sitemap}}\hspace{0.3em}Deployment Patterns}
+
+\begin{itemize}
+    \item \textcolor{info}{\faIcon{server}}\hspace{0.2em}\textbf{Single Site:} One Historian, local access -- small facilities
+    \item \textcolor{info}{\faIcon{network-wired}}\hspace{0.2em}\textbf{Distributed:} Site Historians with central aggregation -- multi-site
+    \item \textcolor{info}{\faIcon{cloud}}\hspace{0.2em}\textbf{Cloud Hybrid:} Edge collection with cloud analytics -- IIoT
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{stream}}\hspace{0.3em}Collection Methods}
+
+\begin{itemize}
+    \item \textbf{Polling:} Historian requests data at intervals
+    \item \textbf{Exception-Based:} Sources send data on value change
+    \item \textbf{Unsolicited:} Sources push data continuously
+    \item \textbf{Store and Forward:} Buffer during network outages
+\end{itemize}
+
+\posterwarning{
+\textbf{Compression settings affect data fidelity.} Aggressive compression may hide transient events or subtle anomalies important for security analysis and incident investigation.
+}
+
+\section{\textcolor{accent}{\faIcon{exclamation-triangle}}\hspace{0.4em}Security Threats}
+
+\posterdanger{
+\textbf{Why Historians are targets:}
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{eye}}\hspace{0.2em}Contain \textbf{sensitive process data} (operational intelligence)
+    \item \textcolor{danger}{\faIcon{exchange-alt}}\hspace{0.2em}Sit at the \textbf{IT/OT boundary} -- pivot point for lateral movement
+    \item \textcolor{danger}{\faIcon{network-wired}}\hspace{0.2em}Have \textbf{multiple network connections} to both zones
+    \item \textcolor{danger}{\faIcon{user-shield}}\hspace{0.2em}Use \textbf{high-privilege accounts} for data collection
+    \item \textcolor{danger}{\faIcon{server}}\hspace{0.2em}Often run on \textbf{legacy systems} with known vulnerabilities
+\end{itemize}
+}
+
+\subsection{\textcolor{accent}{\faIcon{crosshairs}}\hspace{0.3em}Attack Vectors}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.8cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Vector} & \textcolor{white}{\bfseries Description} \\
+\midrule
+SQL injection & SQL backends vulnerable to injection \\
+Default creds & Factory accounts often unchanged \\
+Unpatched SW & Legacy systems with known CVEs \\
+API abuse & Weak/no authentication on APIs \\
+Lateral movement & Pivot between IT and OT networks \\
+Data exfiltration & Extract operational intelligence \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Security Best Practices}
+
+\postersuccess{
+\textbf{Architecture:} Deploy Historians in DMZ between IT and OT. Use separate collector services in the OT zone with unidirectional or tightly controlled data flow to the Historian server.
+
+\textbf{Controls:} Enforce strong authentication, enable TLS for data in transit, implement RBAC with least privilege, maintain patch schedule, log and alert on unusual queries, regular backups with integrity verification.
+}
+
+\subsection{\textcolor{accent}{\faIcon{exchange-alt}}\hspace{0.3em}Data Flow Security}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{2.2cm}p{2.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Flow} & \textcolor{white}{\bfseries Risk} & \textcolor{white}{\bfseries Mitigation} \\
+\midrule
+OT $\rightarrow$ Hist & Collector compromise & Dedicated svc accounts \\
+Hist $\rightarrow$ IT & Data exfiltration & Content filter, DLP \\
+Remote access & Unauth queries & VPN, MFA, audit logs \\
+Cloud sync & Process data exposure & Encryption, data class. \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{download}}\hspace{0.3em}Supported Protocols}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.5cm}p{4.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Protocol} & \textcolor{white}{\bfseries Usage} \\
+\midrule
+OPC DA/UA & Primary interface for Windows systems \\
+Modbus TCP/RTU & Direct PLC communication \\
+DNP3 & Utility and SCADA systems \\
+MQTT & IIoT and edge devices \\
+REST/HTTP & Modern web-based integrations \\
+Native drivers & Vendor-specific PLC protocols \\
+\end{tabular}
+\end{center}
+
+\postertip{
+\textbf{Key principle:} Treat Historians as high-value targets. Their position at the IT/OT boundary and access to both zones makes them ideal pivot points for attackers moving laterally through the network.
+}
+
+\end{multicols}
+
+\end{document}

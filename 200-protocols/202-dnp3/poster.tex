@@ -1,0 +1,187 @@
+% ============================================================================
+%  DNP3 Protocol - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {DNP3 Protocol}
+    {Distributed Network Protocol for Critical Infrastructure}
+    {Poster 202}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{stream}}\hspace{0.4em}Overview}
+
+DNP3 (Distributed Network Protocol 3) is a SCADA communication protocol used primarily in \textbf{electric, water, and gas utilities}. Designed for reliable communication between control centers and remote substations over noisy, unreliable links. Standardized as \textbf{IEEE 1815}.
+
+\posterinfo{
+\faIcon{globe-americas}\hspace{0.2em}DNP3 is the \textbf{dominant SCADA protocol in North American utilities}. Exploited in the 2015/2016 Ukraine power grid attacks.
+}
+
+\subsection{\textcolor{accent}{\faIcon{project-diagram}}\hspace{0.3em}Architecture}
+
+\begin{center}
+\begin{tikzpicture}[
+    dev/.style={rectangle, draw=#1, thick, fill=#1!10, rounded corners=2pt,
+                minimum height=0.55cm, align=center, font=\scriptsize},
+    dev/.default={otaccent},
+    link/.style={<->, thick, >=stealth, #1!60},
+    link/.default={otaccent}
+]
+    \node[dev=otprimary, minimum width=3cm] (master) at (0,0) {\faIcon{building}\hspace{0.2em}\textbf{Master (Control Center)}};
+    \node[dev, minimum width=2cm] (os1) at (-2.2,-1) {\faIcon{broadcast-tower} Outstation};
+    \node[dev, minimum width=2cm] (os2) at (0.8,-1) {\faIcon{broadcast-tower} Outstation};
+    \node[dev=otsuccess, minimum width=1.3cm, font=\scriptsize] (rtu1) at (-3,-1.9) {\faIcon{microchip} RTU};
+    \node[dev=otsuccess, minimum width=1.3cm, font=\scriptsize] (ied1) at (-1.4,-1.9) {\faIcon{microchip} IED};
+    \node[dev=otsuccess, minimum width=1.3cm, font=\scriptsize] (rtu2) at (0.1,-1.9) {\faIcon{microchip} RTU};
+    \node[dev=otsuccess, minimum width=1.3cm, font=\scriptsize] (ied2) at (1.6,-1.9) {\faIcon{microchip} IED};
+    \draw[link=otprimary] (master.south west) -- (os1.north);
+    \draw[link=otprimary] (master.south east) -- (os2.north);
+    \draw[link=otsuccess] (os1.south west) -- (rtu1.north);
+    \draw[link=otsuccess] (os1.south east) -- (ied1.north);
+    \draw[link=otsuccess] (os2.south west) -- (rtu2.north);
+    \draw[link=otsuccess] (os2.south east) -- (ied2.north);
+    \node[font=\scriptsize, text=mediumgray] at (3,-0.5) {TCP/UDP};
+    \node[font=\scriptsize, text=mediumgray] at (3,-0.8) {Port 20000};
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{layer-group}}\hspace{0.4em}Data Link Frame}
+
+\begin{center}
+\begin{tikzpicture}[
+    field/.style={rectangle, draw=otaccent, thick, minimum height=0.65cm, align=center, fill=otaccent!10, font=\scriptsize},
+    lbl/.style={font=\scriptsize, text=mediumgray}
+]
+    \node[field, minimum width=1cm] (start) at (0,0) {Start};
+    \node[field, minimum width=0.7cm, right=0pt of start] (len) {Len};
+    \node[field, minimum width=0.7cm, right=0pt of len, fill=otwarning!15, draw=otwarning] (ctrl) {Ctrl};
+    \node[field, minimum width=1cm, right=0pt of ctrl] (dest) {Dest};
+    \node[field, minimum width=1cm, right=0pt of dest] (src) {Src};
+    \node[field, minimum width=0.8cm, right=0pt of src, fill=otdanger!15, draw=otdanger] (crc) {CRC};
+
+    \node[lbl, below=2pt of start] {2B};
+    \node[lbl, below=2pt of len] {1B};
+    \node[lbl, below=2pt of ctrl] {1B};
+    \node[lbl, below=2pt of dest] {2B};
+    \node[lbl, below=2pt of src] {2B};
+    \node[lbl, below=2pt of crc] {2B};
+
+    \draw[decorate, decoration={brace, amplitude=4pt, mirror}, thick, otaccent]
+        ([yshift=-0.55cm]start.south west) -- ([yshift=-0.55cm]crc.south east)
+        node[midway, below=5pt, font=\scriptsize, text=otaccent] {10 bytes total};
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{database}}\hspace{0.4em}Data Objects}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.2cm}p{2cm}p{3.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Group} & \textcolor{white}{\bfseries Type} & \textcolor{white}{\bfseries Description} \\
+\midrule
+1, 10 & Binary I/O & Digital status and controls \\
+20, 21 & Counters & Accumulated values, pulses \\
+30, 40 & Analog I/O & Measurements, setpoints \\
+50 & Time/Date & Time synchronization \\
+70 & File Transfer & File read/write operations \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{list-ul}}\hspace{0.4em}Function Codes}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1cm}p{2.2cm}p{3.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Code} & \textcolor{white}{\bfseries Function} & \textcolor{white}{\faIcon{shield-alt}\hspace{0.2em}\bfseries Risk} \\
+\midrule
+0x01 & Read & \risklow \\
+0x02 & Write & \riskcritical \\
+0x03 & Select (SBO) & \riskhigh \\
+0x04 & Operate & \riskcritical \\
+0x05 & Direct Operate & \riskcritical \\
+0x0D & Cold Restart & \riskcritical \\
+0x0E & Warm Restart & \riskhigh \\
+0x82 & Unsolicited Resp & \risklow \\
+\end{tabular}
+\end{center}
+
+\posterwarning{
+\faIcon{bolt}\hspace{0.2em}Function codes 0x02 (Write), 0x05 (Direct Operate), 0x0D/0x0E (Restart) can cause \textbf{immediate physical impact}. Without authentication, attackers can manipulate grid equipment.
+}
+
+\section{\textcolor{accent}{\faIcon{exclamation-triangle}}\hspace{0.4em}Security Concerns}
+
+\posterdanger{
+\textbf{Legacy DNP3 has no security:} no authentication, no encryption, predictable sequence numbers enable replay attacks, broadcast addresses allow mass device manipulation.
+}
+
+\subsection{\textcolor{accent}{\faIcon{bolt}}\hspace{0.3em}Ukraine Power Grid Attacks}
+
+In 2015/2016, adversaries sent unauthorized \textbf{Direct Operate} commands to open circuit breakers, corrupted firmware on protective relays, and caused blackouts affecting \textbf{230,000+ customers}.
+
+\subsection{\textcolor{accent}{\faIcon{crosshairs}}\hspace{0.3em}Attack Vectors}
+
+\begin{enumerate}
+    \item \textcolor{accent}{\faIcon{search}}\hspace{0.2em}\textbf{Reconnaissance:} Scan for port 20000
+    \item \textcolor{accent}{\faIcon{headphones}}\hspace{0.2em}\textbf{Traffic capture:} Cleartext data
+    \item \textcolor{accent}{\faIcon{redo}}\hspace{0.2em}\textbf{Replay:} Record/replay valid commands
+    \item \textcolor{accent}{\faIcon{syringe}}\hspace{0.2em}\textbf{Injection:} Unauthorized Direct Operate
+    \item \textcolor{accent}{\faIcon{file-code}}\hspace{0.2em}\textbf{Firmware:} Malicious file transfer
+\end{enumerate}
+
+\section{\textcolor{accent}{\faIcon{lock}}\hspace{0.4em}DNP3 Secure Authentication}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1cm}p{5.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Ver.} & \textcolor{white}{\bfseries Features} \\
+\midrule
+SAv2 & \faIcon{key}\hspace{0.2em}Basic HMAC auth, manual key mgmt \\
+SAv5 & \faIcon{certificate}\hspace{0.2em}Asymmetric keys, IEC 62351-5 \\
+SAv6 & \faIcon{lock}\hspace{0.2em}TLS support, certificate-based \\
+\end{tabular}
+\end{center}
+
+\postersuccess{
+\textbf{DNP3-SA provides:} challenge-response authentication (HMAC), replay protection, aggressive mode for reduced latency, and key change procedures. \textbf{SAv5 is recommended.}
+}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Security Mitigations}
+
+\begin{itemize}
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Enable SAv5} on all DNP3 links
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Use TLS 1.2+} to encrypt traffic
+    \item \faIcon{sync}\hspace{0.2em}\textbf{Rotate keys} regularly
+    \item \faIcon{ban}\hspace{0.2em}\textbf{Disable file transfer} if not required
+    \item \faIcon{project-diagram}\hspace{0.2em}\textbf{Segment networks:} Isolate DNP3
+    \item \faIcon{filter}\hspace{0.2em}\textbf{Firewall port 20000} to authorized masters
+    \item \faIcon{shield-alt}\hspace{0.2em}\textbf{Deploy DNP3-aware IDS}
+    \item \faIcon{lock}\hspace{0.2em}\textbf{VPN tunnels} for WAN communications
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{toolbox}}\hspace{0.3em}Common Tools}
+
+\begin{itemize}
+    \item \faIcon{binoculars}\hspace{0.2em}\textbf{Wireshark} -- DNP3 dissector (port 20000)
+    \item \faIcon{terminal}\hspace{0.2em}\textbf{OpenDNP3} -- Open-source DNP3 library
+    \item \faIcon{crosshairs}\hspace{0.2em}\textbf{Aegis} -- DNP3 traffic analyzer
+    \item \faIcon{shield-alt}\hspace{0.2em}\textbf{Suricata} -- IDS with DNP3 support
+\end{itemize}
+
+\postertip{
+\faIcon{hand-paper}\hspace{0.2em}Select-Before-Operate (SBO) adds a two-step safety check before executing commands. \textbf{Direct Operate bypasses this} and should be restricted. DNP3 is also used in oil/gas pipelines and water/wastewater SCADA beyond the electric grid.
+}
+
+\end{multicols}
+
+\end{document}

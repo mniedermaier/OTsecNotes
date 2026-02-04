@@ -1,0 +1,174 @@
+% ============================================================================
+%  Encryption in OT Environments - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {Encryption in OT Environments}
+    {Challenges and Implementation Strategies for Industrial Systems}
+    {Poster 870}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+Encryption protects data confidentiality and integrity, but OT environments present unique challenges: \textbf{real-time requirements, legacy systems, resource-constrained devices}, and deterministic communication needs. Many industrial protocols were designed without security when networks were isolated.
+
+\section{\textcolor{accent}{\faIcon{exclamation-triangle}}\hspace{0.4em}OT-Specific Challenges}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{exclamation-triangle}\hspace{0.2em}\bfseries Challenge} & \textcolor{white}{\faIcon{bolt}\hspace{0.2em}\bfseries Impact on Encryption} \\
+\midrule
+\textcolor{warning}{\faIcon{clock}}\hspace{0.2em}Real-time reqs & Crypto overhead may break timing \\
+\textcolor{warning}{\faIcon{microchip}}\hspace{0.2em}Resource limits & Limited CPU, memory, no HW accel \\
+\textcolor{warning}{\faIcon{code}}\hspace{0.2em}Legacy protocols & No native encryption support \\
+\textcolor{warning}{\faIcon{clock}}\hspace{0.2em}Deterministic & Variable latency unacceptable \\
+\textcolor{accent}{\faIcon{key}}\hspace{0.2em}Key management & Thousands of devices, 15--25yr life \\
+\textcolor{warning}{\faIcon{eye-slash}}\hspace{0.2em}Inspection & Encryption blinds monitoring tools \\
+\end{tabular}
+\end{center}
+
+\posterwarning{
+\textbf{Real-time impact:} \textcolor{warning}{\faIcon{clock}}\hspace{0.2em}Safety systems need millisecond response. Motion control requires microsecond sync. Encryption adds overhead that may be unacceptable for safety-critical systems.
+}
+
+\section{\textcolor{accent}{\faIcon{layer-group}}\hspace{0.4em}Encryption by Layer}
+
+\begin{center}
+\begin{tikzpicture}[
+    layer/.style={rectangle, draw=#1!60, thick, fill=#1!12, rounded corners=2pt,
+                  minimum width=6.5cm, minimum height=0.65cm, align=center, font=\scriptsize},
+    lbl/.style={font=\scriptsize\bfseries, text=#1, anchor=west},
+    tech/.style={font=\scriptsize, text=mediumgray, anchor=east},
+    arr/.style={->, thick, >=stealth, otprimary!50}
+]
+    \node[layer=otprimary] (app) at (0,0)
+        {\textcolor{otprimary}{\faIcon{code}}\hspace{0.2em}\textbf{Application} -- OPC UA, CIP Security};
+    \node[layer=otaccent] (trans) at (0,-0.85)
+        {\textcolor{otaccent}{\faIcon{lock}}\hspace{0.2em}\textbf{Transport} -- TLS 1.3 / DTLS};
+    \node[layer=otsuccess] (net) at (0,-1.7)
+        {\textcolor{otsuccess}{\faIcon{shield-alt}}\hspace{0.2em}\textbf{Network} -- IPsec};
+    \node[layer=otwarning] (link) at (0,-2.55)
+        {\textcolor{otwarning}{\faIcon{ethernet}}\hspace{0.2em}\textbf{Link} -- MACsec (802.1AE)};
+
+    % Right-side annotations
+    \node[font=\scriptsize, text=otprimary, anchor=west] at (3.5,0) {Native};
+    \node[font=\scriptsize, text=otaccent, anchor=west] at (3.5,-0.85) {Flexible};
+    \node[font=\scriptsize, text=otsuccess, anchor=west] at (3.5,-1.7) {VPN};
+    \node[font=\scriptsize, text=otwarning, anchor=west] at (3.5,-2.55) {HW};
+
+    % Latency arrow on the left
+    \draw[arr, line width=1.5pt, otdanger!60] (-3.7,-2.55) -- (-3.7,0)
+        node[midway, rotate=90, above, font=\scriptsize, text=otdanger] {Lower latency};
+\end{tikzpicture}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{lock}}\hspace{0.3em}MACsec (IEEE 802.1AE)}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{lock}}\hspace{0.2em}Encrypts all traffic between switches at Layer 2
+    \item \textcolor{warning}{\faIcon{clock}}\hspace{0.2em}Minimal latency impact (hardware-based)
+    \item \textcolor{accent}{\faIcon{ethernet}}\hspace{0.2em}Requires MACsec-capable network equipment
+    \item \textcolor{accent}{\faIcon{project-diagram}}\hspace{0.2em}Does not protect across Layer 3 boundaries
+\end{itemize}
+
+\postersuccess{
+\textbf{MACsec} is well-suited for OT where low latency is critical and traffic stays within a Layer 2 domain. Industrial Ethernet switches increasingly support it.
+}
+
+\subsection{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.3em}IPsec (Layer 3)}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{lock}}\hspace{0.2em}Transport mode: encrypt payload, preserve headers
+    \item \textcolor{accent}{\faIcon{lock}}\hspace{0.2em}Tunnel mode: encrypt entire packet (VPN)
+    \item \textcolor{accent}{\faIcon{desktop}}\hspace{0.2em}Supported by most modern operating systems
+    \item \textcolor{accent}{\faIcon{bolt}}\hspace{0.2em}Hardware acceleration reduces overhead
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{certificate}}\hspace{0.3em}TLS/DTLS (Layer 4)}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{lock}}\hspace{0.2em}TLS 1.3 for TCP-based protocols
+    \item \textcolor{accent}{\faIcon{lock}}\hspace{0.2em}DTLS for UDP-based (handles packet loss)
+    \item \textcolor{accent}{\faIcon{exchange-alt}}\hspace{0.2em}Can wrap legacy protocols (e.g., Modbus/TCP + TLS)
+    \item \textcolor{accent}{\faIcon{server}}\hspace{0.2em}Requires TLS-capable endpoints
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{unlock}}\hspace{0.4em}Legacy Protocol Security}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.5cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{network-wired}\hspace{0.2em}\bfseries Protocol} & \textcolor{white}{\faIcon{unlock}\hspace{0.2em}\bfseries Status} \\
+\midrule
+Modbus & No security; cleartext over TCP \\
+DNP3 & Secure Auth adds integrity, not encryption \\
+EtherNet/IP & CIP Security is recent addition \\
+PROFINET & Security extensions still maturing \\
+OPC Classic & DCOM-based, limited options \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{wrench}}\hspace{0.3em}Securing Legacy Protocols}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{wrench}\hspace{0.2em}\bfseries Approach} & \textcolor{white}{\faIcon{info-circle}\hspace{0.2em}\bfseries Description} \\
+\midrule
+\textcolor{accent}{\faIcon{lock}}\hspace{0.2em}TLS wrapper & Encapsulate in TLS tunnel (stunnel) \\
+\textcolor{accent}{\faIcon{lock}}\hspace{0.2em}VPN tunnel & Route through IPsec or WireGuard \\
+Bump-in-wire & HW device encrypts transparently \\
+Protocol GW & Convert to secure protocol at boundary \\
+\textcolor{accent}{\faIcon{lock}}\hspace{0.2em}MACsec & Encrypt at switch level in segment \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{key}}\hspace{0.4em}Key Management}
+
+\posterdanger{
+\textbf{Poor key management undermines encryption.} Many OT breaches exploit weak or default keys rather than breaking encryption itself. Plan for full device lifecycle---15--25 year lifecycles exceed typical key validity.
+}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{lock}}\hspace{0.2em}\textbf{Centralized PKI} -- Certificate authority for OT
+    \item \textcolor{accent}{\faIcon{lock}}\hspace{0.2em}\textbf{HSMs} -- Hardware secure key storage
+    \item \textcolor{accent}{\faIcon{lock}}\hspace{0.2em}\textbf{Automated renewal} -- EST, CMP, or SCEP protocols
+    \item \textcolor{accent}{\faIcon{tools}}\hspace{0.2em}\textbf{Offline procedures} -- Manual for air-gapped systems
+    \item \textcolor{accent}{\faIcon{key}}\hspace{0.2em}\textbf{Key escrow} -- Backup keys for recovery
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{map-marker-alt}}\hspace{0.4em}Where to Encrypt}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.5cm}p{1.5cm}p{2.2cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{network-wired}\hspace{0.2em}\bfseries Traffic} & \textcolor{white}{\faIcon{flag}\hspace{0.2em}\bfseries Priority} & \textcolor{white}{\faIcon{info-circle}\hspace{0.2em}\bfseries Rationale} \\
+\midrule
+Remote access & Critical & Untrusted networks \\
+Zone boundaries & High & Highest exposure \\
+Eng. workstations & High & Sensitive configs \\
+Historian transfer & Medium & Business-sensitive \\
+\textcolor{warning}{\faIcon{clock}}\hspace{0.2em}Intra-zone L0/1 & Low & May impact real-time \\
+\end{tabular}
+\end{center}
+
+\postertip{
+Choose encryption layer based on requirements: MACsec for low-latency L2, IPsec/TLS for flexibility, application-layer for native security. OPC UA and CIP Security are preferred for new deployments. Use TLS wrappers or VPNs for legacy protocols. Focus on zone boundaries and remote access first. Test performance impact before encrypting control traffic. Plan key management for the full device lifecycle.
+}
+
+\end{multicols}
+
+\end{document}

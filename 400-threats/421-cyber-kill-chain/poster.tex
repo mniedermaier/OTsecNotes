@@ -1,0 +1,189 @@
+% ============================================================================
+%  ICS Cyber Kill Chain - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {Cyber Kill Chain for OT}
+    {Understanding Attack Methodologies in Industrial Environments}
+    {Poster 421}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+The Cyber Kill Chain framework maps attack stages to help identify where to detect and disrupt attacks. OT attacks require \textbf{more stages than IT attacks} because adversaries must understand physical processes before impact. This extended timeline provides more \textcolor{success}{\faIcon{eye}}\hspace{0.2em}detection opportunities.
+
+\section{\textcolor{accent}{\faIcon{link}}\hspace{0.4em}Lockheed Martin Kill Chain}
+
+The original 7-stage intrusion framework:
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{0.5cm}p{1.5cm}p{4.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries \#} & \textcolor{white}{\bfseries Stage} & \textcolor{white}{\faIcon{industry}\hspace{0.2em}\bfseries OT Example} \\
+\midrule
+1 & Recon & Research SCADA vendors, job posts \\
+2 & Weaponize & Develop PLC-specific payload \\
+3 & Deliver & Spear phishing, USB drop \\
+4 & Exploit & Exploit unpatched HMI \\
+5 & Install & RAT on engineering workstation \\
+6 & C2 & Encrypted tunnel to attacker \\
+7 & Actions & Manipulate process, steal data \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{sitemap}}\hspace{0.4em}SANS ICS Kill Chain}
+
+\posterinfo{
+The SANS ICS Kill Chain recognizes that attacks on industrial systems require \textbf{two distinct phases}: initial IT intrusion followed by ICS-specific attack development and execution.
+}
+
+\subsection{\textcolor{accent}{\faIcon{desktop}}\hspace{0.3em}Stage 1: IT/Corporate Intrusion}
+
+Follows traditional kill chain to gain corporate access:
+
+\begin{itemize}
+    \item \textcolor{info}{\faIcon{desktop}}\hspace{0.2em}Target IT systems, email, corporate network
+    \item \textcolor{info}{\faIcon{crosshairs}}\hspace{0.2em}Goal: Establish foothold and pivot toward OT
+    \item \textcolor{info}{\faIcon{clock}}\hspace{0.2em}May take weeks to months of patient operation
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{microchip}}\hspace{0.3em}Stage 2: ICS Attack}
+
+\begin{center}
+\begin{tikzpicture}[
+    step/.style={rectangle, draw=#1!40, thick, fill=#1!5, minimum height=0.4cm, rounded corners=2pt, font=\scriptsize, text width=4.5cm, align=left},
+    step/.default={otaccent},
+    num/.style={circle, fill=#1, text=white, font=\scriptsize\bfseries, minimum size=0.35cm, inner sep=0pt},
+    num/.default={otprimary},
+]
+    \node[num=otdanger] (n1) at (0,0) {1};
+    \node[step=otdanger, right=3pt of n1] (s1) {Develop ICS-specific capability};
+    \node[num=otdanger, below=3pt of n1] (n2) {2};
+    \node[step=otdanger, right=3pt of n2] (s2) {Test in lab or simulator};
+    \node[num=otdanger, below=3pt of n2] (n3) {3};
+    \node[step=otdanger, right=3pt of n3] (s3) {Deliver tools to ICS network};
+    \node[num=otdanger, below=3pt of n3] (n4) {4};
+    \node[step=otdanger, right=3pt of n4] (s4) {Install on ICS components};
+    \node[num=otdanger, below=3pt of n4] (n5) {5};
+    \node[step=otdanger, right=3pt of n5] (s5) {Execute for physical impact};
+
+    \draw[thick, otdanger!40] (n1.south) -- (n2.north);
+    \draw[thick, otdanger!40] (n2.south) -- (n3.north);
+    \draw[thick, otdanger!40] (n3.south) -- (n4.north);
+    \draw[thick, otdanger!40] (n4.south) -- (n5.north);
+\end{tikzpicture}
+\end{center}
+
+\postersuccess{
+\textbf{Key insight:} Stage 2 requires significant ICS knowledge. Attackers must understand the physical process, control logic, and potential impacts. This extends the attack timeline and provides more detection opportunities.
+}
+
+\section{\textcolor{accent}{\faIcon{crosshairs}}\hspace{0.4em}Real-World Mappings}
+
+\subsection{\textcolor{accent}{\faIcon{bug}}\hspace{0.3em}Stuxnet Kill Chain}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.5cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Stage} & \textcolor{white}{\faIcon{bug}\hspace{0.2em}\bfseries Stuxnet Activity} \\
+\midrule
+Recon & Years of intelligence on Natanz \\
+Weaponize & 4 zero-days, S7 payloads \\
+Deliver & USB drives via contractors \\
+Exploit & Windows vulns, WinCC DB \\
+Install & Rootkit + PLC code injection \\
+C2 & Peer-to-peer updates \\
+ICS Attack & Modified centrifuge speeds \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{bolt}}\hspace{0.3em}Ukraine Grid (2015)}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.5cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Stage} & \textcolor{white}{\faIcon{bolt}\hspace{0.2em}\bfseries Activity} \\
+\midrule
+Recon & Months mapping SCADA systems \\
+Weaponize & BlackEnergy, KillDisk \\
+Deliver & Spear phishing Word docs \\
+Exploit & Macro exec, credential theft \\
+Install & Persistent access IT + SCADA \\
+C2 & Stolen VPN credentials \\
+ICS Attack & Opened breakers, wiped systems \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Defenses by Stage}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.5cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{link}\hspace{0.2em}\bfseries Stage} & \textcolor{white}{\faIcon{shield-alt}\hspace{0.2em}\bfseries Defensive Measures} \\
+\midrule
+Recon & Limit public info, monitor scanning \\
+Weaponize & Threat intel, malware analysis \\
+Deliver & Email filtering, USB controls \\
+Exploit & Patching, app whitelisting \\
+Install & Endpoint detection, integrity \\
+C2 & Network monitoring, egress filter \\
+ICS Attack & Process monitoring, safety systems \\
+\end{tabular}
+\end{center}
+
+\posterwarning{
+\textbf{Defense in depth:} No single control stops all attacks. Implement detection and prevention at multiple stages. Each disrupted stage forces the attacker to restart or adapt.
+}
+
+\section{\textcolor{accent}{\faIcon{crosshairs}}\hspace{0.4em}MITRE ATT\&CK for ICS}
+
+Key ICS-specific tactics (beyond traditional IT):
+
+\begin{itemize}
+    \item \textcolor{info}{\faIcon{search}}\hspace{0.2em}\textbf{Discovery} -- Learning OT environment details
+    \item \textcolor{warning}{\faIcon{arrows-alt-h}}\hspace{0.2em}\textbf{Lateral Movement} -- Moving through OT network
+    \item \textcolor{info}{\faIcon{database}}\hspace{0.2em}\textbf{Collection} -- Gathering process data
+    \item \textcolor{warning}{\faIcon{ban}}\hspace{0.2em}\textbf{Inhibit Response} -- Preventing operator action
+    \item \textcolor{danger}{\faIcon{cogs}}\hspace{0.2em}\textbf{Impair Process} -- Disrupting physical operations
+    \item \textcolor{danger}{\faIcon{exclamation-triangle}}\hspace{0.2em}\textbf{Impact} -- Causing damage or safety incidents
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{eye}}\hspace{0.4em}Detection Opportunities}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{4.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{clock}\hspace{0.2em}\bfseries Phase} & \textcolor{white}{\faIcon{eye}\hspace{0.2em}\bfseries Detection Method} \\
+\midrule
+IT Intrusion & Email analysis, EDR, SIEM alerts \\
+IT/OT Pivot & FW logs, boundary monitoring \\
+OT Recon & Protocol anomalies, new connections \\
+Payload Deploy & File integrity, config baselines \\
+Execution & Process monitoring, safety alarms \\
+\end{tabular}
+\end{center}
+
+\posterdanger{
+\textbf{Common gap:} Many organizations have IT monitoring but lack OT network visibility. Without OT-specific detection (protocol monitoring, behavioral analytics), Stage 2 of the ICS kill chain goes completely undetected.
+}
+
+\postertip{
+OT attacks typically have an \textbf{extended timeline} -- months of reconnaissance before action. This is the defender's advantage. Detection during recon and lateral movement phases stops attacks before physical impact. Map your defenses to kill chain stages and identify gaps. Use MITRE ATT\&CK for ICS for detailed technique-level threat intelligence and detection rules.
+}
+
+\end{multicols}
+
+\end{document}

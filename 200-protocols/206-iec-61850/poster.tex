@@ -1,0 +1,195 @@
+% ============================================================================
+%  IEC 61850 Protocol - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {IEC 61850 Protocol}
+    {Communication Standard for Electrical Substation Automation}
+    {Poster 206}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{bolt}}\hspace{0.4em}Overview}
+
+IEC 61850 is the international standard for communication in \textbf{electrical substations}. Enables interoperability between protective relays, circuit breakers, transformers, and control systems. Targeted by the \textbf{Industroyer/CrashOverride} malware.
+
+\subsection{\textcolor{accent}{\faIcon{project-diagram}}\hspace{0.3em}Substation Architecture}
+
+\begin{center}
+\begin{tikzpicture}[
+    bus/.style={rectangle, draw=#1, thick, fill=#1!10, rounded corners=2pt,
+                minimum height=0.4cm, align=center, font=\scriptsize},
+    bus/.default={otaccent},
+    dev/.style={rectangle, draw=#1, thick, fill=#1!10, rounded corners=2pt,
+                minimum height=0.4cm, minimum width=1.2cm, align=center, font=\scriptsize},
+    dev/.default={otaccent}
+]
+    % Control Center
+    \node[bus=otprimary, minimum width=5.5cm] (cc) at (0,1.6) {\faIcon{building}\hspace{0.2em}\textbf{Control Center (Remote)}};
+    % Station Bus
+    \node[bus=otinfo, minimum width=5.5cm] (sbus) at (0,0.7) {\faIcon{network-wired}\hspace{0.2em}\textbf{Station Bus} -- MMS (TCP/102)};
+    % Devices on station bus
+    \node[dev=otwarning, minimum width=1.5cm] (hmi) at (-2,0) {\faIcon{desktop} HMI};
+    \node[dev=otwarning, minimum width=1.5cm] (gw) at (0,0) {\faIcon{server} Gateway};
+    \node[dev=otwarning, minimum width=1.5cm] (relay) at (2,0) {\faIcon{shield-alt} Relay};
+    % Process Bus
+    \node[bus=otdanger, minimum width=5.5cm] (pbus) at (0,-0.8) {\faIcon{bolt}\hspace{0.2em}\textbf{Process Bus} -- GOOSE/SV (L2)};
+    % Field devices
+    \node[dev=otsuccess, minimum width=1.2cm] (cb) at (-1.8,-1.6) {\faIcon{plug} CB};
+    \node[dev=otsuccess, minimum width=1.2cm] (mu) at (0,-1.6) {\faIcon{tachometer-alt} MU};
+    \node[dev=otsuccess, minimum width=1.2cm] (sw) at (1.8,-1.6) {\faIcon{random} SW};
+    % Connections
+    \draw[-, thick, otprimary!60] (cc.south) -- (sbus.north);
+    \draw[-, thick, otinfo!60] (sbus.south) -- (hmi.north);
+    \draw[-, thick, otinfo!60] (sbus.south) -- (gw.north);
+    \draw[-, thick, otinfo!60] (sbus.south) -- (relay.north);
+    \draw[-, thick, otdanger!60] (pbus.south) -- (cb.north);
+    \draw[-, thick, otdanger!60] (pbus.south) -- (mu.north);
+    \draw[-, thick, otdanger!60] (pbus.south) -- (sw.north);
+    \draw[-, thick, otwarning!60] (relay.south) -- ([yshift=2pt]pbus.north);
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{sitemap}}\hspace{0.4em}Data Model}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Level} & \textcolor{white}{\bfseries Description} \\
+\midrule
+\faIcon{server}\hspace{0.2em}Physical Device & The actual hardware \\
+\faIcon{cube}\hspace{0.2em}Logical Device & Functional grouping \\
+\faIcon{microchip}\hspace{0.2em}Logical Node & Specific function (e.g., XCBR) \\
+\faIcon{database}\hspace{0.2em}Data Object & Attributes of the node \\
+\faIcon{tag}\hspace{0.2em}Data Attribute & Individual values \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{microchip}}\hspace{0.3em}Key Logical Nodes}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.2cm}p{5.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Node} & \textcolor{white}{\bfseries Function} \\
+\midrule
+XCBR & \faIcon{plug}\hspace{0.2em}Circuit breaker \\
+XSWI & \faIcon{random}\hspace{0.2em}Disconnector/switch \\
+PDIS & \faIcon{ruler}\hspace{0.2em}Distance protection \\
+PTOC & \faIcon{bolt}\hspace{0.2em}Overcurrent protection \\
+MMXU & \faIcon{tachometer-alt}\hspace{0.2em}Measurement unit \\
+CSWI & \faIcon{sliders-h}\hspace{0.2em}Switch controller \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{exchange-alt}}\hspace{0.4em}Service Mapping}
+
+\begin{center}
+\begin{tikzpicture}[
+    svc/.style={rectangle, draw=#1!60, thick, fill=#1!15, minimum width=2.2cm, minimum height=0.5cm, align=center, font=\scriptsize},
+    svc/.default={otaccent},
+    proto/.style={rectangle, draw=#1!60, thick, fill=#1!15, minimum width=1.8cm, minimum height=0.5cm, align=center, font=\scriptsize},
+    proto/.default={otaccent}
+]
+    \node[font=\scriptsize\bfseries, text=otprimary] at (-2.5,0) {\faIcon{cog} MMS};
+    \node[font=\scriptsize\bfseries, text=otdanger] at (-2.5,-0.7) {\faIcon{bolt} GOOSE};
+    \node[font=\scriptsize\bfseries, text=otwarning] at (-2.5,-1.4) {\faIcon{wave-square} SV};
+
+    \node[svc=otprimary] (mms) at (0,0) {Config/Control};
+    \node[proto=otprimary, right=3pt of mms] (mmst) {TCP/102};
+
+    \node[svc=otdanger] (goose) at (0,-0.7) {Protection};
+    \node[proto=otdanger, right=3pt of goose] (gooset) {L2 (0x88B8)};
+    \node[font=\scriptsize, text=otdanger, right=3pt of gooset] {<4ms};
+
+    \node[svc=otwarning] (sv) at (0,-1.4) {Measurements};
+    \node[proto=otwarning, right=3pt of sv] (svt) {L2 (0x88BA)};
+\end{tikzpicture}
+\end{center}
+
+\posterinfo{
+\faIcon{clock}\hspace{0.2em}\textbf{MMS} handles client/server communication. \textbf{GOOSE} provides sub-4ms multicast for protection events. \textbf{SV} streams real-time measurements. \textbf{PTP} (IEEE 1588) provides precision time sync.
+}
+
+\section{\textcolor{accent}{\faIcon{exclamation-triangle}}\hspace{0.4em}Security Vulnerabilities}
+
+\posterdanger{
+Base IEC 61850 has \textbf{no security mechanisms}. GOOSE and SV are particularly vulnerable -- they operate at Layer 2, must be processed within milliseconds, and accept messages from any source.
+}
+
+\subsection{\textcolor{accent}{\faIcon{crosshairs}}\hspace{0.3em}Attack Vectors}
+
+\begin{enumerate}
+    \item \textcolor{danger}{\faIcon{bolt}}\hspace{0.2em}\textbf{GOOSE injection:} Fake trip commands \riskcritical
+    \item \textcolor{danger}{\faIcon{ban}}\hspace{0.2em}\textbf{GOOSE blocking:} Prevent protection \riskcritical
+    \item \textcolor{warning}{\faIcon{chart-line}}\hspace{0.2em}\textbf{SV manipulation:} False measurements \riskhigh
+    \item \textcolor{warning}{\faIcon{cog}}\hspace{0.2em}\textbf{MMS exploitation:} Unauthorized config \riskhigh
+    \item \textcolor{accent}{\faIcon{clock}}\hspace{0.2em}\textbf{Time sync attacks:} Disrupt PTP \riskmedium
+    \item \textcolor{warning}{\faIcon{redo}}\hspace{0.2em}\textbf{Replay attacks:} Capture/replay GOOSE \riskhigh
+\end{enumerate}
+
+\posterwarning{
+\faIcon{skull-crossbones}\hspace{0.2em}\textbf{Industroyer/CrashOverride} (2016 Ukraine): targeted IEC 61850, opened circuit breakers causing outages. Demonstrates \textbf{real-world attack capability}.
+}
+
+\section{\textcolor{accent}{\faIcon{lock}}\hspace{0.4em}IEC 62351 Security}
+
+\postersuccess{
+\textbf{IEC 62351} provides security extensions:
+\begin{itemize}
+    \item \faIcon{lock}\hspace{0.2em}\textbf{Part 3:} TLS for TCP-based protocols (MMS)
+    \item \faIcon{signature}\hspace{0.2em}\textbf{Part 6:} Digital signatures for GOOSE and SV
+    \item \faIcon{user-shield}\hspace{0.2em}\textbf{Part 8:} Role-based access control
+    \item \faIcon{key}\hspace{0.2em}\textbf{Part 9:} Key management
+\end{itemize}
+}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Security Mitigations}
+
+\begin{itemize}
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Physical isolation} -- Separate process/station bus
+    \item \faIcon{project-diagram}\hspace{0.2em}\textbf{VLAN segmentation} -- Isolate GOOSE/SV
+    \item \faIcon{ethernet}\hspace{0.2em}\textbf{Managed switches} -- Port security
+    \item \faIcon{fingerprint}\hspace{0.2em}\textbf{MAC filtering} -- Restrict L2 sources
+    \item \faIcon{id-card}\hspace{0.2em}\textbf{802.1X} -- Port-based authentication
+    \item \faIcon{door-closed}\hspace{0.2em}\textbf{Physical access control} to network equipment
+    \item \faIcon{lock}\hspace{0.2em}\textbf{No remote access} -- or strictly controlled VPN
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{eye}}\hspace{0.3em}Monitoring}
+
+\begin{itemize}
+    \item \faIcon{bell}\hspace{0.2em}Monitor for unauthorized GOOSE publishers
+    \item \faIcon{chart-bar}\hspace{0.2em}Alert on stNum/sqNum anomalies
+    \item \faIcon{plug}\hspace{0.2em}Detect unexpected MMS connections
+    \item \faIcon{clock}\hspace{0.2em}Watch for time synchronization issues
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{toolbox}}\hspace{0.3em}Common Tools}
+
+\begin{itemize}
+    \item \faIcon{binoculars}\hspace{0.2em}\textbf{Wireshark} -- MMS, GOOSE, SV dissectors
+    \item \faIcon{terminal}\hspace{0.2em}\textbf{libIEC61850} -- Open-source protocol library
+    \item \faIcon{crosshairs}\hspace{0.2em}\textbf{IEDScout} -- IEC 61850 device browser
+    \item \faIcon{shield-alt}\hspace{0.2em}\textbf{GridLAB-D} -- Grid simulation framework
+\end{itemize}
+
+\posterinfo{
+\faIcon{industry}\hspace{0.2em}IEC 61850 extends beyond substations to wind farms (IEC 61400-25), hydroelectric plants, distributed energy resources (DER), and electric vehicle charging infrastructure.
+}
+
+\postertip{
+\faIcon{info-circle}\hspace{0.2em}IEC 62351 adoption is slow. \textbf{Network-based protection} (VLANs, managed switches, physical security) remains the primary defense. New installations should require IEC 62351 compliance from vendors.
+}
+
+\end{multicols}
+
+\end{document}

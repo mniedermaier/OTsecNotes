@@ -1,0 +1,184 @@
+% ============================================================================
+%  BACnet Protocol - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {BACnet Protocol}
+    {Building Automation and Control Networks}
+    {Poster 205}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{building}}\hspace{0.4em}Overview}
+
+BACnet (Building Automation and Control Networks) is the \textbf{dominant protocol for building automation systems}. Controls HVAC, lighting, access control, fire systems, and elevators. Standardized as \textbf{ISO 16484-5} (ASHRAE/ANSI).
+
+\subsection{\textcolor{accent}{\faIcon{sitemap}}\hspace{0.3em}System Architecture}
+
+\begin{center}
+\begin{tikzpicture}[
+    dev/.style={rectangle, draw=#1, thick, fill=#1!10, rounded corners=2pt,
+                minimum height=0.45cm, align=center, font=\scriptsize},
+    dev/.default={otaccent},
+    link/.style={-, thick, #1!60},
+    link/.default={otaccent}
+]
+    \node[dev=otprimary, minimum width=4cm] (bms) at (0,1.3) {\faIcon{desktop}\hspace{0.2em}\textbf{BMS Workstation}};
+    \node[dev=otinfo, minimum width=2.5cm] (ctrl1) at (-1.5,0.4) {\faIcon{server} Controller};
+    \node[dev=otinfo, minimum width=2.5cm] (ctrl2) at (1.5,0.4) {\faIcon{server} Controller};
+    \node[dev=otsuccess, minimum width=1.2cm, font=\scriptsize] (hvac) at (-2.5,-0.5) {\faIcon{fan} HVAC};
+    \node[dev=otwarning, minimum width=1.2cm, font=\scriptsize] (fire) at (-0.7,-0.5) {\faIcon{fire} Fire};
+    \node[dev=otaccent, minimum width=1.2cm, font=\scriptsize] (light) at (0.9,-0.5) {\faIcon{lightbulb} Light};
+    \node[dev=otdanger, minimum width=1.2cm, font=\scriptsize] (access) at (2.5,-0.5) {\faIcon{door-open} Access};
+    \draw[link=otprimary] (bms) -- (ctrl1) node[midway, left, font=\scriptsize, text=otprimary] {IP};
+    \draw[link=otprimary] (bms) -- (ctrl2);
+    \draw[link=otsuccess] (ctrl1) -- (hvac);
+    \draw[link=otwarning] (ctrl1) -- (fire);
+    \draw[link=otaccent] (ctrl2) -- (light);
+    \draw[link=otdanger] (ctrl2) -- (access);
+    \node[font=\scriptsize, text=mediumgray] at (3.5,0.4) {MS/TP};
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{network-wired}}\hspace{0.4em}Network Types}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.8cm}p{1.5cm}p{3.2cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Network} & \textcolor{white}{\bfseries Medium} & \textcolor{white}{\bfseries Use Case} \\
+\midrule
+\faIcon{wifi}\hspace{0.2em}BACnet/IP & UDP:47808 & Primary modern deployment \\
+\faIcon{ethernet}\hspace{0.2em}BACnet/ETH & 802.3 & Legacy installations \\
+\faIcon{plug}\hspace{0.2em}MS/TP & RS-485 & Field-level devices \\
+\faIcon{lock}\hspace{0.2em}BACnet/SC & TLS 1.3 & Secure Connect (new) \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{stream}}\hspace{0.3em}BACnet/IP Frame}
+
+\begin{center}
+\begin{tikzpicture}[
+    field/.style={rectangle, draw=otaccent, thick, minimum height=0.65cm, align=center, fill=otaccent!10, font=\scriptsize},
+    lbl/.style={font=\scriptsize, text=mediumgray}
+]
+    \node[field, minimum width=1.5cm, fill=otprimary!15, draw=otprimary] (bvlc) at (0,0) {BVLC};
+    \node[field, minimum width=2cm, right=0pt of bvlc] (npdu) {NPDU};
+    \node[field, minimum width=2.5cm, right=0pt of npdu, fill=otinfo!15, draw=otinfo] (apdu) {APDU};
+
+    \node[lbl, below=2pt of bvlc] {4 bytes};
+    \node[lbl, below=2pt of npdu] {Variable};
+    \node[lbl, below=2pt of apdu] {Variable};
+
+    \draw[decorate, decoration={brace, amplitude=4pt}, thick, otaccent]
+        ([yshift=2pt]bvlc.north west) -- ([yshift=2pt]apdu.north east)
+        node[midway, above=5pt, font=\scriptsize, text=otaccent] {UDP Port 47808};
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{cubes}}\hspace{0.4em}Object Model}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.5cm}p{4cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Object} & \textcolor{white}{\bfseries Purpose} \\
+\midrule
+\faIcon{thermometer-half}\hspace{0.2em}Analog I/O & Temperature, pressure, setpoints \\
+\faIcon{toggle-on}\hspace{0.2em}Binary I/O & On/off states, alarms \\
+\faIcon{calendar-alt}\hspace{0.2em}Schedule & Time-based control programs \\
+\faIcon{chart-line}\hspace{0.2em}Trend Log & Historical data storage \\
+\faIcon{microchip}\hspace{0.2em}Device & Represents the device itself \\
+\faIcon{bell}\hspace{0.2em}Notification & Alarm and event routing \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{exchange-alt}}\hspace{0.4em}Key Services}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.8cm}p{1.5cm}p{2.2cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Service} & \textcolor{white}{\bfseries Type} & \textcolor{white}{\faIcon{shield-alt}\hspace{0.2em}\bfseries Risk} \\
+\midrule
+Who-Is / I-Am & Discovery & \riskmedium \\
+ReadProperty & Read & \risklow \\
+WriteProperty & Write & \riskcritical \\
+SubscribeCOV & Monitor & \risklow \\
+DeviceCommCtrl & Control & \riskcritical \\
+ReinitializeDevice & Reset & \riskcritical \\
+\end{tabular}
+\end{center}
+
+\posterwarning{
+\faIcon{broadcast-tower}\hspace{0.2em}\textbf{BBMD} (Broadcast Management Device) forwards BACnet broadcasts across subnets. A compromised BBMD can expose BACnet networks to a much wider attack surface.
+}
+
+\section{\textcolor{accent}{\faIcon{exclamation-triangle}}\hspace{0.4em}Security Vulnerabilities}
+
+\posterdanger{
+Traditional BACnet has \textbf{no authentication or encryption}. Any device can read, write, and control building systems. WriteProperty and ReinitializeDevice are accepted from any source.
+}
+
+\subsection{\textcolor{accent}{\faIcon{crosshairs}}\hspace{0.3em}Attack Vectors}
+
+\begin{enumerate}
+    \item \textcolor{accent}{\faIcon{fan}}\hspace{0.2em}\textbf{HVAC manipulation:} Damage equipment
+    \item \textcolor{accent}{\faIcon{door-open}}\hspace{0.2em}\textbf{Access control:} Unlock doors, disable alarms
+    \item \textcolor{accent}{\faIcon{fire}}\hspace{0.2em}\textbf{Fire system:} Suppress or trigger false alarms
+    \item \textcolor{accent}{\faIcon{bolt}}\hspace{0.2em}\textbf{Energy attacks:} Maximize consumption
+    \item \textcolor{accent}{\faIcon{power-off}}\hspace{0.2em}\textbf{Device disruption:} ReinitializeDevice
+    \item \textcolor{accent}{\faIcon{eye}}\hspace{0.2em}\textbf{Exfiltration:} Read occupancy patterns
+\end{enumerate}
+
+\posterdanger{
+\faIcon{globe}\hspace{0.2em}Thousands of BACnet devices are \textbf{directly accessible on the internet}. Shodan easily finds them via port \textbf{47808/UDP}. Never expose BACnet to the internet.
+}
+
+\section{\textcolor{accent}{\faIcon{lock}}\hspace{0.4em}BACnet Secure Connect}
+
+\postersuccess{
+\textbf{BACnet/SC} adds \textbf{TLS 1.3 encryption}, X.509 certificate-based device authentication, hub-and-spoke topology with failover, and WebSocket transport. Backward compatible via routers.
+}
+
+\section{\textcolor{accent}{\faIcon{hospital}}\hspace{0.4em}Critical Facility Risks}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries \faIcon{building}\hspace{0.2em}Facility} & \textcolor{white}{\bfseries Risk} \\
+\midrule
+\faIcon{hospital}\hspace{0.2em}Hospitals & HVAC for ORs, isolation wards \\
+\faIcon{server}\hspace{0.2em}Data Centers & Cooling failure = outage \\
+\faIcon{flask}\hspace{0.2em}Pharma & Clean room environmental control \\
+\faIcon{landmark}\hspace{0.2em}Government & Secure facility access control \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Security Mitigations}
+
+\begin{itemize}
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Dedicated VLAN} -- Isolate BACnet traffic
+    \item \faIcon{ban}\hspace{0.2em}\textbf{Block port 47808} at perimeter
+    \item \faIcon{project-diagram}\hspace{0.2em}\textbf{Segment by function} -- HVAC, access, fire
+    \item \faIcon{lock}\hspace{0.2em}\textbf{VPN} for remote building management
+    \item \faIcon{clipboard-list}\hspace{0.2em}\textbf{Log} WriteProperty and Reinitialize commands
+    \item \faIcon{bell}\hspace{0.2em}\textbf{Alert} on Who-Is from unknown sources
+    \item \faIcon{eye}\hspace{0.2em}\textbf{Monitor} for schedule/setpoint changes
+\end{itemize}
+
+\postertip{
+\faIcon{cloud}\hspace{0.2em}Building automation increasingly connects to enterprise IT, cloud platforms, and IoT. Apply the same security rigor as traditional OT/ICS environments. \textbf{BACnet/SC} should be evaluated for all new installations.
+}
+
+\end{multicols}
+
+\end{document}

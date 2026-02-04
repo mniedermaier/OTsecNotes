@@ -1,0 +1,181 @@
+% ============================================================================
+%  OT Tabletop Exercises - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {OT Tabletop Exercises}
+    {Testing Incident Response Through Scenario-Based Discussion}
+    {Poster 650}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+Tabletop exercises are discussion-based sessions where participants walk through simulated incident scenarios to \textbf{test response plans, identify gaps, and improve coordination}. For OT, these are essential because real-world testing on production systems is often impossible without risking safety.
+
+\posterinfo{
+\textbf{Why tabletops for OT?} Unlike IT where systems can be taken offline for testing, OT runs continuously. Tabletop exercises provide a safe way to validate incident response without disrupting operations or creating safety hazards.
+}
+
+\section{\textcolor{accent}{\faIcon{list-ul}}\hspace{0.4em}Exercise Types}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{list-ul}\hspace{0.2em}\bfseries Type} & \textcolor{white}{\faIcon{align-left}\hspace{0.2em}\bfseries Description} \\
+\midrule
+Tabletop & Facilitated discussion, low cost/risk \\
+Workshop & Collaborative planning session \\
+Drill & Tests specific procedure/capability \\
+Functional & Multi-team operational exercise \\
+Full-scale & End-to-end, high cost/complexity \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{clipboard-list}}\hspace{0.4em}Planning and Preparation}
+
+\subsection{\textcolor{accent}{\faIcon{bullseye}}\hspace{0.3em}Define Objectives}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{bullseye}\hspace{0.2em}\bfseries Objective} & \textcolor{white}{\faIcon{pencil-alt}\hspace{0.2em}\bfseries Example} \\
+\midrule
+Test procedures & Validate OT IR plan steps \\
+Identify gaps & Find missing playbooks \\
+Train personnel & Familiarize with escalation \\
+Test comms & Verify notification chains \\
+Assess decisions & Evaluate isolation criteria \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{chess}}\hspace{0.3em}Scenario Design}
+
+Effective OT scenarios should be:
+
+\begin{itemize}
+    \item \textcolor{success}{\faIcon{check-circle}}\hspace{0.2em}\textbf{Realistic} -- Based on actual threats to your industry
+    \item \textcolor{info}{\faIcon{crosshairs}}\hspace{0.2em}\textbf{Relevant} -- Target systems participants manage
+    \item \textcolor{warning}{\faIcon{brain}}\hspace{0.2em}\textbf{Challenging} -- Force difficult decisions
+    \item \textcolor{accent}{\faIcon{hourglass-half}}\hspace{0.2em}\textbf{Scoped} -- Achievable within the exercise timeframe
+\end{itemize}
+
+\postersuccess{
+\textbf{Scenario tip:} Base scenarios on real incidents from your sector. Adapt published case studies (Stuxnet, TRITON, Colonial Pipeline, Oldsmar) to your specific environment and systems.
+}
+
+\subsection{\textcolor{accent}{\faIcon{tasks}}\hspace{0.3em}Preparation Checklist}
+
+\begin{enumerate}
+    \item \faIcon{file-alt}\hspace{0.2em}Scenario narrative and injects
+    \item \faIcon{sitemap}\hspace{0.2em}Network diagrams and system info
+    \item \faIcon{question-circle}\hspace{0.2em}Discussion questions per phase
+    \item \faIcon{book}\hspace{0.2em}Reference documents (IR plans)
+    \item \faIcon{users}\hspace{0.2em}Participant roles and ground rules
+\end{enumerate}
+
+\section{\textcolor{accent}{\faIcon{users}}\hspace{0.4em}Key Participants}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{user-tag}\hspace{0.2em}\bfseries Role} & \textcolor{white}{\faIcon{tasks}\hspace{0.2em}\bfseries Responsibility} \\
+\midrule
+Facilitator & Guide discussion, present injects \\
+OT Operations & Control room, field operations \\
+OT Engineering & Technical system knowledge \\
+IT Security & Detection/response expertise \\
+Management & Escalation, business decisions \\
+Safety & Safety implications review \\
+\end{tabular}
+\end{center}
+
+\posterwarning{
+\textcolor{warning}{\faIcon{exclamation-triangle}}\hspace{0.2em}\textbf{Include OT staff:} Tabletop exercises must include operations and engineering, not just IT security. Decisions about isolating control systems require input from those who understand operational consequences.
+}
+
+\section{\textcolor{accent}{\faIcon{crosshairs}}\hspace{0.4em}OT Scenario Categories}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{crosshairs}\hspace{0.2em}\bfseries Category} & \textcolor{white}{\faIcon{pencil-alt}\hspace{0.2em}\bfseries Example} \\
+\midrule
+Ransomware & IT to historian to HMI spread \\
+Targeted APT & Eng. workstation, PLC logic mod \\
+Insider threat & Disgruntled employee sabotage \\
+Supply chain & Compromised vendor update \\
+Safety system & Attacker disables SIS \\
+Data integrity & Process values manipulated \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{list-ol}}\hspace{0.3em}Scenario Progression}
+
+\begin{enumerate}
+    \item \faIcon{bell}\hspace{0.2em}\textbf{Initial detection} -- SOC alerts on suspicious activity
+    \item \faIcon{search}\hspace{0.2em}\textbf{Investigation} -- Determine scope, affected systems
+    \item \faIcon{level-up-alt}\hspace{0.2em}\textbf{Escalation} -- IT/OT coordination, management notify
+    \item \faIcon{hand-paper}\hspace{0.2em}\textbf{Containment} -- Isolation decisions, operational impact
+    \item \faIcon{undo}\hspace{0.2em}\textbf{Recovery} -- Eradicate threat, restore systems, verify integrity
+    \item \faIcon{lightbulb}\hspace{0.2em}\textbf{Post-incident} -- Lessons learned, improvements
+\end{enumerate}
+
+\section{\textcolor{accent}{\faIcon{chalkboard-teacher}}\hspace{0.4em}Facilitation Tips}
+
+\begin{itemize}
+    \item \textcolor{info}{\faIcon{balance-scale}}\hspace{0.2em}\textbf{Stay neutral} -- Don't lead to ``correct'' answers
+    \item \textcolor{success}{\faIcon{comments}}\hspace{0.2em}\textbf{Encourage participation} -- Draw out quieter members
+    \item \textcolor{accent}{\faIcon{pencil-alt}}\hspace{0.2em}\textbf{Capture insights} -- Assign note-taker for gaps
+    \item \textcolor{danger}{\faIcon{ban}}\hspace{0.2em}\textbf{No blame} -- Focus on process improvement
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{file-alt}}\hspace{0.4em}After-Action Review}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{file-alt}\hspace{0.2em}\bfseries Section} & \textcolor{white}{\faIcon{align-left}\hspace{0.2em}\bfseries Content} \\
+\midrule
+Summary & Key findings, recommendations \\
+Overview & Objectives, scenario, participants \\
+Strengths & Validated capabilities \\
+Improvements & Gaps with specific examples \\
+Actions & Prioritized items with owners \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{calendar-alt}}\hspace{0.3em}Exercise Frequency}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{1.5cm}p{2.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{list-ul}\hspace{0.2em}\bfseries Type} & \textcolor{white}{\faIcon{calendar-alt}\hspace{0.2em}\bfseries Freq.} & \textcolor{white}{\faIcon{bullseye}\hspace{0.2em}\bfseries Purpose} \\
+\midrule
+Basic tabletop & Quarterly & Awareness, test updates \\
+Cross-functional & Semi-annual & IT/OT coordination \\
+Executive & Annually & Strategic decisions \\
+Full-scale & 2--3 years & End-to-end validation \\
+\end{tabular}
+\end{center}
+
+\postertip{
+Tabletop exercises are the \textbf{safest way to test OT incident response}. Include both IT security and OT operations/engineering staff. Use realistic scenarios based on actual industry threats. Progress through all IR phases: detection through recovery. The real value is in the \textbf{follow-through}---track action items to completion and update plans based on findings. CISA provides ready-made exercise packages for critical infrastructure.
+}
+
+\end{multicols}
+
+\end{document}

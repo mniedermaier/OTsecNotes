@@ -1,0 +1,179 @@
+% ============================================================================
+%  EU NIS2 Directive - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {EU NIS2 Directive}
+    {Network and Information Security for Critical Infrastructure}
+    {Poster 140}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{globe}}\hspace{0.4em}Overview}
+
+NIS2 (Directive (EU) 2022/2555) is the EU's updated cybersecurity legislation. It significantly expands requirements for critical infrastructure operators, including OT environments. Replaces NIS1 (2016) with stricter obligations, broader scope, and substantial penalties.
+
+\section{\textcolor{accent}{\faIcon{columns}}\hspace{0.4em}NIS1 vs NIS2}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{2.2cm}p{2.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Aspect} & \textcolor{white}{\bfseries NIS1 (2016)} & \textcolor{white}{\bfseries NIS2 (2022)} \\
+\midrule
+Scope & 7 sectors & 18 sectors \\
+Classification & OES and DSP & Essential + Important \\
+Incident report & 72h (varied) & 24h + 72h \\
+Penalties & State discretion & \texteuro10M / 2\% \\
+Supply chain & Limited & Explicit \\
+Mgmt liability & Not specified & Personal \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{building}}\hspace{0.4em}Covered Sectors}
+
+\subsection{\textcolor{accent}{\faIcon{star}}\hspace{0.3em}Essential Entities (Annex I)}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{bolt}}\hspace{0.2em}\textbf{Energy:} Electricity, oil, gas, hydrogen
+    \item \textcolor{accent}{\faIcon{train}}\hspace{0.2em}\textbf{Transport:} Air, rail, water, road
+    \item \textcolor{accent}{\faIcon{tint}}\hspace{0.2em}\textbf{Water:} Drinking water \& wastewater
+    \item \textcolor{accent}{\faIcon{heartbeat}}\hspace{0.2em}\textbf{Health:} Providers, labs, pharma
+    \item \textcolor{accent}{\faIcon{server}}\hspace{0.2em}\textbf{Digital:} IXPs, DNS, cloud, data centers
+    \item \textcolor{accent}{\faIcon{landmark}}\hspace{0.2em}\textbf{Public admin, banking, space}
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{certificate}}\hspace{0.3em}Important Entities (Annex II)}
+
+Postal/courier, waste, chemical, food production, \textbf{manufacturing} (medical devices, machinery, vehicles), digital providers, research.
+
+\posterwarning{
+\textbf{Size thresholds:} Generally 50+ employees or \texteuro10M+ turnover. Some entities covered regardless of size (CI operators, essential services).
+}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Security Requirements (Art. 21)}
+
+10 minimum security measures, applicable to OT:
+
+\begin{enumerate}
+    \item \textcolor{accent}{\faIcon{balance-scale}}\hspace{0.2em}Risk analysis and security policies
+    \item \textcolor{accent}{\faIcon{fire-extinguisher}}\hspace{0.2em}Incident handling procedures
+    \item \textcolor{accent}{\faIcon{sync}}\hspace{0.2em}Business continuity and crisis management
+    \item \textcolor{accent}{\faIcon{truck}}\hspace{0.2em}Supply chain security
+    \item \textcolor{accent}{\faIcon{shopping-cart}}\hspace{0.2em}Security in system acquisition
+    \item \textcolor{accent}{\faIcon{bug}}\hspace{0.2em}Vulnerability handling and disclosure
+    \item \textcolor{accent}{\faIcon{user-graduate}}\hspace{0.2em}Cybersecurity training and cyber hygiene
+    \item \textcolor{accent}{\faIcon{key}}\hspace{0.2em}Cryptography and encryption policies
+    \item \textcolor{accent}{\faIcon{user-lock}}\hspace{0.2em}Access control and asset management
+    \item \textcolor{accent}{\faIcon{fingerprint}}\hspace{0.2em}Multi-factor authentication
+\end{enumerate}
+
+\section{\textcolor{accent}{\faIcon{bell}}\hspace{0.4em}Incident Reporting Timeline}
+
+\begin{center}
+\begin{tikzpicture}[
+    evt/.style={rectangle, draw=#1!60, thick, fill=#1!12, rounded corners=2pt,
+        minimum height=0.45cm, minimum width=1.8cm, align=center, font=\scriptsize},
+    evt/.default={otaccent},
+    arr/.style={->, very thick, >=stealth, otaccent!40},
+    tlbl/.style={font=\scriptsize\bfseries, text=#1},
+]
+    \node[evt=otdanger] (e1) at (0,0) {\faIcon{bell}\hspace{0.1em}Early Warning};
+    \node[tlbl=otdanger, above=1pt of e1] {24h};
+    \node[evt=otwarning, right=5pt of e1] (e2) {\faIcon{file-alt}\hspace{0.1em}Notification};
+    \node[tlbl=otwarning, above=1pt of e2] {72h};
+    \node[evt=otinfo, right=5pt of e2] (e3) {\faIcon{clipboard-list}\hspace{0.1em}Final Report};
+    \node[tlbl=otinfo, above=1pt of e3] {1 month};
+    \draw[arr] (e1) -- (e2);
+    \draw[arr] (e2) -- (e3);
+\end{tikzpicture}
+\end{center}
+
+\posterdanger{
+A \textbf{significant incident} = severe operational disruption, financial loss, or considerable damage. OT incidents affecting safety or physical processes typically meet this threshold.
+}
+
+\section{\textcolor{accent}{\faIcon{industry}}\hspace{0.4em}OT Implications}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{clipboard-list}}\hspace{0.2em}\textbf{Asset Inventory:} Complete OT asset inventory required
+    \item \textcolor{accent}{\faIcon{project-diagram}}\hspace{0.2em}\textbf{Segmentation:} IT/OT separation implicitly required
+    \item \textcolor{accent}{\faIcon{fingerprint}}\hspace{0.2em}\textbf{Access Control:} MFA needs OT adaptation
+    \item \textcolor{accent}{\faIcon{sync}}\hspace{0.2em}\textbf{Patch Management:} Must account for OT challenges
+    \item \textcolor{accent}{\faIcon{search}}\hspace{0.2em}\textbf{Monitoring:} Detection must extend to OT networks
+    \item \textcolor{accent}{\faIcon{fire-extinguisher}}\hspace{0.2em}\textbf{Incident Response:} Plans must cover OT scenarios
+    \item \textcolor{accent}{\faIcon{truck}}\hspace{0.2em}\textbf{Supply Chain:} Assess supplier practices, monitor access
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{user-tie}}\hspace{0.4em}Management Accountability}
+
+\posterwarning{
+\textbf{Personal liability:} Management must \textbf{approve} cybersecurity measures, \textbf{oversee} implementation, \textbf{undertake} training, and can be \textbf{held personally liable} for failures. Member states may ban executives from management roles.
+}
+
+\section{\textcolor{accent}{\faIcon{gavel}}\hspace{0.4em}Enforcement \& Penalties}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{2.2cm}p{2.2cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Aspect} & \textcolor{white}{\bfseries Essential} & \textcolor{white}{\bfseries Important} \\
+\midrule
+Max fine & \texteuro10M / 2\% & \texteuro7M / 1.4\% \\
+Supervision & Proactive & Reactive \\
+Audits & Regular mandatory & After incidents \\
+\end{tabular}
+\end{center}
+
+Additional powers: binding instructions, public disclosure, suspension of certifications, temporary management bans. National authorities may conduct on-site inspections and request evidence of compliance at any time.
+
+\section{\textcolor{accent}{\faIcon{truck}}\hspace{0.4em}Supply Chain Requirements}
+
+NIS2 explicitly mandates supply chain security (Art. 21(2)(d)):
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{search}}\hspace{0.2em}\textbf{Assess} supplier and service provider cybersecurity practices
+    \item \textcolor{accent}{\faIcon{file-contract}}\hspace{0.2em}\textbf{Include} security requirements in contracts and SLAs
+    \item \textcolor{accent}{\faIcon{user-shield}}\hspace{0.2em}\textbf{Monitor} third-party access to networks and systems
+    \item \textcolor{accent}{\faIcon{network-wired}}\hspace{0.2em}\textbf{Evaluate} dependencies on critical ICT service providers
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{flag}}\hspace{0.4em}National Transposition}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{4.8cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Country} & \textcolor{white}{\bfseries Implementation Approach} \\
+\midrule
+Germany & BSI-Gesetz 2.0, KRITIS-VO update \\
+France & ANSSI framework, LPM alignment \\
+Netherlands & Wbni (network security act) update \\
+Italy & ACN (National Cybersecurity Agency) \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{clock}}\hspace{0.4em}Timeline}
+
+Dec 2022: Adopted $\rightarrow$ Oct 2024: Transposition deadline $\rightarrow$ Apr 2025: Entity registration $\rightarrow$ 2025+: Enforcement begins.
+
+\postersuccess{
+\textbf{Preparation:} 1) Determine if in scope. 2) Assess current posture vs NIS2. 3) Identify OT gaps. 4) Implement measures. 5) Register with national authority.
+
+\textbf{IEC 62443 alignment} is valuable -- its security levels and zone/conduit model support NIS2's risk-based approach.
+}
+
+\postertip{
+\textbf{Key difference from NIS1:} NIS2 removes the distinction between OES and DSP. All covered entities face the same security requirements. Management bodies must personally approve and oversee cybersecurity risk management measures.
+}
+
+\end{multicols}
+
+\end{document}

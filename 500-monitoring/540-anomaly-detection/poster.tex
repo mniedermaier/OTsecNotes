@@ -1,0 +1,182 @@
+% ============================================================================
+%  Anomaly Detection in OT - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {Anomaly Detection in OT}
+    {Behavioral Analysis for Industrial Security Monitoring}
+    {Poster 540}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+Anomaly detection identifies deviations from established normal behavior. OT environments are \textbf{ideal for anomaly detection} because industrial processes are predictable, repetitive, and change slowly---making unusual activity easier to spot.
+
+\posterinfo{
+\textbf{Why OT is ideal:} PLCs communicate in consistent patterns, systems rarely change once deployed, operations follow predictable cycles. This makes anomalies highly detectable compared to dynamic IT environments.
+}
+
+\section{\textcolor{accent}{\faIcon{exclamation-circle}}\hspace{0.4em}Anomaly Categories}
+
+\subsection{\textcolor{accent}{\faIcon{network-wired}}\hspace{0.3em}Network Anomalies}
+
+\begin{itemize}
+    \item \faIcon{plus-circle}\hspace{0.2em}New device on OT network (unauthorized asset)
+    \item \faIcon{arrows-alt-h}\hspace{0.2em}Communication between previously unconnected devices
+    \item \faIcon{chart-bar}\hspace{0.2em}Unusual traffic volume or timing patterns
+    \item \faIcon{ban}\hspace{0.2em}Protocol violations or malformed packets
+    \item \faIcon{globe}\hspace{0.2em}Connections to external/internet addresses
+    \item \faIcon{search}\hspace{0.2em}Port scans or reconnaissance activity
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{chart-line}}\hspace{0.3em}Process Anomalies}
+
+\begin{itemize}
+    \item \faIcon{thermometer-half}\hspace{0.2em}Sensor values outside normal operating ranges
+    \item \faIcon{sliders-h}\hspace{0.2em}Unexpected setpoint modifications
+    \item \faIcon{exclamation-circle}\hspace{0.2em}Control commands inconsistent with process state
+    \item \faIcon{clock}\hspace{0.2em}Timing anomalies in control loops
+    \item \faIcon{link}\hspace{0.2em}Correlation breaks between related variables
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{user-clock}}\hspace{0.3em}Behavioral Anomalies}
+
+\begin{itemize}
+    \item \faIcon{moon}\hspace{0.2em}User accessing systems outside normal hours
+    \item \faIcon{keyboard}\hspace{0.2em}Unusual command sequences from operators
+    \item \faIcon{user-tag}\hspace{0.2em}Access to assets outside normal job function
+    \item \faIcon{download}\hspace{0.2em}Excessive data downloads or queries
+    \item \faIcon{map-marker-alt}\hspace{0.2em}Login from unusual locations
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{columns}}\hspace{0.4em}IT vs OT Comparison}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{2cm}p{2cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{th-list}\hspace{0.2em}\bfseries Aspect} & \textcolor{white}{\faIcon{desktop}\hspace{0.2em}\bfseries IT} & \textcolor{white}{\faIcon{industry}\hspace{0.2em}\bfseries OT} \\
+\midrule
+Traffic & Dynamic & Predictable \\
+Users & Many, varied & Few, defined roles \\
+Changes & Frequent & Rare \\
+Baseline & High variance & Low variance \\
+Detection & Harder & Easier \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{brain}}\hspace{0.4em}Detection Techniques}
+
+\subsection{\textcolor{accent}{\faIcon{calculator}}\hspace{0.3em}Statistical Methods}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{calculator}\hspace{0.2em}\bfseries Method} & \textcolor{white}{\bfseries Application} \\
+\midrule
+Threshold & Alert when values exceed limits \\
+Std deviation & Flag values outside N sigma \\
+Moving average & Detect sudden baseline changes \\
+Seasonal & Account for time-of-day variation \\
+Correlation & Detect breaks in variable relationships \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{brain}}\hspace{0.3em}Machine Learning Approaches}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{brain}\hspace{0.2em}\bfseries Approach} & \textcolor{white}{\bfseries Description} \\
+\midrule
+Clustering & Group behaviors, flag outliers \\
+Autoencoders & Flag reconstruction errors \\
+One-class SVM & Model normal boundary \\
+LSTM networks & Detect sequence breaks \\
+Isolation forest & Identify high-dim outliers \\
+\end{tabular}
+\end{center}
+
+\posterwarning{
+\textcolor{warning}{\faIcon{exclamation-triangle}}\hspace{0.2em}\textbf{ML model risks:} Training data must represent true ``normal'' (not already compromised). Models need retraining after system changes. Black-box models are difficult to explain to operators. False positive rates must be acceptable for OT operations.
+}
+
+\subsection{\textcolor{accent}{\faIcon{list-alt}}\hspace{0.3em}Rule-Based Detection}
+
+\begin{itemize}
+    \item \faIcon{check-circle}\hspace{0.2em}\textbf{Whitelist approach} -- Define allowed behaviors, alert on anything else
+    \item \faIcon{th}\hspace{0.2em}\textbf{Communication matrix} -- Valid source/destination/protocol combinations
+    \item \faIcon{cog}\hspace{0.2em}\textbf{Command validation} -- Verify commands match current process state
+    \item \faIcon{list-ol}\hspace{0.2em}\textbf{Sequence rules} -- Define valid command sequences, flag violations
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{clock}}\hspace{0.4em}Baseline Development}
+
+\begin{enumerate}
+    \item \faIcon{shield-alt}\hspace{0.2em}Verify network is not already compromised
+    \item \faIcon{database}\hspace{0.2em}Collect data across all operational modes
+    \item \faIcon{power-off}\hspace{0.2em}Include startup, shutdown, maintenance periods
+    \item \faIcon{sync}\hspace{0.2em}Account for seasonal/cyclical variations
+    \item \faIcon{user-check}\hspace{0.2em}Validate baseline with OT personnel
+\end{enumerate}
+
+\subsection{\textcolor{accent}{\faIcon{database}}\hspace{0.3em}Baseline Elements}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{database}\hspace{0.2em}\bfseries Element} & \textcolor{white}{\bfseries What to Capture} \\
+\midrule
+Comm pairs & Source/dest IP, ports, protocols \\
+Traffic volume & Bytes/packets per time period \\
+Timing & Request/response intervals, polling \\
+Protocol content & Function codes, register addresses \\
+User behavior & Login times, systems, commands \\
+Process values & Normal ranges, correlations \\
+\end{tabular}
+\end{center}
+
+\posterdanger{
+\textcolor{danger}{\faIcon{skull-crossbones}}\hspace{0.2em}\textbf{Baseline risk:} If the network is already compromised during baseline creation, malicious traffic will be learned as ``normal.'' Always conduct a security assessment before establishing baselines. Capture at least 2--4 weeks of normal operations.
+}
+
+\section{\textcolor{accent}{\faIcon{cogs}}\hspace{0.4em}Operational Considerations}
+
+\subsection{\textcolor{accent}{\faIcon{bell-slash}}\hspace{0.3em}Handling False Positives}
+
+\begin{itemize}
+    \item \faIcon{bell-slash}\hspace{0.2em}High false positive rates cause alert fatigue
+    \item \faIcon{toggle-off}\hspace{0.2em}Operators may disable or ignore detection systems
+    \item \faIcon{sliders-h}\hspace{0.2em}Tune thresholds based on operational feedback
+    \item \faIcon{file-alt}\hspace{0.2em}Create exception rules for known acceptable deviations
+    \item \faIcon{redo}\hspace{0.2em}Continuously refine models with feedback loops
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{tasks}}\hspace{0.3em}Responding to Anomalies}
+
+\begin{enumerate}
+    \item \faIcon{filter}\hspace{0.2em}\textbf{Triage} -- Determine if security-relevant
+    \item \faIcon{search}\hspace{0.2em}\textbf{Context} -- Check for planned changes
+    \item \faIcon{users}\hspace{0.2em}\textbf{Consult} -- Verify with operators
+    \item \faIcon{search-plus}\hspace{0.2em}\textbf{Investigate} -- If suspicious, dig deeper
+    \item \faIcon{redo}\hspace{0.2em}\textbf{Feedback} -- Update model if false positive
+\end{enumerate}
+
+\postertip{
+\textcolor{success}{\faIcon{check-circle}}\hspace{0.2em}OT's predictable nature makes anomaly detection \textbf{more effective than in IT}. Combine statistical, ML, and rule-based approaches for comprehensive coverage. Start with whitelist-based communication matrix detection---it's simple, effective, and produces fewer false positives. Validate all baselines with OT personnel and re-baseline after legitimate changes. Integrate with SIEM and change management to reduce false positives.
+}
+
+\end{multicols}
+
+\end{document}

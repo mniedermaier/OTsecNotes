@@ -119,9 +119,11 @@ Documents are auto-detected by the Makefile. Run `make list` to see all availabl
 OTsecNotes/
 ├── 000-fundamentals/         # Category folders contain documents
 │   ├── 001-it-vs-ot/
-│   │   ├── main.tex
+│   │   ├── document.tex
+│   │   ├── poster.tex        # Optional: 1-page cheat sheet
 │   │   ├── images/
-│   │   └── 001-it-vs-ot.pdf
+│   │   ├── 001-it-vs-ot.pdf
+│   │   └── 001-it-vs-ot-poster.pdf
 │   └── ...
 ├── 100-standards/
 ├── 200-protocols/
@@ -132,7 +134,8 @@ OTsecNotes/
 ├── 700-assessments/
 ├── 800-solutions/
 ├── templates/
-│   └── otsec-template.sty    # Shared LaTeX style - ALL docs use this
+│   ├── otsec-template.sty    # Shared LaTeX style - ALL docs use this
+│   └── otsec-poster.sty      # Poster template - loads otsec-template.sty
 ├── .github/workflows/
 │   └── build-pdfs.yml        # GitHub Actions CI/CD
 ├── Makefile                  # Build system
@@ -179,6 +182,114 @@ When using TikZ figures with `[H]` placement, add at the document preamble:
 Use `\faIcon{icon-name}` for icons. Pre-defined shortcuts:
 - `\iconShield`, `\iconWarning`, `\iconInfo`, `\iconNetwork`
 - `\iconBook`, `\iconLock`, `\iconSuccess`, `\iconDanger`, `\iconTip`
+
+## Poster Template (otsec-poster.sty)
+
+Every document MUST have a one-page A4 portrait poster/cheat sheet alongside its main multi-page PDF. Posters are manually curated with only key highlights.
+
+### Poster Rules
+- **MUST be exactly 1 page** -- CI enforces this; posters exceeding 1 page will fail the build
+- **MUST be at least 85% filled** -- CI checks content fill percentage; underfilled posters will warn
+- A4 portrait format with compact margins
+- Spacious layout with only the most important content
+- Use 2 columns (default) or 3 columns for content-dense topics
+- Build frequently with `make poster-XXX` and check page count stays at 1
+- Run `make check-poster-fill` to verify fill percentage locally
+- If content overflows, trim the least essential sections first
+
+### Critical Technical Constraints
+- Do NOT use `\begin{figure}[H]` floats inside `multicols` -- use `\begin{center}` instead
+- Do NOT use tcolorbox environments (`infobox`, `warningbox`, etc.) from the main template -- they break inside `multicols`. Use the poster-specific box commands below
+- Do NOT use `\footnotesize`, `\scriptsize`, or other font size overrides in poster content -- the template sets `\small` globally for consistent sizing. Only exception: `\scriptsize` for TikZ annotation labels (e.g., byte sizes below diagram fields)
+- Do NOT wrap tables in `\footnotesize` -- they inherit the global `\small` size automatically
+
+### Poster Document Structure
+```latex
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+% Define colors for TikZ (only needed if poster has TikZ figures)
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\makepostertitle
+    {Document Title}
+    {Subtitle}
+    {Poster XXX}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{Overview}
+Your content here.
+
+\end{multicols}
+
+\end{document}
+```
+
+### Poster Title Command
+```latex
+\makepostertitle{Title}{Subtitle}{Document Number}{Contributor}
+```
+Creates the header bar with shield icon, title centered, and document number badge. The contributor name appears in the footer.
+
+### Poster Box Commands
+Compact boxes with colored left accent bars, designed for multicol compatibility. These are **commands** (not environments) -- use `\posterinfo{content}`, NOT `\begin{posterinfo}`:
+- `\posterinfo{content}` -- Blue info box
+- `\posterwarning{content}` -- Yellow/amber warning box
+- `\posterdanger{content}` -- Red critical box
+- `\postersuccess{content}` -- Green key point box
+- `\postertip{content}` -- Cyan tip box
+- `\posterdefinition{Title}{content}` -- Definition box with custom title
+
+Content can include itemize/enumerate lists, bold text, etc.:
+```latex
+\posterdanger{
+\textbf{No built-in security:}
+\begin{itemize}
+    \item No authentication -- any client can connect
+    \item No encryption -- all data in plaintext
+\end{itemize}
+}
+```
+
+### Poster Table Styling
+Tables in posters do not need explicit font size commands. Use the standard table pattern without `\small` or `\footnotesize`:
+```latex
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{2cm}p{3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Col 1} & \textcolor{white}{\bfseries Col 2} & \textcolor{white}{\bfseries Col 3} \\
+\midrule
+Data & Data & Data \\
+\end{tabular}
+\end{center}
+```
+
+### Poster Font Size Hierarchy
+The template manages font sizes automatically. Do not override them in poster content.
+- **9pt** (`\normalsize`): Section headings only
+- **8pt** (`\small`): All content -- body text, lists, tables, boxes (set globally by template)
+- **6pt** (`\scriptsize`): TikZ annotation labels and footer chrome only
+
+### File Structure Per Document
+```
+200-protocols/200-modbus/
+├── document.tex              # Full document (unchanged)
+├── poster.tex            # Manually curated poster
+├── images/               # Shared images
+├── 200-modbus.pdf        # From document.tex
+└── 200-modbus-poster.pdf # From poster.tex
+```
 
 ## TikZ Graphics Guidelines
 
@@ -260,9 +371,18 @@ make verbose-XXX-topic-name # Build with full output (debugging)
 make clean                  # Remove build artifacts
 make distclean              # Remove all generated files including PDFs
 make new NAME=XXX-topic     # Create new document (auto-placed in category)
+
+# Poster commands
+make poster-XXX-topic       # Build poster for specific topic (e.g., make poster-200-modbus)
+make posters                # Build all posters
+make posters-parallel       # Build all posters in parallel
+
+# Validation commands
+make check-poster-fill      # Check poster content fill >= 85%
+make check-missing-posters  # Find documents without poster.tex
 ```
 
-**Note:** When creating a new document with `make new`, it is automatically placed in the correct category folder based on its number prefix (e.g., `203-topic` goes into `200-protocols/`).
+**Note:** When creating a new document with `make new`, it is automatically placed in the correct category folder based on its number prefix (e.g., `203-topic` goes into `200-protocols/`). A poster skeleton (`poster.tex`) is also created alongside `document.tex`.
 
 ## Style Guidelines
 
@@ -317,6 +437,7 @@ Each document should have:
 5. Summary section with `definitionbox` titled "Key Takeaways"
 6. Further Reading section
 7. Footer: `\textit{Part of the OT Security Learning Series}`
+8. A companion `poster.tex` cheat sheet (see Poster Template section)
 
 ### Summary Section Template
 ```latex

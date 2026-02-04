@@ -1,0 +1,164 @@
+% ============================================================================
+%  Endpoint Protection Platforms - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {Endpoint Protection Platforms}
+    {EPP and EDR Solutions for OT Environments}
+    {Poster 835}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+Modern EPP integrates multiple security capabilities into unified platforms. EDR adds advanced threat detection and investigation. Deploying in OT requires careful consideration of \textbf{operational constraints and system capabilities}.
+
+\section{\textcolor{accent}{\faIcon{columns}}\hspace{0.4em}Technology Comparison}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{0.7cm}p{0.7cm}p{0.7cm}p{0.7cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{columns}\hspace{0.2em}\bfseries Capability} & \textcolor{white}{\bfseries AV} & \textcolor{white}{\bfseries EPP} & \textcolor{white}{\bfseries EDR} & \textcolor{white}{\bfseries XDR} \\
+\midrule
+Signature detect & Yes & Yes & Yes & Yes \\
+Behavior analysis & -- & Yes & Yes & Yes \\
+Machine learning & -- & Yes & Yes & Yes \\
+Threat hunting & -- & -- & Yes & Yes \\
+Forensic invest. & -- & -- & Yes & Yes \\
+Network correlate & -- & -- & -- & Yes \\
+Auto response & -- & Ltd & Yes & Yes \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}EPP Core Components}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{bug}}\hspace{0.2em}\textbf{Anti-malware} -- Signature and heuristic detection
+    \item \textcolor{accent}{\faIcon{list-alt}}\hspace{0.2em}\textbf{Application control} -- Whitelist/blacklist enforcement
+    \item \textcolor{accent}{\faIcon{usb}}\hspace{0.2em}\textbf{Device control} -- USB and removable media policies
+    \item \textcolor{accent}{\faIcon{network-wired}}\hspace{0.2em}\textbf{Host firewall} -- Local network traffic filtering
+    \item \textcolor{accent}{\faIcon{memory}}\hspace{0.2em}\textbf{Exploit prevention} -- Memory protection, anti-exploit
+    \item \textcolor{accent}{\faIcon{globe}}\hspace{0.2em}\textbf{Web protection} -- URL filtering, download scanning
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{search}}\hspace{0.4em}EDR Capabilities}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{4.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{search}\hspace{0.2em}\bfseries Capability} & \textcolor{white}{\bfseries Description} \\
+\midrule
+Monitoring & Process, file, network, registry events \\
+Detection & Behavioral rules and analytics \\
+Alert triage & Priority by severity and context \\
+Investigation & Timeline, process trees, artifacts \\
+Threat hunting & Proactive IOC search \\
+Response & Isolate, kill, quarantine, collect \\
+\end{tabular}
+\end{center}
+
+\posterwarning{
+\textbf{EDR telemetry impact:} Collection can affect system performance and generate significant network traffic. Carefully evaluate resource requirements and consider limiting telemetry scope on constrained OT systems.
+}
+
+\section{\textcolor{accent}{\faIcon{exclamation-triangle}}\hspace{0.4em}OT Deployment Constraints}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{4.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{exclamation-triangle}\hspace{0.2em}\bfseries Constraint} & \textcolor{white}{\bfseries Impact on EPP/EDR} \\
+\midrule
+Legacy OS & May not support modern agents \\
+Real-time reqs & Agent overhead must not impact timing \\
+Change mgmt & Updates require testing/approval \\
+Network isolation & Cloud management may not work \\
+Vendor support & Security software may void warranty \\
+Limited resources & Embedded systems lack CPU/memory \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{layer-group}}\hspace{0.4em}System Classification}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{2cm}p{2.2cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{layer-group}\hspace{0.2em}\bfseries Tier} & \textcolor{white}{\bfseries Systems} & \textcolor{white}{\bfseries Protection} \\
+\midrule
+Full EPP/EDR & Win servers, HMIs, eng. stations & All features enabled \\
+Lightweight & Older Windows, limited resources & Reduced telemetry \\
+No agent & PLCs, RTUs, embedded, safety & Network-only monitoring \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{cogs}}\hspace{0.3em}Agent Deployment Modes}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{shield-alt}}\hspace{0.2em}\textbf{Full protection} -- All EPP/EDR features enabled
+    \item \textcolor{accent}{\faIcon{eye}}\hspace{0.2em}\textbf{Detection only} -- Monitor and alert, no blocking
+    \item \textcolor{accent}{\faIcon{clipboard-list}}\hspace{0.2em}\textbf{Audit mode} -- Log what would be blocked for tuning
+    \item \textcolor{accent}{\faIcon{feather-alt}}\hspace{0.2em}\textbf{Passive} -- Minimal footprint, scheduled scans only
+\end{itemize}
+
+\postersuccess{
+\textbf{Start with detection-only or audit mode} in OT environments. Analyze alerts and tune policies before enabling blocking to prevent operational disruptions.
+}
+
+\section{\textcolor{accent}{\faIcon{cloud}}\hspace{0.4em}Architecture: Cloud vs On-Premise}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{2cm}p{2.2cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{cloud}\hspace{0.2em}\bfseries Aspect} & \textcolor{white}{\bfseries Cloud} & \textcolor{white}{\bfseries On-Prem} \\
+\midrule
+Updates & Automatic & Manual cycles \\
+Connectivity & Requires internet & Air-gap compatible \\
+Data & Leaves network & Stays on-site \\
+Cost model & Subscription & License + infra \\
+Deployment & Quick, no infra & Requires servers \\
+\end{tabular}
+\end{center}
+
+\posterdanger{
+\textbf{Cloud management sends telemetry outside OT.} For air-gapped or sensitive environments, on-premise management is required. Evaluate data sensitivity and regulatory requirements before choosing cloud.
+}
+
+\section{\textcolor{accent}{\faIcon{sliders-h}}\hspace{0.4em}OT Policy Tuning}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{ban}}\hspace{0.2em}\textbf{Exclusions} -- Whitelist OT application paths/processes
+    \item \textcolor{accent}{\faIcon{calendar-alt}}\hspace{0.2em}\textbf{Scan scheduling} -- Avoid scans during critical operations
+    \item \textcolor{accent}{\faIcon{download}}\hspace{0.2em}\textbf{Update windows} -- Signature updates in maintenance periods
+    \item \textcolor{accent}{\faIcon{bell}}\hspace{0.2em}\textbf{Response actions} -- Disable auto-quarantine; alert only
+    \item \textcolor{accent}{\faIcon{tachometer-alt}}\hspace{0.2em}\textbf{Resource limits} -- Cap CPU and memory usage
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{bell}}\hspace{0.4em}Alert Handling in OT}
+
+\begin{enumerate}
+    \item \faIcon{heartbeat}\hspace{0.2em}Assess impact on critical process
+    \item \faIcon{check-circle}\hspace{0.2em}Validate true positive vs false positive
+    \item \faIcon{users}\hspace{0.2em}Coordinate response with OT operations
+    \item \faIcon{power-off}\hspace{0.2em}Controlled isolation via safe shutdown if needed
+    \item \faIcon{search}\hspace{0.2em}Investigate scope using EDR tools
+    \item \faIcon{wrench}\hspace{0.2em}Remediate during maintenance window
+\end{enumerate}
+
+\postertip{
+EPP provides multiple prevention layers; EDR adds detection and response for advanced threats. Classify OT systems by capability and deploy appropriate protection tiers. Tune policies for OT including exclusions, scan scheduling, and disabled auto-responses. Never automatically isolate OT endpoints without operational coordination---abrupt disconnection can cause safety incidents worse than the security threat.
+}
+
+\end{multicols}
+
+\end{document}

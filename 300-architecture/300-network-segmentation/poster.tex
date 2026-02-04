@@ -1,0 +1,172 @@
+% ============================================================================
+%  OT Network Segmentation - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {OT Network Segmentation}
+    {Defense in Depth for Industrial Networks}
+    {Poster 300}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{project-diagram}}\hspace{0.4em}Overview}
+
+Network segmentation divides a network into smaller, isolated segments to limit attack spread and control traffic flow. In OT, proper segmentation is one of the \textbf{most effective security controls}. Flat networks allow attackers to move laterally from initial compromise directly to critical control systems.
+
+\posterinfo{
+\faIcon{clipboard-check}\hspace{0.2em}Network segmentation is consistently identified as a \textbf{critical missing control} in post-incident analyses. Required by IEC 62443, NIST 800-82, and NERC CIP.
+}
+
+\section{\textcolor{accent}{\faIcon{sitemap}}\hspace{0.4em}Segmentation Models}
+
+\subsection{\textcolor{accent}{\faIcon{layer-group}}\hspace{0.3em}Layered Architecture}
+
+\begin{center}
+\begin{tikzpicture}[
+    layer/.style={rectangle, draw=#1!70, thick, fill=#1!15,
+        minimum width=5.8cm, minimum height=0.65cm, align=center, font=\scriptsize\bfseries},
+    fwline/.style={draw=mediumgray, thick, dashed},
+    fwlabel/.style={font=\scriptsize, text=mediumgray, fill=white, inner sep=1pt},
+]
+\node[layer=danger] (l45) at (0,0) {\textcolor{danger!80!black}{\faIcon{building}\hspace{0.2em}Enterprise Zone (L4-5)} \scriptsize -- Business IT};
+\draw[fwline] (-3.1,-0.5) -- (3.1,-0.5);
+\node[fwlabel] at (2.2,-0.5) {\faIcon{shield-alt}~FW};
+\node[layer=warning] (l35) at (0,-1.0) {\textcolor{warning!80!black}{\faIcon{server}\hspace{0.2em}Industrial DMZ (L3.5)} \scriptsize -- Buffer};
+\draw[fwline] (-3.1,-1.5) -- (3.1,-1.5);
+\node[fwlabel] at (2.2,-1.5) {\faIcon{shield-alt}~FW};
+\node[layer=success] (l3) at (0,-2.0) {\textcolor{success!80!black}{\faIcon{desktop}\hspace{0.2em}Operations Zone (L3)} \scriptsize -- Site Ops};
+\draw[fwline] (-3.1,-2.5) -- (3.1,-2.5);
+\node[fwlabel] at (2.2,-2.5) {\faIcon{shield-alt}~FW};
+\node[layer=info] (l12) at (0,-3.0) {\textcolor{info!80!black}{\faIcon{microchip}\hspace{0.2em}Control Zone (L1-2)} \scriptsize -- PLCs, HMIs};
+\draw[fwline] (-3.1,-3.5) -- (3.1,-3.5);
+\node[fwlabel] at (2.2,-3.5) {\faIcon{shield-alt}~FW};
+\node[layer=violet] (l0) at (0,-4.0) {\textcolor{violet!80!black}{\faIcon{cog}\hspace{0.2em}Field Zone (L0)} \scriptsize -- Sensors, Actuators};
+\draw[decorate, decoration={brace, amplitude=4pt}, thick, accent]
+    (3.2,0.35) -- (3.2,-4.35) node[midway, right=5pt, font=\scriptsize, text=accent, align=left] {Defense\\in Depth};
+\end{tikzpicture}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{map}}\hspace{0.3em}Zone and Conduit (IEC 62443)}
+
+\begin{itemize}
+    \item \faIcon{object-group}\hspace{0.2em}\textbf{Zone:} Grouping of assets with common security requirements
+    \item \faIcon{exchange-alt}\hspace{0.2em}\textbf{Conduit:} Controlled communication path between zones
+    \item \faIcon{sliders-h}\hspace{0.2em}\textbf{Security Level:} Target capability per zone (SL 1--4)
+    \item \faIcon{chart-bar}\hspace{0.2em}\textbf{Risk-based:} Assign SL per zone based on threat assessment
+    \item \faIcon{file-alt}\hspace{0.2em}\textbf{Document:} Maintain zone/conduit diagrams and policies
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{cogs}}\hspace{0.4em}Implementation Approaches}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.8cm}p{1.5cm}p{1cm}p{1.8cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Method} & \textcolor{white}{\bfseries Security} & \textcolor{white}{\bfseries Cost} & \textcolor{white}{\bfseries Flexibility} \\
+\midrule
+\faIcon{ban}\hspace{0.2em}Air Gap & Highest & High & Very Low \\
+\faIcon{long-arrow-alt-right}\hspace{0.2em}Data Diode & Very High & High & Low \\
+\faIcon{ethernet}\hspace{0.2em}Physical Sep. & High & Med-Hi & Low \\
+\faIcon{shield-alt}\hspace{0.2em}FW + VLANs & Med-High & Medium & High \\
+\faIcon{project-diagram}\hspace{0.2em}VLANs Only & Low-Med & Low & High \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{server}}\hspace{0.4em}Industrial DMZ Design}
+
+The IDMZ (Level 3.5) acts as a buffer zone:
+
+\begin{itemize}
+    \item \faIcon{ban}\hspace{0.2em}\textbf{No direct IT-OT connections} -- all traffic proxied
+    \item \faIcon{laptop}\hspace{0.2em}\textbf{Services hosted:} Jump servers, historians, patch servers
+    \item \faIcon{columns}\hspace{0.2em}\textbf{Dual-firewall:} Separate firewalls on each side
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{list-ul}}\hspace{0.3em}Common DMZ Services}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.5cm}p{4cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Service} & \textcolor{white}{\bfseries Purpose} \\
+\midrule
+\faIcon{laptop}\hspace{0.2em}Jump Server & Controlled remote access point \\
+\faIcon{database}\hspace{0.2em}Historian Mirror & Process data for business \\
+\faIcon{download}\hspace{0.2em}Patch Repository & OT software update staging \\
+\faIcon{shield-alt}\hspace{0.2em}AV Update Server & Signature distribution \\
+\faIcon{lock}\hspace{0.2em}RA Gateway & VPN termination \\
+\end{tabular}
+\end{center}
+
+\posterdanger{
+\faIcon{exclamation-triangle}\hspace{0.2em}Never allow \textbf{direct connections} from enterprise networks (L4-5) to control systems (L0-2). All communication must pass through the DMZ. No ``any-any'' rules.
+}
+
+\section{\textcolor{accent}{\faIcon{filter}}\hspace{0.4em}Firewall Rule Design}
+
+\postersuccess{
+\textbf{Principles:} \faIcon{ban}\hspace{0.1em}Default deny. \faIcon{key}\hspace{0.1em}Least privilege. \faIcon{crosshairs}\hspace{0.1em}Source/dest specific. \faIcon{long-arrow-alt-right}\hspace{0.1em}Direction matters -- OT initiates outbound. \faIcon{clipboard-list}\hspace{0.1em}Log denied traffic.
+}
+
+\subsection{\textcolor{accent}{\faIcon{table}}\hspace{0.3em}Example Rule Set}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1cm}p{1.8cm}p{1.8cm}p{1cm}p{1cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Act} & \textcolor{white}{\bfseries Source} & \textcolor{white}{\bfseries Dest} & \textcolor{white}{\bfseries Port} & \textcolor{white}{\bfseries Proto} \\
+\midrule
+\textcolor{success}{\faIcon{check}} & Hist-DMZ & Hist-OT & 1433 & TCP \\
+\textcolor{success}{\faIcon{check}} & Jump-Srv & Eng-WS & 3389 & TCP \\
+\textcolor{success}{\faIcon{check}} & Patch-Srv & OT-Srv & 445 & TCP \\
+\textcolor{danger}{\faIcon{times}} & Any & Any & Any & Any \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{exclamation-circle}}\hspace{0.4em}Common Mistakes}
+
+\posterwarning{
+\textbf{Segmentation pitfalls:}
+\begin{itemize}
+    \item \textcolor{warning}{\faIcon{exclamation}}\hspace{0.2em}VLANs without firewalls (no filtering)
+    \item \textcolor{warning}{\faIcon{exclamation}}\hspace{0.2em}Overly permissive ``allow any'' rules
+    \item \textcolor{warning}{\faIcon{exclamation}}\hspace{0.2em}Dual-homed workstations bridging zones
+    \item \textcolor{warning}{\faIcon{exclamation}}\hspace{0.2em}Forgotten vendor modems/cellular gateways
+    \item \textcolor{warning}{\faIcon{exclamation}}\hspace{0.2em}No monitoring at segmentation boundaries
+\end{itemize}
+}
+
+\section{\textcolor{accent}{\faIcon{clipboard-check}}\hspace{0.4em}Validation}
+
+\begin{itemize}
+    \item \faIcon{search}\hspace{0.2em}\textbf{Network scanning:} Verify only expected hosts reachable
+    \item \faIcon{file-alt}\hspace{0.2em}\textbf{Rule review:} Audit firewall rules quarterly
+    \item \faIcon{chart-line}\hspace{0.2em}\textbf{Traffic analysis:} Confirm actual flows match policy
+    \item \faIcon{crosshairs}\hspace{0.2em}\textbf{Penetration testing:} Validate effectiveness
+    \item \faIcon{clipboard-list}\hspace{0.2em}\textbf{Change management:} Document and approve all changes
+    \item \faIcon{list-alt}\hspace{0.2em}\textbf{Asset inventory:} Keep zone assignments current
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{sync-alt}}\hspace{0.3em}Ongoing Maintenance}
+
+\begin{itemize}
+    \item \faIcon{calendar-alt}\hspace{0.2em}\textbf{Quarterly audits:} Review all firewall rules
+    \item \faIcon{history}\hspace{0.2em}\textbf{Incident integration:} Update from lessons learned
+    \item \faIcon{plus-circle}\hspace{0.2em}\textbf{Asset tracking:} New systems to correct zones
+    \item \faIcon{balance-scale}\hspace{0.2em}\textbf{Compliance mapping:} Align with IEC 62443
+\end{itemize}
+
+\postertip{
+\faIcon{lightbulb}\hspace{0.2em}For most environments, \textbf{firewalls + VLANs} provide the best balance of security and flexibility. Always combine segmentation with \textbf{monitoring at zone boundaries}. Consider \textbf{micro-segmentation} for high-value assets within the control zone.
+}
+
+\end{multicols}
+
+\end{document}

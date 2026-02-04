@@ -1,0 +1,176 @@
+% ============================================================================
+%  Safety Instrumented Systems - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {Safety Instrumented Systems}
+    {SIS, SIL Levels, and Safety System Security}
+    {Poster 040}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{hard-hat}}\hspace{0.4em}Overview}
+
+Safety Instrumented Systems (SIS) are the \textbf{last line of defense} against catastrophic events. Unlike control systems that optimize production, safety systems exist solely to prevent harm to people, equipment, and the environment. SIS operates independently from the Basic Process Control System (BPCS).
+
+\posterdanger{
+Compromised safety systems can lead to \textbf{loss of life}. They are explicitly targeted by sophisticated attackers (e.g., TRITON malware, 2017). Security measures must never compromise safety functionality.
+}
+
+\section{\textcolor{accent}{\faIcon{cogs}}\hspace{0.4em}SIF Chain}
+
+A Safety Instrumented Function consists of three elements:
+
+\begin{center}
+\begin{tikzpicture}[
+    sifbox/.style={rectangle, draw=#1!60, thick, fill=#1!12, rounded corners=3pt,
+        minimum height=0.7cm, minimum width=2cm, align=center, font=\scriptsize},
+    sifbox/.default={otaccent},
+    arr/.style={->, very thick, >=stealth, otprimary!60},
+]
+    \node[sifbox=otinfo] (sen) at (0,0) {\faIcon{thermometer-half}\\\textbf{Sensor}};
+    \node[sifbox=otwarning] (log) at (3,0) {\faIcon{microchip}\\\textbf{Logic Solver}};
+    \node[sifbox=otdanger] (fin) at (6,0) {\faIcon{cog}\\\textbf{Final Element}};
+
+    \draw[arr] (sen) -- (log) node[midway, above, font=\scriptsize, text=mediumgray] {detect};
+    \draw[arr] (log) -- (fin) node[midway, above, font=\scriptsize, text=mediumgray] {act};
+
+    \node[font=\scriptsize, text=mediumgray, text width=2cm, align=center, below=2pt] at (sen.south) {Temp, pressure, gas detectors};
+    \node[font=\scriptsize, text=mediumgray, text width=2cm, align=center, below=2pt] at (log.south) {Safety PLC, relay system};
+    \node[font=\scriptsize, text=mediumgray, text width=2cm, align=center, below=2pt] at (fin.south) {ESV, trip relay, circuit breaker};
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{layer-group}}\hspace{0.4em}Protection Layers}
+
+\begin{center}
+\begin{tikzpicture}[
+    layer/.style={rectangle, draw=#1!50, thick, fill=#1!10, rounded corners=2pt,
+        minimum height=0.38cm, align=center, font=\scriptsize},
+    layer/.default={otaccent},
+]
+    \node[layer=otdanger, minimum width=6.8cm] (l6) at (0,0) {\faIcon{fire-extinguisher}\hspace{0.2em}Emergency Response};
+    \node[layer=otdanger, minimum width=5.8cm, above=2pt of l6] (l5) {\faIcon{shield-alt}\hspace{0.2em}Physical Protection (relief valves, dikes)};
+    \node[layer=otwarning, minimum width=4.8cm, above=2pt of l5] (l4) {\faIcon{hard-hat}\hspace{0.2em}Safety Instrumented System (SIS)};
+    \node[layer=otinfo, minimum width=3.8cm, above=2pt of l4] (l3) {\faIcon{bell}\hspace{0.2em}Alarms \& Operator Response};
+    \node[layer=otaccent, minimum width=2.8cm, above=2pt of l3] (l2) {\faIcon{sliders-h}\hspace{0.2em}BPCS Control};
+    \node[layer=otsuccess, minimum width=1.8cm, above=2pt of l2] (l1) {\faIcon{cog}\hspace{0.2em}Process Design};
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{columns}}\hspace{0.4em}Safety vs Control}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{2.3cm}p{2.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Aspect} & \textcolor{white}{\bfseries BPCS} & \textcolor{white}{\bfseries SIS} \\
+\midrule
+Purpose & Optimize production & Prevent hazards \\
+Operation & Continuous & On-demand \\
+Focus & Efficiency & Safety \\
+Changes & Frequent & Rarely modified \\
+Priority & Production uptime & Fail-safe state \\
+\end{tabular}
+\end{center}
+
+\posterwarning{
+\textbf{Key Principle -- Independence:} SIS must be \textbf{separate} from BPCS in hardware, software, networks, and personnel.
+}
+
+\section{\textcolor{accent}{\faIcon{chart-line}}\hspace{0.4em}Safety Integrity Levels}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{0.5cm}p{1.8cm}p{1.8cm}p{2.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries SIL} & \textcolor{white}{\bfseries PFD Range} & \textcolor{white}{\bfseries Reduction} & \textcolor{white}{\bfseries Application} \\
+\midrule
+\textcolor{success}{\textbf{1}} & $10^{-1}$--$10^{-2}$ & 10--100 & Low-risk processes \\
+\textcolor{info}{\textbf{2}} & $10^{-2}$--$10^{-3}$ & 100--1K & Standard chemical \\
+\textcolor{warning}{\textbf{3}} & $10^{-3}$--$10^{-4}$ & 1K--10K & High-hazard \\
+\textcolor{danger}{\textbf{4}} & $10^{-4}$--$10^{-5}$ & 10K--100K & Nuclear (rare) \\
+\end{tabular}
+\end{center}
+
+PFD = Probability of Failure on Demand. Higher SIL = more rigorous design, testing, and maintenance.
+
+\subsection{\textcolor{accent}{\faIcon{project-diagram}}\hspace{0.3em}Voting Architectures}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.2cm}p{2cm}p{3.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Config} & \textcolor{white}{\bfseries Meaning} & \textcolor{white}{\bfseries Trade-off} \\
+\midrule
+1oo1 & 1 of 1 trips & Simple, no redundancy \\
+1oo2 & 1 of 2 trips & Safe but more spurious trips \\
+2oo3 & 2 of 3 trip & Best balance: safe + available \\
+2oo4 & 2 of 4 trip & High availability, complex \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{gavel}}\hspace{0.4em}Relevant Standards}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Standard} & \textcolor{white}{\bfseries Scope} \\
+\midrule
+IEC 61511 & Process industry functional safety \\
+IEC 61508 & General functional safety (basis) \\
+IEC 62443 & Industrial cybersecurity (incl. SIS) \\
+ISA 84 & US adoption of IEC 61511 \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{exclamation-triangle}}\hspace{0.4em}Security Threats}
+
+\posterwarning{
+\textbf{TRITON/TRISIS (2017):} First malware targeting safety systems. Attacked Schneider Electric Triconex safety controllers at a petrochemical facility, attempting to disable safety functions that could have enabled a catastrophic release.
+}
+
+\subsection{\textcolor{accent}{\faIcon{crosshairs}}\hspace{0.3em}Attack Scenarios}
+
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{eye-slash}}\hspace{0.2em}\textbf{Disable safety silently} -- enables physical destruction
+    \item \textcolor{danger}{\faIcon{sliders-h}}\hspace{0.2em}\textbf{Modify setpoints} -- safety triggers too late
+    \item \textcolor{warning}{\faIcon{clock}}\hspace{0.2em}\textbf{Delay response} -- process exceeds safe limits
+    \item \textcolor{warning}{\faIcon{bell-slash}}\hspace{0.2em}\textbf{Suppress alarms} -- operators unaware
+    \item \textcolor{info}{\faIcon{power-off}}\hspace{0.2em}\textbf{Spurious trips} -- denial of service
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{bullseye}}\hspace{0.3em}Why SIS is Targeted}
+
+\begin{itemize}
+    \item Disabling safety enables \textbf{catastrophic physical destruction}
+    \item Trusted status -- safety systems are often \textbf{less monitored}
+    \item Rare changes make anomalies \textbf{harder to detect}
+    \item Fewer defenders understand safety system internals
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Security Best Practices}
+
+\postersuccess{
+\textbf{Network:} Separate SIS network from BPCS, firewalls with strict allowlists, data diodes for one-way flow out of SIS, disable unnecessary protocols.
+
+\textbf{Access:} Restrict physical access to SIS cabinets, key switches/hardware write-protect for logic changes, RBAC with strong auth, log all access and changes.
+
+\textbf{Monitoring:} Include SIS in security assessments and IR plans, monitor for unauthorized changes, ensure security measures don't compromise safety functionality.
+}
+
+\postertip{
+\textbf{Remember:} Safety systems protect lives. Security supports safety -- never the other way around. Any security measure that could impair safety function must be rejected.
+}
+
+\end{multicols}
+
+\end{document}

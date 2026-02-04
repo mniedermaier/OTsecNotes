@@ -1,0 +1,192 @@
+% ============================================================================
+%  OPC UA - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {OPC UA}
+    {OPC Unified Architecture for Industrial Communication}
+    {Poster 201}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{plug}}\hspace{0.4em}Overview}
+
+OPC UA (Unified Architecture) is a \textbf{platform-independent, service-oriented} industrial communication protocol. Developed by the OPC Foundation, it replaces OPC Classic (COM/DCOM) with built-in security, cross-platform support, and a unified information model. Standardized as \textbf{IEC 62541}.
+
+\subsection{\textcolor{accent}{\faIcon{columns}}\hspace{0.3em}OPC Classic vs OPC UA}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{2cm}p{2.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Aspect} & \textcolor{white}{\bfseries Classic} & \textcolor{white}{\bfseries OPC UA} \\
+\midrule
+Platform & Windows only & Cross-platform \\
+Transport & COM/DCOM & TCP, HTTPS, WS \\
+Security & Windows auth & Built-in PKI \\
+Firewall & Dynamic ports & Single port \\
+Data Model & Separate specs & Unified model \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{project-diagram}}\hspace{0.4em}Architecture}
+
+\subsection{\textcolor{accent}{\faIcon{layer-group}}\hspace{0.3em}Communication Stack}
+
+\begin{center}
+\begin{tikzpicture}[
+    layer/.style={rectangle, draw=#1!60, thick, fill=#1!15, minimum width=6cm, minimum height=0.5cm, align=center, font=\scriptsize},
+    layer/.default={otaccent}
+]
+    \node[layer=otprimary] (app) at (0,0) {\faIcon{desktop}\hspace{0.3em}\textbf{Application (Client/Server)}};
+    \node[layer=otinfo, below=1pt of app] (svc) {\faIcon{cogs}\hspace{0.3em}Services (Read, Write, Subscribe, Browse)};
+    \node[layer=otsuccess, below=1pt of svc] (sec) {\faIcon{lock}\hspace{0.3em}Security (Sign + Encrypt)};
+    \node[layer=otaccent, below=1pt of sec] (tr) {\faIcon{network-wired}\hspace{0.3em}Transport (TCP 4840, HTTPS, WS)};
+\end{tikzpicture}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{sitemap}}\hspace{0.3em}Information Model}
+
+\begin{itemize}
+    \item \faIcon{cube}\hspace{0.2em}\textbf{Nodes:} Objects, Variables, Methods
+    \item \faIcon{link}\hspace{0.2em}\textbf{References:} Relationships between nodes
+    \item \faIcon{folder-open}\hspace{0.2em}\textbf{Address Space:} Hierarchical namespace
+    \item \faIcon{puzzle-piece}\hspace{0.2em}\textbf{Companion Specs:} Industry-specific data models
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{exchange-alt}}\hspace{0.3em}Communication Patterns}
+
+\begin{center}
+\begin{tikzpicture}[
+    box/.style={rectangle, draw=#1, thick, fill=#1!10, rounded corners=2pt,
+                minimum width=2cm, minimum height=0.5cm, align=center, font=\scriptsize},
+    box/.default={otaccent}
+]
+    % Client-Server
+    \node[box=otprimary] (client) at (0,0) {\faIcon{desktop} Client};
+    \node[box=otaccent] (server) at (3.5,0) {\faIcon{server} Server};
+    \draw[->, thick, >=stealth, otprimary!70] ([yshift=2pt]client.east) -- ([yshift=2pt]server.west) node[midway, above, font=\scriptsize] {Request};
+    \draw[<-, thick, >=stealth, otsuccess!70] ([yshift=-2pt]client.east) -- ([yshift=-2pt]server.west) node[midway, below, font=\scriptsize] {Response};
+    % PubSub
+    \node[box=otwarning] (pub) at (0,-1.4) {\faIcon{broadcast-tower} Publisher};
+    \node[box=otsuccess, minimum width=1.2cm] (sub1) at (3,-0.9) {\faIcon{satellite-dish} Sub};
+    \node[box=otsuccess, minimum width=1.2cm] (sub2) at (3,-1.9) {\faIcon{satellite-dish} Sub};
+    \draw[->, thick, >=stealth, otwarning!70] (pub.east) -- (sub1.west);
+    \draw[->, thick, >=stealth, otwarning!70] (pub.east) -- (sub2.west);
+    \node[font=\scriptsize, text=mediumgray, anchor=west] at (4.2,-1.4) {PubSub};
+    \node[font=\scriptsize, text=mediumgray, anchor=west] at (5,0) {TCP 4840};
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{lock}}\hspace{0.4em}Security Model}
+
+\postersuccess{
+OPC UA includes \textbf{comprehensive built-in security}: authentication, authorization (RBAC), encryption, message signing, and audit logging.
+}
+
+\subsection{\textcolor{accent}{\faIcon{sliders-h}}\hspace{0.3em}Security Modes}
+
+\begin{center}
+\begin{tikzpicture}[
+    mode/.style={rectangle, draw=#1, thick, fill=#1!10, rounded corners=3pt,
+                 minimum width=2cm, minimum height=0.7cm, align=center, font=\scriptsize},
+]
+    \node[mode=otdanger] (none) at (0,0) {\faIcon{unlock}\\\textbf{None}};
+    \node[mode=otwarning] (sign) at (2.5,0) {\faIcon{signature}\\\textbf{Sign}};
+    \node[mode=otsuccess] (full) at (5,0) {\faIcon{lock}\\\textbf{Sign+Encrypt}};
+    \draw[->, very thick, >=stealth, otaccent!50] (none.east) -- (sign.west);
+    \draw[->, very thick, >=stealth, otaccent!50] (sign.east) -- (full.west);
+    \node[font=\scriptsize, text=mediumgray] at (2.5,-0.65) {Increasing Security $\longrightarrow$};
+\end{tikzpicture}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{user-check}}\hspace{0.3em}Authentication Methods}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.8cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Method} & \textcolor{white}{\bfseries Description} \\
+\midrule
+\faIcon{user-slash}\hspace{0.2em}Anonymous & No authentication (not recommended) \\
+\faIcon{key}\hspace{0.2em}User/Password & Basic credential authentication \\
+\faIcon{certificate}\hspace{0.2em}X.509 Certs & Strong app and user authentication \\
+\faIcon{id-badge}\hspace{0.2em}Kerberos & Enterprise SSO integration \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{certificate}}\hspace{0.3em}Certificate Trust}
+
+Each application has its own X.509 certificate. Clients and servers must trust each other's certificates (explicit trust list or CA-based). Proper PKI with a Certificate Authority is recommended over self-signed certificates.
+
+\section{\textcolor{accent}{\faIcon{exclamation-triangle}}\hspace{0.4em}Security Concerns}
+
+\posterdanger{
+Security Mode ``None'' disables all security. Many deployments use this for convenience, \textbf{negating all OPC UA security advantages}. Anonymous access is frequently left enabled.
+}
+
+\subsection{\textcolor{accent}{\faIcon{crosshairs}}\hspace{0.3em}Attack Scenarios}
+
+\begin{enumerate}
+    \item \textcolor{accent}{\faIcon{search}}\hspace{0.2em}\textbf{Discovery abuse:} Enumerate servers
+    \item \textcolor{accent}{\faIcon{level-down-alt}}\hspace{0.2em}\textbf{Downgrade:} Force weaker security modes
+    \item \textcolor{accent}{\faIcon{key}}\hspace{0.2em}\textbf{Cert theft:} Steal keys to impersonate
+    \item \textcolor{accent}{\faIcon{bomb}}\hspace{0.2em}\textbf{DoS:} Exhaust server resources
+    \item \textcolor{accent}{\faIcon{eye}}\hspace{0.2em}\textbf{Info disclosure:} Access process data
+\end{enumerate}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Best Practices}
+
+\begin{itemize}
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Always use SignAndEncrypt} mode
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Disable anonymous access}
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Use Basic256Sha256+} security policies
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Implement PKI} for certificate management
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Enable audit logging} for events
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Restrict port 4840} via firewalls
+    \item \textcolor{success}{\faIcon{check}}\hspace{0.2em}\textbf{Keep software updated} -- patch regularly
+\end{itemize}
+
+\posterwarning{
+The OPC UA specification is complex. \textbf{Implementation vulnerabilities} are common (buffer overflows, cert handling flaws, auth bypasses). Regular patching is essential.
+}
+
+\subsection{\textcolor{accent}{\faIcon{key}}\hspace{0.3em}Security Policies}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3cm}p{3.8cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Policy} & \textcolor{white}{\bfseries Status} \\
+\midrule
+None & \textcolor{danger}{\faIcon{times}}\hspace{0.2em}No security \\
+Basic256 & \textcolor{warning}{\faIcon{exclamation}}\hspace{0.2em}Deprecated (weak) \\
+Basic256Sha256 & \textcolor{success}{\faIcon{check}}\hspace{0.2em}Recommended minimum \\
+Aes128-Sha256 & \textcolor{success}{\faIcon{check}}\hspace{0.2em}Current best practice \\
+Aes256-Sha256-RsaPss & \textcolor{success}{\faIcon{check}}\hspace{0.2em}Strongest available \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{toolbox}}\hspace{0.3em}Common Tools}
+
+\begin{itemize}
+    \item \faIcon{binoculars}\hspace{0.2em}\textbf{Wireshark} -- OPC UA dissector (TCP 4840)
+    \item \faIcon{terminal}\hspace{0.2em}\textbf{UaExpert} -- OPC UA client for browsing
+    \item \faIcon{code}\hspace{0.2em}\textbf{open62541} -- Open-source OPC UA stack
+    \item \faIcon{crosshairs}\hspace{0.2em}\textbf{OpalOPC} -- OPC UA security scanner
+\end{itemize}
+
+\postertip{
+OPC UA is the recommended replacement for legacy OPC Classic and is increasingly adopted for \textbf{Industry 4.0} and IIoT. Companion specifications extend the base model for industry-specific use. Default port: \textbf{4840/TCP}.
+}
+
+\end{multicols}
+
+\end{document}

@@ -1,0 +1,168 @@
+% ============================================================================
+%  HMI and SCADA Basics - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {HMI \& SCADA Fundamentals}
+    {Operator Interfaces and Supervisory Control}
+    {Poster 030}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+HMIs and SCADA systems are the ``eyes and hands'' of operators. HMIs provide local visualization and control; SCADA extends this to geographically distributed assets. Both sit at \textbf{Purdue Level 2} and are critical for process oversight.
+
+\posterinfo{
+\textbf{HMI} = Local operator interface for a specific process or machine.\\
+\textbf{SCADA} = Distributed system for monitoring and controlling remote assets across wide areas.
+}
+
+\section{\textcolor{accent}{\faIcon{server}}\hspace{0.4em}SCADA Architecture}
+
+\begin{center}
+\begin{tikzpicture}[
+    comp/.style={rectangle, draw=#1!60, thick, fill=#1!12, rounded corners=2pt,
+        minimum height=0.5cm, align=center, font=\scriptsize},
+    comp/.default={otaccent},
+    arr/.style={<->, thick, >=stealth, #1!60},
+    arr/.default={otaccent},
+    lnk/.style={font=\scriptsize, text=mediumgray},
+]
+    % MTU/Server at top
+    \node[comp=otprimary, minimum width=3.2cm] (mtu) at (0,1.8) {\faIcon{server}\hspace{0.2em}\textbf{SCADA Server (MTU)}};
+    \node[comp=otinfo, minimum width=1.4cm] (hmi1) at (-2.8,1.8) {\faIcon{desktop}\hspace{0.1em}HMI};
+    \node[comp=otaccent, minimum width=1.4cm] (hist) at (2.8,1.8) {\faIcon{database}\hspace{0.1em}Historian};
+    \draw[-, thick, otprimary!40] (hmi1) -- (mtu);
+    \draw[-, thick, otprimary!40] (mtu) -- (hist);
+
+    % Communication links
+    \node[lnk] at (0,1.1) {\faIcon{broadcast-tower}\hspace{0.2em}WAN / Radio / Cellular / Satellite};
+
+    % RTUs at bottom
+    \node[comp=otsuccess, minimum width=1.5cm] (rtu1) at (-2,0.3) {\faIcon{broadcast-tower}\hspace{0.1em}RTU 1};
+    \node[comp=otsuccess, minimum width=1.5cm] (rtu2) at (0,0.3) {\faIcon{broadcast-tower}\hspace{0.1em}RTU 2};
+    \node[comp=otsuccess, minimum width=1.5cm] (rtu3) at (2,0.3) {\faIcon{broadcast-tower}\hspace{0.1em}RTU 3};
+
+    \draw[arr=otaccent] (mtu.south) -- ++(0,-0.25) -| (rtu1.north);
+    \draw[arr=otaccent] (mtu.south) -- (rtu2.north);
+    \draw[arr=otaccent] (mtu.south) -- ++(0,-0.25) -| (rtu3.north);
+
+    % Field devices
+    \node[comp=otwarning, minimum width=1cm, font=\scriptsize] (f1) at (-2,-0.5) {\faIcon{cog}\hspace{0.1em}Field};
+    \node[comp=otwarning, minimum width=1cm, font=\scriptsize] (f2) at (0,-0.5) {\faIcon{cog}\hspace{0.1em}Field};
+    \node[comp=otwarning, minimum width=1cm, font=\scriptsize] (f3) at (2,-0.5) {\faIcon{cog}\hspace{0.1em}Field};
+    \draw[-, thick, otsuccess!40] (rtu1) -- (f1);
+    \draw[-, thick, otsuccess!40] (rtu2) -- (f2);
+    \draw[-, thick, otsuccess!40] (rtu3) -- (f3);
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{desktop}}\hspace{0.4em}HMI Types}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Type} & \textcolor{white}{\bfseries Use Case} \\
+\midrule
+\faIcon{tablet-alt}\hspace{0.2em}Panel HMI & Dedicated touchscreen, machine-level control \\
+\faIcon{desktop}\hspace{0.2em}PC-based & Windows/Linux workstation, complex processes \\
+\faIcon{globe}\hspace{0.2em}Web HMI & Browser-based, remote monitoring \\
+\faIcon{mobile-alt}\hspace{0.2em}Mobile HMI & Tablet/smartphone for field operations \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{columns}}\hspace{0.3em}SCADA vs DCS}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{2.3cm}p{2.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Aspect} & \textcolor{white}{\bfseries SCADA} & \textcolor{white}{\bfseries DCS} \\
+\midrule
+Geography & Wide area & Single site \\
+Control & Supervisory & Continuous \\
+Comms & WAN/radio/cell & High-speed LAN \\
+Latency & Seconds--min & Milliseconds \\
+Industries & Utilities, water & Chemical, refining \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{network-wired}}\hspace{0.4em}Protocols}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.3cm}p{2.3cm}p{2.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Protocol} & \textcolor{white}{\bfseries Common Use} & \textcolor{white}{\bfseries Security} \\
+\midrule
+Modbus TCP/RTU & Legacy HMI-PLC & \risklow None \\
+DNP3 & Utilities SCADA & \riskmedium Optional auth \\
+IEC 61850 & Substation auto. & \riskmedium TLS capable \\
+OPC DA/UA & Multi-vendor HMI & \riskhigh UA built-in \\
+IEC 60870-5-104 & Power grid SCADA & \riskmedium Optional auth \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{exclamation-triangle}}\hspace{0.4em}Security Threats}
+
+\posterdanger{
+\textbf{Common vulnerabilities:}
+\begin{itemize}
+    \item Default/weak credentials on HMI and SCADA servers
+    \item Unpatched Windows OS on HMI workstations (XP, 7 still common)
+    \item Insecure protocols without authentication or encryption
+    \item SQL/command injection in web-based HMI interfaces
+    \item Exposed SCADA servers on corporate/internet networks
+\end{itemize}
+}
+
+\subsection{\textcolor{accent}{\faIcon{crosshairs}}\hspace{0.3em}Attack Vectors}
+
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{network-wired}}\hspace{0.2em}\textbf{Network-based:} Exploiting exposed SCADA/HMI on corporate networks
+    \item \textcolor{danger}{\faIcon{code}}\hspace{0.2em}\textbf{Protocol manipulation:} Injecting commands via insecure protocols
+    \item \textcolor{warning}{\faIcon{user-secret}}\hspace{0.2em}\textbf{Social engineering:} Phishing operators for HMI credentials
+    \item \textcolor{warning}{\faIcon{box}}\hspace{0.2em}\textbf{Supply chain:} Compromised HMI software or vendor access
+    \item \textcolor{info}{\faIcon{user-shield}}\hspace{0.2em}\textbf{Insider threats:} Malicious or negligent authorized users
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{history}}\hspace{0.3em}Notable Incidents}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.2cm}p{5.8cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Year} & \textcolor{white}{\bfseries Incident} \\
+\midrule
+2015/16 & Ukraine -- HMI access used to open breakers \\
+2021 & Oldsmar -- Remote HMI access, chemical attack \\
+2021 & Colonial Pipeline -- IT ransomware shut OT \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Security Best Practices}
+
+\postersuccess{
+\textbf{Access Control:} RBAC for all HMI users, strong passwords, MFA for remote access, disable default accounts, log all operator actions.
+
+\textbf{Network Security:} Isolate HMI/SCADA from corporate IT, firewalls between zones, IDS tuned for OT protocols, encrypt where possible.
+
+\textbf{System Hardening:} Patch after testing, application whitelisting, disable USB ports, host-based firewalls, remove unnecessary software.
+}
+
+\postertip{
+Compromised HMI/SCADA provides \textbf{direct control over physical processes}. Defense in depth is essential: access control, network segmentation, system hardening, and continuous monitoring.
+}
+
+\end{multicols}
+
+\end{document}

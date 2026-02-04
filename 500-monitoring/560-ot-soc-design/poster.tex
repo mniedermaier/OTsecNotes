@@ -1,0 +1,187 @@
+% ============================================================================
+%  OT Security Operations Center - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {OT Security Operations Center}
+    {Designing and Operating a SOC for Industrial Environments}
+    {Poster 560}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+A Security Operations Center (SOC) provides centralized monitoring, detection, and response. Extending SOC capabilities to OT requires \textbf{different approaches, skills, and tools} than traditional IT security operations, with emphasis on \textcolor{danger}{\faIcon{hard-hat}}\hspace{0.2em}operational safety and availability.
+
+\section{\textcolor{accent}{\faIcon{building}}\hspace{0.4em}SOC Models for OT}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.5cm}p{1.7cm}p{1.7cm}p{1.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{th-list}\hspace{0.2em}\bfseries Aspect} & \textcolor{white}{\bfseries Dedicated} & \textcolor{white}{\bfseries Converged} & \textcolor{white}{\bfseries Hybrid} \\
+\midrule
+Expertise & Deep OT & Limited & Tiered \\
+Cost & High & Lower & Medium \\
+Coverage & 24/7 hard & 24/7 easy & 24/7 ok \\
+Best for & Large OT & Small OT & Most orgs \\
+\end{tabular}
+\end{center}
+
+\postersuccess{
+\textbf{Recommendation:} Most organizations benefit from a \textbf{hybrid model}---IT SOC provides 24/7 monitoring with OT-trained analysts who escalate to OT specialists for investigation and response.
+}
+
+\section{\textcolor{accent}{\faIcon{users}}\hspace{0.4em}Staffing and Skills}
+
+\subsection{\textcolor{accent}{\faIcon{graduation-cap}}\hspace{0.3em}Required Competencies}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3cm}p{3.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{desktop}\hspace{0.2em}\bfseries IT Security} & \textcolor{white}{\faIcon{industry}\hspace{0.2em}\bfseries OT-Specific} \\
+\midrule
+Network analysis & Industrial protocols \\
+Malware analysis & Control system architecture \\
+SIEM operations & Process understanding \\
+Incident response & Safety awareness \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{layer-group}}\hspace{0.3em}Staffing Tiers}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.2cm}p{1.5cm}p{3.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Tier} & \textcolor{white}{\faIcon{user-tag}\hspace{0.2em}\bfseries Role} & \textcolor{white}{\bfseries OT Requirements} \\
+\midrule
+Tier 1 & Triage & Basic OT awareness, protocol ID \\
+Tier 2 & Investigate & OT network, ICS malware \\
+Tier 3 & Response & Deep OT, vendor coordination \\
+SME & Expert & Control system engineering \\
+\end{tabular}
+\end{center}
+
+\posterwarning{
+\textbf{Talent scarcity:} OT security talent is scarce. Cross-train IT analysts in OT fundamentals and partner with OT engineering teams for deep expertise during incidents.
+}
+
+\section{\textcolor{accent}{\faIcon{server}}\hspace{0.4em}Technology Stack}
+
+\subsection{\textcolor{accent}{\faIcon{cogs}}\hspace{0.3em}Core Components}
+
+\begin{itemize}
+    \item \faIcon{eye}\hspace{0.2em}\textbf{OT Network Monitoring} -- DPI for industrial protocols
+    \item \faIcon{chart-bar}\hspace{0.2em}\textbf{SIEM/SOAR} -- Correlation, automation, dashboards
+    \item \faIcon{list-alt}\hspace{0.2em}\textbf{Asset Inventory} -- Automated OT device tracking
+    \item \faIcon{bug}\hspace{0.2em}\textbf{Vulnerability Management} -- OT-aware assessment
+    \item \faIcon{broadcast-tower}\hspace{0.2em}\textbf{Threat Intelligence} -- ICS-specific feeds and IOCs
+    \item \faIcon{key}\hspace{0.2em}\textbf{Secure Remote Access} -- Monitored vendor access
+    \item \faIcon{desktop}\hspace{0.2em}\textbf{EDR/EPP} -- Endpoint protection where possible
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{puzzle-piece}}\hspace{0.3em}Integration Challenges}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{exclamation-triangle}\hspace{0.2em}\bfseries Challenge} & \textcolor{white}{\bfseries Approach} \\
+\midrule
+Protocol support & Ensure SIEM parses Modbus, DNP3 \\
+Data volume & Filter/aggregate at source \\
+Network isolation & Data diodes, secure forwarders \\
+Real-time & Tune for OT use cases \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{eye}}\hspace{0.4em}Data Sources and Visibility}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.2cm}p{5.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{sitemap}\hspace{0.2em}\bfseries Zone} & \textcolor{white}{\bfseries Log Sources} \\
+\midrule
+DMZ & Jump servers, firewalls, historians \\
+Zone 3 & SCADA servers, HMIs, eng. workstations \\
+Zone 1-2 & Network TAPs, managed switches, PLCs* \\
+\end{tabular}
+\end{center}
+
+\vspace{0.2em}
+{\scriptsize *Limited logging capability on most controllers}
+
+\posterdanger{
+Many OT devices cannot run agents or forward logs. \textcolor{info}{\faIcon{network-wired}}\hspace{0.2em}\textbf{Network traffic analysis} is often the only visibility into Level 0--1 activity. Deploy monitoring at strategic points to maximize coverage.
+}
+
+\section{\textcolor{accent}{\faIcon{bell}}\hspace{0.4em}Detection Use Cases}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{search}\hspace{0.2em}\bfseries Use Case} & \textcolor{white}{\bfseries Detection Logic} \\
+\midrule
+Unauth. eng. access & PLC commands from non-eng stations \\
+New OT device & ARP/DHCP for unknown MACs \\
+Protocol anomaly & Invalid function codes, malformed pkts \\
+Lateral movement & IT protocols (SMB, RDP) in OT \\
+Config change & Write to PLCs outside change windows \\
+Remote access abuse & VPN/jump server at unusual times \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{sort-amount-down}}\hspace{0.3em}Alert Prioritization}
+
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{exclamation-circle}}\hspace{0.2em}\textbf{Critical} -- Safety system alerts, immediate escalation
+    \item \faIcon{cog}\hspace{0.2em}\textbf{High} -- Control system changes, verify with operations
+    \item \faIcon{chart-line}\hspace{0.2em}\textbf{Medium} -- Network anomalies, investigate within shift
+    \item \faIcon{clipboard-list}\hspace{0.2em}\textbf{Low} -- Policy violations, queue for review
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{clipboard-list}}\hspace{0.4em}Operations and Processes}
+
+\subsection{\textcolor{accent}{\faIcon{book}}\hspace{0.3em}Runbooks and Playbooks}
+
+\begin{itemize}
+    \item \faIcon{level-up-alt}\hspace{0.2em}\textbf{Escalation paths} -- Include OT engineering contacts
+    \item \faIcon{hard-hat}\hspace{0.2em}\textbf{Response constraints} -- Document safe vs. risky actions
+    \item \faIcon{users}\hspace{0.2em}\textbf{Coordination} -- When to involve plant operations
+    \item \faIcon{bullhorn}\hspace{0.2em}\textbf{Communication} -- Who to notify, in what order
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{chart-bar}}\hspace{0.3em}Key Performance Indicators}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{tachometer-alt}\hspace{0.2em}\bfseries Metric} & \textcolor{white}{\bfseries Description} \\
+\midrule
+MTTD & Time from event to SOC awareness \\
+MTTR & Time from detection to response \\
+Alert volume & Distribution across Purdue levels \\
+FP rate & Percentage of non-true incidents \\
+Asset coverage & OT assets with monitoring visibility \\
+\end{tabular}
+\end{center}
+
+\postertip{
+Start with a \textbf{hybrid IT/OT SOC model} and build OT expertise over time. Deploy network traffic analysis where endpoint logging is unavailable. Build OT-specific detection rules---IT patterns don't translate directly. Coordinate alert thresholds with operations and integrate with change management. OT SOC analysts must understand operational context: a traffic spike during batch processing is normal, at 3 AM it's suspicious.
+}
+
+\end{multicols}
+
+\end{document}

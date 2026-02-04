@@ -1,0 +1,178 @@
+% ============================================================================
+%  OT Recovery Procedures - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {OT Recovery Procedures}
+    {Safely Restoring Industrial Control Systems After a Security Incident}
+    {Poster 630}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+Recovery in OT requires careful, methodical restoration while ensuring the threat has been \textbf{fully eradicated}. Rushing recovery can reintroduce malware, cause process upsets, or create safety hazards.
+
+\posterdanger{
+\textbf{Do not rush:} Pressure to restore production can lead to incomplete recovery. Restarting on compromised systems will result in repeat incidents. Backups may also be compromised---verify before restoring.
+}
+
+\section{\textcolor{accent}{\faIcon{list-ol}}\hspace{0.4em}Recovery Phases}
+
+\begin{enumerate}
+    \item \faIcon{search}\hspace{0.2em}\textbf{Assess Damage} -- Scope and impact determination
+    \item \faIcon{clipboard-list}\hspace{0.2em}\textbf{Plan Recovery} -- Strategy, priorities, resources
+    \item \faIcon{server}\hspace{0.2em}\textbf{Rebuild Systems} -- Clean installation and config
+    \item \faIcon{check-double}\hspace{0.2em}\textbf{Validate Function} -- Testing at all levels
+    \item \faIcon{play-circle}\hspace{0.2em}\textbf{Restore Operations} -- Staged startup with monitoring
+\end{enumerate}
+
+\section{\textcolor{accent}{\faIcon{search}}\hspace{0.4em}Phase 1: Damage Assessment}
+
+\begin{itemize}
+    \item \faIcon{desktop}\hspace{0.2em}Which systems were directly compromised?
+    \item \faIcon{cog}\hspace{0.2em}Were any configurations or programs modified?
+    \item \faIcon{database}\hspace{0.2em}Is historian data trustworthy?
+    \item \textcolor{danger}{\faIcon{database}}\hspace{0.2em} Are backups known to be clean?
+    \item \faIcon{calendar-alt}\hspace{0.2em}When was the initial compromise (dwell time)?
+\end{itemize}
+
+\posterwarning{
+\textbf{Backup integrity:} Attackers often persist by compromising backups. Verify: When was backup created relative to initial compromise? Has it been accessed/modified? Can you verify contents against known-good hashes?
+}
+
+\section{\textcolor{accent}{\faIcon{clipboard-check}}\hspace{0.4em}Phase 2: Recovery Planning}
+
+\subsection{\textcolor{accent}{\faIcon{sort-amount-down}}\hspace{0.3em}Priority Order}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{0.8cm}p{2.2cm}p{3.2cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{hashtag}\hspace{0.2em}\bfseries \#} & \textcolor{white}{\faIcon{server}\hspace{0.2em}\bfseries Systems} & \textcolor{white}{\faIcon{question-circle}\hspace{0.2em}\bfseries Rationale} \\
+\midrule
+1 & Safety systems & Must verify before any restart \\
+2 & Critical PLCs & Core process control \\
+3 & Primary HMIs & Operator visibility \\
+4 & Historians & Process monitoring \\
+5 & Eng. stations & Can operate without initially \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{undo}}\hspace{0.3em}Recovery Strategy}
+
+\begin{itemize}
+    \item \faIcon{hdd}\hspace{0.2em}\textbf{Restore from backup} -- Fastest if backups verified clean
+    \item \faIcon{tools}\hspace{0.2em}\textbf{Rebuild from scratch} -- Most thorough, time-consuming
+    \item \faIcon{puzzle-piece}\hspace{0.2em}\textbf{Hybrid approach} -- Rebuild critical, restore others
+    \item \faIcon{phone}\hspace{0.2em}\textbf{Vendor recovery} -- Engage vendor for complex systems
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{server}}\hspace{0.4em}Phase 3: System Rebuild}
+
+\subsection{\textcolor{accent}{\faIcon{cogs}}\hspace{0.3em}General Process}
+
+\begin{enumerate}
+    \item \faIcon{unlink}\hspace{0.2em}Disconnect system from all networks
+    \item \faIcon{eraser}\hspace{0.2em}Wipe or replace storage media
+    \item \faIcon{download}\hspace{0.2em}Install clean OS from verified media
+    \item \faIcon{shield-alt}\hspace{0.2em}Apply security patches and hardening
+    \item \faIcon{box}\hspace{0.2em}Install applications from verified sources
+    \item \faIcon{undo}\hspace{0.2em}Restore configurations from clean backups
+    \item \textcolor{warning}{\faIcon{key}}\hspace{0.2em} Change all credentials and keys
+    \item \faIcon{file-alt}\hspace{0.2em}Document all changes made
+\end{enumerate}
+
+\subsection{\textcolor{accent}{\faIcon{microchip}}\hspace{0.3em}PLC/Controller Recovery}
+
+\begin{enumerate}
+    \item \faIcon{search}\hspace{0.2em}Verify hardware integrity (no physical tampering)
+    \item \faIcon{redo}\hspace{0.2em}Factory reset controller if possible
+    \item \faIcon{download}\hspace{0.2em}Reload firmware from verified vendor source
+    \item \faIcon{microchip}\hspace{0.2em}Download verified-clean program
+    \item \faIcon{check-double}\hspace{0.2em}Verify program matches baseline (checksums)
+    \item \faIcon{flask}\hspace{0.2em}Test in simulation mode if available
+    \item \faIcon{plug}\hspace{0.2em}Reconnect I/O carefully, verifying signals
+\end{enumerate}
+
+\subsection{\textcolor{accent}{\faIcon{desktop}}\hspace{0.3em}HMI/SCADA Recovery}
+
+\begin{enumerate}
+    \item \faIcon{hdd}\hspace{0.2em}Rebuild OS from clean media
+    \item \faIcon{download}\hspace{0.2em}Install SCADA from verified installation files
+    \item \faIcon{folder-open}\hspace{0.2em}Restore project files from clean backup
+    \item \faIcon{tags}\hspace{0.2em}Verify tags and communications
+    \item \faIcon{flask}\hspace{0.2em}Test displays and controls in simulation
+    \item \faIcon{link}\hspace{0.2em}Reconnect to controllers one at a time
+\end{enumerate}
+
+\section{\textcolor{accent}{\faIcon{check-circle}}\hspace{0.4em}Phase 4: Validation}
+
+\subsection{\textcolor{accent}{\faIcon{hard-hat}}\hspace{0.3em}Safety System Verification}
+
+\posterdanger{
+\textbf{Mandatory:} Safety systems must be fully validated before process restart. This is non-negotiable regardless of production pressure. Verify SIS logic, test all safety functions, confirm voting logic, validate emergency shutdown sequences.
+}
+
+\subsection{\textcolor{accent}{\faIcon{vial}}\hspace{0.3em}Functional Testing}
+
+\begin{itemize}
+    \item \faIcon{sliders-h}\hspace{0.2em}Verify all I/O points read correctly
+    \item \faIcon{hand-paper}\hspace{0.2em}Test control loops in manual mode
+    \item \faIcon{crosshairs}\hspace{0.2em}Confirm setpoints and tuning parameters
+    \item \faIcon{bell}\hspace{0.2em}Validate alarm points and limits
+    \item \faIcon{lock}\hspace{0.2em}Test interlocks and permissives
+    \item \faIcon{desktop}\hspace{0.2em}Verify HMI displays match process state
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.3em}Security Verification}
+
+\begin{itemize}
+    \item \faIcon{key}\hspace{0.2em}Verify all credentials were changed
+    \item \faIcon{project-diagram}\hspace{0.2em}Confirm network segmentation is correct
+    \item \faIcon{shield-alt}\hspace{0.2em}Validate firewall rules are in place
+    \item \textcolor{info}{\faIcon{chart-line}}\hspace{0.2em} Check monitoring and logging is active
+    \item \faIcon{search}\hspace{0.2em}Scan for indicators of compromise
+    \item \faIcon{hdd}\hspace{0.2em}Verify backup systems are operational
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{play-circle}}\hspace{0.4em}Phase 5: Return to Operations}
+
+\postersuccess{
+\textbf{Staged startup:} Bring non-critical systems up first. Bring up one area at a time. Monitor closely for anomalies. Validate each stage before proceeding. Have rollback plan ready at each step.
+}
+
+\subsection{\textcolor{accent}{\faIcon{eye}}\hspace{0.3em}Enhanced Monitoring Period}
+
+\begin{itemize}
+    \item \faIcon{list-alt}\hspace{0.2em}Increased logging verbosity
+    \item \faIcon{search}\hspace{0.2em}More frequent security scans
+    \item \faIcon{users}\hspace{0.2em}Additional operator oversight
+    \item \faIcon{heartbeat}\hspace{0.2em}Regular system health checks
+    \item \faIcon{eye}\hspace{0.2em}Watching for signs of re-compromise
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{lightbulb}}\hspace{0.3em}Post-Recovery Activities}
+
+\begin{itemize}
+    \item \faIcon{lightbulb}\hspace{0.2em}Conduct lessons learned review
+    \item \faIcon{sync}\hspace{0.2em}Update recovery procedures based on experience
+    \item \faIcon{hdd}\hspace{0.2em}Create new verified-clean backups
+    \item \faIcon{list-alt}\hspace{0.2em}Update asset inventory
+    \item \faIcon{tools}\hspace{0.2em}Implement identified security improvements
+\end{itemize}
+
+\postertip{
+Recovery is \textbf{methodical, not fast}. Verify backup integrity before any restoration---attackers target backups too. Safety systems are validated first, always. Use staged startup: one system at a time, validated at each step. Change every credential---assume all are compromised. Enhanced monitoring after recovery catches re-compromise. Document everything and update procedures based on lessons learned.
+}
+
+\end{multicols}
+
+\end{document}

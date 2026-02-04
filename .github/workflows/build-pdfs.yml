@@ -31,6 +31,9 @@ jobs:
       - name: Build all PDFs
         run: make parallel
 
+      - name: Build posters
+        run: make posters-parallel || true
+
       - name: Collect PDFs and generate thumbnails
         run: |
           mkdir -p pdf-output
@@ -62,28 +65,64 @@ jobs:
           echo "ZIP:"
           ls -la pdf-output/*.zip
 
-      - name: Check page count (max 10 pages)
+      - name: Check page count (max 10 pages for docs, 1 page for posters)
         run: |
           MAX_PAGES=10
           FAILED=0
-          echo "📄 Checking document page counts (max: $MAX_PAGES pages)"
+          echo "📄 Checking document page counts"
           echo "================================================"
           for pdf in pdf-output/*.pdf; do
             filename=$(basename "$pdf")
             pages=$(pdfinfo "$pdf" | grep "^Pages:" | awk '{print $2}')
-            if [ "$pages" -gt "$MAX_PAGES" ]; then
-              echo "❌ FAIL: $filename has $pages pages (exceeds $MAX_PAGES)"
-              FAILED=1
+            if [[ "$filename" == *"-poster.pdf" ]]; then
+              # Posters must be exactly 1 page
+              if [ "$pages" -ne 1 ]; then
+                echo "❌ FAIL: $filename has $pages pages (posters must be 1 page)"
+                FAILED=1
+              else
+                echo "✅ OK: $filename ($pages page, poster)"
+              fi
             else
-              echo "✅ OK: $filename ($pages pages)"
+              if [ "$pages" -gt "$MAX_PAGES" ]; then
+                echo "❌ FAIL: $filename has $pages pages (exceeds $MAX_PAGES)"
+                FAILED=1
+              else
+                echo "✅ OK: $filename ($pages pages)"
+              fi
             fi
           done
           echo "================================================"
           if [ "$FAILED" -eq 1 ]; then
-            echo "::error::One or more documents exceed the $MAX_PAGES page limit. Please reduce content."
+            echo "::error::One or more documents/posters failed page count check."
             exit 1
           fi
-          echo "✅ All documents are within the $MAX_PAGES page limit."
+          echo "✅ All documents and posters pass page count checks."
+
+      - name: Check poster fill percentage (>= 85%)
+        run: |
+          echo "📋 Checking poster content fill"
+          echo "================================================"
+          python3 scripts/check-poster-fill.py --all pdf-output 85 || \
+            echo "::warning::Some posters are below 85% content fill threshold."
+          echo "================================================"
+
+      - name: Check for documents missing posters
+        run: |
+          echo "📋 Checking for missing posters"
+          echo "================================================"
+          MISSING=0
+          for dir in [0-9]*-*/[0-9]*-*/; do
+            if [ -f "${dir}document.tex" ] && [ ! -f "${dir}poster.tex" ]; then
+              echo "⚠️  MISSING: ${dir}poster.tex"
+              MISSING=$((MISSING + 1))
+            fi
+          done
+          if [ "$MISSING" -gt 0 ]; then
+            echo "::warning::$MISSING document(s) are missing poster.tex files."
+          else
+            echo "✅ All documents have poster.tex"
+          fi
+          echo "================================================"
 
       - name: Upload PDFs as artifact
         uses: actions/upload-artifact@v4
@@ -123,7 +162,8 @@ jobs:
 
       - name: Generate index page
         run: |
-          PDF_COUNT=$(ls public/*.pdf 2>/dev/null | wc -l)
+          PDF_COUNT=$(ls public/*.pdf 2>/dev/null | grep -v '\-poster\.pdf$' | wc -l)
+          POSTER_COUNT=$(ls public/*-poster.pdf 2>/dev/null | wc -l)
 
           cat > public/index.html << 'HTMLEOF'
           <!DOCTYPE html>
@@ -635,6 +675,17 @@ jobs:
                 border-color: #10b981;
                 color: #10b981;
               }
+              .doc-btn-poster {
+                background: rgba(139, 92, 246, 0.15);
+                border: 1px solid rgba(139, 92, 246, 0.3);
+                color: #a78bfa;
+              }
+              .doc-btn-poster:hover {
+                background: rgba(139, 92, 246, 0.3);
+                border-color: #8b5cf6;
+                color: #c4b5fd;
+                transform: translateY(-2px);
+              }
               .footer {
                 position: relative;
                 z-index: 1;
@@ -768,6 +819,7 @@ jobs:
               </p>
               <div class="badges">
                 <span class="badge">📄 PDF_COUNT Documents</span>
+                <span class="badge">📋 POSTER_COUNT Posters</span>
                 <span class="badge">📖 Under 10 pages each</span>
                 <span class="badge">⚖️ CC BY-SA 4.0</span>
                 <a href="https://github.com/mniedermaier/OTsecNotes" class="badge badge-github" target="_blank">⭐ <span id="star-count">GitHub</span></a>
@@ -821,7 +873,7 @@ jobs:
             category_name="${CATEGORIES[$range]}"
             category_icon="${ICONS[$range]}"
 
-            pdfs=$(ls public/*.pdf 2>/dev/null | xargs -I {} basename {} .pdf | grep -E "^[0-9]{3}-" | while read name; do
+            pdfs=$(ls public/*.pdf 2>/dev/null | xargs -I {} basename {} .pdf | grep -E "^[0-9]{3}-" | grep -v '\-poster$' | while read name; do
               num=${name%%-*}
               if [ "$num" -ge "$start" ] && [ "$num" -le "$end" ]; then
                 echo "$name"
@@ -840,8 +892,8 @@ jobs:
 
               echo "$pdfs" | while read pdf_name; do
                 doc_num=${pdf_name%%-*}
-                # Extract title from main.tex (first argument after \maketitlepage)
-                tex_file=$(find . -path "./[0-9]*-*/${pdf_name}/main.tex" -type f 2>/dev/null | head -1)
+                # Extract title from document.tex (first argument after \maketitlepage)
+                tex_file=$(find . -path "./[0-9]*-*/${pdf_name}/document.tex" -type f 2>/dev/null | head -1)
                 if [ -n "$tex_file" ]; then
                   # Extract title and unescape LaTeX special characters
                   title=$(grep -A1 '\\maketitlepage' "$tex_file" | tail -1 | sed 's/.*{\(.*\)}.*/\1/' | \
@@ -859,6 +911,10 @@ jobs:
                 echo "                  <div class=\"doc-actions\">" >> public/index.html
                 echo "                    <a href=\"viewer.html?file=${pdf_name}.pdf\" class=\"doc-btn doc-btn-view\">&#128065; View</a>" >> public/index.html
                 echo "                    <a href=\"${pdf_name}.pdf\" class=\"doc-btn doc-btn-download\" download>&#8595; PDF</a>" >> public/index.html
+                # Add poster button if poster PDF exists
+                if [ -f "public/${pdf_name}-poster.pdf" ]; then
+                  echo "                    <a href=\"viewer.html?file=${pdf_name}-poster.pdf\" class=\"doc-btn doc-btn-poster\">&#128203; Poster</a>" >> public/index.html
+                fi
                 echo "                  </div>" >> public/index.html
                 echo "                </li>" >> public/index.html
               done
@@ -1169,6 +1225,7 @@ jobs:
 
           sed -i "s/TIMESTAMP/$(date -u +'%Y-%m-%d %H:%M UTC')/g" public/index.html
           sed -i "s/PDF_COUNT/$PDF_COUNT/g" public/index.html
+          sed -i "s/POSTER_COUNT/$POSTER_COUNT/g" public/index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

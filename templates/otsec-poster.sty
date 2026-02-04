@@ -1,0 +1,329 @@
+% ============================================================================
+%  OT Security Poster Template - A4 Portrait Cheat Sheet Style
+%  Include this in poster documents with: \usepackage{otsec-poster}
+%  Requires: \documentclass[9pt,a4paper]{extarticle}
+% ============================================================================
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{otsec-poster}[2026/02/03 OT Security Poster Template]
+
+% Load the base template (inherits all colors, icons, badges)
+\RequirePackage{otsec-template}
+
+% Additional TikZ libraries for poster figures
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{positioning}
+
+% Multi-column layout
+\RequirePackage{multicol}
+
+% Float placement
+\RequirePackage{float}
+
+% Prevent column breaks between headings and their content
+\RequirePackage{needspace}
+
+% ============================================================================
+%  GEOMETRY OVERRIDE - A4 Landscape with tight margins
+% ============================================================================
+
+\geometry{
+    a4paper,
+    portrait,
+    top=2.8cm,
+    bottom=1.5cm,
+    left=1.2cm,
+    right=1.2cm
+}
+
+% No page numbers
+\pagenumbering{gobble}
+
+% ============================================================================
+%  HEADER/FOOTER OVERRIDE - Poster-specific branding
+% ============================================================================
+
+% Store poster metadata
+\newcommand{\@postertitle}{}
+\newcommand{\@postersubtitle}{}
+\newcommand{\@posterdocnum}{}
+\newcommand{\@postercontributor}{}
+
+% Remove default fancy header/footer from base template
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Adjust head/foot dimensions for poster
+\setlength{\headheight}{1.8cm}
+\setlength{\footskip}{1.2cm}
+
+% Poster header - dark navy bar with branding
+\fancyhead[L]{%
+    \begin{tikzpicture}[remember picture, overlay]
+        % Dark navy header bar
+        \fill[primary] (current page.north west) rectangle ([yshift=-1.8cm]current page.north east);
+        % Accent line below header
+        \fill[accent] ([yshift=-1.8cm]current page.north west) rectangle ([yshift=-1.9cm]current page.north east);
+        % Shield icon + "OT SECURITY NOTES" on left
+        \node[anchor=west, text=accentlight, font=\small\bfseries] at ([xshift=1.2cm, yshift=-0.9cm]current page.north west) {%
+            \faIcon{shield-alt}\hspace{0.3em}OT SECURITY NOTES%
+        };
+        % Title in center
+        \node[anchor=center, text=white, font=\large\bfseries] at ([yshift=-0.9cm]current page.north) {%
+            \@postertitle%
+        };
+        % Document number badge on right
+        \node[fill=accent, text=white, font=\small\bfseries, inner sep=5pt, rounded corners=3pt,
+              anchor=east] at ([xshift=-1.2cm, yshift=-0.9cm]current page.north east) {%
+            \@posterdocnum%
+        };
+    \end{tikzpicture}
+}
+
+% Poster footer - light gray bar with license and date
+\fancyfoot[C]{%
+    \begin{tikzpicture}[remember picture, overlay]
+        % Light gray footer bar
+        \fill[lightgray] (current page.south west) rectangle ([yshift=0.9cm]current page.south east);
+        % Accent line above footer
+        \draw[accent, line width=1.5pt] ([yshift=0.9cm]current page.south west) -- ([yshift=0.9cm]current page.south east);
+        % CC license on left (upper row)
+        \node[anchor=south west, text=mediumgray, font=\scriptsize] at ([xshift=1.2cm, yshift=0.38cm]current page.south west) {%
+            \faIcon{creative-commons}\hspace{0.2em}\faIcon{creative-commons-by}\hspace{0.2em}\faIcon{creative-commons-sa}\hspace{0.3em}CC BY-SA 4.0%
+        };
+        % AI assistance note on left (lower row)
+        \node[anchor=north west, text=mediumgray, font=\scriptsize] at ([xshift=1.2cm, yshift=0.38cm]current page.south west) {%
+            \faIcon{robot}\hspace{0.3em}Created with AI assistance%
+        };
+        % Contributor in center
+        \node[anchor=center, text=darkgray, font=\scriptsize] at ([yshift=0.45cm]current page.south) {%
+            \faIcon{user}\hspace{0.2em}\@postercontributor%
+        };
+        % Date on right
+        \node[anchor=east, text=mediumgray, font=\scriptsize] at ([xshift=-1.2cm, yshift=0.45cm]current page.south east) {%
+            \today%
+        };
+    \end{tikzpicture}
+}
+
+% ============================================================================
+%  TITLE COMMAND FOR POSTERS
+% ============================================================================
+
+% \makepostertitle{Title}{Subtitle}{Document Number}{Contributor}
+\newcommand{\makepostertitle}[4]{%
+    \renewcommand{\@postertitle}{#1}%
+    \renewcommand{\@postersubtitle}{#2}%
+    \renewcommand{\@posterdocnum}{#3}%
+    \renewcommand{\@postercontributor}{#4}%
+}
+
+% ============================================================================
+%  SECTION STYLING OVERRIDE - Compact for poster
+% ============================================================================
+
+\titleformat{\section}
+    {\normalfont\normalsize\bfseries\color{primary}}
+    {\colorbox{accent}{\parbox{0.8cm}{\centering\textcolor{white}{\small\thesection}}}}
+    {0.5em}
+    {}
+    [\vspace{-0.5em}\textcolor{accent}{\rule{\linewidth}{0.8pt}}]
+
+\titlespacing*{\section}{0pt}{1.8em}{0.3em}
+
+\titleformat{\subsection}
+    {\normalfont\small\bfseries\color{secondary}}
+    {\textcolor{accent}{\thesubsection}}
+    {0.4em}
+    {}
+
+\titlespacing*{\subsection}{0pt}{0.8em}{0.2em}
+
+\titleformat{\subsubsection}
+    {\normalfont\footnotesize\bfseries\color{darkgray}}
+    {\textcolor{mediumgray}{\thesubsubsection}}
+    {0.3em}
+    {}
+
+\titlespacing*{\subsubsection}{0pt}{0.3em}{0.1em}
+
+% Keep headings together with following content (prevent orphaned headings)
+\pretocmd{\section}{\needspace{5\baselineskip}}{}{}
+\pretocmd{\subsection}{\needspace{4\baselineskip}}{}{}
+\pretocmd{\subsubsection}{\needspace{3\baselineskip}}{}{}
+
+% ============================================================================
+%  COMPACT BOXES FOR POSTERS
+%  Uses tabular with colored left rule via \arrayrulecolor to create
+%  accent bars that are constrained to the box height (avoids vrule/colorbox
+%  bleeding issues inside multicols).
+% ============================================================================
+
+% Internal helper: #1=border color, #2=bg color, #3=icon+label, #4=content
+\newcommand{\@posterboxrender}[4]{%
+    \par\vspace{3pt}\noindent
+    \begingroup
+    \setlength{\arrayrulewidth}{2pt}%
+    \arrayrulecolor{#1}%
+    \begin{tabular}{@{}|@{\hspace{4pt}}p{\dimexpr\linewidth-6pt\relax}@{}}
+    \noindent #3\par\vspace{1pt}
+    #4
+    \end{tabular}%
+    \endgroup
+    \par\vspace{6pt}%
+}
+
+% Poster Info Box
+\newcommand{\posterinfo}[1]{%
+    \@posterboxrender{info}{info!5}{%
+        \textcolor{info}{\faIcon{info-circle}}\hspace{0.3em}\textbf{Info}%
+    }{#1}%
+}
+
+% Poster Warning Box
+\newcommand{\posterwarning}[1]{%
+    \@posterboxrender{warning}{warning!5}{%
+        \textcolor{warning}{\faIcon{exclamation-triangle}}\hspace{0.3em}\textbf{Warning}%
+    }{#1}%
+}
+
+% Poster Danger Box
+\newcommand{\posterdanger}[1]{%
+    \@posterboxrender{danger}{danger!5}{%
+        \textcolor{danger}{\faIcon{skull-crossbones}}\hspace{0.3em}\textbf{Critical}%
+    }{#1}%
+}
+
+% Poster Success Box
+\newcommand{\postersuccess}[1]{%
+    \@posterboxrender{success}{success!5}{%
+        \textcolor{success}{\faIcon{check-circle}}\hspace{0.3em}\textbf{Key Point}%
+    }{#1}%
+}
+
+% Poster Tip Box
+\newcommand{\postertip}[1]{%
+    \@posterboxrender{accent}{accent!5}{%
+        \textcolor{accent}{\faIcon{lightbulb}}\hspace{0.3em}\textbf{Tip}%
+    }{#1}%
+}
+
+% Poster Definition Box (takes a title argument)
+\newcommand{\posterdefinition}[2]{%
+    \@posterboxrender{primary}{primary!3}{%
+        \textcolor{primary}{\faIcon{book}}\hspace{0.3em}\textbf{#1}%
+    }{#2}%
+}
+
+% ============================================================================
+%  COMPACT LIST STYLING
+% ============================================================================
+
+\setlist[itemize]{
+    leftmargin=1.2em,
+    label=\textcolor{accent}{\faIcon{angle-right}},
+    itemsep=1pt,
+    parsep=0pt,
+    topsep=2pt,
+}
+
+\setlist[enumerate]{
+    leftmargin=1.5em,
+    itemsep=1pt,
+    parsep=0pt,
+    topsep=2pt,
+}
+
+% ============================================================================
+%  COMPACT TABLE STYLING
+% ============================================================================
+
+\renewcommand{\arraystretch}{1.1}
+\setlength{\extrarowheight}{1pt}
+
+% ============================================================================
+%  MULTICOL DEFAULTS
+% ============================================================================
+
+\setlength{\columnsep}{0.8cm}
+\setlength{\columnseprule}{0.4pt}
+\renewcommand{\columnseprulecolor}{\color{bordergray}}
+
+% ============================================================================
+%  PARAGRAPH SPACING
+% ============================================================================
+
+\setlength{\parskip}{0.2em}
+\setlength{\parindent}{0pt}
+
+% ============================================================================
+%  CONSISTENT FONT SIZE
+%  Set \small as the default content size for posters. Section titles
+%  explicitly use \normalsize so they remain slightly larger.
+%  Only TikZ annotations and footer chrome use \scriptsize.
+% ============================================================================
+
+\AtBeginDocument{\small}
+
+% ============================================================================
+%  TIKZ COLOR ALIASES FOR POSTER DIAGRAMS
+%  Define these once so individual posters don't need to repeat them.
+% ============================================================================
+
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+% ============================================================================
+%  REUSABLE TIKZ STYLE SETS FOR POSTER DIAGRAMS
+% ============================================================================
+
+% Style set: Protocol frame fields
+\tikzset{
+    framefield/.style={rectangle, draw=#1, thick, minimum height=0.65cm,
+        align=center, fill=#1!10, font=\scriptsize},
+    framefield/.default={otaccent},
+    framelabel/.style={font=\scriptsize, text=mediumgray},
+}
+
+% Style set: Numbered step flow (vertical)
+\tikzset{
+    flowstep/.style={rectangle, draw=#1!40, thick, fill=#1!5,
+        minimum height=0.5cm, rounded corners=2pt, font=\scriptsize,
+        text width=\dimexpr\linewidth-2cm\relax, align=left},
+    flowstep/.default={otaccent},
+    flownum/.style={circle, fill=#1, text=white, font=\scriptsize\bfseries,
+        minimum size=0.4cm, inner sep=0pt},
+    flownum/.default={otprimary},
+    flowline/.style={thick, #1!40},
+    flowline/.default={otaccent},
+}
+
+% Style set: Layered stack diagram
+\tikzset{
+    stacklayer/.style={rectangle, draw=#1!60, thick, fill=#1!15,
+        minimum width=6cm, minimum height=0.55cm, align=center, font=\scriptsize},
+    stacklayer/.default={otaccent},
+}
+
+% Style set: Zone/architecture boxes
+\tikzset{
+    zonebox/.style={rectangle, draw=#1!60, thick, fill=#1!10,
+        rounded corners=3pt, minimum height=0.6cm, align=center, font=\scriptsize},
+    zonebox/.default={otaccent},
+    zoneconnector/.style={->, thick, >=stealth, #1!60},
+    zoneconnector/.default={otaccent},
+}
+
+% Horizontal separator line
+\newcommand{\postersep}{%
+    \par\vspace{4pt}%
+    \noindent\textcolor{bordergray}{\rule{\linewidth}{0.4pt}}%
+    \par\vspace{4pt}%
+}
+
+\endinput

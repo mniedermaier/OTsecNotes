@@ -1,0 +1,212 @@
+% ============================================================================
+%  Modbus Protocol - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {Modbus Protocol}
+    {The Most Common Industrial Protocol}
+    {Poster 200}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+% ---- Column 1: Protocol Overview & Function Codes ----
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Protocol Overview}
+
+Modbus was developed by \textbf{Modicon in 1979} and is the most widely deployed industrial protocol. Its simplicity and openness made it the de facto standard for connecting PLCs, sensors, and actuators.
+
+\subsection{\textcolor{accent}{\faIcon{code-branch}}\hspace{0.3em}Variants}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{1.8cm}p{3.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Variant} & \textcolor{white}{\bfseries Medium} & \textcolor{white}{\bfseries Notes} \\
+\midrule
+Modbus RTU & Serial & Binary, most common serial \\
+Modbus ASCII & Serial & Human-readable, slower \\
+Modbus TCP & Ethernet & Port 502, most common \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{project-diagram}}\hspace{0.3em}Architecture}
+
+\begin{center}
+\begin{tikzpicture}[
+    dev/.style={rectangle, draw=#1, thick, fill=#1!10, rounded corners=2pt,
+                minimum height=0.55cm, align=center, font=\scriptsize},
+    dev/.default={otaccent}
+]
+    \node[dev=otprimary, minimum width=2.8cm] (master) at (0,0) {\faIcon{desktop}\hspace{0.2em}\textbf{Master / Client}};
+    \node[dev, minimum width=1.4cm] (s1) at (-2.2,-1.5) {\faIcon{microchip} Slave 1};
+    \node[dev, minimum width=1.4cm] (s2) at (0,-1.5) {\faIcon{microchip} Slave 2};
+    \node[dev, minimum width=1.4cm] (s3) at (2.2,-1.5) {\faIcon{microchip} Slave N};
+    \draw[->, thick, >=stealth, otprimary!70] (master.south) -- (s1.north);
+    \draw[->, thick, >=stealth, otprimary!70] (master.south) -- (s2.north);
+    \draw[->, thick, >=stealth, otprimary!70] (master.south) -- (s3.north);
+    \node[font=\scriptsize, text=otprimary] at (-2.6,-0.6) {Req};
+    \draw[->, thick, >=stealth, otsuccess!70, dashed] (s3.north) -- ([xshift=3pt]master.south east);
+    \node[font=\scriptsize, text=otsuccess] at (2.6,-0.6) {Resp};
+\end{tikzpicture}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{table}}\hspace{0.3em}Data Model}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.5cm}p{1.2cm}p{3.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Type} & \textcolor{white}{\bfseries Access} & \textcolor{white}{\bfseries Typical Use} \\
+\midrule
+Coils (1 bit) & R/W & Digital outputs (relays) \\
+Discrete Inputs & R & Digital inputs (switches) \\
+Holding Regs (16b) & R/W & Setpoints, config values \\
+Input Regs (16b) & R & Analog measurements \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{list-ul}}\hspace{0.4em}Function Codes}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{0.8cm}p{3.5cm}p{2.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Code} & \textcolor{white}{\faIcon{exchange-alt}\hspace{0.2em}\bfseries Function} & \textcolor{white}{\faIcon{shield-alt}\hspace{0.2em}\bfseries Risk} \\
+\midrule
+0x01 & Read Coils & \risklow \\
+0x03 & Read Holding Registers & \risklow \\
+0x05 & Write Single Coil & \riskcritical \\
+0x06 & Write Single Register & \riskcritical \\
+0x0F & Write Multiple Coils & \riskcritical \\
+0x10 & Write Multiple Registers & \riskcritical \\
+0x08 & Diagnostics & \riskhigh \\
+0x2B & Device Identification & \riskmedium \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{stream}}\hspace{0.3em}Modbus TCP Frame}
+
+\begin{center}
+\begin{tikzpicture}[
+    field/.style={rectangle, draw=otaccent, thick, minimum height=0.7cm, align=center,
+                  fill=otaccent!10},
+    label/.style={font=\scriptsize, text=mediumgray}
+]
+    \node[field, minimum width=1.2cm] (tid) at (0,0) {Trans ID};
+    \node[field, minimum width=1.2cm, right=0pt of tid] (pid) {Proto ID};
+    \node[field, minimum width=1cm, right=0pt of pid] (len) {Length};
+    \node[field, minimum width=0.8cm, right=0pt of len, fill=otwarning!15, draw=otwarning] (uid) {Unit};
+    \node[field, minimum width=0.8cm, right=0pt of uid, fill=otdanger!15, draw=otdanger] (fc) {FC};
+    \node[field, minimum width=1.5cm, right=0pt of fc, fill=otinfo!15, draw=otinfo] (data) {Data};
+
+    \node[label, below=2pt of tid] {2 bytes};
+    \node[label, below=2pt of pid] {2 bytes};
+    \node[label, below=2pt of len] {2 bytes};
+    \node[label, below=2pt of uid] {1 byte};
+    \node[label, below=2pt of fc] {1 byte};
+    \node[label, below=2pt of data] {N bytes};
+
+    \draw[decorate, decoration={brace, amplitude=4pt, mirror}, thick, otaccent]
+        ([yshift=-0.55cm]tid.south west) -- ([yshift=-0.55cm]len.south east)
+        node[midway, below=5pt, font=\scriptsize, text=otaccent] {MBAP Header};
+
+    \draw[decorate, decoration={brace, amplitude=4pt, mirror}, thick, otdanger]
+        ([yshift=-0.55cm]uid.south west) -- ([yshift=-0.55cm]data.south east)
+        node[midway, below=5pt, font=\scriptsize, text=otdanger] {PDU};
+\end{tikzpicture}
+\end{center}
+
+\posterinfo{
+Default port: \textbf{TCP/502}. Protocol ID is always \texttt{0x0000} for Modbus. Errors return FC + \texttt{0x80} with exception code.
+}
+
+% ---- Column 2: Security ----
+
+\section{\textcolor{accent}{\faIcon{exclamation-triangle}}\hspace{0.4em}Security Concerns}
+
+\posterdanger{
+\textbf{No built-in security:}
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{unlock}}\hspace{0.2em}No authentication -- any client can connect
+    \item \textcolor{danger}{\faIcon{eye-slash}}\hspace{0.2em}No encryption -- all data in plaintext
+    \item \textcolor{danger}{\faIcon{pen}}\hspace{0.2em}No integrity checking -- packets modifiable
+    \item \textcolor{danger}{\faIcon{user-slash}}\hspace{0.2em}No authorization for function codes
+\end{itemize}
+}
+
+\subsection{\textcolor{accent}{\faIcon{crosshairs}}\hspace{0.3em}Common Attack Vectors}
+
+\begin{enumerate}
+    \item \textcolor{accent}{\faIcon{search}}\hspace{0.2em}\textbf{Reconnaissance} -- Scan port 502, enumerate slaves
+    \item \textcolor{accent}{\faIcon{headphones}}\hspace{0.2em}\textbf{Eavesdropping} -- Capture process data in transit
+    \item \textcolor{accent}{\faIcon{redo}}\hspace{0.2em}\textbf{Replay attacks} -- Record \& replay valid commands
+    \item \textcolor{accent}{\faIcon{syringe}}\hspace{0.2em}\textbf{Command injection} -- Send unauthorized writes
+    \item \textcolor{accent}{\faIcon{bomb}}\hspace{0.2em}\textbf{Denial of Service} -- Flood with requests
+    \item \textcolor{accent}{\faIcon{user-secret}}\hspace{0.2em}\textbf{Man-in-the-Middle} -- Intercept and modify
+\end{enumerate}
+
+\posterwarning{
+\textbf{Attack example:} A 12-byte packet can turn on a coil: \texttt{00\,01\,00\,00\,00\,06\,01\,05\,00\,00\,FF\,00}. No credentials required.
+}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Mitigations}
+
+\postersuccess{
+\textbf{Key defenses:}
+\begin{itemize}
+    \item \textcolor{success}{\faIcon{project-diagram}}\hspace{0.2em}Network segmentation (dedicated VLANs)
+    \item \textcolor{success}{\faIcon{filter}}\hspace{0.2em}Firewall rules restricting port 502 access
+    \item \textcolor{success}{\faIcon{search}}\hspace{0.2em}Deep packet inspection (filter function codes)
+    \item \textcolor{success}{\faIcon{lock}}\hspace{0.2em}VPN/TLS tunnels for encrypted transport
+    \item \textcolor{success}{\faIcon{power-off}}\hspace{0.2em}Disable unused Modbus services
+\end{itemize}
+}
+
+\subsection{\textcolor{accent}{\faIcon{eye}}\hspace{0.3em}Monitoring \& Detection}
+
+\begin{itemize}
+    \item \faIcon{chart-line}\hspace{0.2em}Baseline normal Modbus traffic patterns
+    \item \faIcon{bell}\hspace{0.2em}Alert on unexpected function codes or addresses
+    \item \faIcon{tachometer-alt}\hspace{0.2em}Detect scanning and flooding attempts
+    \item \faIcon{clipboard-list}\hspace{0.2em}Log all Modbus transactions for forensics
+    \item \faIcon{shield-alt}\hspace{0.2em}Deploy OT-aware IDS (e.g., Suricata with ET rules)
+\end{itemize}
+
+\postertip{
+The Modbus Security extension (TLS + RBAC) exists but adoption is limited due to legacy constraints. Compensating controls remain the primary defense strategy.
+}
+
+\section{\textcolor{accent}{\faIcon{wrench}}\hspace{0.4em}Quick Reference}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.5cm}p{2cm}p{2.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Type} & \textcolor{white}{\bfseries Range} & \textcolor{white}{\bfseries Prefix} \\
+\midrule
+Coils & 00001--09999 & 0xxxx \\
+Discrete Inputs & 10001--19999 & 1xxxx \\
+Input Registers & 30001--39999 & 3xxxx \\
+Holding Registers & 40001--49999 & 4xxxx \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{toolbox}}\hspace{0.3em}Common Tools}
+
+\begin{itemize}
+    \item \faIcon{binoculars}\hspace{0.2em}\textbf{Wireshark} -- Modbus TCP/RTU dissector
+    \item \faIcon{terminal}\hspace{0.2em}\textbf{mbtget} -- CLI Modbus/TCP client
+    \item \faIcon{server}\hspace{0.2em}\textbf{ModRSsim2} -- Slave simulator
+    \item \faIcon{crosshairs}\hspace{0.2em}\textbf{Nmap} -- \texttt{modbus-discover} script
+\end{itemize}
+
+\end{multicols}
+
+\end{document}

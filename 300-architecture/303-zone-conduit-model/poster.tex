@@ -1,0 +1,180 @@
+% ============================================================================
+%  Zone and Conduit Model - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {Zone \& Conduit Model}
+    {IEC 62443 Network Segmentation Architecture}
+    {Poster 303}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{map}}\hspace{0.4em}Overview}
+
+The Zone and Conduit Model is the \textbf{foundational architecture concept in IEC 62443} for segmenting industrial control systems. It groups assets by security requirements and controls communication between groups through defined paths.
+
+\posterinfo{
+\faIcon{key}\hspace{0.2em}\textbf{Key principles:} Group assets with similar security requirements into \textbf{zones}. Control all communication through \textbf{conduits}. Assign Security Levels (SL) to each zone based on risk.
+}
+
+\section{\textcolor{accent}{\faIcon{cubes}}\hspace{0.4em}Zones}
+
+A zone is a grouping of logical or physical assets that share common security requirements. All assets within a zone have the \textbf{same Security Level target}.
+
+\begin{itemize}
+    \item \faIcon{border-all}\hspace{0.2em}\textbf{Clear boundary} -- Defined perimeter with controlled entry/exit
+    \item \faIcon{sliders-h}\hspace{0.2em}\textbf{Common SL} -- All assets share target Security Level
+    \item \faIcon{handshake}\hspace{0.2em}\textbf{Trust relationship} -- Assets within zone trust each other
+    \item \faIcon{user-shield}\hspace{0.2em}\textbf{Managed independently} -- Each zone has defined ownership
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{layer-group}}\hspace{0.3em}Common Zone Types}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{1cm}p{3.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Zone} & \textcolor{white}{\bfseries SL} & \textcolor{white}{\bfseries Contents} \\
+\midrule
+\faIcon{building}\hspace{0.2em}Enterprise & \slone & IT, ERP, email, internet \\
+\faIcon{server}\hspace{0.2em}IDMZ & \sltwo & Historians, jump hosts \\
+\faIcon{desktop}\hspace{0.2em}Manufacturing & \sltwo & HMI, eng. workstations \\
+\faIcon{microchip}\hspace{0.2em}Control & \sltwo--\slthree & PLCs, RTUs, DCS \\
+\faIcon{hard-hat}\hspace{0.2em}Safety & \slthree--\slfour & SIS, emergency shutdown \\
+\faIcon{cog}\hspace{0.2em}Field & \slone--\sltwo & Sensors, actuators \\
+\end{tabular}
+\end{center}
+
+\posterwarning{
+\faIcon{ruler}\hspace{0.2em}\textbf{Zone sizing:} Too large = broad attack surface. Too small = excessive complexity. Right size = based on function, criticality, and connectivity.
+}
+
+\subsection{\textcolor{accent}{\faIcon{project-diagram}}\hspace{0.3em}Zone \& Conduit Architecture}
+
+\begin{center}
+\begin{tikzpicture}[
+    box/.style={rectangle, draw=#1!70, thick, fill=#1!8, rounded corners=3pt,
+        minimum width=5.5cm, minimum height=0.5cm, align=center, font=\scriptsize},
+    flowarrow/.style={<->, thick, >=stealth, otaccent!70},
+]
+    \node[box=otdanger] (enterprise) at (0,0) {\faIcon{building}\hspace{0.2em}\textbf{Enterprise} (SL 1)};
+    \node[box=otprimary] (c1) at (0,-0.75) {\faIcon{shield-alt}\hspace{0.2em}Conduit -- FW/IDS};
+    \node[box=otsuccess] (mfg) at (0,-1.5) {\faIcon{microchip}\hspace{0.2em}\textbf{Manufacturing} (SL 2--3)};
+    \node[box=otprimary] (c2) at (0,-2.25) {\faIcon{shield-alt}\hspace{0.2em}Conduit -- Data Diode};
+    \node[box=otinfo] (safety) at (0,-3.0) {\faIcon{hard-hat}\hspace{0.2em}\textbf{Safety} (SL 3--4)};
+    \draw[flowarrow] (enterprise.south) -- (c1.north);
+    \draw[flowarrow] (c1.south) -- (mfg.north);
+    \draw[flowarrow] (mfg.south) -- (c2.north);
+    \draw[flowarrow] (c2.south) -- (safety.north);
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{exchange-alt}}\hspace{0.4em}Conduits}
+
+A conduit is a logical grouping of communication channels connecting two or more zones, with defined security controls.
+
+\begin{itemize}
+    \item \faIcon{route}\hspace{0.2em}\textbf{Controlled path} -- All traffic flows through conduits
+    \item \faIcon{shield-alt}\hspace{0.2em}\textbf{Security controls} -- Firewalls, data diodes, proxies
+    \item \faIcon{file-contract}\hspace{0.2em}\textbf{Defined protocols} -- Only approved communication
+    \item \faIcon{eye}\hspace{0.2em}\textbf{Monitored} -- Traffic logged and inspected
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.3em}Conduit Security Controls}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Control} & \textcolor{white}{\bfseries Description} \\
+\midrule
+\faIcon{filter}\hspace{0.2em}Firewall & Stateful filtering, app awareness \\
+\faIcon{long-arrow-alt-right}\hspace{0.2em}Data Diode & Hardware unidirectional flow \\
+\faIcon{laptop}\hspace{0.2em}Jump Server & Controlled admin access \\
+\faIcon{random}\hspace{0.2em}Protocol Proxy & Break, inspect, translate \\
+\faIcon{lock}\hspace{0.2em}VPN Gateway & Encrypted remote tunnel \\
+\faIcon{search}\hspace{0.2em}IDS/IPS & Traffic inspection, detection \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{sliders-h}}\hspace{0.3em}Conduit SL Requirements}
+
+The conduit must meet the \textbf{higher} SL of the two connected zones:
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.5cm}p{1.5cm}p{2cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Zone A} & \textcolor{white}{\bfseries Zone B} & \textcolor{white}{\bfseries Conduit SL} \\
+\midrule
+\slone & \sltwo & \sltwo \\
+\sltwo & \slthree & \slthree \\
+\slthree & \slfour & \slfour \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{tasks}}\hspace{0.4em}Implementation Steps}
+
+\begin{enumerate}
+    \item \faIcon{list-alt}\hspace{0.2em}\textbf{Asset inventory} -- Identify all IACS assets
+    \item \faIcon{object-group}\hspace{0.2em}\textbf{Group by function} -- Cluster by operational role
+    \item \faIcon{project-diagram}\hspace{0.2em}\textbf{Identify dependencies} -- Map communication needs
+    \item \faIcon{border-all}\hspace{0.2em}\textbf{Define zone boundaries} -- Logical/physical perimeters
+    \item \faIcon{sliders-h}\hspace{0.2em}\textbf{Assign Security Levels} -- Based on risk assessment
+    \item \faIcon{exchange-alt}\hspace{0.2em}\textbf{Design conduits} -- Define allowed flows
+    \item \faIcon{shield-alt}\hspace{0.2em}\textbf{Implement controls} -- Deploy firewalls, monitoring
+    \item \faIcon{check-double}\hspace{0.2em}\textbf{Validate \& document} -- Test isolation, maintain diagrams
+\end{enumerate}
+
+\section{\textcolor{accent}{\faIcon{filter}}\hspace{0.4em}Conduit Rule Design}
+
+\postersuccess{
+\faIcon{ban}\hspace{0.2em}\textbf{Default deny:} Every conduit must have explicitly defined rules -- permitted protocols/ports, source/destination addresses, data flow direction, and authentication requirements.
+}
+
+\subsection{\textcolor{accent}{\faIcon{table}}\hspace{0.3em}Example Conduit Rules}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.2cm}p{1.5cm}p{1.5cm}p{2.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Action} & \textcolor{white}{\bfseries Source} & \textcolor{white}{\bfseries Dest} & \textcolor{white}{\bfseries Service} \\
+\midrule
+\textcolor{success}{\faIcon{check}} & MFG & DMZ & Historian (1433) \\
+\textcolor{success}{\faIcon{check}} & DMZ & MFG & Patch (445) \\
+\textcolor{success}{\faIcon{check}} & MFG & CTRL & OPC UA (4840) \\
+\textcolor{danger}{\faIcon{times}} & Any & Any & All \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{file-alt}}\hspace{0.4em}Zone Documentation}
+
+Each zone requires: \textbf{Asset inventory}, \textbf{Target SL} and current (achieved) SL, \textbf{Zone owner}, \textbf{Connected conduits} and their rules, \textbf{Risk assessment} results.
+
+\section{\textcolor{accent}{\faIcon{exclamation-circle}}\hspace{0.4em}Common Mistakes}
+
+\posterdanger{
+\textbf{Anti-patterns:}
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{times}}\hspace{0.2em}Flat networks with no segmentation
+    \item \textcolor{danger}{\faIcon{times}}\hspace{0.2em}Single firewall between IT and all of OT
+    \item \textcolor{danger}{\faIcon{times}}\hspace{0.2em}Conduits with ``allow all'' rules
+    \item \textcolor{danger}{\faIcon{times}}\hspace{0.2em}Mixing different SL requirements in one zone
+    \item \textcolor{danger}{\faIcon{times}}\hspace{0.2em}Undocumented connections
+\end{itemize}
+}
+
+\postertip{
+The zone and conduit model from \textbf{IEC 62443-3-2} is the standard for OT network design. Start with existing diagrams, identify natural boundaries, and review annually.
+}
+
+\end{multicols}
+
+\end{document}

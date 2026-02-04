@@ -1,0 +1,169 @@
+% ============================================================================
+%  OT Asset Discovery - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {OT Asset Discovery}
+    {Building and Maintaining an Industrial Asset Inventory}
+    {Poster 510}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+Asset discovery and inventory management is the \textbf{foundation of any OT security program}. You cannot protect assets you don't know exist, and you cannot assess risk without understanding what systems are in your environment.
+
+\posterinfo{
+Industry reports indicate that organizations commonly \textbf{underestimate their OT asset count by 30--50\%}. Unknown assets represent unmanaged risk and potential attack vectors.
+}
+
+\subsection{\textcolor{accent}{\faIcon{clipboard-list}}\hspace{0.3em}Why Asset Inventory Matters}
+
+\begin{itemize}
+    \item \faIcon{tools}\hspace{0.2em}\textbf{Vulnerability management} -- Know what needs patching
+    \item \faIcon{balance-scale}\hspace{0.2em}\textbf{Risk assessment} -- Understand exposure and criticality
+    \item \textcolor{danger}{\faIcon{ambulance}}\hspace{0.2em}\textbf{Incident response} -- Identify affected systems quickly
+    \item \faIcon{gavel}\hspace{0.2em}\textbf{Compliance} -- Required by IEC 62443, NERC CIP
+    \item \faIcon{sync}\hspace{0.2em}\textbf{Change management} -- Baseline for detecting changes
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{search}}\hspace{0.4em}Discovery Methods}
+
+\subsection{\textcolor{accent}{\faIcon{eye}}\hspace{0.3em}Passive Discovery (Preferred)}
+
+\begin{itemize}
+    \item \textcolor{info}{\faIcon{network-wired}}\hspace{0.2em}Network traffic analysis via SPAN ports and TAPs
+    \item \faIcon{fingerprint}\hspace{0.2em}Protocol fingerprinting from observed communications
+    \item \faIcon{file-alt}\hspace{0.2em}DHCP and DNS log analysis
+    \item \faIcon{table}\hspace{0.2em}Switch CAM table queries (low risk)
+\end{itemize}
+
+\posterdanger{
+\textbf{Active scanning risks:} May crash legacy PLCs and controllers, trigger safety system responses, or disrupt real-time communications. Only perform during maintenance windows with OT-aware tools and rate limiting.
+}
+
+\subsection{\textcolor{accent}{\faIcon{clipboard-check}}\hspace{0.3em}Manual Methods}
+
+\begin{itemize}
+    \item \faIcon{walking}\hspace{0.2em}\textbf{Physical walkdowns} -- Visually inspect and document equipment
+    \item \faIcon{file-alt}\hspace{0.2em}\textbf{Documentation review} -- Network diagrams, as-built drawings
+    \item \faIcon{handshake}\hspace{0.2em}\textbf{Vendor records} -- Maintenance contracts, support agreements
+    \item \faIcon{users}\hspace{0.2em}\textbf{Staff interviews} -- Operations and maintenance knowledge
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{list-ul}}\hspace{0.4em}Essential Asset Attributes}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{tag}\hspace{0.2em}\bfseries Attribute} & \textcolor{white}{\faIcon{align-left}\hspace{0.2em}\bfseries Description} \\
+\midrule
+Device Name/ID & Unique identifier for the asset \\
+IP/MAC Address & Network identifiers \\
+Device Type & PLC, HMI, Switch, Server, etc. \\
+Vendor/Model & Manufacturer and model number \\
+FW/OS Version & For vulnerability matching \\
+Location & Physical and logical (Purdue level) \\
+Function & Role in process (criticality) \\
+Owner & Responsible person/department \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.3em}Security-Relevant Attributes}
+
+\begin{itemize}
+    \item \faIcon{plug}\hspace{0.2em}\textbf{Connectivity} -- What can it communicate with?
+    \item \faIcon{code}\hspace{0.2em}\textbf{Protocols} -- Modbus, OPC, EtherNet/IP, etc.
+    \item \textcolor{warning}{\faIcon{key}}\hspace{0.2em}\textbf{Authentication} -- Does it support/require auth?
+    \item \faIcon{tools}\hspace{0.2em}\textbf{Patch status} -- Last update, available patches
+    \item \faIcon{calendar-alt}\hspace{0.2em}\textbf{EOL status} -- Vendor support availability
+    \item \faIcon{hdd}\hspace{0.2em}\textbf{Backup status} -- Configuration backup available?
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{database}}\hspace{0.4em}Inventory Management}
+
+\subsection{\textcolor{accent}{\faIcon{sitemap}}\hspace{0.3em}Building Initial Baseline}
+
+\begin{enumerate}
+    \item \faIcon{eye}\hspace{0.2em}Deploy passive monitoring on key network segments
+    \item \faIcon{walking}\hspace{0.2em}Conduct physical walkdowns of critical areas
+    \item \faIcon{file-alt}\hspace{0.2em}Review existing documentation and diagrams
+    \item \faIcon{compress-arrows-alt}\hspace{0.2em}Merge and deduplicate discovered assets
+    \item \faIcon{user-check}\hspace{0.2em}Validate with operations and engineering staff
+\end{enumerate}
+
+\subsection{\textcolor{accent}{\faIcon{sync-alt}}\hspace{0.3em}Ongoing Maintenance}
+
+\begin{itemize}
+    \item \faIcon{broadcast-tower}\hspace{0.2em}\textbf{Continuous monitoring} -- Detect new devices automatically
+    \item \faIcon{clipboard-check}\hspace{0.2em}\textbf{Change management} -- Update on approved changes
+    \item \faIcon{calendar-alt}\hspace{0.2em}\textbf{Periodic reviews} -- Quarterly validation with stakeholders
+    \item \textcolor{info}{\faIcon{exchange-alt}}\hspace{0.2em}\textbf{Reconciliation} -- Compare discovered vs documented
+\end{itemize}
+
+\posterwarning{
+\textbf{Common challenges:} Shadow OT (unauthorized devices), transient devices (vendor laptops), legacy undocumented equipment, serial devices not visible on IP networks, and air-gapped systems requiring manual discovery.
+}
+
+\section{\textcolor{accent}{\faIcon{exclamation-triangle}}\hspace{0.4em}Criticality Assessment}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.5cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{layer-group}\hspace{0.2em}\bfseries Level} & \textcolor{white}{\faIcon{align-left}\hspace{0.2em}\bfseries Description} \\
+\midrule
+Critical & Safety systems, emergency shutdown, life safety \\
+High & Core process control, production-critical \\
+Medium & Supporting systems, historians, non-critical HMIs \\
+Low & Monitoring only, easily replaceable \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{balance-scale}}\hspace{0.3em}Classification Criteria}
+
+Assess each asset based on:
+
+\begin{itemize}
+    \item \faIcon{hard-hat}\hspace{0.2em}\textbf{Safety impact} -- Could failure cause injury?
+    \item \faIcon{industry}\hspace{0.2em}\textbf{Process impact} -- Effect on production if unavailable
+    \item \faIcon{clock}\hspace{0.2em}\textbf{Recovery time} -- How long to restore or replace?
+    \item \faIcon{lock}\hspace{0.2em}\textbf{Data sensitivity} -- Confidential process information?
+    \item \faIcon{network-wired}\hspace{0.2em}\textbf{Connectivity} -- Exposure to other networks
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{plug}}\hspace{0.4em}Integration Points}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{cogs}\hspace{0.2em}\bfseries System} & \textcolor{white}{\faIcon{link}\hspace{0.2em}\bfseries Integration Purpose} \\
+\midrule
+Vuln. management & Match assets to CVEs \\
+SIEM/SOC & Provide context for alerts \\
+CMDB & Enterprise config management \\
+Backup systems & Ensure configs backed up \\
+Incident response & Rapid asset lookup \\
+\end{tabular}
+\end{center}
+
+\postersuccess{
+\textbf{Compliance alignment:} IEC 62443-2-1 requires asset inventory as part of the security management system. NERC CIP requires identification of BES Cyber Systems. NIST SP 800-82 recommends comprehensive OT asset management. A complete inventory is the starting point for all these frameworks.
+}
+
+\postertip{
+Start with passive network monitoring at IT/OT boundaries combined with physical walkdowns of critical areas. Prioritize \textbf{completeness over perfection}---a rough inventory is better than none. Classify assets by criticality, integrate with vulnerability management, and establish continuous monitoring to keep the inventory current. Asset inventory is required by IEC 62443, NERC CIP, and most OT security frameworks.
+}
+
+\end{multicols}
+
+\end{document}

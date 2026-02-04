@@ -1,0 +1,186 @@
+% ============================================================================
+%  OT Terminology - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {OT Terminology}
+    {Essential Terms and Acronyms for OT Security}
+    {Poster 050}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{sitemap}}\hspace{0.4em}OT Architecture Overview}
+
+\begin{center}
+\begin{tikzpicture}[
+    sys/.style={rectangle, draw=#1!60, thick, fill=#1!12, rounded corners=2pt,
+        minimum height=0.4cm, align=center, font=\scriptsize},
+    sys/.default={otaccent},
+    conn/.style={-, thick, #1!40},
+    conn/.default={otaccent},
+]
+    % Level labels
+    \node[font=\scriptsize, text=mediumgray] at (-3.2,1.6) {L3};
+    \node[font=\scriptsize, text=mediumgray] at (-3.2,0.7) {L2};
+    \node[font=\scriptsize, text=mediumgray] at (-3.2,-0.2) {L1};
+    \node[font=\scriptsize, text=mediumgray] at (-3.2,-1.1) {L0};
+
+    % L3 - Historians, MES
+    \node[sys=otsuccess, minimum width=1.6cm] (hist) at (-1.2,1.6) {\faIcon{database}\hspace{0.1em}Historian};
+    \node[sys=otsuccess, minimum width=1.6cm] (mes) at (1.2,1.6) {\faIcon{server}\hspace{0.1em}MES};
+    \node[sys=otsuccess, minimum width=1.6cm] (opc) at (3.2,1.6) {\faIcon{exchange-alt}\hspace{0.1em}OPC};
+
+    % L2 - HMI, SCADA
+    \node[sys=otinfo, minimum width=1.6cm] (hmi) at (-1.2,0.7) {\faIcon{desktop}\hspace{0.1em}HMI};
+    \node[sys=otinfo, minimum width=1.6cm] (scada) at (1.2,0.7) {\faIcon{tv}\hspace{0.1em}SCADA};
+    \node[sys=otwarning, minimum width=1.6cm] (sis) at (3.2,0.7) {\faIcon{hard-hat}\hspace{0.1em}SIS};
+
+    % L1 - Controllers
+    \node[sys=otaccent, minimum width=1.2cm] (plc1) at (-1.5,-0.2) {\faIcon{microchip}\hspace{0.1em}PLC};
+    \node[sys=otaccent, minimum width=1.2cm] (plc2) at (0.3,-0.2) {\faIcon{microchip}\hspace{0.1em}DCS};
+    \node[sys=otaccent, minimum width=1.4cm] (rtu) at (2.2,-0.2) {\faIcon{broadcast-tower}\hspace{0.1em}RTU};
+
+    % L0 - Field
+    \node[sys=otprimary, minimum width=1.2cm] (sen) at (-1.5,-1.1) {\faIcon{thermometer-half}\hspace{0.1em}Sensors};
+    \node[sys=otprimary, minimum width=1.3cm] (act) at (0.5,-1.1) {\faIcon{cog}\hspace{0.1em}Actuators};
+    \node[sys=otprimary, minimum width=1.2cm] (vfd) at (2.5,-1.1) {\faIcon{tachometer-alt}\hspace{0.1em}VFD};
+
+    % Connections
+    \draw[conn=otsuccess] (hist) -- (hmi);
+    \draw[conn=otsuccess] (mes) -- (scada);
+    \draw[conn=otinfo] (hmi) -- (plc1);
+    \draw[conn=otinfo] (scada) -- (plc2);
+    \draw[conn=otinfo] (scada) -- (rtu);
+    \draw[conn=otaccent] (plc1) -- (sen);
+    \draw[conn=otaccent] (plc2) -- (act);
+    \draw[conn=otaccent] (rtu) -- (vfd);
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{book}}\hspace{0.4em}Core OT Systems}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1cm}p{2.5cm}p{3.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Abbr.} & \textcolor{white}{\bfseries Full Name} & \textcolor{white}{\bfseries Description} \\
+\midrule
+SCADA & Supervisory Control \& Data Acquisition & Remote monitoring of distributed assets \\
+DCS & Distributed Control System & Integrated control for continuous processes \\
+PLC & Programmable Logic Controller & Ruggedized controller for automation \\
+RTU & Remote Terminal Unit & Field device interfacing sensors/SCADA \\
+IED & Intelligent Electronic Device & Smart device in power systems \\
+HMI & Human-Machine Interface & Operator visualization and control \\
+SIS & Safety Instrumented System & Independent safety protection \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{network-wired}}\hspace{0.4em}Network \& Communication}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.5cm}p{5.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Term} & \textcolor{white}{\bfseries Definition} \\
+\midrule
+OT Network & Network connecting industrial control systems \\
+Air Gap & Physical isolation with no external connections \\
+DMZ & Buffer zone between IT and OT networks \\
+Conduit & Communication path between zones (IEC 62443) \\
+Zone & Asset group with common security requirements \\
+Fieldbus & Industrial network connecting field devices \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{exchange-alt}}\hspace{0.3em}Industrial Protocols}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{2cm}p{2.8cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Protocol} & \textcolor{white}{\bfseries Full Name} & \textcolor{white}{\bfseries Use Case} \\
+\midrule
+Modbus & -- & Register-based comms \\
+DNP3 & Distr. Network Proto & SCADA, utilities \\
+OPC UA & Open Platform UA & Industrial interop \\
+EtherNet/IP & EtherNet Ind. Proto & Rockwell systems \\
+PROFINET & Process Field Net & Siemens environments \\
+BACnet & Building Auto Ctrl & Building automation \\
+IEC 61850 & -- & Substation automation \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{microchip}}\hspace{0.4em}Hardware Components}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{thermometer-half}}\hspace{0.2em}\textbf{Sensor:} Measures physical parameters (temp, pressure, flow, level)
+    \item \textcolor{accent}{\faIcon{broadcast-tower}}\hspace{0.2em}\textbf{Transmitter:} Sensor with built-in signal conditioning and communication
+    \item \textcolor{accent}{\faIcon{cog}}\hspace{0.2em}\textbf{Actuator:} Performs physical action (valve, motor, relay)
+    \item \textcolor{accent}{\faIcon{tachometer-alt}}\hspace{0.2em}\textbf{VFD/VSD:} Variable Frequency/Speed Drive -- controls motor speed
+    \item \textcolor{accent}{\faIcon{plug}}\hspace{0.2em}\textbf{I/O Module:} Interface between controller and field devices
+    \item \textcolor{accent}{\faIcon{database}}\hspace{0.2em}\textbf{Historian:} Server storing time-series process data
+    \item \textcolor{accent}{\faIcon{laptop}}\hspace{0.2em}\textbf{Eng. Workstation:} PC for programming controllers
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{sliders-h}}\hspace{0.4em}Control Concepts}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Term} & \textcolor{white}{\bfseries Definition} \\
+\midrule
+Scan Cycle & Time to read inputs, execute logic, update outputs \\
+Tag & Named data point for a process variable \\
+Setpoint & Target value for a controlled variable \\
+PID & Proportional-Integral-Derivative control algorithm \\
+Interlock & Logic preventing unsafe operations \\
+Permissive & Condition required before action is allowed \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{hard-hat}}\hspace{0.4em}Safety Terms}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1cm}p{2.5cm}p{3.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Abbr.} & \textcolor{white}{\bfseries Full Name} & \textcolor{white}{\bfseries Definition} \\
+\midrule
+SIF & Safety Instr. Function & Sensor + logic + actuator chain \\
+SIL & Safety Integrity Level & Risk reduction capability (1--4) \\
+PFD & Prob. Failure on Demand & Likelihood SIF fails when needed \\
+BPCS & Basic Process Ctrl Sys & Normal process control (not safety) \\
+ESD & Emergency Shutdown & System/action to stop process safely \\
+HAZOP & Hazard \& Operability & Risk assessment methodology \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Security Terms}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.3cm}p{4.7cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Term} & \textcolor{white}{\bfseries Definition} \\
+\midrule
+IEC 62443 & International standard for industrial cybersecurity \\
+NIST 800-82 & US guide to OT security \\
+NERC CIP & North American electric grid security \\
+SL (1--4) & Security Level (IEC 62443 capability rating) \\
+Defense in Depth & Multiple overlapping security layers \\
+Allowlisting & Permit only approved apps/traffic \\
+OT IDS & Intrusion detection for industrial protocols \\
+\end{tabular}
+\end{center}
+
+\end{multicols}
+
+\end{document}

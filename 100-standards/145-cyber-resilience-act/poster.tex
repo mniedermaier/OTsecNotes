@@ -1,0 +1,176 @@
+% ============================================================================
+%  EU Cyber Resilience Act - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {EU Cyber Resilience Act}
+    {Product Security Requirements for Digital Elements}
+    {Poster 145}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{certificate}}\hspace{0.4em}Overview}
+
+The Cyber Resilience Act (CRA) establishes \textbf{mandatory cybersecurity requirements for products} with digital elements sold in the EU. Unlike NIS2 (which regulates operators), the CRA targets manufacturers, importers, and distributors. For OT: PLCs, RTUs, sensors, and control software must meet security requirements before market placement.
+
+\section{\textcolor{accent}{\faIcon{sitemap}}\hspace{0.4em}CRA + NIS2 Coverage}
+
+\begin{center}
+\begin{tikzpicture}[
+    reg/.style={rectangle, draw=#1!60, thick, fill=#1!12, rounded corners=3pt,
+        minimum height=0.55cm, align=center, font=\scriptsize\bfseries},
+    reg/.default={otaccent},
+    tgt/.style={rectangle, draw=#1!40, thick, fill=#1!8, rounded corners=2pt,
+        minimum height=0.4cm, align=center, font=\scriptsize},
+    arr/.style={->, thick, >=stealth, #1!50},
+]
+    \node[reg=otwarning, minimum width=2cm] (cra) at (-1.5,0.8) {\faIcon{box}\hspace{0.1em}CRA};
+    \node[reg=otinfo, minimum width=2cm] (nis2) at (1.5,0.8) {\faIcon{building}\hspace{0.1em}NIS2};
+
+    \node[tgt=otwarning, minimum width=2.8cm] (mfr) at (-1.5,0) {Manufacturers};
+    \node[tgt=otinfo, minimum width=2.8cm] (ops) at (1.5,0) {Operators};
+
+    \draw[arr=otwarning] (cra) -- (mfr);
+    \draw[arr=otinfo] (nis2) -- (ops);
+
+    \node[font=\scriptsize, text=otprimary, align=center] at (0,-0.6) {\textbf{End-to-end security:}\\Products + Operations};
+\end{tikzpicture}
+\end{center}
+
+\posterinfo{
+The CRA addresses a fundamental gap: while NIS2 requires operators to secure systems, the \textbf{products they purchase often lack basic security}. CRA shifts responsibility to manufacturers.
+}
+
+\section{\textcolor{accent}{\faIcon{search}}\hspace{0.4em}Scope}
+
+\subsection{\textcolor{accent}{\faIcon{box}}\hspace{0.3em}Products Covered}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{microchip}}\hspace{0.2em}\textbf{Hardware with software:} PLCs, RTUs, industrial PCs, network equipment
+    \item \textcolor{accent}{\faIcon{code}}\hspace{0.2em}\textbf{Standalone software:} SCADA, HMI applications, engineering tools
+    \item \textcolor{accent}{\faIcon{cloud}}\hspace{0.2em}\textbf{Remote data processing:} Cloud components essential to product function
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{layer-group}}\hspace{0.3em}Product Categories}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{2cm}p{2.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Category} & \textcolor{white}{\bfseries Risk Level} & \textcolor{white}{\bfseries OT Examples} \\
+\midrule
+Default & Standard & Basic sensors, HMIs \\
+Important I & Higher & Firewalls, IDS, NMS \\
+Important II & Critical & OSes, hypervisors \\
+Critical & Highest & IACS, smart meters \\
+\end{tabular}
+\end{center}
+
+\posterdanger{
+Industrial automation and control systems (IACS) are explicitly listed as \textbf{``critical'' products} in Annex III. Stricter conformity assessment applies to most OT products.
+}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Essential Requirements}
+
+\subsection{\textcolor{accent}{\faIcon{lock}}\hspace{0.3em}Security by Design}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.8cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Requirement} & \textcolor{white}{\bfseries Description} \\
+\midrule
+\faIcon{balance-scale}\hspace{0.2em}Risk Assessment & Cybersecurity risks addressed in design \\
+\faIcon{cog}\hspace{0.2em}Secure Default & Secure config, no default passwords \\
+\faIcon{user-lock}\hspace{0.2em}Access Control & Authentication and authorization \\
+\faIcon{lock}\hspace{0.2em}Data Protection & Confidentiality and integrity \\
+\faIcon{compress}\hspace{0.2em}Min. Attack Surface & Only necessary functions enabled \\
+\faIcon{shield-alt}\hspace{0.2em}Incident Mitigation & Features to limit impact \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{bug}}\hspace{0.3em}Vulnerability Handling}
+
+\begin{enumerate}
+    \item \textcolor{accent}{\faIcon{search}}\hspace{0.2em}Identify and document vulnerabilities
+    \item \textcolor{accent}{\faIcon{wrench}}\hspace{0.2em}Address vulnerabilities without delay
+    \item \textcolor{accent}{\faIcon{download}}\hspace{0.2em}Provide security updates for support period
+    \item \textcolor{accent}{\faIcon{bullhorn}}\hspace{0.2em}Disclose vulnerabilities after remediation
+    \item \textcolor{accent}{\faIcon{bell}}\hspace{0.2em}Report actively exploited vulnerabilities
+\end{enumerate}
+
+\subsection{\textcolor{accent}{\faIcon{clock}}\hspace{0.3em}Support Period}
+
+\begin{itemize}
+    \item \textbf{Minimum 5 years} or expected product lifetime (shorter)
+    \item \textbf{Free security updates} at no additional cost
+    \item Security updates installable \textbf{independently from features}
+    \item End-of-support date \textbf{stated at purchase}
+\end{itemize}
+
+\posterwarning{
+For OT products with 15--25 year lifecycles, the support period creates significant obligations. Manufacturers must plan long-term support or clearly communicate shorter windows.
+}
+
+\section{\textcolor{accent}{\faIcon{users}}\hspace{0.4em}Obligations by Role}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{industry}}\hspace{0.2em}\textbf{Manufacturers:} Conformity assessment, CE marking, vulnerability management, report exploited vulns within 24h
+    \item \textcolor{accent}{\faIcon{ship}}\hspace{0.2em}\textbf{Importers:} Verify manufacturer compliance, ensure documentation
+    \item \textcolor{accent}{\faIcon{store}}\hspace{0.2em}\textbf{Distributors:} Verify CE marking, don't supply non-compliant products
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{clipboard-check}}\hspace{0.4em}Conformity Assessment}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{4.8cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Category} & \textcolor{white}{\bfseries Procedure} \\
+\midrule
+Default & Self-assessment by manufacturer \\
+Important I & Self or third-party (standards-based) \\
+Important II & Third-party required (EU-type exam) \\
+Critical & Third-party + certification required \\
+\end{tabular}
+\end{center}
+
+\postersuccess{
+\textbf{IEC 62443} expected as harmonized standard. Organizations already implementing 62443 have a significant head start -- CRA requirements align closely with IEC 62443 security levels and secure development lifecycle.
+}
+
+\section{\textcolor{accent}{\faIcon{bell}}\hspace{0.4em}Reporting to ENISA}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.5cm}p{1.2cm}p{2.8cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Event} & \textcolor{white}{\bfseries When} & \textcolor{white}{\bfseries Content} \\
+\midrule
+Exploited vuln & 24h & Basic info, impact \\
+Exploited vuln & 72h & Detailed technical info \\
+Exploited vuln & 14 days & Root cause, remediation \\
+Severe incident & 24h & Product security impact \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{gavel}}\hspace{0.4em}Timeline \& Penalties}
+
+Dec 2024: CRA entered into force. Sep 2026: Reporting obligations apply. \textbf{Dec 2027: Full application}.
+
+Penalties: essential requirements up to EUR 15M / 2.5\%; other obligations up to EUR 10M / 2\%. Authorities can order product withdrawal from market.
+
+\postertip{
+\textbf{CRA + NIS2 together} create end-to-end security: CRA covers products, NIS2 covers operators. For OT asset owners, CRA means better baseline product security, clear support periods, and available vulnerability information.
+}
+
+\end{multicols}
+
+\end{document}

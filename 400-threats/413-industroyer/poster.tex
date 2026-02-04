@@ -1,0 +1,182 @@
+% ============================================================================
+%  Industroyer/CrashOverride - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {Industroyer / CrashOverride}
+    {Analysis of Grid-Targeting Malware}
+    {Poster 413}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+Industroyer (CrashOverride) is sophisticated malware designed to attack \textcolor{danger}{\faIcon{industry}}\hspace{0.2em}\textbf{electric power grids}. Used in the December 2016 Ukraine attack, it caused a blackout in Kyiv affecting $\sim$200MW of load. Only the second known malware (after Stuxnet) specifically designed to disrupt physical industrial processes.
+
+\section{\textcolor{accent}{\faIcon{list-ul}}\hspace{0.4em}Incident Facts}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{list-ul}\hspace{0.2em}\bfseries Attribute} & \textcolor{white}{\faIcon{info-circle}\hspace{0.2em}\bfseries Details} \\
+\midrule
+Date & December 17, 2016 \\
+Target & \textcolor{danger}{\faIcon{industry}}\hspace{0.2em}Ukrenergo (Kyiv transmission) \\
+Location & Pivnichna substation \\
+Impact & $\sim$200MW, 1-hour outage \\
+Attribution & Sandworm (Russian GRU) \\
+Discovery & ESET and Dragos (June 2017) \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{cubes}}\hspace{0.4em}Modular Architecture}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{cubes}\hspace{0.2em}\bfseries Component} & \textcolor{white}{\faIcon{cogs}\hspace{0.2em}\bfseries Function} \\
+\midrule
+\textcolor{warning}{\faIcon{bug}}\hspace{0.2em}Main backdoor & C2 communication, orchestration \\
+\textcolor{warning}{\faIcon{bug}}\hspace{0.2em}Add. backdoor & Persistence mechanism \\
+Launcher & Schedule-based payload execution \\
+Protocol mods & ICS protocol attack components \\
+\textcolor{warning}{\faIcon{bug}}\hspace{0.2em}Data wiper & Evidence destruction, damage \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{stream}}\hspace{0.4em}ICS Protocol Modules}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{stream}\hspace{0.2em}\bfseries Protocol} & \textcolor{white}{\faIcon{crosshairs}\hspace{0.2em}\bfseries Attack Capability} \\
+\midrule
+IEC 60870-5-101 & Serial comms with RTUs \\
+IEC 60870-5-104 & TCP/IP RTU comms (primary) \\
+IEC 61850 & Substation auto., GOOSE \\
+OPC DA & SCADA historian/HMI access \\
+\end{tabular}
+\end{center}
+
+\posterdanger{
+\textbf{Four industrial protocol modules} show extensive power grid knowledge. The modular design allows rapid adaptation to different targets worldwide. Fully automated attack requiring no operator interaction.
+}
+
+\section{\textcolor{accent}{\faIcon{crosshairs}}\hspace{0.4em}Attack Sequence}
+
+\begin{center}
+\begin{tikzpicture}[
+    step/.style={rectangle, draw=#1!40, thick, fill=#1!5, minimum height=0.38cm, rounded corners=2pt, font=\scriptsize, text width=4.5cm, align=left},
+    step/.default={otdanger},
+    num/.style={circle, fill=#1, text=white, font=\scriptsize\bfseries, minimum size=0.33cm, inner sep=0pt},
+    num/.default={otdanger},
+]
+    \node[num=otwarning] (n1) at (0,0) {1};
+    \node[step=otwarning, right=3pt of n1] (s1) {Spearphishing / supply chain};
+    \node[num=otwarning, below=2pt of n1] (n2) {2};
+    \node[step=otwarning, right=3pt of n2] (s2) {Lateral move through enterprise};
+    \node[num=otdanger, below=2pt of n2] (n3) {3};
+    \node[step=otdanger, right=3pt of n3] (s3) {Pivot to control system network};
+    \node[num=otdanger, below=2pt of n3] (n4) {4};
+    \node[step=otdanger, right=3pt of n4] (s4) {Recon and deploy malware};
+    \node[num=otdanger, below=2pt of n4] (n5) {5};
+    \node[step=otdanger, right=3pt of n5] (s5) {\faIcon{bolt}\hspace{0.1em}Open breakers (23:50 local)};
+    \node[num=otprimary, below=2pt of n5] (n6) {6};
+    \node[step=otprimary, right=3pt of n6] (s6) {\faIcon{eraser}\hspace{0.1em}Data wiper destroys evidence};
+
+    \foreach \i/\j in {1/2,2/3,3/4,4/5,5/6} {
+        \draw[thick, otdanger!40] (n\i.south) -- (n\j.north);
+    }
+\end{tikzpicture}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{bolt}}\hspace{0.3em}IEC 104 Attack Details}
+
+\begin{itemize}
+    \item \textcolor{warning}{\faIcon{search}}\hspace{0.2em}Scanned network for IEC 104 devices
+    \item \textcolor{warning}{\faIcon{list-alt}}\hspace{0.2em}Enumerated Information Object Addresses (IOAs)
+    \item \textcolor{danger}{\faIcon{keyboard}}\hspace{0.2em}Sent unauthorized commands to open breakers
+    \item \textcolor{danger}{\faIcon{exchange-alt}}\hspace{0.2em}Issued single-point and double-point commands
+    \item \textcolor{danger}{\faIcon{sync}}\hspace{0.2em}Toggled breakers repeatedly to prevent manual restore
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{columns}}\hspace{0.4em}Comparison: 2015 vs 2016}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.8cm}p{2.2cm}p{2.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{columns}\hspace{0.2em}\bfseries Aspect} & \textcolor{white}{\bfseries 2015} & \textcolor{white}{\bfseries 2016} \\
+\midrule
+Method & Remote desktop & \textcolor{warning}{\faIcon{bug}}\hspace{0.2em}Automated malware \\
+Protocols & Proprietary & IEC 104, 61850 \\
+Scale & 225,000 affected & Smaller impact \\
+Reusability & Low (manual) & High (modular) \\
+Sophistic. & Medium & High \\
+\end{tabular}
+\end{center}
+
+\posterinfo{
+Industroyer represents an \textbf{evolution from manual to automated attacks}. The modular design allows rapid adaptation to different targets. This is a reusable weapon, not a one-time tool.
+}
+
+\section{\textcolor{accent}{\faIcon{cogs}}\hspace{0.4em}Technical Details}
+
+\subsection{\textcolor{accent}{\faIcon{bug}}\hspace{0.3em}Main Backdoor}
+
+\begin{itemize}
+    \item \textcolor{warning}{\faIcon{bug}}\hspace{0.2em}Written in C++, compiled for Windows
+    \item \textcolor{warning}{\faIcon{globe}}\hspace{0.2em}HTTPS to C2 servers, optional Tor anonymization
+    \item \textcolor{warning}{\faIcon{upload}}\hspace{0.2em}File upload/download, shell commands
+    \item \textcolor{warning}{\faIcon{file-code}}\hspace{0.2em}Configurable via XML configuration files
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{eraser}}\hspace{0.3em}Data Wiper}
+
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{eraser}}\hspace{0.2em}Overwrites files with random data
+    \item \textcolor{danger}{\faIcon{cog}}\hspace{0.2em}Targets Windows registry and system files
+    \item \textcolor{danger}{\faIcon{power-off}}\hspace{0.2em}Makes systems unbootable
+    \item \textcolor{danger}{\faIcon{search}}\hspace{0.2em}Hampers forensic investigation
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{search}}\hspace{0.3em}Detection Indicators}
+
+\begin{itemize}
+    \item \textcolor{info}{\faIcon{chart-bar}}\hspace{0.2em}Unusual IEC 104 traffic patterns or command sequences
+    \item \textcolor{info}{\faIcon{plug}}\hspace{0.2em}Unauthorized connections to RTU/IED addresses
+    \item \textcolor{info}{\faIcon{calendar-alt}}\hspace{0.2em}Suspicious scheduled tasks on SCADA systems
+    \item \textcolor{info}{\faIcon{user-secret}}\hspace{0.2em}Tor network connections from OT systems
+    \item \textcolor{info}{\faIcon{file-alt}}\hspace{0.2em}File modifications in system directories
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Defense Measures}
+
+\postersuccess{
+\begin{itemize}
+    \item \textcolor{success}{\faIcon{project-diagram}}\hspace{0.2em}Network segmentation between IT and OT
+    \item \textcolor{success}{\faIcon{shield-alt}}\hspace{0.2em}ICS-aware intrusion detection systems
+    \item \textcolor{success}{\faIcon{check-circle}}\hspace{0.2em}Application whitelisting on SCADA servers
+    \item \textcolor{success}{\faIcon{eye}}\hspace{0.2em}Monitor IEC 104/61850 protocol traffic
+    \item \textcolor{success}{\faIcon{hdd}}\hspace{0.2em}Offline backups of critical configurations
+    \item \textcolor{success}{\faIcon{clipboard-list}}\hspace{0.2em}Incident response plans for \textcolor{danger}{\faIcon{industry}}\hspace{0.2em}grid emergencies
+\end{itemize}
+}
+
+\postertip{
+\textbf{Protocol-specific protections:} Deploy IEC 62351 security extensions. Implement command validation against expected operations. Use rate limiting to detect rapid command sequences. Restrict which systems can send control commands. Automation increases risk -- malware attacks faster than humans respond. Manual restoration procedures remain essential for recovery.
+}
+
+\end{multicols}
+
+\end{document}

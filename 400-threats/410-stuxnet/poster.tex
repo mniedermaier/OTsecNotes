@@ -1,0 +1,164 @@
+% ============================================================================
+%  Stuxnet - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {Stuxnet}
+    {The First Cyber Weapon Targeting Industrial Control Systems}
+    {Poster 410}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+Stuxnet (discovered 2010) is the \textbf{first true cyber weapon} -- malware designed to cause physical destruction of industrial equipment. It targeted Iran's Natanz uranium enrichment facility, destroying centrifuges while hiding its activities from operators.
+
+\section{\textcolor{accent}{\faIcon{list-ul}}\hspace{0.4em}Key Facts}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{crosshairs}\hspace{0.2em}\bfseries Attribute} & \textcolor{white}{\bfseries Details} \\
+\midrule
+Discovery & June 2010 \\
+Target & Natanz enrichment facility, Iran \\
+Systems & Siemens S7-300 PLCs \\
+Method & USB, network, PLC manipulation \\
+Impact & $\sim$1,000 centrifuges destroyed \\
+Attribution & US and Israel (unconfirmed) \\
+Zero-Days & 4 Windows vulnerabilities \\
+\end{tabular}
+\end{center}
+
+\posterdanger{
+Stuxnet demonstrated that \textbf{cyber attacks can cause physical destruction}. It fundamentally changed the threat landscape for critical infrastructure worldwide and lowered the barrier for future ICS attacks.
+}
+
+\section{\textcolor{accent}{\faIcon{bug}}\hspace{0.4em}Propagation Methods}
+
+\begin{enumerate}
+    \item \textcolor{danger}{\faIcon{usb}}\hspace{0.2em}\textbf{USB Drives} -- Exploited autorun and LNK vulnerabilities
+    \item \textcolor{danger}{\faIcon{network-wired}}\hspace{0.2em}\textbf{Network Shares} -- Spread via Windows shares
+    \item \textcolor{danger}{\faIcon{print}}\hspace{0.2em}\textbf{Print Spooler} -- Exploited MS10-061 vulnerability
+    \item \textcolor{danger}{\faIcon{folder-open}}\hspace{0.2em}\textbf{Step 7 Projects} -- Infected shared project files
+\end{enumerate}
+
+\posterwarning{
+Stuxnet \textbf{crossed the air gap} through infected USB drives carried by contractors and employees. Physical isolation alone is not sufficient protection against determined adversaries.
+}
+
+\section{\textcolor{accent}{\faIcon{crosshairs}}\hspace{0.4em}Zero-Day Exploits}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries CVE} & \textcolor{white}{\bfseries Description} \\
+\midrule
+CVE-2010-2568 & LNK file (USB propagation) \\
+CVE-2010-2729 & Print Spooler (remote exec) \\
+CVE-2010-2772 & Server Service (network) \\
+CVE-2010-3338 & Task Scheduler (priv. esc.) \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{search}}\hspace{0.4em}Target Identification}
+
+Stuxnet was highly selective:
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{microchip}}\hspace{0.2em}Searched for Siemens Step 7 installations
+    \item \textcolor{accent}{\faIcon{cogs}}\hspace{0.2em}Identified specific PLC configs (S7-315, S7-417)
+    \item \textcolor{accent}{\faIcon{tachometer-alt}}\hspace{0.2em}Verified presence of specific frequency converters (Vacon, Fararo Paya)
+    \item \textcolor{accent}{\faIcon{wave-square}}\hspace{0.2em}Checked drive frequencies 807--1210 Hz (centrifuge range)
+    \item \textcolor{accent}{\faIcon{bullseye}}\hspace{0.2em}Only activated payload when \textbf{all conditions matched}
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{bolt}}\hspace{0.4em}PLC Attack Chain}
+
+\begin{center}
+\begin{tikzpicture}[
+    step/.style={rectangle, draw=#1!40, thick, fill=#1!5, minimum height=0.38cm, rounded corners=2pt, font=\scriptsize, text width=4.5cm, align=left},
+    step/.default={otdanger},
+    num/.style={circle, fill=#1, text=white, font=\scriptsize\bfseries, minimum size=0.33cm, inner sep=0pt},
+    num/.default={otdanger},
+]
+    \node[num] (n1) at (0,0) {1};
+    \node[step, right=3pt of n1] (s1) {\faIcon{usb}\hspace{0.1em}USB $\rightarrow$ Windows exploits};
+    \node[num, below=2pt of n1] (n2) {2};
+    \node[step, right=3pt of n2] (s2) {Lateral movement $\rightarrow$ Step 7};
+    \node[num, below=2pt of n2] (n3) {3};
+    \node[step, right=3pt of n3] (s3) {PLC rootkit hides modifications};
+    \node[num, below=2pt of n3] (n4) {4};
+    \node[step, right=3pt of n4] (s4) {\faIcon{eye-slash}\hspace{0.1em}Record 21 days, replay to ops};
+    \node[num, below=2pt of n4] (n5) {5};
+    \node[step, right=3pt of n5] (s5) {Vary centrifuge speed (807--1210 Hz)};
+    \node[num, below=2pt of n5] (n6) {6};
+    \node[step, right=3pt of n6] (s6) {\faIcon{bomb}\hspace{0.1em}Metal fatigue $\rightarrow$ destruction};
+
+    \foreach \i/\j in {1/2,2/3,3/4,4/5,5/6} {
+        \draw[thick, otdanger!40] (n\i.south) -- (n\j.north);
+    }
+\end{tikzpicture}
+\end{center}
+
+\posterdanger{
+\textbf{Man-in-the-middle on PLCs:} Operators saw normal readings while centrifuges were being destroyed. This ``lying to the operator'' technique has been replicated in subsequent attacks. Independent measurements are essential.
+}
+
+\section{\textcolor{accent}{\faIcon{clock}}\hspace{0.4em}Attack Timeline}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{calendar-alt}\hspace{0.2em}\bfseries Period} & \textcolor{white}{\bfseries Event} \\
+\midrule
+2005--2007 & \faIcon{code}\hspace{0.2em}Development phase (estimated) \\
+June 2009 & \faIcon{rocket}\hspace{0.2em}First known variant deployed \\
+March 2010 & \faIcon{exclamation-triangle}\hspace{0.2em}More aggressive variant released \\
+June 2010 & \faIcon{search}\hspace{0.2em}Discovered by VirusBlokAda \\
+July 2010 & \faIcon{industry}\hspace{0.2em}Siemens acknowledges targeting \\
+Sept 2010 & \faIcon{file-alt}\hspace{0.2em}Full Symantec analysis published \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{bolt}}\hspace{0.4em}Impact and Consequences}
+
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{atom}}\hspace{0.2em}$\sim$1,000 IR-1 centrifuges destroyed at Natanz
+    \item \textcolor{danger}{\faIcon{clock}}\hspace{0.2em}Iranian nuclear program delayed 1--2 years
+    \item \textcolor{danger}{\faIcon{globe}}\hspace{0.2em}100,000+ systems infected globally (most not affected)
+    \item \textcolor{danger}{\faIcon{code}}\hspace{0.2em}4 zero-day vulnerabilities burned
+    \item \textcolor{danger}{\faIcon{eye}}\hspace{0.2em}Code studied and reused by other actors
+    \item \textcolor{danger}{\faIcon{shield-alt}}\hspace{0.2em}Sparked global investment in OT security
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Defense Lessons}
+
+\postersuccess{
+\begin{enumerate}
+    \item \textcolor{success}{\faIcon{plug}}\hspace{0.2em}\textbf{Air gaps aren't absolute} -- USB/contractor laptops bridge them
+    \item \textcolor{success}{\faIcon{microchip}}\hspace{0.2em}\textbf{Monitor PLC integrity} -- Detect unauthorized logic changes
+    \item \textcolor{success}{\faIcon{desktop}}\hspace{0.2em}\textbf{Verify operator displays} -- Cross-check with independent sensors
+    \item \textcolor{success}{\faIcon{usb}}\hspace{0.2em}\textbf{Control removable media} -- Strict USB and media policies
+    \item \textcolor{success}{\faIcon{project-diagram}}\hspace{0.2em}\textbf{Segment networks} -- Limit lateral movement in OT
+    \item \textcolor{success}{\faIcon{band-aid}}\hspace{0.2em}\textbf{Patch systems} -- Apply updates where safely possible
+\end{enumerate}
+}
+
+\postertip{
+Stuxnet could have been detected through: monitoring for unauthorized Step 7 project modifications, anomalous PLC communication patterns, unexpected DLL injections in SCADA software, centrifuge performance deviations, and network traffic analysis for C2 communications. \textbf{Independent physical measurements} would have revealed the discrepancy between reported and actual centrifuge behavior.
+}
+
+\end{multicols}
+
+\end{document}

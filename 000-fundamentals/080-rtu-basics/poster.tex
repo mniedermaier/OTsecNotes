@@ -1,0 +1,169 @@
+% ============================================================================
+%  RTU Basics - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {RTU Basics}
+    {Remote Terminal Units in Industrial Control Systems}
+    {Poster 080}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{broadcast-tower}}\hspace{0.4em}What is an RTU?}
+
+A Remote Terminal Unit is a ruggedized, standalone device that interfaces with physical equipment at \textbf{remote locations} and communicates with a central SCADA system. RTUs are the eyes and ears of distributed infrastructure.
+
+\posterinfo{
+RTUs serve five key functions: \textbf{Acquire data} from sensors, \textbf{execute control} commands, \textbf{communicate} with SCADA masters, \textbf{store data} during outages, and \textbf{process locally} when communication is lost.
+}
+
+\section{\textcolor{accent}{\faIcon{satellite-dish}}\hspace{0.4em}SCADA-RTU Communication}
+
+\begin{center}
+\begin{tikzpicture}[
+    comp/.style={rectangle, draw=#1!60, thick, fill=#1!12, rounded corners=2pt,
+        minimum height=0.55cm, align=center, font=\scriptsize},
+    comp/.default={otaccent},
+    arr/.style={<->, very thick, >=stealth, #1!50},
+    arr/.default={otaccent},
+    media/.style={font=\scriptsize, text=mediumgray, align=center},
+]
+    % SCADA Master
+    \node[comp=otprimary, minimum width=2.2cm] (scada) at (0,0) {\faIcon{server}\hspace{0.1em}\textbf{SCADA Master}};
+
+    % Communication cloud
+    \node[comp=otinfo, minimum width=3.2cm, minimum height=0.9cm] (comms) at (0,-1.3) {\faIcon{broadcast-tower}\hspace{0.2em}\textbf{Communication}\\\textcolor{mediumgray}{Radio | Cell | Sat | IP}};
+
+    \draw[arr=otprimary] (scada) -- (comms);
+
+    % RTUs
+    \node[comp=otsuccess, minimum width=1.5cm] (rtu1) at (-2,-2.8) {\faIcon{broadcast-tower}\hspace{0.1em}\textbf{RTU}};
+    \node[comp=otsuccess, minimum width=1.5cm] (rtu2) at (0,-2.8) {\faIcon{broadcast-tower}\hspace{0.1em}\textbf{RTU}};
+    \node[comp=otsuccess, minimum width=1.5cm] (rtu3) at (2,-2.8) {\faIcon{broadcast-tower}\hspace{0.1em}\textbf{RTU}};
+
+    \draw[arr=otinfo] (comms.south) -- ++(0,-0.2) -| (rtu1.north);
+    \draw[arr=otinfo] (comms) -- (rtu2);
+    \draw[arr=otinfo] (comms.south) -- ++(0,-0.2) -| (rtu3.north);
+
+    % Field devices
+    \node[comp=otwarning, minimum width=1cm, font=\scriptsize] (f1) at (-2,-3.7) {\faIcon{thermometer-half}\hspace{0.1em}Field};
+    \node[comp=otwarning, minimum width=1cm, font=\scriptsize] (f2) at (0,-3.7) {\faIcon{cog}\hspace{0.1em}Field};
+    \node[comp=otwarning, minimum width=1cm, font=\scriptsize] (f3) at (2,-3.7) {\faIcon{tachometer-alt}\hspace{0.1em}Field};
+    \draw[-, thick, otsuccess!40] (rtu1) -- (f1);
+    \draw[-, thick, otsuccess!40] (rtu2) -- (f2);
+    \draw[-, thick, otsuccess!40] (rtu3) -- (f3);
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{columns}}\hspace{0.4em}RTU vs PLC}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{2.3cm}p{2.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Aspect} & \textcolor{white}{\bfseries RTU} & \textcolor{white}{\bfseries PLC} \\
+\midrule
+Purpose & Remote telemetry & Local process ctrl \\
+Location & Distributed sites & Within a plant \\
+Comms & Radio, cellular, sat & Ethernet, serial \\
+Autonomy & High (comm loss) & Moderate \\
+I/O Density & Lower, distributed & Higher, concentrated \\
+Environment & Extreme outdoor & Indoor, controlled \\
+Scan Rate & Seconds--minutes & Milliseconds \\
+\end{tabular}
+\end{center}
+
+\postertip{
+Modern devices blur the RTU/PLC distinction. Many RTUs include PLC-like programming; some PLCs support telemetry. ``RTU'' often indicates the device's \textbf{role} in SCADA architecture rather than strict hardware differences.
+}
+
+\section{\textcolor{accent}{\faIcon{microchip}}\hspace{0.4em}RTU Architecture}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{microchip}}\hspace{0.2em}\textbf{CPU/Processor:} Executes control logic, manages comms
+    \item \textcolor{accent}{\faIcon{memory}}\hspace{0.2em}\textbf{Memory (RAM/Flash):} Program, config, buffered data
+    \item \textcolor{accent}{\faIcon{toggle-on}}\hspace{0.2em}\textbf{Digital I/O:} On/off status inputs and control outputs
+    \item \textcolor{accent}{\faIcon{wave-square}}\hspace{0.2em}\textbf{Analog I/O:} 4-20mA, 0-10V measurement and control
+    \item \textcolor{accent}{\faIcon{wifi}}\hspace{0.2em}\textbf{Comm Ports:} Serial, Ethernet, radio, cellular
+    \item \textcolor{accent}{\faIcon{bolt}}\hspace{0.2em}\textbf{Power Supply:} AC/DC conversion with regulation
+    \item \textcolor{accent}{\faIcon{battery-full}}\hspace{0.2em}\textbf{Battery Backup:} Maintains operation during outages
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{satellite-dish}}\hspace{0.4em}Communication}
+
+\subsection{\textcolor{accent}{\faIcon{exchange-alt}}\hspace{0.3em}Protocols}
+
+\begin{itemize}
+    \item \textcolor{accent}{\faIcon{network-wired}}\hspace{0.2em}\textbf{DNP3:} Distributed Network Protocol -- dominant in utilities
+    \item \textcolor{accent}{\faIcon{exchange-alt}}\hspace{0.2em}\textbf{Modbus:} Simple, widely supported -- RTU and TCP variants
+    \item \textcolor{accent}{\faIcon{globe}}\hspace{0.2em}\textbf{IEC 60870-5-101/104:} International telecontrol standard
+    \item \textcolor{accent}{\faIcon{bolt}}\hspace{0.2em}\textbf{IEC 61850:} Modern substation automation
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{wifi}}\hspace{0.3em}Communication Media}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{2cm}p{2.7cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Medium} & \textcolor{white}{\bfseries Use Case} & \textcolor{white}{\bfseries Considerations} \\
+\midrule
+\faIcon{broadcast-tower}\hspace{0.1em}Licensed Radio & Utilities, CI & Reliable, dedicated \\
+\faIcon{signal}\hspace{0.1em}Cellular 4G/5G & Wide-area & Coverage dependent \\
+\faIcon{satellite}\hspace{0.1em}Satellite & Offshore/remote & High latency, costly \\
+\faIcon{plug}\hspace{0.1em}Serial Line & Legacy installs & Being phased out \\
+\faIcon{ethernet}\hspace{0.1em}Ethernet/IP & Modern sites & Requires infrastructure \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{industry}}\hspace{0.4em}Typical Applications}
+
+\begin{itemize}
+    \item \textcolor{warning}{\faIcon{bolt}}\hspace{0.2em}\textbf{Electric Utilities:} Substation monitoring, distribution automation, fault detection
+    \item \textcolor{accent}{\faIcon{gas-pump}}\hspace{0.2em}\textbf{Oil and Gas:} Pipeline monitoring, well site automation, tank farm levels
+    \item \textcolor{info}{\faIcon{tint}}\hspace{0.2em}\textbf{Water/Wastewater:} Pump station control, reservoir monitoring, treatment
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Security Considerations}
+
+\posterdanger{
+\textbf{Common vulnerabilities:}
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{unlock}}\hspace{0.2em}\textbf{No authentication:} Modbus, older DNP3 lack auth
+    \item \textcolor{danger}{\faIcon{eye-slash}}\hspace{0.2em}\textbf{Cleartext comms:} Data transmitted without encryption
+    \item \textbf{Physical access:} Remote sites may have weak security
+    \item \textbf{Default credentials:} Factory passwords unchanged
+    \item \textbf{Legacy firmware:} Difficult or impossible to update
+\end{itemize}
+}
+
+\postersuccess{
+\textbf{Security measures:}
+\begin{itemize}
+    \item \textbf{Protocol security:} DNP3 Secure Auth, IEC 62351
+    \item \textbf{Encryption:} VPN tunnels, TLS for IP-based comms
+    \item \textbf{Access control:} Strong passwords, disable unused ports
+    \item \textbf{Physical security:} Locked enclosures, tamper detection
+    \item \textbf{Monitoring:} Log communications, detect anomalies
+    \item \textbf{Segmentation:} Separate RTU network from corporate IT
+\end{itemize}
+}
+
+\posterwarning{
+For new deployments, select RTUs supporting modern security (DNP3 SA, TLS, RBAC). For legacy devices, implement compensating controls: VPN tunnels, monitoring, and physical access controls.
+}
+
+\postertip{
+\textbf{Key takeaway:} RTUs are the front-line interface between SCADA and the physical world at remote sites. Their geographic isolation creates unique security challenges -- physical access, communication link security, and autonomous operation during outages all require specific attention.
+}
+
+\end{multicols}
+
+\end{document}

@@ -1,0 +1,202 @@
+% ============================================================================
+%  OT Attack Vectors - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\makepostertitle
+    {OT Attack Vectors}
+    {Common Attack Paths Targeting Industrial Control Systems}
+    {Poster 420}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{\textcolor{accent}{\faIcon{info-circle}}\hspace{0.4em}Overview}
+
+Attack vectors are the paths attackers use to access OT systems. OT environments face both IT-style attacks and \textbf{OT-specific threats} targeting industrial protocols and physical processes. Understanding vectors is essential for implementing effective defenses.
+
+\posterinfo{
+\textbf{Five vector categories:} Network-based (exploiting connectivity), Physical (direct equipment access), Supply chain (compromised vendors), Human (social engineering, insiders), and Wireless (RF communications).
+}
+
+\section{\textcolor{accent}{\faIcon{network-wired}}\hspace{0.4em}Network-Based Vectors}
+
+\subsection{\textcolor{accent}{\faIcon{exchange-alt}}\hspace{0.3em}IT/OT Boundary Attacks}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{crosshairs}\hspace{0.2em}\bfseries Vector} & \textcolor{white}{\faIcon{align-left}\hspace{0.2em}\bfseries Description} \\
+\midrule
+FW misconfig & Overly permissive rules \\
+VPN compromise & Stolen creds or VPN vulns \\
+Jump server & Compromising admin points \\
+Historian pivot & Data historians as bridge \\
+DMZ bypass & Poor DMZ segmentation \\
+\end{tabular}
+\end{center}
+
+\subsection{\textcolor{accent}{\faIcon{bug}}\hspace{0.3em}Protocol Exploitation}
+
+\posterdanger{
+\textbf{Industrial protocols lack authentication:} Modbus accepts commands from any source. DNP3 security rarely enabled. EtherNet/IP CIP has limited security. S7comm has weak auth. OPC Classic has known DCOM vulnerabilities.
+}
+
+\subsection{\textcolor{accent}{\faIcon{user-secret}}\hspace{0.3em}Man-in-the-Middle}
+
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{random}}\hspace{0.2em}ARP spoofing to intercept OT traffic
+    \item \textcolor{danger}{\faIcon{pencil-alt}}\hspace{0.2em}Modifying commands between HMI and PLCs
+    \item \textcolor{danger}{\faIcon{download}}\hspace{0.2em}Intercepting engineering uploads/downloads
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{laptop}}\hspace{0.4em}Remote Access Vectors}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{crosshairs}\hspace{0.2em}\bfseries Vector} & \textcolor{white}{\faIcon{bolt}\hspace{0.2em}\bfseries Attack Method} \\
+\midrule
+VPN credentials & Phishing, credential stuffing \\
+RDP exposure & Brute force, BlueKeep \\
+Vendor backdoors & Default/hardcoded creds \\
+TeamViewer etc. & Compromised remote tools \\
+Cellular modems & Exposed management interfaces \\
+\end{tabular}
+\end{center}
+
+\posterwarning{
+\textbf{Remote access is the most exploited vector} in OT attacks. Ukraine grid attacks used stolen VPN credentials. Oldsmar used TeamViewer. Colonial Pipeline used a compromised VPN without MFA.
+}
+
+\section{\textcolor{accent}{\faIcon{hand-paper}}\hspace{0.4em}Physical Vectors}
+
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{usb}}\hspace{0.2em}\textbf{USB devices} -- Malware delivery (Stuxnet via USB)
+    \item \textcolor{danger}{\faIcon{plug}}\hspace{0.2em}\textbf{Serial ports} -- Direct connection to PLCs/RTUs
+    \item \textcolor{danger}{\faIcon{ethernet}}\hspace{0.2em}\textbf{Network jacks} -- Connecting rogue devices
+    \item \textcolor{danger}{\faIcon{building}}\hspace{0.2em}\textbf{Exposed equipment} -- Substations, pump stations
+    \item \textcolor{danger}{\faIcon{laptop}}\hspace{0.2em}\textbf{Maintenance laptops} -- Infected contractor equipment
+\end{itemize}
+
+\subsection{\textcolor{accent}{\faIcon{usb}}\hspace{0.3em}Removable Media Risks}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{hdd}\hspace{0.2em}\bfseries Media} & \textcolor{white}{\faIcon{exclamation-triangle}\hspace{0.2em}\bfseries Risk Scenario} \\
+\midrule
+USB drives & Malware autorun, BadUSB \\
+External HDD & Infected backup restoration \\
+SD cards & Compromised firmware updates \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{truck}}\hspace{0.4em}Supply Chain Vectors}
+
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{code}}\hspace{0.2em}Trojanized software updates (SolarWinds-style)
+    \item \textcolor{danger}{\faIcon{microchip}}\hspace{0.2em}Compromised firmware from manufacturer
+    \item \textcolor{danger}{\faIcon{puzzle-piece}}\hspace{0.2em}Malicious third-party libraries
+    \item \textcolor{danger}{\faIcon{sim-card}}\hspace{0.2em}Counterfeit hardware with backdoors
+    \item \textcolor{danger}{\faIcon{key}}\hspace{0.2em}Compromised vendor remote access
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{users}}\hspace{0.4em}Human Vectors}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.2cm}p{4.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\faIcon{crosshairs}\hspace{0.2em}\bfseries Technique} & \textcolor{white}{\faIcon{industry}\hspace{0.2em}\bfseries OT Example} \\
+\midrule
+Phishing & Fake vendor security bulletin \\
+Spear phishing & Targeting engineers with files \\
+Pretexting & Impersonating vendor support \\
+Baiting & Infected USB near control room \\
+Insider threat & Disgruntled employee access \\
+\end{tabular}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{wifi}}\hspace{0.4em}Wireless Vectors}
+
+\begin{itemize}
+    \item \textcolor{danger}{\faIcon{wifi}}\hspace{0.2em}\textbf{Rogue APs} -- Unauthorized WiFi bridging IT/OT
+    \item \textcolor{danger}{\faIcon{lock}}\hspace{0.2em}\textbf{WiFi attacks} -- WPA2 cracking, evil twin
+    \item \textcolor{danger}{\faIcon{bluetooth-b}}\hspace{0.2em}\textbf{Bluetooth} -- Exploiting industrial BT devices
+    \item \textcolor{danger}{\faIcon{broadcast-tower}}\hspace{0.2em}\textbf{Cellular/LTE} -- Exposed modem interfaces
+    \item \textcolor{danger}{\faIcon{signal}}\hspace{0.2em}\textbf{RF protocols} -- ZigBee, LoRa, WirelessHART
+\end{itemize}
+
+\section{\textcolor{accent}{\faIcon{sitemap}}\hspace{0.4em}Typical OT Attack Chain}
+
+\begin{center}
+\begin{tikzpicture}[
+    stepbox/.style={rectangle, draw=#1!60, thick, fill=#1!10, rounded corners=2pt,
+        minimum height=0.4cm, minimum width=4.8cm, align=center, font=\scriptsize},
+    stepbox/.default={otaccent},
+    num/.style={circle, fill=otprimary, text=white, font=\scriptsize\bfseries,
+        minimum size=0.35cm, inner sep=0pt},
+    arr/.style={->, thick, >=stealth, otaccent!50},
+]
+    \node[num] (n1) at (0,0) {1};
+    \node[stepbox=otwarning, right=3pt of n1] (s1) {Initial Access -- Phishing, VPN};
+    \node[num, below=4pt of n1] (n2) {2};
+    \node[stepbox=otaccent, right=3pt of n2] (s2) {IT Foothold -- Malware on workstation};
+    \node[num, below=4pt of n2] (n3) {3};
+    \node[stepbox=otaccent, right=3pt of n3] (s3) {Lateral Movement through IT};
+    \node[num, below=4pt of n3] (n4) {4};
+    \node[stepbox=otwarning, right=3pt of n4] (s4) {IT/OT Boundary -- Jump server, historian};
+    \node[num, below=4pt of n4] (n5) {5};
+    \node[stepbox=otdanger, right=3pt of n5] (s5) {OT Recon and Target Identification};
+    \node[num, below=4pt of n5] (n6) {6};
+    \node[stepbox=otdanger, right=3pt of n6] (s6) {Execute -- Manipulate physical process};
+    \draw[arr] (n1) -- (n2);
+    \draw[arr] (n2) -- (n3);
+    \draw[arr] (n3) -- (n4);
+    \draw[arr] (n4) -- (n5);
+    \draw[arr] (n5) -- (n6);
+\end{tikzpicture}
+\end{center}
+
+\section{\textcolor{accent}{\faIcon{shield-alt}}\hspace{0.4em}Defensive Priorities}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.8cm}p{1.2cm}p{3.3cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Vector} & \textcolor{white}{\bfseries Risk} & \textcolor{white}{\bfseries Primary Defense} \\
+\midrule
+Remote access & \riskcritical & MFA, jump servers, monitoring \\
+Network & \riskcritical & Segmentation, firewalls, IDS \\
+Protocol & \riskhigh & Network monitoring, validation \\
+Physical & \riskhigh & Access controls, USB restrict \\
+Supply chain & \riskhigh & Vendor mgmt, integrity verify \\
+Social eng. & \riskmedium & Security awareness training \\
+Wireless & \riskmedium & WPA3-Enterprise, WIDS \\
+\end{tabular}
+\end{center}
+
+\postertip{
+\textcolor{success}{\faIcon{shield-alt}}\hspace{0.2em}Remote access is the \textbf{most commonly exploited initial vector}. Implement MFA on all remote access as the single highest-impact control. No single defense stops all vectors -- layer controls across network, physical, supply chain, human, and wireless attack surfaces. Monitor the IT/OT boundary as the critical chokepoint.
+}
+
+\end{multicols}
+
+\end{document}
