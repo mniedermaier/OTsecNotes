@@ -768,11 +768,12 @@ jobs:
                 .hero-icon { font-size: 3.5rem; }
                 .hero { padding: 3rem 1rem; min-height: 300px; }
                 .hero-subtitle { font-size: 0.95rem; }
-                .doc-item { flex-wrap: wrap; gap: 0.75rem; padding: 0.75rem 1rem; }
+                .doc-item { flex-wrap: wrap; gap: 0.5rem; padding: 0.75rem 1rem; }
                 .doc-thumb { width: 45px; height: 58px; }
                 .doc-info { flex: 1; min-width: 0; }
                 .doc-title-text { font-size: 0.9rem; }
-                .doc-actions { margin-left: auto; }
+                .doc-actions { width: 100%; display: flex; justify-content: stretch; }
+                .doc-actions .doc-btn { flex: 1; justify-content: center; font-size: 0.75rem; padding: 0.4rem; }
                 .footer-links { gap: 1rem; flex-direction: column; }
                 .badges { gap: 0.5rem; }
                 .badge { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
