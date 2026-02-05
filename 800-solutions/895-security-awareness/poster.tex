@@ -1,0 +1,167 @@
+% ============================================================================
+%  895-security-awareness - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+\begin{document}
+
+\makepostertitle
+    {Security Awareness Training for OT}
+    {Building a Human Firewall}
+    {Poster 895}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{Why OT-Specific Training?}
+
+\posterinfo{
+Generic IT training is insufficient for OT:
+\begin{itemize}
+    \item Safety implications of security incidents
+    \item USB critical for air-gapped systems
+    \item Physical access threats are common
+    \item Diverse workforce (operators, engineers)
+    \item 24/7 shift operations
+\end{itemize}
+}
+
+\section{IT vs OT Focus}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{2.2cm}p{2.2cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Aspect} & \textcolor{white}{\bfseries IT} & \textcolor{white}{\bfseries OT} \\
+\midrule
+Priority & Confidentiality & Safety/Availability \\
+Threats & Email phishing & Phishing, USB, physical \\
+Impact & Data breach & Physical damage \\
+Users & Office staff & Operators, techs \\
+Delivery & Online & Hands-on, shifts \\
+\end{tabular}
+\end{center}
+
+\section{Key Training Topics}
+
+\posterdanger{
+\textbf{USB/Removable Media}
+\begin{itemize}
+    \item Never use unknown USB devices
+    \item Scan all media before use
+    \item Beware of ``USB drop'' attacks
+    \item Use only approved devices
+\end{itemize}
+}
+
+\posterwarning{
+\textbf{Social Engineering}
+\begin{itemize}
+    \item Pretexting (false scenarios)
+    \item Tailgating into secure areas
+    \item Impersonation of vendors/IT
+    \item Always verify identities
+\end{itemize}
+}
+
+\textbf{Physical Security:}
+\begin{itemize}
+    \item Badge usage and door security
+    \item Clean desk policy
+    \item Lock workstations
+    \item Report suspicious activity
+\end{itemize}
+
+\textbf{Passwords:}
+\begin{itemize}
+    \item Strong, unique passwords
+    \item Never share credentials
+    \item Understand shared account risks
+\end{itemize}
+
+\section{Role-Based Training}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2cm}p{4.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Role} & \textcolor{white}{\bfseries Focus Areas} \\
+\midrule
+Operators & Incident recognition, physical security, USB handling \\
+Engineers & Secure config, vendor mgmt, remote access \\
+Management & Risk awareness, compliance, resource allocation \\
+Contractors & Site policies, access procedures \\
+\end{tabular}
+\end{center}
+
+\section{Delivery Methods}
+
+\postersuccess{
+\begin{itemize}
+    \item \textbf{Classroom} -- Onboarding, complex topics
+    \item \textbf{E-Learning} -- Flexible, shift-friendly
+    \item \textbf{Hands-on} -- Phishing tests, USB drops
+    \item \textbf{Just-in-time} -- Toolbox talks, posters
+\end{itemize}
+}
+
+\section{Building Security Culture}
+
+\textbf{Leadership:}
+\begin{itemize}
+    \item Visible management support
+    \item Security in regular meetings
+    \item Adequate training resources
+\end{itemize}
+
+\textbf{Positive Reinforcement:}
+\begin{itemize}
+    \item Reward reporting concerns
+    \item Recognize threat identifiers
+    \item No blame for honest mistakes
+\end{itemize}
+
+\section{Measuring Effectiveness}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.5cm}p{4cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Metric} & \textcolor{white}{\bfseries Description} \\
+\midrule
+Phishing click rate & \% clicking test links \\
+Reporting rate & Concerns reported \\
+Completion rate & Training finished \\
+Assessment scores & Pre/post tests \\
+\end{tabular}
+\end{center}
+
+\section{Compliance Requirements}
+
+\posterinfo{
+\begin{itemize}
+    \item \textbf{IEC 62443-2-1} -- Awareness programs
+    \item \textbf{NERC CIP-004} -- Personnel training
+    \item \textbf{NIST 800-82} -- OT training guidance
+    \item \textbf{NIS2} -- Cybersecurity training
+\end{itemize}
+}
+
+\section{Key Takeaways}
+
+\postersuccess{
+\begin{itemize}
+    \item OT training must cover USB and physical threats
+    \item Tailor content to roles (operators vs engineers)
+    \item Use multiple delivery methods for shift workers
+    \item Build culture through leadership and reinforcement
+    \item Measure with phishing tests and reporting rates
+\end{itemize}
+}
+
+\end{multicols}
+
+\end{document}

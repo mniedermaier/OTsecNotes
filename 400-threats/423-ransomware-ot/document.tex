@@ -1,0 +1,469 @@
+% ============================================================================
+%  423-ransomware-ot - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {Ransomware in OT Environments}
+    {Understanding and Defending Against Industrial Ransomware Attacks}
+    {OT Security Learning Series}
+    {Document 423 \quad|\quad February 2026}
+    {Matthias Niedermaier}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+\begin{infobox}
+Ransomware has evolved from a nuisance targeting individual computers to a critical threat against industrial infrastructure. When ransomware strikes OT environments, the consequences extend beyond data loss to physical safety hazards, environmental damage, and disruption of essential services.
+\end{infobox}
+
+Ransomware attacks against industrial organizations have increased dramatically in recent years. Unlike traditional IT ransomware that primarily impacts data availability, attacks on OT environments can halt production lines, disrupt critical infrastructure, and create safety hazards. The convergence of IT and OT networks has expanded the attack surface, making industrial systems more accessible to ransomware operators.
+
+\section{IT vs OT Ransomware Impact}
+
+The impact of ransomware differs significantly between IT and OT environments:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=5pt, minimum width=5.5cm, minimum height=1cm, align=center, font=\small},
+    header/.style={rectangle, draw, thick, rounded corners=5pt, minimum width=5.5cm, minimum height=1cm, align=center, font=\small\bfseries, fill=#1},
+    impact/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=5cm, minimum height=0.7cm, align=center, font=\footnotesize, fill=#1}
+]
+
+% IT Side
+\node[header=otinfo!30] (itheader) at (-3.5,4) {IT Environment};
+\node[impact=otinfo!10] at (-3.5,3) {Data encrypted/unavailable};
+\node[impact=otinfo!10] at (-3.5,2.1) {Business operations disrupted};
+\node[impact=otinfo!10] at (-3.5,1.2) {Financial losses};
+\node[impact=otinfo!10] at (-3.5,0.3) {Reputation damage};
+\node[impact=otinfo!10] at (-3.5,-0.6) {Recovery: days to weeks};
+
+% OT Side
+\node[header=otdanger!30] (otheader) at (3.5,4) {OT Environment};
+\node[impact=otdanger!10] at (3.5,3) {Production halted};
+\node[impact=otdanger!10] at (3.5,2.1) {Safety systems compromised};
+\node[impact=otdanger!10] at (3.5,1.2) {Physical equipment damage};
+\node[impact=otdanger!10] at (3.5,0.3) {Environmental hazards};
+\node[impact=otdanger!10] at (3.5,-0.6) {Recovery: weeks to months};
+
+% Severity indicator
+\node[font=\footnotesize, text=otinfo] at (-3.5,-1.5) {\faIcon{exclamation-circle} Serious};
+\node[font=\footnotesize, text=otdanger] at (3.5,-1.5) {\faIcon{skull-crossbones} Critical/Life-threatening};
+
+\end{tikzpicture}
+\caption{Comparison of ransomware impact on IT vs OT environments}
+\end{figure}
+
+\begin{dangerbox}
+In OT environments, ransomware can cause physical consequences: halted production, damaged equipment, safety incidents, and even loss of life. The stakes are fundamentally different from traditional IT ransomware.
+\end{dangerbox}
+
+\section{Ransomware Attack Chain in OT}
+
+Understanding how ransomware reaches OT systems is essential for defense:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    phase/.style={rectangle, draw, thick, rounded corners=5pt, minimum width=2.2cm, minimum height=1.8cm, align=center, font=\footnotesize},
+    arrow/.style={->, thick, >=stealth, otprimary},
+    label/.style={font=\scriptsize, align=center}
+]
+
+% Phase boxes
+\node[phase, fill=otinfo!20] (init) at (0,0) {\faIcon{envelope}\\[2pt]\textbf{Initial}\\Access};
+\node[phase, fill=otinfo!30] (exec) at (2.8,0) {\faIcon{cog}\\[2pt]\textbf{Execution}\\Establish};
+\node[phase, fill=otwarning!20] (lateral) at (5.6,0) {\faIcon{project-diagram}\\[2pt]\textbf{Lateral}\\Movement};
+\node[phase, fill=otwarning!30] (recon) at (8.4,0) {\faIcon{search}\\[2pt]\textbf{OT}\\Discovery};
+\node[phase, fill=otdanger!20] (stage) at (11.2,0) {\faIcon{database}\\[2pt]\textbf{Data}\\Exfil};
+\node[phase, fill=otdanger!40] (deploy) at (14,0) {\faIcon{lock}\\[2pt]\textbf{Ransom}\\Deploy};
+
+% Arrows
+\draw[arrow] (init) -- (exec);
+\draw[arrow] (exec) -- (lateral);
+\draw[arrow] (lateral) -- (recon);
+\draw[arrow] (recon) -- (stage);
+\draw[arrow] (stage) -- (deploy);
+
+% Labels below
+\node[label] at (0,-1.5) {Phishing\\VPN exploit\\RDP};
+\node[label] at (2.8,-1.5) {Malware\\C2 setup\\Persistence};
+\node[label] at (5.6,-1.5) {IT to OT\\Credential theft\\Network pivot};
+\node[label] at (8.4,-1.5) {Map ICS\\Find HMIs\\Identify PLCs};
+\node[label] at (11.2,-1.5) {Steal data\\Double extort\\Leverage};
+\node[label] at (14,-1.5) {Encrypt\\Demand\\Deadline};
+
+% Zone indicators
+\draw[dashed, thick, otinfo] (-1,-2.5) -- (4.2,-2.5) node[midway, below, font=\footnotesize] {IT Network};
+\draw[dashed, thick, otdanger] (4.2,-2.5) -- (15,-2.5) node[midway, below, font=\footnotesize] {IT/OT Boundary \& OT Network};
+
+\end{tikzpicture}
+\caption{Typical ransomware attack chain targeting OT environments}
+\end{figure}
+
+\subsection{Attack Phases Explained}
+
+\begin{enumerate}
+    \item \textbf{Initial Access} -- Attackers gain foothold via phishing, exploiting VPN vulnerabilities, or compromised RDP
+    \item \textbf{Execution \& Persistence} -- Malware establishes command and control, creates persistence mechanisms
+    \item \textbf{Lateral Movement} -- Attackers move through IT network, harvest credentials, pivot toward OT
+    \item \textbf{OT Discovery} -- Reconnaissance of industrial systems, identifying HMIs, historians, engineering workstations
+    \item \textbf{Data Exfiltration} -- Stealing sensitive data for double extortion leverage
+    \item \textbf{Ransomware Deployment} -- Encryption of systems, ransom demand issued
+\end{enumerate}
+
+\section{Common Attack Vectors}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    vector/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=3.2cm, minimum height=1cm, align=center, font=\small},
+    pct/.style={circle, draw, thick, minimum size=1.2cm, font=\small\bfseries, fill=#1}
+]
+
+% Attack vectors with percentages
+\node[vector, fill=otdanger!20] (phish) at (0,0) {\faIcon{envelope-open}\\Phishing};
+\node[pct=otdanger!30] at (0,1.5) {35\%};
+
+\node[vector, fill=otwarning!20] (rdp) at (4,0) {\faIcon{desktop}\\Exposed RDP};
+\node[pct=otwarning!30] at (4,1.5) {25\%};
+
+\node[vector, fill=otwarning!20] (vpn) at (8,0) {\faIcon{shield-alt}\\VPN Exploits};
+\node[pct=otwarning!30] at (8,1.5) {20\%};
+
+\node[vector, fill=otinfo!20] (supply) at (12,0) {\faIcon{truck}\\Supply Chain};
+\node[pct=otinfo!30] at (12,1.5) {15\%};
+
+\node[font=\footnotesize, text=gray] at (6,-1.2) {Other vectors (USB, insider, etc.): 5\%};
+
+\end{tikzpicture}
+\caption{Common initial access vectors for OT ransomware (approximate distribution)}
+\end{figure}
+
+\section{Major OT Ransomware Incidents}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    event/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=2.8cm, minimum height=2.2cm, align=center, font=\footnotesize, fill=#1},
+    yearbox/.style={circle, draw, thick, minimum size=0.8cm, font=\scriptsize\bfseries, fill=otprimary!20}
+]
+
+% Timeline line
+\draw[very thick, otprimary!50] (0,0) -- (14,0);
+
+% Events
+\node[event=otwarning!15] (norsk) at (1,1.8) {\textbf{Norsk Hydro}\\LockerGoga\\Aluminum};
+\node[yearbox] at (1,0) {2019};
+\draw[thick, otprimary!50] (1,0.4) -- (1,0.7);
+
+\node[event=otwarning!15] (honda) at (4,1.8) {\textbf{Honda}\\SNAKE\\Automotive};
+\node[yearbox] at (4,0) {2020};
+\draw[thick, otprimary!50] (4,0.4) -- (4,0.7);
+
+\node[event=otdanger!20] (colonial) at (7,1.8) {\textbf{Colonial}\\DarkSide\\Pipeline};
+\node[yearbox] at (7,0) {2021};
+\draw[thick, otprimary!50] (7,0.4) -- (7,0.7);
+
+\node[event=otdanger!20] (jbs) at (10,1.8) {\textbf{JBS Foods}\\REvil\\Food Supply};
+\node[yearbox] at (10,0) {2021};
+\draw[thick, otprimary!50] (10,0.4) -- (10,0.7);
+
+\node[event=otwarning!15] (recent) at (13,1.8) {\textbf{Ongoing}\\Multiple\\All Sectors};
+\node[yearbox] at (13,0) {2024+};
+\draw[thick, otprimary!50] (13,0.4) -- (13,0.7);
+
+\end{tikzpicture}
+\caption{Timeline of significant OT ransomware incidents}
+\end{figure}
+
+\subsection{Colonial Pipeline (2021)}
+
+\begin{warningbox}
+The Colonial Pipeline attack demonstrated how IT ransomware can force OT shutdowns. Although the ransomware only infected IT systems, the company shut down pipeline operations as a precaution, causing fuel shortages across the US East Coast.
+\end{warningbox}
+
+\begin{itemize}
+    \item \textbf{Attack vector:} Compromised VPN credentials (no MFA)
+    \item \textbf{Ransomware:} DarkSide
+    \item \textbf{Impact:} 5,500-mile pipeline shutdown for 6 days
+    \item \textbf{Ransom:} \$4.4 million paid (partially recovered)
+    \item \textbf{Lesson:} IT/OT interdependencies can force OT shutdowns
+\end{itemize}
+
+\subsection{Norsk Hydro (2019)}
+
+\begin{itemize}
+    \item \textbf{Attack vector:} Phishing email with infected attachment
+    \item \textbf{Ransomware:} LockerGoga
+    \item \textbf{Impact:} Global aluminum production halted, manual operations for weeks
+    \item \textbf{Cost:} \$70+ million in losses
+    \item \textbf{Response:} Refused to pay ransom, transparent public communication
+\end{itemize}
+
+\subsection{JBS Foods (2021)}
+
+\begin{itemize}
+    \item \textbf{Attack vector:} Unknown initial access
+    \item \textbf{Ransomware:} REvil
+    \item \textbf{Impact:} Meat processing plants closed in US, Australia, Canada
+    \item \textbf{Ransom:} \$11 million paid
+    \item \textbf{Lesson:} Food supply chain vulnerability to cyber attacks
+\end{itemize}
+
+\section{OT-Specific Ransomware}
+
+While most OT ransomware incidents involve IT-focused malware spreading to OT, some variants specifically target industrial systems:
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.5cm}p{3cm}p{7cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Ransomware} & \textcolor{white}{\bfseries Target} & \textcolor{white}{\bfseries Characteristics} \\
+\midrule
+EKANS/SNAKE & ICS processes & Kills ICS-specific processes before encryption \\
+MegaCortex & Enterprise/OT & Targets domain controllers, spreads to OT \\
+LockerGoga & Industrial & Aggressive encryption, disables network adapters \\
+Ryuk & Enterprise/OT & Big game hunting, targets large organizations \\
+Conti & Critical infra & RaaS model, healthcare and industrial targets \\
+\end{tabular}
+\caption{Ransomware variants that have impacted OT environments}
+\end{table}
+
+\subsection{EKANS/SNAKE Analysis}
+
+\begin{dangerbox}
+EKANS (SNAKE spelled backwards) was the first ransomware designed with ICS awareness. It contains a kill list of industrial processes including GE Proficy, Honeywell HMI, and Fanuc automation software---terminating them before encryption.
+\end{dangerbox}
+
+\section{Defense Strategy}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    layer/.style={rectangle, draw, thick, rounded corners=5pt, minimum width=6cm, minimum height=1cm, align=center, font=\small},
+    arrow/.style={->, thick, >=stealth, gray}
+]
+
+% Defense layers (stacked vertically)
+\node[layer, fill=otdanger!15] (perimeter) at (0,3) {\textbf{Perimeter}};
+\node[layer, fill=otwarning!15] (network) at (0,1.8) {\textbf{Network}};
+\node[layer, fill=otsuccess!15] (endpoint) at (0,0.6) {\textbf{Endpoint}};
+\node[layer, fill=otinfo!15] (data) at (0,-0.6) {\textbf{Data}};
+\node[layer, fill=otprimary!15] (critical) at (0,-1.8) {\textbf{OT Assets}};
+
+% Arrows showing attacker must penetrate layers
+\draw[arrow] (-4,3.8) -- (-4,-2.3) node[midway, left, font=\scriptsize, align=center] {Attacker\\must\\penetrate\\all layers};
+
+% Defense measures (right side)
+\node[font=\scriptsize, align=left, text width=5cm, anchor=west] at (3.5,3) {Firewall/DMZ, VPN + MFA, Email filtering};
+\node[font=\scriptsize, align=left, text width=5cm, anchor=west] at (3.5,1.8) {Segmentation, IDS/IPS, Traffic monitoring};
+\node[font=\scriptsize, align=left, text width=5cm, anchor=west] at (3.5,0.6) {EDR, Application whitelisting, Patching};
+\node[font=\scriptsize, align=left, text width=5cm, anchor=west] at (3.5,-0.6) {Encryption, Access controls, DLP};
+\node[font=\scriptsize, align=left, text width=5cm, anchor=west] at (3.5,-1.8) {Offline backups, Golden images, Air-gap};
+
+\end{tikzpicture}
+\caption{Defense-in-depth strategy for OT ransomware protection}
+\end{figure}
+
+\subsection{Prevention Controls}
+
+\begin{successbox}
+The best defense against ransomware is preventing initial access. Focus on the most common vectors: phishing, exposed RDP, and VPN vulnerabilities.
+\end{successbox}
+
+\textbf{Network Security:}
+\begin{itemize}
+    \item Implement proper IT/OT segmentation with industrial DMZ
+    \item Disable unnecessary RDP; if required, use VPN + MFA
+    \item Deploy email filtering with attachment sandboxing
+    \item Maintain strict firewall rules between zones
+\end{itemize}
+
+\textbf{Endpoint Protection:}
+\begin{itemize}
+    \item Application whitelisting on OT systems
+    \item Endpoint detection and response (EDR) where compatible
+    \item Disable macros in Office documents
+    \item Regular patching of IT systems (prioritize internet-facing)
+\end{itemize}
+
+\textbf{Access Control:}
+\begin{itemize}
+    \item Multi-factor authentication for all remote access
+    \item Privileged access management (PAM)
+    \item Principle of least privilege
+    \item Regular credential rotation
+\end{itemize}
+
+\subsection{Detection Capabilities}
+
+\begin{itemize}
+    \item Network traffic analysis for anomalies
+    \item Monitor for reconnaissance activities
+    \item Alert on lateral movement indicators
+    \item Watch for mass file modifications
+    \item Honeypots and deception technology
+\end{itemize}
+
+\subsection{Backup and Recovery}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=3cm, minimum height=1.5cm, align=center, font=\small},
+    arrow/.style={->, thick, >=stealth}
+]
+
+% 3-2-1 Rule
+\node[box, fill=otsuccess!20] (three) at (0,0) {\textbf{3}\\Copies of data};
+\node[box, fill=otsuccess!20] (two) at (4.5,0) {\textbf{2}\\Different media};
+\node[box, fill=otsuccess!20] (one) at (9,0) {\textbf{1}\\Offsite/offline};
+
+\draw[arrow] (three) -- (two);
+\draw[arrow] (two) -- (one);
+
+% Additional note
+\node[font=\footnotesize, align=center] at (4.5,-1.5) {\textbf{Critical:} Test restoration regularly and keep backups offline/air-gapped};
+
+\end{tikzpicture}
+\caption{The 3-2-1 backup rule for ransomware resilience}
+\end{figure}
+
+\textbf{OT-Specific Backup Considerations:}
+\begin{itemize}
+    \item Backup PLC programs and configurations
+    \item Preserve HMI graphics and setpoints
+    \item Document network configurations
+    \item Store golden images for rapid rebuild
+    \item Test restoration procedures regularly
+\end{itemize}
+
+\section{Incident Response}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    phase/.style={rectangle, draw, thick, rounded corners=5pt, minimum width=2.5cm, minimum height=1.5cm, align=center, font=\small, fill=#1},
+    arrow/.style={->, thick, >=stealth, otprimary}
+]
+
+% Response phases
+\node[phase=otdanger!20] (detect) at (0,0) {\faIcon{search}\\Detect};
+\node[phase=otwarning!20] (contain) at (3.5,0) {\faIcon{shield-alt}\\Contain};
+\node[phase=otinfo!20] (assess) at (7,0) {\faIcon{clipboard-list}\\Assess};
+\node[phase=otsuccess!20] (recover) at (10.5,0) {\faIcon{redo}\\Recover};
+\node[phase=otprimary!10] (learn) at (14,0) {\faIcon{graduation-cap}\\Learn};
+
+\draw[arrow] (detect) -- (contain);
+\draw[arrow] (contain) -- (assess);
+\draw[arrow] (assess) -- (recover);
+\draw[arrow] (recover) -- (learn);
+
+% Key actions
+\node[font=\scriptsize, align=center, text width=2.3cm] at (0,-1.5) {Identify scope\\Alert team\\Preserve logs};
+\node[font=\scriptsize, align=center, text width=2.3cm] at (3.5,-1.5) {Isolate systems\\Block C2\\Protect OT};
+\node[font=\scriptsize, align=center, text width=2.3cm] at (7,-1.5) {Damage eval\\Ransom decision\\Legal/regulatory};
+\node[font=\scriptsize, align=center, text width=2.3cm] at (10.5,-1.5) {Restore backups\\Rebuild systems\\Verify integrity};
+\node[font=\scriptsize, align=center, text width=2.3cm] at (14,-1.5) {Root cause\\Improve defenses\\Update plans};
+
+\end{tikzpicture}
+\caption{OT ransomware incident response phases}
+\end{figure}
+
+\subsection{To Pay or Not to Pay?}
+
+\begin{warningbox}
+The decision to pay ransom is complex and should involve legal, business, and technical considerations. Paying does not guarantee recovery and may fund future attacks.
+\end{warningbox}
+
+\textbf{Considerations against paying:}
+\begin{itemize}
+    \item No guarantee of decryption key
+    \item May fund criminal/terrorist organizations
+    \item Encourages future attacks
+    \item Potential legal implications (sanctions)
+\end{itemize}
+
+\textbf{Considerations for paying:}
+\begin{itemize}
+    \item Safety-critical systems at risk
+    \item No viable backup recovery option
+    \item Cost of downtime exceeds ransom
+    \item Critical infrastructure service restoration
+\end{itemize}
+
+\section{Regulatory Landscape}
+
+Recent regulations have increased reporting requirements for ransomware attacks on critical infrastructure:
+
+\begin{itemize}
+    \item \textbf{CIRCIA (US)} -- 72-hour reporting for critical infrastructure incidents
+    \item \textbf{NIS2 (EU)} -- 24-hour early warning, 72-hour incident report
+    \item \textbf{TSA Security Directives} -- Pipeline cybersecurity requirements
+    \item \textbf{SEC Rules} -- Material cybersecurity incident disclosure
+\end{itemize}
+
+\section{Summary}
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{OT ransomware has physical consequences} -- safety hazards, equipment damage, environmental impact
+    \item \textbf{Most attacks start in IT} and spread to OT through lateral movement
+    \item \textbf{Common vectors:} phishing (35\%), exposed RDP (25\%), VPN exploits (20\%)
+    \item \textbf{Prevention focus:} IT/OT segmentation, MFA, email filtering, patching
+    \item \textbf{Offline backups are critical} -- include PLC programs and configurations
+    \item \textbf{Incident response planning} must address OT-specific considerations
+    \item \textbf{Ransom payment} is a business decision with no guaranteed outcome
+\end{itemize}
+\end{definitionbox}
+
+\section{Further Reading}
+
+\subsection*{Standards and Guidelines}
+\begin{itemize}
+    \item \textbf{CISA Ransomware Guide} -- Best practices for prevention and response\\
+          \url{https://www.cisa.gov/stopransomware}
+    \item \textbf{NIST Cybersecurity Framework} -- Risk management guidance\\
+          \url{https://www.nist.gov/cyberframework}
+\end{itemize}
+
+\subsection*{Resources}
+\begin{itemize}
+    \item \textbf{No More Ransom Project} -- Decryption tools and prevention advice\\
+          \url{https://www.nomoreransom.org/}
+    \item \textbf{CISA ICS Advisories} -- Industrial control system alerts\\
+          \url{https://www.cisa.gov/news-events/ics-advisories}
+\end{itemize}
+
+\subsection*{Reports}
+\begin{itemize}
+    \item Dragos -- \textit{Year in Review: ICS/OT Cybersecurity}
+    \item Mandiant -- \textit{M-Trends Annual Threat Report}
+    \item IBM -- \textit{X-Force Threat Intelligence Index}
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

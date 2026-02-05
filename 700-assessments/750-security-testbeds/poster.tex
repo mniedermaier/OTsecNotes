@@ -1,0 +1,174 @@
+% ============================================================================
+%  750-security-testbeds - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\makepostertitle
+    {Industrial Security Testbeds}
+    {Open-Source Platforms for ICS Security Training}
+    {Poster 750}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{Overview}
+
+Security testbeds provide controlled environments for learning and testing ICS security without risking production systems.
+
+\posterinfo{
+\textbf{Why use testbeds?}
+\begin{itemize}
+    \item Safe environment for attack practice
+    \item No expensive hardware required (virtual)
+    \item Hands-on protocol experience
+    \item CTF and training scenarios
+\end{itemize}
+}
+
+\section{Testbed Comparison}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.8cm}p{1.3cm}p{1.1cm}p{2.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Testbed} & \textcolor{white}{\bfseries License} & \textcolor{white}{\bfseries Type} & \textcolor{white}{\bfseries Protocols} \\
+\midrule
+CybICS & MIT & Virtual/Phys & Modbus, OPC-UA, S7, DNP3, ENIP \\
+Labshock & Propri.* & Virtual & Modbus, S7comm \\
+GRFICSv3 & GPL & Virtual & Modbus, ENIP \\
+LICSTER & MIT & Physical & Modbus \\
+MiniCPS & MIT & Virtual & Modbus, ENIP \\
+VirtuaPlant & MIT & Virtual & Modbus \\
+DVCP & Academic & Virtual & Custom \\
+ICSSIM & OSS & Virtual & Modbus, DNP3 \\
+\end{tabular}
+\end{center}
+
+\section{CybICS}
+
+\postersuccess{
+\textbf{Most comprehensive protocol coverage}
+\begin{itemize}
+    \item 5 protocols: Modbus, OPC-UA, S7comm, DNP3, EtherNet/IP
+    \item 13+ training modules with CTF challenges
+    \item Docker or Raspberry Pi + STM32 deployment
+\end{itemize}
+\url{github.com/mniedermaier/CybICS}
+}
+
+\section{Labshock}
+
+\posterwarning{Proprietary with limited free tier -- not fully open source.}
+
+Fast setup OT security lab with built-in ELK Stack:
+\begin{itemize}
+    \item Real industrial protocols and telemetry
+    \item Pentest Fury offensive module
+    \item Pre-configured Kibana dashboards
+    \item Min: 2 CPU, 2GB RAM, 10GB disk
+\end{itemize}
+\url{github.com/zakharb/labshock}
+
+\section{GRFICS}
+
+\posterinfo{
+\textbf{3D visualization of attack impact}
+\begin{itemize}
+    \item Unity game engine graphics
+    \item Chemical reactor simulation
+    \item 5 VirtualBox VMs (v2) or simplified (v3)
+    \item Includes OpenPLC, AdvancedHMI
+\end{itemize}
+}
+
+\section{LICSTER}
+
+\posterwarning{
+\textbf{Physical hardware required (\texteuro500)}
+\begin{itemize}
+    \item Multiple Raspberry Pi boards
+    \item Real I/O modules and timing
+    \item Pre-built attack scenarios
+    \item 3D-printed enclosure available
+\end{itemize}
+\url{github.com/thainnos/LICSTER}
+}
+
+\section{Selection Guide}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.8cm}p{4cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Need} & \textcolor{white}{\bfseries Recommendation} \\
+\midrule
+\$0 budget & CybICS, Labshock, GRFICS, MiniCPS \\
+Multiple protocols & CybICS (5 protocols) \\
+3D visualization & GRFICS (Unity) \\
+Physical realism & LICSTER, CybICS (hybrid) \\
+CTF training & CybICS (built-in) \\
+Chemical process & DVCP-TE, DVCP-VAM \\
+Quick start & Labshock (Docker) \\
+\end{tabular}
+\end{center}
+
+\section{Additional Testbeds}
+
+\textbf{MiniCPS} -- CPS simulation on Mininet\\
+\url{github.com/scy-phy/minicps}
+
+\textbf{VirtuaPlant} -- Python-based with 2D physics\\
+\url{github.com/jseidl/virtuaplant}
+
+\textbf{DVCP} -- Chemical process models (MATLAB)\\
+\url{github.com/satejnik/DVCP-TE}
+
+\textbf{ICSSIM} -- Docker-based ICS simulation\\
+\url{github.com/AlirezaDehlaghi/ICSSIM}
+
+\section{Deployment Types}
+
+\posterinfo{
+\textbf{Virtual} -- Docker/VMs, zero cost, quick setup\\
+\textbf{Hybrid} -- Software + optional hardware\\
+\textbf{Physical} -- Real equipment, realistic timing
+}
+
+\section{Resources}
+
+\textbf{Curated Lists:}
+\begin{itemize}
+    \item Awesome ICS Security:\\
+          \url{github.com/hslatman/awesome-industrial-control-system-security}
+    \item ICS Security Tools:\\
+          \url{github.com/ITI/ICS-Security-Tools}
+\end{itemize}
+
+\section{Key Takeaways}
+
+\postersuccess{
+\begin{itemize}
+    \item Virtual testbeds are free and easy to deploy
+    \item CybICS offers most protocol variety
+    \item GRFICS excels at visualizing attack impact
+    \item LICSTER provides best physical realism
+    \item Most use MIT/GPL licenses (*Labshock: proprietary)
+\end{itemize}
+}
+
+\end{multicols}
+
+\end{document}

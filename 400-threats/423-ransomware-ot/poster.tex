@@ -1,0 +1,192 @@
+% ============================================================================
+%  423-ransomware-ot - Poster / Cheat Sheet
+% ============================================================================
+
+\documentclass[9pt,a4paper]{extarticle}
+\usepackage{otsec-poster}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\makepostertitle
+    {Ransomware in OT Environments}
+    {Understanding and Defending Industrial Systems}
+    {Poster 423}
+    {Matthias Niedermaier}
+
+\begin{multicols}{2}
+
+\section{IT vs OT Impact}
+
+\begin{center}
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=3.2cm, minimum height=0.5cm, align=center, font=\scriptsize, fill=#1}
+]
+\node[font=\scriptsize\bfseries] at (-1.7,1.2) {IT};
+\node[font=\scriptsize\bfseries] at (1.7,1.2) {OT};
+
+\node[box=otinfo!15] at (-1.7,0.7) {Data loss};
+\node[box=otdanger!20] at (1.7,0.7) {Production halt};
+
+\node[box=otinfo!15] at (-1.7,0.1) {Financial loss};
+\node[box=otdanger!20] at (1.7,0.1) {Safety hazards};
+
+\node[box=otinfo!15] at (-1.7,-0.5) {Days recovery};
+\node[box=otdanger!20] at (1.7,-0.5) {Weeks/months};
+\end{tikzpicture}
+\end{center}
+
+\section{Attack Chain}
+
+\begin{center}
+\begin{tikzpicture}[
+    phase/.style={rectangle, draw, thick, rounded corners=2pt, minimum width=1.1cm, minimum height=0.7cm, align=center, font=\tiny, fill=#1},
+    arrow/.style={->, thick, >=stealth, otprimary}
+]
+\node[phase=otinfo!20] (a) at (0,0) {Initial\\Access};
+\node[phase=otinfo!30] (b) at (1.4,0) {Lateral\\Move};
+\node[phase=otwarning!20] (c) at (2.8,0) {OT\\Recon};
+\node[phase=otdanger!30] (d) at (4.2,0) {Deploy\\Ransom};
+
+\draw[arrow] (a) -- (b);
+\draw[arrow] (b) -- (c);
+\draw[arrow] (c) -- (d);
+\end{tikzpicture}
+\end{center}
+
+\section{Attack Vectors}
+
+\posterdanger{
+\begin{itemize}
+    \item \textbf{Phishing} -- 35\% of attacks
+    \item \textbf{Exposed RDP} -- 25\%
+    \item \textbf{VPN Exploits} -- 20\%
+    \item \textbf{Supply Chain} -- 15\%
+\end{itemize}
+}
+
+\section{Major Incidents}
+
+\begin{center}
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{1.8cm}p{1.3cm}p{3.2cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Victim} & \textcolor{white}{\bfseries Year} & \textcolor{white}{\bfseries Impact} \\
+\midrule
+Colonial Pipeline & 2021 & 6-day fuel shortage \\
+Norsk Hydro & 2019 & \$70M+ losses \\
+JBS Foods & 2021 & \$11M ransom paid \\
+Honda & 2020 & Global production halt \\
+\end{tabular}
+\end{center}
+
+\section{OT-Aware Ransomware}
+
+\posterwarning{
+\textbf{EKANS/SNAKE} -- First ICS-aware ransomware
+\begin{itemize}
+    \item Kills industrial processes before encrypting
+    \item Targets: GE Proficy, Honeywell HMI, Fanuc
+\end{itemize}
+}
+
+\section{Prevention}
+
+\postersuccess{
+\textbf{Network:}
+\begin{itemize}
+    \item IT/OT segmentation with DMZ
+    \item Disable/secure RDP
+    \item Email filtering + sandboxing
+\end{itemize}
+\textbf{Endpoint:}
+\begin{itemize}
+    \item Application whitelisting
+    \item EDR where compatible
+    \item Regular patching
+\end{itemize}
+\textbf{Access:}
+\begin{itemize}
+    \item MFA on all remote access
+    \item Privileged access management
+    \item Least privilege principle
+\end{itemize}
+}
+
+\section{3-2-1 Backup Rule}
+
+\begin{center}
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=2pt, minimum width=1.8cm, minimum height=0.6cm, align=center, font=\scriptsize, fill=otsuccess!20}
+]
+\node[box] (a) at (0,0) {\textbf{3} Copies};
+\node[box] (b) at (2.2,0) {\textbf{2} Media};
+\node[box] (c) at (4.4,0) {\textbf{1} Offsite};
+\draw[->, thick] (a) -- (b);
+\draw[->, thick] (b) -- (c);
+\end{tikzpicture}
+\end{center}
+
+\textbf{OT Backups:} PLC programs, HMI configs, network settings, golden images
+
+\section{Incident Response}
+
+\posterinfo{
+\begin{enumerate}
+    \item \textbf{Detect} -- Identify scope, preserve logs
+    \item \textbf{Contain} -- Isolate systems, protect OT
+    \item \textbf{Assess} -- Evaluate damage, legal review
+    \item \textbf{Recover} -- Restore from backups
+    \item \textbf{Learn} -- Root cause, improve defenses
+\end{enumerate}
+}
+
+\section{To Pay or Not?}
+
+\posterwarning{
+\textbf{Against:} No guarantee, funds criminals, legal risk\\
+\textbf{For:} Safety-critical systems, no backup option\\
+\textbf{Decision:} Involve legal, business, and technical teams
+}
+
+\section{Detection Signs}
+
+\begin{itemize}
+    \item Unusual network scanning activity
+    \item Mass file modifications
+    \item Disabled security tools
+    \item Unauthorized lateral movement
+    \item Unexpected process termination
+\end{itemize}
+
+\section{Reporting Requirements}
+
+\begin{itemize}
+    \item \textbf{CIRCIA (US):} 72-hour reporting
+    \item \textbf{NIS2 (EU):} 24h warning, 72h report
+    \item \textbf{TSA Directives:} Pipeline specific
+\end{itemize}
+
+\section{Key Takeaways}
+
+\postersuccess{
+\begin{itemize}
+    \item OT ransomware causes physical consequences
+    \item Most attacks start in IT, spread to OT
+    \item Focus: segmentation, MFA, offline backups
+    \item Include PLC/HMI configs in backups
+    \item Plan incident response before attack
+\end{itemize}
+}
+
+\end{multicols}
+
+\end{document}

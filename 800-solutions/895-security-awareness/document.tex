@@ -1,0 +1,374 @@
+% ============================================================================
+%  895-security-awareness - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {Security Awareness Training for OT}
+    {Building a Human Firewall in Industrial Environments}
+    {OT Security Learning Series}
+    {Document 895 \quad|\quad February 2026}
+    {Matthias Niedermaier}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+\begin{infobox}
+Security awareness training in OT environments must address the unique challenges of industrial settings, where personnel interact with both cyber and physical systems. Effective training transforms employees from potential vulnerabilities into active defenders of critical infrastructure.
+\end{infobox}
+
+Human factors remain one of the most significant vulnerabilities in OT security. While technical controls are essential, they cannot prevent all attacks---especially those targeting personnel through social engineering, phishing, or manipulation. Security awareness training bridges this gap by equipping staff with the knowledge and skills to recognize and respond to threats.
+
+\subsection{Why OT-Specific Training Matters}
+
+OT environments differ significantly from traditional IT settings:
+
+\begin{itemize}
+    \item \textbf{Safety implications} -- Security incidents can cause physical harm
+    \item \textbf{Different threat landscape} -- USB-based attacks, physical access, and insider threats are critical vectors, especially for isolated systems
+    \item \textbf{Diverse workforce} -- Operators, engineers, and contractors have varying technical backgrounds
+    \item \textbf{Legacy systems} -- Many systems lack modern security features
+    \item \textbf{24/7 operations} -- Training must accommodate shift workers
+\end{itemize}
+
+\section{IT vs OT Security Awareness}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{4cm}p{4.5cm}p{4.5cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Aspect} & \textcolor{white}{\bfseries IT Focus} & \textcolor{white}{\bfseries OT Focus} \\
+\midrule
+Primary concern & Data confidentiality & Safety and availability \\
+Common threats & Email phishing, malware & Phishing, USB, physical access \\
+Attack impact & Data breach, financial loss & Physical damage, safety hazards \\
+User base & Office workers & Operators, engineers, technicians \\
+Training delivery & Online modules, email & Hands-on, shift-based sessions \\
+Compliance drivers & GDPR, PCI-DSS & IEC 62443, NERC CIP \\
+\end{tabular}
+\caption{Key differences between IT and OT security awareness}
+\end{table}
+
+\section{Key Training Topics}
+
+\subsection{Social Engineering}
+
+\begin{warningbox}
+Social engineering attacks exploit human psychology rather than technical vulnerabilities. In OT environments, attackers may pose as vendors, contractors, or support personnel to gain physical or logical access.
+\end{warningbox}
+
+Training should cover:
+\begin{itemize}
+    \item \textbf{Pretexting} -- Attackers creating false scenarios to extract information
+    \item \textbf{Tailgating} -- Following authorized personnel into secure areas
+    \item \textbf{Impersonation} -- Posing as vendors, auditors, or IT support
+    \item \textbf{Phone-based attacks} -- Vishing (voice phishing) targeting control rooms
+    \item \textbf{Verification procedures} -- How to validate identities and requests
+\end{itemize}
+
+\subsection{Phishing and Email Security}
+
+Phishing is the leading initial access vector for ransomware attacks (approximately 35\% of incidents). While OT networks may be isolated, many personnel have access to both IT and OT systems, making phishing a primary threat:
+
+\begin{itemize}
+    \item Recognizing suspicious emails and links
+    \item Spear-phishing targeting specific roles (e.g., control engineers)
+    \item Reporting procedures for suspected phishing
+    \item Safe handling of attachments
+\end{itemize}
+
+\subsection{Removable Media Threats}
+
+\begin{dangerbox}
+USB devices are a critical attack vector for targeting air-gapped OT networks. Stuxnet spread via infected USB drives, demonstrating how removable media can bypass network isolation. While USB accounts for a smaller percentage of overall ransomware attacks, it remains essential for targeted attacks on isolated systems.
+\end{dangerbox}
+
+Training must emphasize:
+\begin{itemize}
+    \item Never using unknown or untrusted USB devices
+    \item Following media scanning procedures before use
+    \item Understanding the risks of ``USB drop'' attacks
+    \item Proper handling of vendor-provided media
+    \item Using only approved, encrypted devices
+\end{itemize}
+
+\subsection{Physical Security}
+
+OT security extends beyond cyber threats:
+
+\begin{itemize}
+    \item \textbf{Access control} -- Badge usage, door security, visitor management
+    \item \textbf{Clean desk policy} -- Protecting sensitive documents and credentials
+    \item \textbf{Device security} -- Locking workstations, securing portable equipment
+    \item \textbf{Photography restrictions} -- Preventing reconnaissance
+    \item \textbf{Reporting suspicious activity} -- What to report and to whom
+\end{itemize}
+
+\subsection{Password and Authentication}
+
+\begin{itemize}
+    \item Creating strong, unique passwords
+    \item Never sharing credentials (even with colleagues)
+    \item Understanding shared account risks in control rooms
+    \item Multi-factor authentication where available
+    \item Recognizing credential harvesting attempts
+\end{itemize}
+
+\subsection{Incident Recognition and Reporting}
+
+Personnel should know how to:
+\begin{itemize}
+    \item Recognize signs of a security incident
+    \item Distinguish between safety and security events
+    \item Report incidents through proper channels
+    \item Preserve evidence without disrupting operations
+    \item Understand their role in incident response
+\end{itemize}
+
+\section{Role-Based Training}
+
+Different roles require tailored training content:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=4cm, minimum height=1.5cm, align=center, font=\small},
+    arrow/.style={->, thick, >=stealth}
+]
+
+% Role boxes
+\node[box, fill=otinfo!20] (ops) at (0,0) {\textbf{Operators}\\\small Shift workers\\Control room staff};
+\node[box, fill=otsuccess!20] (eng) at (5.5,0) {\textbf{Engineers}\\\small Control engineers\\Maintenance staff};
+\node[box, fill=otwarning!20] (mgmt) at (11,0) {\textbf{Management}\\\small Plant managers\\Security leaders};
+
+% Training focus
+\node[font=\footnotesize, text width=3.5cm, align=center] at (0,-2) {Incident recognition\\Physical security\\USB handling\\Social engineering};
+\node[font=\footnotesize, text width=3.5cm, align=center] at (5.5,-2) {Secure configuration\\Vendor management\\Remote access\\Change control};
+\node[font=\footnotesize, text width=3.5cm, align=center] at (11,-2) {Risk awareness\\Policy compliance\\Resource allocation\\Incident oversight};
+
+\end{tikzpicture}
+\caption{Role-based training focus areas}
+\end{figure}
+
+\subsection{Operators and Technicians}
+
+\begin{itemize}
+    \item Focus on daily operational security practices
+    \item Hands-on scenarios relevant to their work environment
+    \item Clear, simple procedures for reporting
+    \item Emphasis on safety-security relationship
+\end{itemize}
+
+\subsection{Engineers and Technical Staff}
+
+\begin{itemize}
+    \item Deeper technical content on attack methods
+    \item Secure engineering practices
+    \item Vendor and third-party risk management
+    \item Secure remote access procedures
+\end{itemize}
+
+\subsection{Management and Supervisors}
+
+\begin{itemize}
+    \item Risk management and business impact
+    \item Regulatory compliance requirements
+    \item Resource allocation for security
+    \item Leading by example and fostering security culture
+\end{itemize}
+
+\subsection{Contractors and Vendors}
+
+\begin{successbox}
+Third parties often have privileged access to OT systems. They must receive security awareness training before accessing your environment, covering your specific policies and procedures.
+\end{successbox}
+
+\section{Training Delivery Methods}
+
+\subsection{Classroom Training}
+
+Traditional instructor-led sessions work well for:
+\begin{itemize}
+    \item Initial onboarding of new employees
+    \item Complex topics requiring discussion
+    \item Building team awareness and culture
+    \item Hands-on exercises with equipment
+\end{itemize}
+
+\subsection{Online/E-Learning}
+
+Digital training modules offer:
+\begin{itemize}
+    \item Flexibility for shift workers
+    \item Consistent content delivery
+    \item Progress tracking and documentation
+    \item Cost-effective refresher training
+\end{itemize}
+
+\subsection{Hands-On Exercises}
+
+Practical exercises reinforce learning:
+\begin{itemize}
+    \item Simulated phishing campaigns
+    \item Physical security walkthroughs
+    \item USB drop tests
+    \item Tabletop exercises
+\end{itemize}
+
+\subsection{Just-In-Time Training}
+
+Brief, targeted training at the point of need:
+\begin{itemize}
+    \item Quick reminders before high-risk activities
+    \item Toolbox talks during shift handovers
+    \item Posters and visual aids in control rooms
+    \item Security tips in regular communications
+\end{itemize}
+
+\section{Building a Security Culture}
+
+\begin{tipbox}
+A strong security culture means employees naturally consider security in their daily decisions, without needing constant reminders or enforcement.
+\end{tipbox}
+
+\subsection{Leadership Commitment}
+
+\begin{itemize}
+    \item Visible support from plant management
+    \item Security discussed in regular meetings
+    \item Adequate resources for training programs
+    \item Recognition of security-conscious behavior
+\end{itemize}
+
+\subsection{Positive Reinforcement}
+
+\begin{itemize}
+    \item Reward reporting of security concerns
+    \item Recognize employees who identify threats
+    \item Avoid blame culture for honest mistakes
+    \item Celebrate security achievements
+\end{itemize}
+
+\subsection{Continuous Communication}
+
+\begin{itemize}
+    \item Regular security updates and newsletters
+    \item Share relevant incidents (anonymized)
+    \item Post security reminders in visible locations
+    \item Include security in operational briefings
+\end{itemize}
+
+\section{Measuring Effectiveness}
+
+\subsection{Key Metrics}
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{5cm}p{8cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Metric} & \textcolor{white}{\bfseries Description} \\
+\midrule
+Phishing click rate & Percentage clicking simulated phishing links \\
+Reporting rate & Number of security concerns reported \\
+Training completion & Percentage completing required training \\
+Time to report & Average time to report incidents \\
+Assessment scores & Pre/post training knowledge tests \\
+Policy compliance & Adherence to security policies \\
+\end{tabular}
+\caption{Security awareness program metrics}
+\end{table}
+
+\subsection{Continuous Improvement}
+
+\begin{itemize}
+    \item Regular assessment of training effectiveness
+    \item Update content based on emerging threats
+    \item Gather feedback from participants
+    \item Benchmark against industry standards
+    \item Adjust frequency based on results
+\end{itemize}
+
+\section{Compliance Considerations}
+
+Several standards require security awareness training:
+
+\begin{itemize}
+    \item \textbf{IEC 62443-2-1} -- Requires security awareness and training programs
+    \item \textbf{NERC CIP-004} -- Mandates personnel risk assessment and training
+    \item \textbf{NIST SP 800-82} -- Recommends OT-specific awareness training
+    \item \textbf{NIS2 Directive} -- Requires cybersecurity training for essential entities
+\end{itemize}
+
+\section{Implementation Roadmap}
+
+\begin{enumerate}
+    \item \textbf{Assess current state} -- Evaluate existing awareness levels and training
+    \item \textbf{Identify requirements} -- Determine compliance and organizational needs
+    \item \textbf{Develop content} -- Create OT-specific training materials
+    \item \textbf{Pilot program} -- Test with a small group and gather feedback
+    \item \textbf{Roll out} -- Deploy to all personnel with role-based tracks
+    \item \textbf{Measure and improve} -- Track metrics and continuously enhance
+\end{enumerate}
+
+\section{Summary}
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{OT-specific training} is essential---generic IT awareness is insufficient
+    \item \textbf{USB and physical security} are critical topics often overlooked in IT training
+    \item \textbf{Role-based content} ensures relevance for operators, engineers, and management
+    \item \textbf{Multiple delivery methods} accommodate shift work and diverse learning styles
+    \item \textbf{Security culture} requires leadership commitment and positive reinforcement
+    \item \textbf{Measure effectiveness} through phishing tests, reporting rates, and assessments
+\end{itemize}
+\end{definitionbox}
+
+\section{Further Reading}
+
+\subsection*{Standards and Guidelines}
+\begin{itemize}
+    \item \textbf{IEC 62443-2-1} -- Security program requirements for IACS\\
+          \url{https://webstore.iec.ch/publication/7030}
+    \item \textbf{NIST SP 800-50} -- Building an IT Security Awareness and Training Program\\
+          \url{https://csrc.nist.gov/pubs/sp/800/50/final}
+\end{itemize}
+
+\subsection*{Resources}
+\begin{itemize}
+    \item \textbf{SANS Security Awareness} -- Resources and training materials\\
+          \url{https://www.sans.org/security-awareness-training/}
+    \item \textbf{CISA Industrial Control Systems} -- Training and resources\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+\end{itemize}
+
+\subsection*{Books}
+\begin{itemize}
+    \item Hadnagy, C. -- \textit{Social Engineering: The Science of Human Hacking} (Wiley)
+    \item Mitnick, K. -- \textit{The Art of Deception} (Wiley)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}

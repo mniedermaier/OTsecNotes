@@ -1,0 +1,391 @@
+% ============================================================================
+%  750-security-testbeds - OT Security Learning Resource
+% ============================================================================
+
+\documentclass[11pt,a4paper]{article}
+\usepackage{otsec-template}
+\usepackage{float}
+
+% Define colors for TikZ
+\colorlet{otprimary}{primary}
+\colorlet{otaccent}{accent}
+\colorlet{otsuccess}{success}
+\colorlet{otwarning}{warning}
+\colorlet{otdanger}{danger}
+\colorlet{otinfo}{info}
+
+\begin{document}
+
+\maketitlepage
+    {Industrial Security Testbeds}
+    {Open-Source Platforms for ICS Security Training and Research}
+    {OT Security Learning Series}
+    {Document 750 \quad|\quad February 2026}
+    {Matthias Niedermaier}
+
+\tableofcontents
+\newpage
+
+\section{Introduction}
+
+\begin{infobox}
+Industrial security testbeds provide controlled environments for learning, researching, and testing security techniques on Industrial Control Systems (ICS) without risking production systems. These platforms range from fully virtual solutions to physical hardware setups, enabling hands-on experience with real industrial protocols and attack scenarios.
+\end{infobox}
+
+Understanding ICS security requires practical experience with industrial protocols, control systems, and attack techniques. However, access to real industrial equipment is often limited due to:
+
+\begin{itemize}
+    \item \textbf{High costs} -- Industrial PLCs and SCADA systems are expensive
+    \item \textbf{Safety concerns} -- Testing on production systems can cause physical damage
+    \item \textbf{Availability} -- Industrial environments are not easily accessible for training
+    \item \textbf{Complexity} -- Setting up realistic environments requires specialized knowledge
+\end{itemize}
+
+Security testbeds address these challenges by providing safe, accessible, and often free platforms for developing ICS security skills.
+
+\section{Testbed Categories}
+
+Industrial security testbeds can be categorized based on their deployment model:
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw, thick, rounded corners=3pt, minimum width=3.5cm, minimum height=1.2cm, align=center, font=\small},
+    arrow/.style={->, thick, >=stealth}
+]
+
+% Category boxes
+\node[box, fill=otinfo!20] (virtual) at (0,0) {\textbf{Virtual}\\\small Docker, VMs};
+\node[box, fill=otsuccess!20] (hybrid) at (5,0) {\textbf{Hybrid}\\\small Virtual + Hardware};
+\node[box, fill=otwarning!20] (physical) at (10,0) {\textbf{Physical}\\\small Real Hardware};
+
+% Examples
+\node[font=\footnotesize, text width=3cm, align=center] at (0,-2) {Labshock\\GRFICS\\MiniCPS\\VirtuaPlant\\CybICS};
+\node[font=\footnotesize, text width=3cm, align=center] at (5,-2) {CybICS\\ICSSIM};
+\node[font=\footnotesize, text width=3cm, align=center] at (10,-2) {LICSTER\\SWaT};
+
+% Cost indicators
+\node[font=\scriptsize, fill=otsuccess!30, rounded corners] at (0,1.2) {Free};
+\node[font=\scriptsize, fill=otwarning!30, rounded corners] at (5,1.2) {Low Cost};
+\node[font=\scriptsize, fill=otdanger!30, rounded corners] at (10,1.2) {\$\$\$};
+
+\end{tikzpicture}
+\caption{Testbed deployment categories and cost implications}
+\end{figure}
+
+\subsection{Virtual Testbeds}
+
+Virtual testbeds run entirely in software using Docker containers or virtual machines. They offer:
+\begin{itemize}
+    \item Zero hardware cost
+    \item Quick deployment and teardown
+    \item Easy sharing and reproducibility
+    \item Limited physical process realism
+\end{itemize}
+
+\subsection{Physical Testbeds}
+
+Physical testbeds use real hardware components and provide:
+\begin{itemize}
+    \item Realistic timing and behavior
+    \item Experience with actual industrial equipment
+    \item Better understanding of physical consequences
+    \item Higher cost and maintenance requirements
+\end{itemize}
+
+\subsection{Hybrid Testbeds}
+
+Hybrid solutions combine virtual environments with optional physical hardware integration, offering flexibility between cost and realism.
+
+\section{Testbed Comparison}
+
+The following table compares major open-source ICS security testbeds:
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{2.5cm}p{2cm}p{2cm}p{2cm}p{4cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Testbed} & \textcolor{white}{\bfseries License} & \textcolor{white}{\bfseries Cost} & \textcolor{white}{\bfseries Type} & \textcolor{white}{\bfseries Protocols} \\
+\midrule
+CybICS & MIT & Free & Virtual/Physical & Modbus, OPC-UA, S7comm, DNP3, EtherNet/IP \\
+Labshock & Proprietary & Free (limited) & Virtual & Modbus, S7comm \\
+GRFICSv3 & GPL & Free & Virtual & Modbus, EtherNet/IP \\
+LICSTER & MIT & \texteuro500 & Physical & Modbus \\
+MiniCPS & MIT & Free & Virtual & Modbus, EtherNet/IP \\
+VirtuaPlant & MIT & Free & Virtual & Modbus \\
+DVCP & Academic & Free & Virtual & Custom \\
+ICSSIM & Open Source & Free & Virtual & Modbus, DNP3 \\
+\end{tabular}
+\caption{Testbed comparison overview}
+\end{table}
+
+\section{Detailed Testbed Descriptions}
+
+\subsection{CybICS}
+
+\begin{successbox}
+CybICS is a comprehensive open-source training platform for ICS security with support for multiple industrial protocols and flexible deployment options.
+\end{successbox}
+
+\textbf{Repository:} \url{https://github.com/mniedermaier/CybICS}
+
+\textbf{Key Features:}
+\begin{itemize}
+    \item Physical process simulation (gas pressure control system)
+    \item Multiple protocol support: Modbus TCP, OPC-UA, S7comm, DNP3, EtherNet/IP
+    \item 13+ hands-on training modules
+    \item Integrated CTF challenges
+    \item Web interface with real-time statistics and network monitoring
+    \item Browser-based VNC access to Kali Linux and engineering workstation
+\end{itemize}
+
+\textbf{Deployment Options:}
+\begin{itemize}
+    \item \textbf{Virtual:} Docker Compose environment
+    \item \textbf{Physical:} Raspberry Pi + STM32 microcontroller setup
+\end{itemize}
+
+\textbf{Use Cases:} Education, penetration testing training, security research, CTF competitions.
+
+\subsection{Labshock}
+
+\textbf{Repository:} \url{https://github.com/zakharb/labshock}
+
+\begin{warningbox}
+Labshock is proprietary software with a limited free tier. It is not fully open source. The free version has restrictions on features and usage.
+\end{warningbox}
+
+\textbf{Key Features:}
+\begin{itemize}
+    \item Practical OT security laboratory environment
+    \item Real industrial protocols and telemetry
+    \item Built-in ELK Stack for log analysis
+    \item Pentest Fury offensive module for ICS/OT networks
+    \item Pre-configured Kibana dashboards
+\end{itemize}
+
+\textbf{Requirements:}
+\begin{itemize}
+    \item Minimum: CPU 2 cores, 2GB RAM, 10GB storage
+    \item Recommended: CPU 4 cores, 8GB RAM, 20GB storage
+    \item Docker installation required
+\end{itemize}
+
+\textbf{Use Cases:} Universities, OT Red/Blue teams, SIEM rule development and testing.
+
+\subsection{GRFICS (Graphical Realism Framework for ICS)}
+
+\textbf{Repository:} \url{https://github.com/Fortiphyd/GRFICSv2} (v2) \\
+\textbf{Repository:} \url{https://github.com/mrideout/GRFICSv3} (v3)
+
+\begin{infobox}
+GRFICS uses Unity 3D game engine graphics to visualize the physical impact of cyber attacks on industrial processes, making it easier to understand attack consequences.
+\end{infobox}
+
+\textbf{Architecture (GRFICSv2):}
+\begin{itemize}
+    \item 3D simulation VM (Unity-based visualization)
+    \item Soft PLC VM (OpenPLC)
+    \item HMI VM (AdvancedHMI)
+    \item pfSense firewall VM
+    \item Workstation VM (attack platform)
+\end{itemize}
+
+\textbf{GRFICSv3 Changes:}
+\begin{itemize}
+    \item Removed pfSense VM
+    \item Upgraded workstation to Ubuntu 20.04 with pre-installed attack tools
+    \item Merged ICS and DMZ networks
+\end{itemize}
+
+\textbf{Simulated Process:} Chemical reactor with mixing tank, maintaining safe operation parameters.
+
+\textbf{Attack Scenarios:} Command injection, man-in-the-middle, buffer overflows.
+
+\subsection{LICSTER (Low-cost ICS Security Testbed)}
+
+\textbf{Repository:} \url{https://github.com/thainnos/LICSTER}
+
+\begin{warningbox}
+LICSTER requires purchasing physical hardware (approximately \texteuro500) but provides the most realistic hands-on experience with actual industrial components.
+\end{warningbox}
+
+\textbf{Hardware Components:}
+\begin{itemize}
+    \item Multiple Raspberry Pi boards
+    \item Physical I/O modules
+    \item Network switches
+    \item Optional 3D-printed enclosure
+\end{itemize}
+
+\textbf{Features:}
+\begin{itemize}
+    \item Real hardware for realistic timing behavior
+    \item Pre-built attack scenarios (DoS, flooding, replay)
+    \item Ready-to-use SD card images
+    \item Detailed assembly instructions
+\end{itemize}
+
+\textbf{Target Audience:} Students, researchers, and anyone wanting hands-on experience with physical ICS components.
+
+\subsection{MiniCPS}
+
+\textbf{Repository:} \url{https://github.com/scy-phy/minicps}
+
+MiniCPS is a framework for Cyber-Physical Systems real-time simulation built on top of Mininet.
+
+\textbf{Features:}
+\begin{itemize}
+    \item Physical process simulation
+    \item Control device emulation
+    \item Network emulation using Mininet
+    \item Support for Modbus/TCP and EtherNet/IP
+    \item Python 3.6 based
+\end{itemize}
+
+\textbf{Use Cases:} Academic research, network security experiments, CPS simulation.
+
+\subsection{VirtuaPlant}
+
+\textbf{Repository:} \url{https://github.com/jseidl/virtuaplant}
+
+VirtuaPlant adds real-world control logic to basic PLC simulators, combined with a 2D physics engine for visualization.
+
+\textbf{Features:}
+\begin{itemize}
+    \item GUI visualization of control processes
+    \item Written entirely in Python
+    \item Modular design for different plant types
+    \item Initial release: bottle-filling factory with Modbus
+\end{itemize}
+
+\begin{tipbox}
+VirtuaPlant is archived but remains a useful learning resource for understanding basic ICS concepts and Modbus protocol interactions.
+\end{tipbox}
+
+\subsection{DVCP (Damn Vulnerable Chemical Process)}
+
+\textbf{Repository (TE):} \url{https://github.com/satejnik/DVCP-TE} \\
+\textbf{Repository (VAM):} \url{https://github.com/satejnik/DVCP-VAM}
+
+DVCP provides realistic chemical process simulations for studying cyber-physical attacks.
+
+\textbf{Variants:}
+\begin{itemize}
+    \item \textbf{DVCP-TE:} Tennessee Eastman process model
+    \item \textbf{DVCP-VAM:} Vinyl Acetate Monomer process model
+\end{itemize}
+
+\textbf{Requirements:}
+\begin{itemize}
+    \item MATLAB/Simulink
+    \item Process models written in C-code
+\end{itemize}
+
+\textbf{Availability:} Free for universities, students, and research institutions.
+
+\subsection{ICSSIM}
+
+\textbf{Repository:} \url{https://github.com/AlirezaDehlaghi/ICSSIM}
+
+ICSSIM enables building virtual ICS security testbeds using Docker container technology.
+
+\textbf{Features:}
+\begin{itemize}
+    \item Runs on separate private OS kernels
+    \item Realistic network emulation
+    \item Customizable to specific needs
+    \item Can simulate various processes (e.g., bottle filling)
+\end{itemize}
+
+\section{Selecting a Testbed}
+
+Consider the following factors when choosing a testbed:
+
+\begin{table}[H]
+\centering
+\small
+\rowcolors{2}{lightgray}{white}
+\begin{tabular}{p{3.5cm}p{9cm}}
+\rowcolor{primary}
+\textcolor{white}{\bfseries Factor} & \textcolor{white}{\bfseries Recommendation} \\
+\midrule
+\textbf{Budget: \$0} & CybICS, Labshock, GRFICS, MiniCPS, VirtuaPlant \\
+\textbf{Multiple protocols} & CybICS (5 protocols), ICSSIM \\
+\textbf{3D visualization} & GRFICS (Unity-based) \\
+\textbf{Physical realism} & LICSTER (hardware), CybICS (hybrid option) \\
+\textbf{CTF training} & CybICS (built-in challenges) \\
+\textbf{Chemical processes} & DVCP-TE, DVCP-VAM \\
+\textbf{Academic research} & MiniCPS, DVCP, SWaT datasets \\
+\textbf{Quick start} & Labshock, CybICS (Docker) \\
+\end{tabular}
+\caption{Testbed selection guide by use case}
+\end{table}
+
+\section{Additional Resources}
+
+\subsection{Curated Lists}
+
+\begin{itemize}
+    \item \textbf{Awesome ICS Security} -- Comprehensive resource list\\
+          \url{https://github.com/hslatman/awesome-industrial-control-system-security}
+    \item \textbf{ICS Security Tools} -- Testbed and tool collection\\
+          \url{https://github.com/ITI/ICS-Security-Tools}
+\end{itemize}
+
+\subsection{Datasets}
+
+For machine learning and detection research, several testbeds provide datasets:
+
+\begin{itemize}
+    \item \textbf{SWaT Dataset} -- Secure Water Treatment attack data (iTrust)
+    \item \textbf{HAI Dataset} -- HIL-based Augmented ICS Security Dataset\\
+          \url{https://github.com/icsdataset/hai}
+\end{itemize}
+
+\section{Summary}
+
+\begin{definitionbox}{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Virtual testbeds} (Labshock, GRFICS, MiniCPS) offer zero-cost entry into ICS security training
+    \item \textbf{CybICS} provides the most comprehensive protocol coverage with flexible deployment
+    \item \textbf{LICSTER} offers the most realistic experience with actual hardware (\texteuro500)
+    \item \textbf{GRFICS} excels at visualizing attack impact through 3D simulation
+    \item \textbf{Most testbeds are open-source} with MIT or GPL licenses (Labshock is proprietary with limited free tier)
+    \item Choose based on your budget, required protocols, and learning objectives
+\end{itemize}
+\end{definitionbox}
+
+\section{Further Reading}
+
+\subsection*{Standards and Guidelines}
+\begin{itemize}
+    \item \textbf{NIST SP 800-82} -- Guide to ICS Security\\
+          \url{https://csrc.nist.gov/pubs/sp/800/82/r3/final}
+    \item \textbf{IEC 62443} -- Industrial Automation and Control Systems Security\\
+          \url{https://webstore.iec.ch/publication/7029}
+\end{itemize}
+
+\subsection*{Resources}
+\begin{itemize}
+    \item \textbf{SANS ICS Security} -- Training and resources\\
+          \url{https://www.sans.org/cyber-security-courses/ics-scada-cyber-security-essentials/}
+    \item \textbf{CISA ICS Resources} -- Government guidance\\
+          \url{https://www.cisa.gov/topics/industrial-control-systems}
+\end{itemize}
+
+\subsection*{Research Papers}
+\begin{itemize}
+    \item Formby, D. and Rad, R. -- \textit{Lowering the Barriers to Industrial Control System Security with GRFICS}
+    \item Antonioli, D. et al. -- \textit{MiniCPS: A Toolkit for Security Research on CPS Networks}
+    \item Sauer, F., Niedermaier, M. et al. -- \textit{LICSTER: A Low-cost ICS Security Testbed for Education and Research} (2019)
+\end{itemize}
+
+\vfill
+\begin{center}
+\textit{Part of the OT Security Learning Series}
+\end{center}
+
+\end{document}
